@@ -13,6 +13,7 @@ import { useUsage } from '../contexts/UsageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { analyzeText } from '../App'; // Adjust the path if needed
 import AnalysisLegend from '../components/AnalysisLegend';
+import HighlightLyrics from '../components/HighlightLyrics';
 
 const Analysis: React.FC = () => {
   const [text, setText] = useState('');
@@ -105,15 +106,26 @@ const Analysis: React.FC = () => {
 
         {/* Results section */}
         {results && (
-          <>
-            <Paper sx={{ p: 3, mt: 3 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: { xs: 'column', md: 'row' },
+              gap: 4,
+              alignItems: 'flex-start',
+              mt: 3,
+            }}
+          >
+            <Paper sx={{ p: 3, flex: 2, minWidth: 0 }}>
               <Typography variant="h5" gutterBottom>Analysis Output</Typography>
-              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(results, null, 2)}</pre>
+              {/* Highlighted lyrics */}
+              <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '1.1rem', lineHeight: 1.7 }}>
+                <HighlightLyrics lyrics={text} patterns={results} />
+              </Box>
             </Paper>
-            {results.rhyme_details && results.rhyme_details.length > 0 && (
-              <AnalysisLegend rhymeGroups={results.rhyme_details} />
-            )}
-          </>
+            <Box sx={{ flex: 1, minWidth: 220 }}>
+              <AnalysisLegend patterns={results} />
+            </Box>
+          </Box>
         )}
       </Box>
     </Container>
