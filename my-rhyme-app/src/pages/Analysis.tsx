@@ -119,11 +119,11 @@ const Analysis: React.FC = () => {
               <Typography variant="h5" gutterBottom>Analysis Output</Typography>
               {/* Highlighted lyrics */}
               <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '1.1rem', lineHeight: 1.7 }}>
-                <HighlightLyrics lyrics={text} patterns={results} />
+                <HighlightLyrics lyrics={text} patterns={Array.isArray(results) ? results : []} />
               </Box>
             </Paper>
             <Box sx={{ flex: 1, minWidth: 220 }}>
-              <AnalysisLegend patterns={results} />
+              <AnalysisLegend patterns={Array.isArray(results) ? results : []} />
             </Box>
           </Box>
         )}
