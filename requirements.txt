@@ -1,0 +1,8 @@
+flask
+anthropic
+python-dotenv
+gunicorn
+flask-cors
+flask-limiter
+flask-caching
+python-json-logger

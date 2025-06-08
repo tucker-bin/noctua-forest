@@ -1,0 +1,23 @@
+
+.email-input-text {
+    margin-top: 20px;
+    padding: 20px 20px;
+    border: 2px solid #dddFcF; /* Darker blue border */
+    border-radius: 8px;
+    background-color: #e0f2F8; /* Light blue */
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: 60px;
+    line-height: 1.8;
+    font-size: 0.9em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Added subtle shadow */
+}
+
+.analysis-legend {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px solid #B4e3b4; /* Darker green border */
+    border-radius: 8px;
+    background-color: #d0f0d0; /* Light green */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Added subtle shadow */
+}

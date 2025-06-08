@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Rhyme Finder</title>
+    <!-- We will fix this link in the next stage -->
+    <link rel="stylesheet" href="{{ url_for('serve_assets', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Advanced Rhyme Finder</h1>
+
+        <div class="input-method-toggle">
+            <button id="toggleText" class="active">Paste Text</button>
+            <button id="toggleUrl">Fetch from Genius URL</button>
+        </div>
+
+        <div id="textInputArea">
+            <p>Paste your text below or switch to URL input.</p>
+            <textarea id="textInput" rows="12" placeholder="Enter your poem, lyrics, or text here..."></textarea>
+        </div>
+        <div id="urlInputArea" style="display:none;">
+            <p>Paste a Genius.com lyrics page URL.</p>
+            <input type="url" id="geniusUrlInput" placeholder="https://genius.com/artist/song-lyrics">
+        </div>
+
+        <div class="options">
+            <label for="rhymeScheme">Analysis Style:</label>
+            <select id="rhymeScheme">
+                <option value="general">General Rhymes (Default)</option>
+                <option value="perfect">Perfect Rhymes</option>
+                <option value="slant">Slant Rhymes / Near Rhymes</option>
+                <option value="assonance">Assonance (Vowel Rhyme)</option>
+                <option value="consonance">Consonance (Consonant Rhyme)</option>
+                <option value="alliteration">Alliteration (Initial Sounds)</option>
+                <option value="combined_all">Combined (Max Highlighting)</option>
+                </select>
+        </div>
+
+        <button id="findRhymesButton">Find Rhymes</button>
+
+        <div id="loadingIndicator" style="display:none;">
+            <div class="spinner"></div>
+            <p id="loadingMessage">Analyzing... Please wait.</p>
+        </div>
+
+        <h2>Result:</h2>
+        <div id="resultArea" class="result-text">
+            </div>
+        <div id="errorMessage" class="error-message" style="display:none;"></div>
+    </div>
+    <!-- We will fix this link in a later stage -->
+    <script src="{{ url_for('serve_assets', filename='script.js') }}"></script>
+</body>
+</html>

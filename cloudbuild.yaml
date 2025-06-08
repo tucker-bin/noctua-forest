@@ -1,0 +1,67 @@
+options:
+  logging: CLOUD_LOGGING_ONLY
+steps:
+  # Step 1: Install frontend dependencies
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['install']
+    dir: 'my-rhyme-app' # Run npm install in the my-rhyme-app directory
+    id: 'Install Frontend Dependencies'
+
+  # Step 2: Build the frontend application
+  - name: 'gcr.io/cloud-builders/npm'
+    args: ['run', 'build']
+    dir: 'my-rhyme-app' # Run npm run build in the my-rhyme-app directory
+    id: 'Build Frontend'
+    waitFor: ['Install Frontend Dependencies']
+
+  # Step 3: Deploy to Firebase Hosting
+  # This step assumes your firebase.json is in the my-rhyme-app directory
+  # and configured to use the 'dist' folder (which it is).
+  - name: 'gcr.io/firebase/firebase'
+    args: ['deploy', '--only', 'hosting', '--project', '${PROJECT_ID}']
+    dir: 'my-rhyme-app' # Run firebase deploy from the my-rhyme-app directory
+    id: 'Deploy to Firebase Hosting'
+    waitFor: ['Build Frontend']
+
+  # Step 4: Build Docker Image for the backend
+  # This step runs from the root project directory where your Dockerfile is located.
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-py:$BUILD_ID'
+      - '.' # Docker build context is the root
+    id: 'Build Docker Image'
+    # This can run in parallel with frontend steps if desired, or wait for them.
+    # For simplicity, placing it here implies it runs after or parallel to some frontend steps,
+    # depending on Cloud Build's optimization. If strict ordering is needed before backend build, adjust waitFor.
+
+  # Step 5: Push Image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-py:$BUILD_ID'
+    id: 'Push Image to Artifact Registry'
+    waitFor: ['Build Docker Image']
+
+  # Step 6: Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'my-rhyme-app-py'
+      - '--image'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-py:$BUILD_ID'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-secrets=ANTHROPIC_API_KEY=apikey:latest'
+    id: 'Deploy to Cloud Run'
+    waitFor: ['Push Image to Artifact Registry', 'Deploy to Firebase Hosting'] # Wait for both frontend and backend image push
+
+images:
+  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-py:$BUILD_ID'
+timeout: '1800s' # Increased timeout to 30 minutes
