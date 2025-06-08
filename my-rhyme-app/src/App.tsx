@@ -32,7 +32,7 @@ const Analysis = React.lazy(() => import('./pages/Analysis'));
 const API_BASE_URL = '';
 
 // Real API call function
-const analyzeText = async (text: string): Promise<AnalysisData> => {
+export const analyzeText = async (text: string): Promise<AnalysisData> => {
     try {
         const response = await fetch(`${API_BASE_URL}/api/analyze`, {
             method: 'POST',

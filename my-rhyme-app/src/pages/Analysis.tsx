@@ -11,11 +11,14 @@ import {
 } from '@mui/material';
 import { useUsage } from '../contexts/UsageContext';
 import { useAuth } from '../contexts/AuthContext';
+import { analyzeText } from '../App'; // Adjust the path if needed
+import AnalysisLegend from '../components/AnalysisLegend';
 
 const Analysis: React.FC = () => {
   const [text, setText] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [results, setResults] = useState<any>(null);
   const { usageInfo, recordAnalysis } = useUsage();
   const { currentUser } = useAuth();
 
@@ -44,15 +47,11 @@ const Analysis: React.FC = () => {
     setError(null);
 
     try {
-      // Simulate analysis
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      // Call the backend API
+      const analysisResults = await analyzeText(text);
+      setResults(analysisResults);
       // Record the analysis
       await recordAnalysis(text.length);
-      
-      // TODO: Implement actual analysis logic
-      console.log('Analyzing text:', text);
-      
     } catch (err) {
       setError('Analysis failed. Please try again.');
       console.error('Analysis error:', err);
@@ -104,7 +103,18 @@ const Analysis: React.FC = () => {
           </Box>
         </Paper>
 
-        {/* Results section will be added here */}
+        {/* Results section */}
+        {results && (
+          <>
+            <Paper sx={{ p: 3, mt: 3 }}>
+              <Typography variant="h5" gutterBottom>Analysis Output</Typography>
+              <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{JSON.stringify(results, null, 2)}</pre>
+            </Paper>
+            {results.rhyme_details && results.rhyme_details.length > 0 && (
+              <AnalysisLegend rhymeGroups={results.rhyme_details} />
+            )}
+          </>
+        )}
       </Box>
     </Container>
   );
