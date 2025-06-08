@@ -51,10 +51,17 @@ function flattenSegments(patterns: HighlightLyricsProps['patterns']): Segment[] 
 }
 
 const HighlightLyrics: React.FC<HighlightLyricsProps> = ({ lyrics, patterns }) => {
+  console.log('HighlightLyrics patterns:', patterns);
   if (!patterns || patterns.length === 0) return <span>{lyrics}</span>;
-  const segments = flattenSegments(patterns);
+  const segments = flattenSegments(patterns).filter(seg =>
+    seg.globalStartIndex >= 0 &&
+    seg.globalEndIndex < lyrics.length &&
+    seg.globalStartIndex <= seg.globalEndIndex
+  );
+  console.log('Highlight segments:', segments, 'Lyrics:', lyrics);
   const output: React.ReactNode[] = [];
   let lastIdx = 0;
+  let highlightCount = 0;
 
   for (const seg of segments) {
     // Add text before the segment
@@ -70,17 +77,27 @@ const HighlightLyrics: React.FC<HighlightLyricsProps> = ({ lyrics, patterns }) =
           borderRadius: 3,
           padding: '0 2px',
           color: '#222',
+          border: '2px solid #000',
+          fontWeight: 'bold',
+          fontSize: '1.1em',
         }}
-        title={seg.phonetic_link_id}
+        title={
+          `${seg.phonetic_link_id} [${seg.globalStartIndex},${seg.globalEndIndex}] "${lyrics.slice(seg.globalStartIndex, seg.globalEndIndex + 1)}"`
+        }
       >
         {lyrics.slice(seg.globalStartIndex, seg.globalEndIndex + 1)}
       </span>
     );
     lastIdx = seg.globalEndIndex + 1;
+    highlightCount++;
   }
   // Add any remaining text
   if (lastIdx < lyrics.length) {
     output.push(lyrics.slice(lastIdx));
+  }
+  if (patterns.length > 0 && highlightCount === 0) {
+    console.warn('HighlightLyrics: Patterns present but no highlights rendered. Check segment indices and input text.');
+    return <span style={{ color: 'red', fontWeight: 'bold' }}>No highlights rendered. Check segment indices and input text.</span>;
   }
   return <span>{output}</span>;
 };
