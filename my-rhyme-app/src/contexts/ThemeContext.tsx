@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { createAppTheme } from '../theme';
+import { theme } from '../theme';
 
 interface ThemeContextType {
   isDarkMode: boolean;
@@ -37,14 +37,22 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     setIsDarkMode(prev => !prev);
   };
 
-  const theme = createAppTheme(isDarkMode ? 'dark' : 'light');
+  const value = useMemo(() => ({ isDarkMode, toggleDarkMode }), [isDarkMode, toggleDarkMode]);
 
   return (
-    <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
+    <ThemeContext.Provider value={value}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         {children}
       </MuiThemeProvider>
     </ThemeContext.Provider>
   );
+};
+
+export const useThemeContext = () => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useThemeContext must be used within a ThemeProvider');
+  }
+  return context;
 }; 
