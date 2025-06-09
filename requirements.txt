@@ -1,5 +1,6 @@
 flask>=2.2.5
 werkzeug>=2.2.5
+firebase-admin
 flask-cors==3.0.10
 flask-limiter==2.4.0
 flask-caching==1.10.1
