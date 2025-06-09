@@ -16,4 +16,14 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1000,
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://my-rhyme-app-py-487322724536.us-central1.run.app',
+        changeOrigin: true,
+        secure: false, // Set to true if your backend uses a valid SSL certificate
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+      },
+    },
+  },
 })

@@ -8,6 +8,8 @@ const Analysis = React.lazy(() => import('./pages/Analysis'));
 const AuthFormComponent = React.lazy(() => import('./components/AuthFormComponent'));
 const AccountsPage = React.lazy(() => import('./pages/AccountsPage'));
 const SubscriptionPlansPage = React.lazy(() => import('./pages/SubscriptionPlansPage'));
+const Profile = React.lazy(() => import('./pages/Profile'));
+const Admin = React.lazy(() => import('./pages/Admin'));
 
 const AppRoutes: React.FC = () => {
   const authCtx = useContext(AuthContext);
@@ -62,6 +64,8 @@ const AppRoutes: React.FC = () => {
           path="/subscription"
           element={currentUser ? <SubscriptionPlansPage /> : <Navigate to="/login" replace />}
         />
+        <Route path="/profile" element={currentUser ? <Profile /> : <Navigate to="/login" replace />} />
+        <Route path="/admin" element={currentUser && authCtx?.isAdmin ? <Admin /> : <Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </React.Suspense>

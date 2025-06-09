@@ -14,6 +14,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { analyzeText } from '../App'; // Adjust the path if needed
 import AnalysisLegend from '../components/AnalysisLegend';
 import HighlightLyrics from '../components/HighlightLyrics';
+import AnalysisResultsCard from '../components/AnalysisResultsCard';
 
 const Analysis: React.FC = () => {
   const [text, setText] = useState('');
@@ -60,6 +61,9 @@ const Analysis: React.FC = () => {
       setIsAnalyzing(false);
     }
   };
+
+  // Debug log for results
+  console.log('Analysis results:', results);
 
   return (
     <Container maxWidth="md">
@@ -119,14 +123,15 @@ const Analysis: React.FC = () => {
               <Typography variant="h5" gutterBottom>Analysis Output</Typography>
               {/* Highlighted lyrics */}
               <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '1.1rem', lineHeight: 1.7 }}>
-                <HighlightLyrics lyrics={text} patterns={Array.isArray(results) ? results : []} />
+                <HighlightLyrics lyrics={results?.original_text || text} patterns={Array.isArray(results?.rhyme_details) ? results.rhyme_details : []} />
               </Box>
             </Paper>
             <Box sx={{ flex: 1, minWidth: 220 }}>
-              <AnalysisLegend patterns={Array.isArray(results) ? results : []} />
+              <AnalysisLegend patterns={Array.isArray(results?.rhyme_details) ? results.rhyme_details : []} />
             </Box>
           </Box>
         )}
+        {results && <AnalysisResultsCard />}
       </Box>
     </Container>
   );

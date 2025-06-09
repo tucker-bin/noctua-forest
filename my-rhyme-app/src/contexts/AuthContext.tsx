@@ -9,10 +9,12 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
+  isAdmin: boolean;
   signInAnon: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
@@ -36,16 +38,28 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const auth = getAuth();
+  const db = getFirestore();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       setLoading(false);
+      if (user && !user.isAnonymous) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          setIsAdmin(!!userDoc.exists() && !!userDoc.data()?.admin);
+        } catch (e) {
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
       console.log('Auth state changed:', user);
     });
     return unsubscribe;
-  }, [auth]);
+  }, [auth, db]);
 
   const signInAnon = async () => {
     try {
@@ -86,6 +100,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value = {
     currentUser,
     loading,
+    isAdmin,
     signInAnon,
     login,
     signup,

@@ -73,3 +73,7 @@ Thumbs.db
 
 # User-added
 old_app/
+
+# Ignore Firebase Admin SDK keys and secrets
+my-rhyme-app-firebase-adminsdk-*.json
+secrets/

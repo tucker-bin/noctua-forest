@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
     Box,
     TextField,
@@ -15,10 +15,12 @@ import {
     Stack,
     IconButton,
     Tooltip,
+    LinearProgress,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import InfoIcon from '@mui/icons-material/Info';
+import debounce from 'lodash/debounce';
 
 export interface AnalysisData {
     original_text: string;
@@ -44,6 +46,9 @@ interface RhymeAnalysisToolProps {
     tokenBalance?: number;
 }
 
+const BATCH_SIZE = 1000; // Characters per batch
+const DEBOUNCE_DELAY = 500; // ms
+
 const RhymeAnalysisTool: React.FC<RhymeAnalysisToolProps> = ({
     onSubmit,
     results,
@@ -53,13 +58,44 @@ const RhymeAnalysisTool: React.FC<RhymeAnalysisToolProps> = ({
     tokenBalance,
 }) => {
     const [text, setText] = useState('');
+    const [debouncedText, setDebouncedText] = useState('');
     const [copySuccess, setCopySuccess] = useState<string | null>(null);
+    const [batchProgress, setBatchProgress] = useState(0);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+    // Debounced text update
+    const debouncedSetText = useCallback(
+        debounce((value: string) => {
+            setDebouncedText(value);
+        }, DEBOUNCE_DELAY),
+        []
+    );
+
+    useEffect(() => {
+        debouncedSetText(text);
+        return () => {
+            debouncedSetText.cancel();
+        };
+    }, [text, debouncedSetText]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (text.trim()) {
+        if (!text.trim()) return;
+
+        // Split text into batches if it's too long
+        if (text.length > BATCH_SIZE) {
+            const batches = [];
+            for (let i = 0; i < text.length; i += BATCH_SIZE) {
+                batches.push(text.slice(i, i + BATCH_SIZE));
+            }
+
+            setBatchProgress(0);
+            for (let i = 0; i < batches.length; i++) {
+                await onSubmit(batches[i]);
+                setBatchProgress(((i + 1) / batches.length) * 100);
+            }
+        } else {
             await onSubmit(text);
         }
     };
@@ -184,6 +220,15 @@ const RhymeAnalysisTool: React.FC<RhymeAnalysisToolProps> = ({
                                 {isLoading ? 'Analyzing...' : 'Break Down My Rhymes'}
                             </Button>
                         </Box>
+
+                        {isLoading && batchProgress > 0 && (
+                            <Box sx={{ width: '100%', mt: 2 }}>
+                                <LinearProgress variant="determinate" value={batchProgress} />
+                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                    Processing batch {Math.ceil(batchProgress / 100)} of {Math.ceil(text.length / BATCH_SIZE)}
+                                </Typography>
+                            </Box>
+                        )}
                     </Stack>
                 </form>
             </Paper>
