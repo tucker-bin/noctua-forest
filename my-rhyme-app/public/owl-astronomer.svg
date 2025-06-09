@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Telescope -->
+  <path d="M60 20L80 40L40 40L60 20Z" fill="#FFD700" stroke="#2B3A67" stroke-width="2"/>
+  <path d="M40 40L80 40L75 60L45 60L40 40Z" fill="#2B3A67" stroke="#FFD700" stroke-width="2"/>
+  
+  <!-- Owl Body -->
+  <circle cx="60" cy="70" r="30" fill="#2B3A67" stroke="#FFD700" stroke-width="2"/>
+  
+  <!-- Eyes -->
+  <circle cx="45" cy="65" r="8" fill="#FFD700"/>
+  <circle cx="75" cy="65" r="8" fill="#FFD700"/>
+  <circle cx="45" cy="65" r="4" fill="#2B3A67"/>
+  <circle cx="75" cy="65" r="4" fill="#2B3A67"/>
+  
+  <!-- Beak -->
+  <path d="M55 75L65 75L60 85L55 75Z" fill="#FFD700"/>
+  
+  <!-- Wings -->
+  <path d="M30 70C30 70 40 60 60 70C80 80 90 70 90 70" stroke="#FFD700" stroke-width="2" fill="none"/>
+  
+  <!-- Space Helmet -->
+  <circle cx="60" cy="50" r="35" fill="none" stroke="#FFD700" stroke-width="2" stroke-dasharray="4 4"/>
+</svg> 

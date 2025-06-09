@@ -1,105 +1,131 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  CardActions,
-} from '@mui/material';
+import { Box, Typography, Button, Paper } from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import {
-  Analytics as AnalyticsIcon,
-  Speed as SpeedIcon,
-  School as SchoolIcon,
-} from '@mui/icons-material';
+import { Layout } from '../components/Layout';
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(4),
+  background: 'rgba(26, 37, 71, 0.8)',
+  backdropFilter: 'blur(10px)',
+  border: '1px solid rgba(255, 215, 0, 0.2)',
+  borderRadius: theme.shape.borderRadius,
+  textAlign: 'center',
+}));
+
+const FeatureCard = styled(motion.div)(({ theme }) => ({
+  padding: theme.spacing(3),
+  background: 'rgba(43, 58, 103, 0.5)',
+  borderRadius: theme.shape.borderRadius,
+  border: '1px solid rgba(255, 215, 0, 0.1)',
+  textAlign: 'center',
+}));
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
 
   const features = [
     {
-      title: 'Advanced Analysis',
-      description: 'Get detailed insights into your rhyme patterns and poetic techniques.',
-      icon: <AnalyticsIcon sx={{ fontSize: 40 }} />,
+      title: 'Discover Patterns',
+      description: 'Uncover the hidden patterns in your favorite songs and poems',
     },
     {
-      title: 'Real-time Processing',
-      description: 'Instant feedback on your writing with our powerful analysis engine.',
-      icon: <SpeedIcon sx={{ fontSize: 40 }} />,
+      title: 'Learn & Create',
+      description: 'Understand rhyme schemes and create your own masterpieces',
     },
     {
-      title: 'Learn & Improve',
-      description: 'Understand your writing style and discover new techniques.',
-      icon: <SchoolIcon sx={{ fontSize: 40 }} />,
+      title: 'Share & Connect',
+      description: 'Share your discoveries with the community',
     },
   ];
 
   return (
-    <Container maxWidth="lg">
-      <Box sx={{ mt: 8, mb: 6, textAlign: 'center' }}>
-        <Typography variant="h2" component="h1" gutterBottom>
-          Welcome to Rhyme App
-        </Typography>
-        <Typography variant="h5" color="text.secondary" paragraph>
-          Your AI-powered poetry analysis companion
-        </Typography>
-        <Button
-          variant="contained"
-          size="large"
-          onClick={() => navigate('/analysis')}
-          sx={{ mt: 2 }}
-        >
-          Start Analyzing
-        </Button>
-      </Box>
+    <Layout
+      owlMessage="Welcome to the Rhyme Observatory! Let's explore the patterns in your favorite songs and poems."
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <StyledPaper elevation={3}>
+          <Typography
+            variant="h3"
+            component="h1"
+            sx={{
+              color: 'secondary.main',
+              fontFamily: '"Space Grotesk", sans-serif',
+              marginBottom: 2,
+            }}
+          >
+            Welcome to Rhyme Observatory
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              color: 'text.secondary',
+              marginBottom: 4,
+            }}
+          >
+            Discover the patterns in your favorite songs and poems
+          </Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="large"
+            onClick={() => navigate('/analyze')}
+            sx={{
+              fontFamily: '"Space Grotesk", sans-serif',
+              padding: '12px 32px',
+            }}
+          >
+            Start Analyzing
+          </Button>
+        </StyledPaper>
+      </motion.div>
 
-      <Grid container spacing={4} sx={{ mb: 8 }}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gap: 3,
+          mt: 6,
+        }}
+      >
         {features.map((feature, index) => (
-          <Grid item xs={12} md={4} key={index}>
-            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-              <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-                <Box sx={{ color: 'primary.main', mb: 2 }}>{feature.icon}</Box>
-                <Typography gutterBottom variant="h5" component="h2">
-                  {feature.title}
-                </Typography>
-                <Typography color="text.secondary">
-                  {feature.description}
-                </Typography>
-              </CardContent>
-              <CardActions sx={{ justifyContent: 'center', pb: 2 }}>
-                <Button
-                  size="small"
-                  color="primary"
-                  onClick={() => navigate('/analysis')}
-                >
-                  Learn More
-                </Button>
-              </CardActions>
-            </Card>
-          </Grid>
+          <FeatureCard
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.2 }}
+            whileHover={{
+              scale: 1.05,
+              boxShadow: '0 4px 20px rgba(255, 215, 0, 0.1)',
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{
+                color: 'secondary.main',
+                fontFamily: '"Space Grotesk", sans-serif',
+                marginBottom: 2,
+              }}
+            >
+              {feature.title}
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
+              {feature.description}
+            </Typography>
+          </FeatureCard>
         ))}
-      </Grid>
-
-      <Box sx={{ textAlign: 'center', mb: 8 }}>
-        <Typography variant="h4" gutterBottom>
-          Ready to elevate your poetry?
-        </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
-          Join thousands of poets who use Rhyme App to improve their craft
-        </Typography>
-        <Button
-          variant="contained"
-          size="large"
-          onClick={() => navigate('/analysis')}
-          sx={{ mt: 2 }}
-        >
-          Get Started Now
-        </Button>
       </Box>
-    </Container>
+    </Layout>
   );
 };
 

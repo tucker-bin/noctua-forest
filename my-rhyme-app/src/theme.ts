@@ -1,75 +1,129 @@
 import { createTheme } from '@mui/material/styles';
-import type { ThemeOptions } from '@mui/material/styles';
 
-const getThemeOptions = (mode: 'light' | 'dark'): ThemeOptions => ({
+export const theme = createTheme({
   palette: {
-    mode,
+    mode: 'dark',
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
+      main: '#2B3A67', // Deep space blue
+      light: '#3B4A77',
+      dark: '#1B2A57',
     },
     secondary: {
-      main: '#9c27b0',
-      light: '#ba68c8',
-      dark: '#7b1fa2',
+      main: '#FFD700', // Stellar gold
+      light: '#FFE44D',
+      dark: '#CCAC00',
     },
     background: {
-      default: mode === 'light' ? '#f5f5f5' : '#121212',
-      paper: mode === 'light' ? '#ffffff' : '#1e1e1e',
+      default: '#0A1128', // Night sky
+      paper: '#1A2547', // Deep space
     },
     text: {
-      primary: mode === 'light' ? 'rgba(0, 0, 0, 0.87)' : '#ffffff',
-      secondary: mode === 'light' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+      primary: '#FFFFFF',
+      secondary: '#B8C6DB',
+    },
+    success: {
+      main: '#4CAF50',
+      light: '#81C784',
+      dark: '#388E3C',
+    },
+    error: {
+      main: '#F44336',
+      light: '#E57373',
+      dark: '#D32F2F',
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
-      fontSize: '2.5rem',
-      fontWeight: 500,
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 700,
     },
     h2: {
-      fontSize: '2rem',
-      fontWeight: 500,
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 700,
     },
     h3: {
-      fontSize: '1.75rem',
-      fontWeight: 500,
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 600,
     },
     h4: {
-      fontSize: '1.5rem',
-      fontWeight: 500,
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 600,
     },
     h5: {
-      fontSize: '1.25rem',
+      fontFamily: '"Space Grotesk", sans-serif',
       fontWeight: 500,
     },
     h6: {
-      fontSize: '1rem',
+      fontFamily: '"Space Grotesk", sans-serif',
       fontWeight: 500,
     },
+    body1: {
+      fontFamily: '"Inter", sans-serif',
+      fontSize: '1rem',
+      lineHeight: 1.5,
+    },
+    body2: {
+      fontFamily: '"Inter", sans-serif',
+      fontSize: '0.875rem',
+      lineHeight: 1.43,
+    },
+    button: {
+      fontFamily: '"Space Grotesk", sans-serif',
+      fontWeight: 500,
+      textTransform: 'none',
+    },
+  },
+  shape: {
+    borderRadius: 12,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          textTransform: 'none',
           borderRadius: 8,
+          padding: '8px 24px',
+        },
+        contained: {
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: '0 4px 20px rgba(255, 215, 0, 0.2)',
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          boxShadow: mode === 'light' 
-            ? '0 2px 4px rgba(0,0,0,0.1)'
-            : '0 2px 4px rgba(0,0,0,0.2)',
+          background: 'rgba(26, 37, 71, 0.8)',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255, 215, 0, 0.2)',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: 'rgba(255, 215, 0, 0.2)',
+            },
+            '&:hover fieldset': {
+              borderColor: 'rgba(255, 215, 0, 0.4)',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: '#FFD700',
+            },
+          },
         },
       },
     },
   },
-});
-
-export const createAppTheme = (mode: 'light' | 'dark') => createTheme(getThemeOptions(mode)); 
+}); 

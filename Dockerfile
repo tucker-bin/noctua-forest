@@ -18,7 +18,7 @@ COPY my-rhyme-app ./
 RUN npm run build
 
 # Stage 2: Python application
-FROM python:3.9-slim
+FROM python:3.10-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED True

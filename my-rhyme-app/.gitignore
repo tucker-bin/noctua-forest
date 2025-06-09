@@ -23,6 +23,21 @@ dist-ssr
 *.sln
 *.sw?
 
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+
+# Secrets
+secrets/
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!tsconfig.*.json
+!firebase.json
+!firestore.rules
+!firestore.indexes.json
+
 # Ignore Firebase Admin SDK keys and secrets
 my-rhyme-app-firebase-adminsdk-*.json
-secrets/

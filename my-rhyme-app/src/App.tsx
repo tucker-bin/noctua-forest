@@ -19,6 +19,7 @@ import Drawer from './components/Drawer';
 import UsageDashboard from './components/UsageDashboard';
 import Navbar from './components/Navbar';
 import { useUsage } from './contexts/UsageContext';
+import { theme } from './theme';
 
 // Lazy load components
 const AuthFormComponent = lazy(() => import('./components/AuthFormComponent'));
@@ -455,13 +456,21 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
     return (
-        <Router>
-            <AuthProvider>
-                <UsageProvider>
-                    <AppContent />
-                </UsageProvider>
-            </AuthProvider>
-        </Router>
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Router>
+                <Box
+                    className="star-field"
+                    sx={{
+                        minHeight: '100vh',
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
+                >
+                    <AppRoutes />
+                </Box>
+            </Router>
+        </ThemeProvider>
     );
 };
 
