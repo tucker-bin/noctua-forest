@@ -36,7 +36,8 @@
 ---
 
 ## 🖼️ Screenshots
-> _Add your screenshots here!_
+![image](https://github.com/user-attachments/assets/02859c7f-2ae5-4f0b-93e1-bcc0c140aacd)
+
 
 ---
 
