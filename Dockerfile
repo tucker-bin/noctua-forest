@@ -52,7 +52,5 @@ CMD exec gunicorn \
     --threads 8 \
     --timeout 120 \
     --worker-class gthread \
-    --access-logfile /var/log/app/access.log \
-    --error-logfile /var/log/app/error.log \
     --log-level info \
     app:app
