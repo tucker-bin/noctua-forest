@@ -80,7 +80,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'my-rhyme-app-py'
+      - 'my-rhyme-app'
       - '--image'
       - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-py:$BUILD_ID'
       - '--region'
@@ -90,7 +90,7 @@ steps:
       - '--allow-unauthenticated'
       - '--set-secrets=ANTHROPIC_API_KEY=apikey:latest'
     id: 'Deploy to Cloud Run'
-    waitFor: ['Push Image to Artifact Registry', 'Deploy to Firebase Hosting'] # Wait for both frontend and backend image push
+    waitFor: ['Push Image to Artifact Registry', 'Deploy to Firebase Hosting']
 
 images:
   - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-py:$BUILD_ID'
