@@ -80,7 +80,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ---
 
 ## 📬 Contact
-For questions or support, contact: [support@myrhymeapp.com](mailto:support@myrhymeapp.com)
+For questions or support, contact: [tucker.note@gmail.com](mailto:tucker.note@gmail.com)
 
 ---
 
