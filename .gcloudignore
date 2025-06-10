@@ -82,4 +82,4 @@ firebase-debug.*.log
 
 # User-added
 old_app/
-secrets/ 
+secrets/

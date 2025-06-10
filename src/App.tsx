@@ -1,6 +1,6 @@
 import OnboardingModal from './components/OnboardingModal';
 
-const AppContent: React.FC = () => {
+const App: React.FC = () => {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const { currentUser, signInAnon } = useAuth();
     const { usageInfo, isLoading } = useUsage();
