@@ -30,7 +30,7 @@ const TopUpTokensPage = lazy(() => import('./pages/TopUpTokensPage'));
 const Home = React.lazy(() => import('./pages/Home'));
 const Analysis = React.lazy(() => import('./pages/Analysis'));
 
-const API_BASE_URL = '';
+const API_BASE_URL = 'https://my-rhyme-app-bpeavbldxq-uc.a.run.app';
 
 // Real API call function
 export const analyzeText = async (text: string): Promise<AnalysisData> => {
@@ -474,4 +474,4 @@ const App: React.FC = () => {
     );
 };
 
-export default AppContent;
+export default App;

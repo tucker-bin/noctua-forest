@@ -19,7 +19,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://my-rhyme-app-py-487322724536.us-central1.run.app',
+        target: 'https://my-rhyme-app-bpeavbldxq-uc.a.run.app',
         changeOrigin: true,
         secure: false, // Set to true if your backend uses a valid SSL certificate
         rewrite: (path) => path.replace(/^\/api/, '/api'),
