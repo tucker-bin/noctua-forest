@@ -89,6 +89,7 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--set-secrets=ANTHROPIC_API_KEY=apikey:latest'
+      - '--set-secrets=GOOGLE_APPLICATION_CREDENTIALS=/secrets/my-rhyme-app-service-account:latest'
     id: 'Deploy to Cloud Run'
     waitFor: ['Push Image to Artifact Registry', 'Deploy to Firebase Hosting']
 

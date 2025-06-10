@@ -387,6 +387,45 @@ def analyze_text_route():
         logger.error(f"Error in analyze_text_route: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
+@app.route("/")
+def landing_page():
+    return (
+        """
+        <html>
+        <head>
+            <title>Welcome to My Rhyme App</title>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; background: #f7f7fa; color: #222; margin: 0; padding: 0; }
+                .container { max-width: 600px; margin: 60px auto; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); padding: 40px 32px; }
+                h1 { color: #3f51b5; margin-bottom: 0.5em; }
+                p { font-size: 1.15em; line-height: 1.6; }
+                .features { margin: 2em 0; }
+                .feature { margin-bottom: 1em; }
+                .cta { margin-top: 2em; }
+                .cta a { background: #3f51b5; color: #fff; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.1em; transition: background 0.2s; }
+                .cta a:hover { background: #283593; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Welcome to My Rhyme App</h1>
+                <p><b>My Rhyme App</b> is your modern, AI-powered tool for rhyme and lyric analysis. Instantly analyze your lyrics, poems, or rap bars with advanced language models and get deep insights into rhyme schemes, patterns, and more.</p>
+                <div class="features">
+                    <div class="feature">🎤 <b>AI-Powered Analysis:</b> Get instant feedback and suggestions for your lyrics.</div>
+                    <div class="feature">🔒 <b>Secure & Private:</b> Sign in with Google or email using Firebase Authentication. Your data is protected.</div>
+                    <div class="feature">📊 <b>Usage Dashboard:</b> Track your analysis history and usage.</div>
+                    <div class="feature">🌍 <b>International Friendly:</b> Works with lyrics and poetry in many languages.</div>
+                </div>
+                <div class="cta">
+                    <a href="/analysis">Try the Rhyme Analyzer</a>
+                </div>
+                <p style="margin-top:2em;font-size:0.95em;color:#888;">&copy; 2024 My Rhyme App &mdash; Powered by Firebase & Anthropic</p>
+            </div>
+        </body>
+        </html>
+        """
+    )
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_react_app(path):
