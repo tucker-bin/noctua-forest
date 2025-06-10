@@ -88,7 +88,9 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--set-secrets=ANTHROPIC_API_KEY=apikey:latest,GOOGLE_APPLICATION_CREDENTIALS=my-rhyme-app-service-account:latest'
+      - '--set-secrets=ANTHROPIC_API_KEY=apikey:latest'
+      - '--set-env-vars=FLASK_ENV=production'
+      - '--service-account=my-rhyme-app-service@${PROJECT_ID}.iam.gserviceaccount.com'
     id: 'Deploy to Cloud Run'
     waitFor: ['Push Image to Artifact Registry', 'Deploy to Firebase Hosting']
 

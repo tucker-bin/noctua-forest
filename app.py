@@ -237,26 +237,34 @@ def monitor_request(f):
     return decorated_function
 
 def get_firebase_credentials_path():
-    prod_path = '/secrets/my-rhyme-app-firebase-adminsdk-fbsvc-751e344993.json'
-    if os.path.isfile(prod_path):
-        print("Found Firebase secret in Cloud Run secrets volume.")
-        return prod_path
+    # In Cloud Run, we'll use the default credentials
+    if os.getenv('FLASK_ENV') == 'production':
+        print("Using default credentials in production environment")
+        return None
+    
+    # For local development, try to find the credentials file
     local_path = os.path.join(os.path.dirname(__file__), 'secrets', 'my-rhyme-app-firebase-adminsdk-fbsvc-751e344993.json')
     if os.path.isfile(local_path):
         print("Found Firebase secret in local secrets folder.")
         return local_path
-    env_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    if env_path and os.path.isfile(env_path):
-        print(f"Found Firebase secret at path from GOOGLE_APPLICATION_CREDENTIALS: {env_path}")
-        return env_path
-    print("ERROR: Firebase secret is missing. Checked Cloud Run, local secrets, and GOOGLE_APPLICATION_CREDENTIALS.")
-    sys.exit(1)
+    
+    print("No Firebase credentials found. Using default credentials.")
+    return None
 
-# Initialize Firebase Admin SDK if not already initialized
-if not firebase_admin._apps:
+# Initialize Firebase Admin SDK
+try:
     cred_path = get_firebase_credentials_path()
-    cred = credentials.Certificate(cred_path)
-    firebase_admin.initialize_app(cred)
+    if cred_path:
+        cred = credentials.Certificate(cred_path)
+        firebase_admin.initialize_app(cred)
+    else:
+        # Use default credentials in production
+        firebase_admin.initialize_app()
+    print("Firebase Admin SDK initialized successfully")
+except Exception as e:
+    print(f"Error initializing Firebase Admin SDK: {str(e)}")
+    # Don't raise the exception - allow the app to start without Firebase
+    # The app will handle Firebase-related errors gracefully
 db = firestore.client()
 
 def is_firebase_admin_user(id_token):
