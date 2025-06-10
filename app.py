@@ -425,7 +425,7 @@ def landing_page():
                     <div class="feature">🌍 <b>International Friendly:</b> Works with lyrics and poetry in many languages.</div>
                 </div>
                 <div class="cta">
-                    <a href="/analysis">Try the Rhyme Analyzer</a>
+                    <a href="https://my-rhyme-app.web.app">Try the Rhyme Analyzer</a>
                 </div>
                 <p style="margin-top:2em;font-size:0.95em;color:#888;">&copy; 2024 My Rhyme App &mdash; Powered by Firebase & Anthropic</p>
             </div>
