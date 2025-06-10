@@ -17,15 +17,15 @@ import HighlightLyrics from '../components/HighlightLyrics';
 import AnalysisResultsCard from '../components/AnalysisResultsCard';
 
 const Analysis: React.FC = () => {
-  const [text, setText] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [input, setInput] = useState('');
+  const [result, setResult] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<any>(null);
   const { usageInfo, recordAnalysis } = useUsage();
   const { currentUser } = useAuth();
 
   const handleAnalyze = async () => {
-    if (!text.trim()) {
+    if (!input.trim()) {
       setError('Please enter some text to analyze');
       return;
     }
@@ -45,25 +45,22 @@ const Analysis: React.FC = () => {
       return;
     }
 
-    setIsAnalyzing(true);
+    setLoading(true);
     setError(null);
+    setResult(null);
 
     try {
       // Call the backend API
-      const analysisResults = await analyzeText(text);
-      setResults(analysisResults);
+      const analysis = await analyzeText(input);
+      setResult(analysis);
       // Record the analysis
-      await recordAnalysis(text.length);
-    } catch (err) {
-      setError('Analysis failed. Please try again.');
-      console.error('Analysis error:', err);
+      await recordAnalysis(input.length);
+    } catch (err: any) {
+      setError(err.message || 'An error occurred');
     } finally {
-      setIsAnalyzing(false);
+      setLoading(false);
     }
   };
-
-  // Debug log for results
-  console.log('Analysis results:', results);
 
   return (
     <Container maxWidth="md">
@@ -88,10 +85,11 @@ const Analysis: React.FC = () => {
             rows={6}
             variant="outlined"
             label="Enter your text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            disabled={isAnalyzing}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            disabled={loading}
             sx={{ mb: 2 }}
+            placeholder="Paste your lyrics or poem here..."
           />
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="body2" color="text.secondary">
@@ -100,16 +98,16 @@ const Analysis: React.FC = () => {
             <Button
               variant="contained"
               onClick={handleAnalyze}
-              disabled={isAnalyzing || !text.trim()}
-              startIcon={isAnalyzing ? <CircularProgress size={20} /> : null}
+              disabled={loading || !input.trim()}
+              startIcon={loading ? <CircularProgress size={20} /> : null}
             >
-              {isAnalyzing ? 'Analyzing...' : 'Analyze Text'}
+              {loading ? 'Analyzing...' : 'Analyze Text'}
             </Button>
           </Box>
         </Paper>
 
         {/* Results section */}
-        {results && (
+        {result && (
           <Box
             sx={{
               display: 'flex',
@@ -123,15 +121,15 @@ const Analysis: React.FC = () => {
               <Typography variant="h5" gutterBottom>Analysis Output</Typography>
               {/* Highlighted lyrics */}
               <Box sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '1.1rem', lineHeight: 1.7 }}>
-                <HighlightLyrics lyrics={results?.original_text || text} patterns={Array.isArray(results?.rhyme_details) ? results.rhyme_details : []} />
+                <HighlightLyrics lyrics={result} patterns={Array.isArray(result) ? result : []} />
               </Box>
             </Paper>
             <Box sx={{ flex: 1, minWidth: 220 }}>
-              <AnalysisLegend patterns={Array.isArray(results?.rhyme_details) ? results.rhyme_details : []} />
+              <AnalysisLegend patterns={Array.isArray(result) ? result : []} />
             </Box>
           </Box>
         )}
-        {results && <AnalysisResultsCard />}
+        {result && <AnalysisResultsCard />}
       </Box>
     </Container>
   );

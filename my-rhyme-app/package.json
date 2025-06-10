@@ -12,15 +12,12 @@
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.10",
-    "@mui/material": "^5.15.10",
     "@types/lodash": "^4.14.202",
     "@types/react-router-dom": "^5.3.3",
     "@types/react-virtualized-auto-sizer": "^1.0.5",
     "@types/react-window": "^1.8.8",
     "bootstrap": "^5.3.6",
     "firebase": "^11.8.1",
-    "framer-motion": "^12.16.0",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -30,6 +27,8 @@
     "react-window": "^1.8.9"
   },
   "devDependencies": {
+    "@mui/icons-material": "^7.1.1",
+    "@mui/material": "^7.1.1",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
@@ -39,6 +38,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
+    "framer-motion": "^12.16.0",
     "rollup-plugin-visualizer": "^6.0.1",
     "typescript": "^5.2.2",
     "vite": "^5.1.0"

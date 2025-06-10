@@ -21,9 +21,43 @@ from collections import deque
 import statistics
 import firebase_admin
 from firebase_admin import credentials, auth, firestore
+import sys
 
 # Load environment variables
 load_dotenv()
+
+# Debug: Print if ANTHROPIC_API_KEY is set (mask value for safety)
+anthropic_key = os.getenv('ANTHROPIC_API_KEY')
+if anthropic_key:
+    print(f"ANTHROPIC_API_KEY is set. Length: {len(anthropic_key)}. Starts with: {anthropic_key[:4]}***")
+else:
+    print("ANTHROPIC_API_KEY is NOT set.")
+
+# Print all environment variables (mask values that look like keys)
+def mask_env_value(key, value):
+    if 'KEY' in key or 'SECRET' in key or 'TOKEN' in key:
+        return value[:4] + '***' if value else ''
+    return value
+print("--- ENVIRONMENT VARIABLES ---")
+for k, v in os.environ.items():
+    print(f"{k}={mask_env_value(k, v)}")
+print("-----------------------------")
+
+# Print working directory and list files in /secrets if it exists
+print(f"Current working directory: {os.getcwd()}")
+if os.path.exists('/secrets'):
+    print("/secrets directory contents:", os.listdir('/secrets'))
+    # Try to print the first few lines of the Firebase secret if it exists
+    secret_path = '/secrets/my-rhyme-app-firebase-adminsdk-fbsvc-751e344993.json'
+    if os.path.isfile(secret_path):
+        with open(secret_path) as f:
+            print("First 5 lines of Firebase secret:")
+            for i in range(5):
+                print(f.readline().strip())
+    else:
+        print(f"{secret_path} is not a file.")
+else:
+    print("/secrets directory does not exist.")
 
 print("=== Flask app is starting up ===")
 
@@ -202,18 +236,26 @@ def monitor_request(f):
             raise e
     return decorated_function
 
+def get_firebase_credentials_path():
+    prod_path = '/secrets/my-rhyme-app-firebase-adminsdk-fbsvc-751e344993.json'
+    if os.path.isfile(prod_path):
+        print("Found Firebase secret in Cloud Run secrets volume.")
+        return prod_path
+    local_path = os.path.join(os.path.dirname(__file__), 'secrets', 'my-rhyme-app-firebase-adminsdk-fbsvc-751e344993.json')
+    if os.path.isfile(local_path):
+        print("Found Firebase secret in local secrets folder.")
+        return local_path
+    env_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+    if env_path and os.path.isfile(env_path):
+        print(f"Found Firebase secret at path from GOOGLE_APPLICATION_CREDENTIALS: {env_path}")
+        return env_path
+    print("ERROR: Firebase secret is missing. Checked Cloud Run, local secrets, and GOOGLE_APPLICATION_CREDENTIALS.")
+    sys.exit(1)
+
 # Initialize Firebase Admin SDK if not already initialized
 if not firebase_admin._apps:
-    # Try to get credentials from environment variable first
-    if os.getenv('FIREBASE_CREDENTIALS'):
-        cred_dict = json.loads(os.getenv('FIREBASE_CREDENTIALS'))
-        cred = credentials.Certificate(cred_dict)
-    # Then try to get from mounted volume
-    elif os.path.exists('/secrets/my-rhyme-app-firebase-adminsdk-fbsvc-751e344993.json'):
-        cred = credentials.Certificate('/secrets/my-rhyme-app-firebase-adminsdk-fbsvc-751e344993.json')
-    else:
-        raise ValueError("No Firebase credentials found. Please set FIREBASE_CREDENTIALS environment variable or mount the credentials file.")
-
+    cred_path = get_firebase_credentials_path()
+    cred = credentials.Certificate(cred_path)
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 

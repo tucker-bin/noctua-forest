@@ -36,6 +36,8 @@ import {
   Delete as DeleteIcon,
   AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 interface AccountsPageProps {
   navigateToSubscriptionPlans: () => void;
@@ -65,7 +67,6 @@ const AccountsPage: React.FC<AccountsPageProps> = ({ navigateToSubscriptionPlans
   const [isSubscribedToNewsletter, setIsSubscribedToNewsletter] = useState<boolean>(false);
   const [newsletterMessage, setNewsletterMessage] = useState<string>('');
   
-  // Mock current user plan - in a real app, this would come from user data in Firestore
   const [currentUserPlan, setCurrentUserPlan] = useState<string>("Free User"); 
 
   const [isAdmin, setIsAdmin] = useState(false);
@@ -76,27 +77,24 @@ const AccountsPage: React.FC<AccountsPageProps> = ({ navigateToSubscriptionPlans
   const [resetValue, setResetValue] = useState<{[uid: string]: number}>({});
 
   useEffect(() => {
-    if (currentUser && !currentUser.isAnonymous) {
-      const userDocRef = doc(db, "users", currentUser.uid);
-      getDoc(userDocRef).then(docSnap => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          if (data.newsletterSubscription) {
-            setIsSubscribedToNewsletter(data.newsletterSubscription.subscribed || false);
-          }
-          // Admin flag check
-          if (data.admin === true || currentUser.email === 'tucker.apply@gmail.com') {
-            setIsAdmin(true);
-          } else {
-            setIsAdmin(false);
-          }
-          // Mock logic for setting plan based on some criteria or fetched data
-          // For now, we'll just keep it as "Free User" unless specified otherwise.
-          // if (data.subscriptionTier) { setCurrentUserPlan(data.subscriptionTier); }
+    const auth = getAuth();
+    const db = getFirestore();
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+        setIsAdmin(!!userDoc.exists() && !!userDoc.data()?.admin);
+        // Set plan based on user data if available
+        if (userDoc.exists() && userDoc.data()?.subscriptionTier) {
+          setCurrentUserPlan(userDoc.data()?.subscriptionTier);
         }
-      }).catch(err => console.error("Error fetching user data:", err));
-    }
-  }, [currentUser]);
+      } else {
+        setIsAdmin(false);
+        setCurrentUserPlan('Free User');
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   // Fetch all users and feedback for admin
   useEffect(() => {
