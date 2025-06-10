@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
-import { UsageContext } from '../contexts/UsageContext'; // To display current balance
+import { useUsage } from '../contexts/UsageContext'; // To display current balance
 import { Button, Typography, Box, Card, CardContent, CardActions, Grid } from '@mui/material';
 
 // Simple PageView type for navigation prop
@@ -26,9 +26,9 @@ interface TopUpTokensPageProps {
 
 const TopUpTokensPage: React.FC<TopUpTokensPageProps> = ({ onNavigate }) => {
   const authCtx = useContext(AuthContext);
-  const usageCtx = useContext(UsageContext);
+  const { usageInfo } = useUsage();
   const currentUser = authCtx?.currentUser;
-  const currentTokenBalance = usageCtx?.usageInfo?.tokenBalance;
+  const currentTokenBalance = usageInfo?.tokenBalance;
 
   const [isRedirecting, setIsRedirecting] = useState<string | null>(null);
 
@@ -43,7 +43,7 @@ const TopUpTokensPage: React.FC<TopUpTokensPageProps> = ({ onNavigate }) => {
     // Simulate payment processing and update token balance
     setTimeout(() => {
       setIsRedirecting(null);
-      // Potentially call usageCtx?.fetchUsage(); here to refresh balance after mock purchase
+      // Potentially call usageInfo?.fetchUsage(); here to refresh balance after mock purchase
     }, 2000);
   };
 

@@ -3,7 +3,7 @@ import { AuthContext } from '../contexts/AuthContext';
 import { updateProfile, updatePassword, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
-import { UsageContext } from '../contexts/UsageContext';
+import { useUsage } from '../contexts/UsageContext';
 import type { FormEvent } from 'react';
 import {
   Container,
@@ -45,9 +45,8 @@ interface AccountsPageProps {
 
 const AccountsPage: React.FC<AccountsPageProps> = ({ navigateToSubscriptionPlans }) => {
   const authCtx = useContext(AuthContext);
-  const usageCtx = useContext(UsageContext);
+  const { usageInfo } = useUsage();
   const currentUser = authCtx?.currentUser;
-  const usageInfo = usageCtx?.usageInfo;
 
   const [displayName, setDisplayName] = useState<string>(currentUser?.displayName || '');
   const [newPassword, setNewPassword] = useState<string>('');
