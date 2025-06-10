@@ -54,7 +54,11 @@ const Navbar: React.FC = () => {
           Rhyme App
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          {currentUser ? (
+          {!currentUser || currentUser.isAnonymous ? (
+            <Button color="inherit" onClick={() => navigate('/login')}>
+              Login
+            </Button>
+          ) : (
             <>
               <Button
                 color="inherit"
@@ -71,10 +75,6 @@ const Navbar: React.FC = () => {
                 Logout
               </Button>
             </>
-          ) : (
-            <Button color="inherit" onClick={() => navigate('/login')}>
-              Login
-            </Button>
           )}
         </Box>
       </Toolbar>

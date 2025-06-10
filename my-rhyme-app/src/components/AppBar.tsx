@@ -61,21 +61,21 @@ const AppBar: React.FC<AppBarProps> = ({ onMenuClick }) => {
           <IconButton color="inherit" onClick={toggleDarkMode} aria-label="toggle dark mode">
             {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
           </IconButton>
-          {currentUser ? (
-            <Button
-              color="inherit"
-              component={RouterLink}
-              to="/account"
-            >
-              Account
-            </Button>
-          ) : (
+          {!currentUser || currentUser.isAnonymous ? (
             <Button
               color="inherit"
               component={RouterLink}
               to="/login"
             >
               Login
+            </Button>
+          ) : (
+            <Button
+              color="inherit"
+              component={RouterLink}
+              to="/account"
+            >
+              Account
             </Button>
           )}
         </Box>
