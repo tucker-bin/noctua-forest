@@ -1,28 +1,40 @@
 # Dependencies
 node_modules/
 */node_modules/
+bower_components/
 
 # Production builds
 dist/
 build/
 *.build/
 .cache/
+.parcel-cache/
+out/
 
 # Environment files
 .env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 *.env
+# Exception for template files
+!*.env.template
+!*.env.example
 
-# IDE
+# IDE and Editor
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+Thumbs.db
+.project
+.settings/
+*.sublime-workspace
+*.sublime-project
 
 # Logs
 logs/
@@ -32,43 +44,120 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+pnpm-debug.log*
+deployment_log.txt
 
 # Testing
 coverage/
 .nyc_output/
+*.lcov
+.coverage
+htmlcov/
+test-results/
+jest-results/
 
-# Python (from old backend)
+# Python (from old backend - to be removed)
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
 venv/
 .venv/
+env/
+ENV/
 *.egg-info/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Firebase
 .firebase/
 firebase-debug.log
+firebase-debug.*.log
 .firebaserc
-
-# Misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-*.pem
-
-# Vite
-my-rhyme-app/.vite/
-
-# Deployment logs
-deployment_log.txt
+firestore-debug.log
+ui-debug.log
+database-debug.log
+pubsub-debug.log
 
 # OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# Package manager locks (keep one, ignore others based on your choice)
-# If using npm, keep package-lock.json and ignore yarn.lock
+# Package manager files
+# Keep package-lock.json for npm reproducible builds
+# Uncomment if using yarn instead
 # yarn.lock
-# If using yarn, keep yarn.lock and ignore package-lock.json
-# package-lock.json
+# Uncomment if using pnpm
+# pnpm-lock.yaml
+
+# Build tools
+.grunt/
+.sass-cache/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+.tmp/
+tmp/
+temp/
+
+# Security - Never commit these!
+*.pem
+*.key
+*.cert
+*.crt
+*.p12
+*.pfx
+secrets/
+private/
+credentials/
+service-account*.json
+firebase-adminsdk*.json
+
+# Stripe
+.stripe/
+
+# Google Cloud
+.gcloudignore
+gcs-keyfile.json
+
+# Monitoring
+grafana-storage/
+prometheus-data/
+
+# Misc
+.history/
+.vscode-test/
+*.seed
+*.pid
+*.pid.lock
+*.tgz
+.yarn-integrity
+.cache
+.next/
+.nuxt/
+.docusaurus/
+bundle-analysis.html
+
+# Project specific
+PASTE_YOUR_ENV_HERE.txt
+production-fixes.patch
+old.env
+contextual-info
+
+# Old/deprecated files to clean up
+src/App.js
+templates/
+static/
