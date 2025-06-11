@@ -851,8 +851,29 @@ app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async
   res.status(200).send('Received');
 });
 
+// --- Startup Environment Checks ---
+function checkRequiredEnv(vars) {
+  const missing = vars.filter((v) => !process.env[v]);
+  if (missing.length) {
+    console.error('Missing required environment variables:', missing.join(', '));
+    process.exit(1);
+  }
+}
+
+checkRequiredEnv([
+  'STRIPE_SECRET_KEY',
+  'FRONTEND_URL',
+  // Add any other required env vars here
+]);
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  logger.info({ event: 'server_started', port: PORT });
-  console.log(`Server running on port ${PORT}`);
-});
+try {
+  app.listen(PORT, () => {
+    logger.info({ event: 'server_started', port: PORT });
+    console.log(`Server running on port ${PORT}`);
+  });
+} catch (err) {
+  logger.error({ event: 'server_startup_error', error: err.message, stack: err.stack });
+  console.error('Failed to start server:', err);
+  process.exit(1);
+}
