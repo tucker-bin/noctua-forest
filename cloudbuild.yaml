@@ -80,7 +80,7 @@ steps:
         echo "VITE_FIREBASE_STORAGE_BUCKET=${_VITE_FIREBASE_STORAGE_BUCKET}" >> my-rhyme-app/.env
         echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${_VITE_FIREBASE_MESSAGING_SENDER_ID}" >> my-rhyme-app/.env
         echo "VITE_FIREBASE_APP_ID=${_VITE_FIREBASE_APP_ID}" >> my-rhyme-app/.env
-        echo "VITE_API_URL=${BACKEND_URL}/api" >> my-rhyme-app/.env
+        echo "VITE_API_URL=$$BACKEND_URL/api" >> my-rhyme-app/.env
         echo "--- Frontend .env file contents ---"
         cat my-rhyme-app/.env
     id: 'Write Frontend .env'
