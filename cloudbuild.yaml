@@ -61,8 +61,8 @@ steps:
       - '-c'
       - |
         SERVICE_URL=$(gcloud run services describe my-rhyme-app-backend --region=us-central1 --format='value(status.url)')
-        echo "Backend URL: $SERVICE_URL"
-        echo "$SERVICE_URL" > /workspace/backend_url.txt
+        echo "Backend URL: $$SERVICE_URL"
+        echo "$$SERVICE_URL" > /workspace/backend_url.txt
     id: 'Get Backend URL'
     waitFor: ['Deploy Backend to Cloud Run']
 
