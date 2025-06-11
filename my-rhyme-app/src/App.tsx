@@ -1,41 +1,38 @@
-import React, { useState, useEffect, useContext, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import type { FormEvent } from 'react';
 import type { AnalysisData } from './components/RhymeAnalysisTool';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { AuthContext, AuthProvider, useAuth } from './contexts/AuthContext';
-import type { UsageInfo } from './contexts/UsageContext';
-import { UsageContext, UsageProvider } from './contexts/UsageContext';
-import { Container, TextField, Button, Alert, Typography, Box, Toolbar, IconButton, List, ListItem, ListItemIcon, ListItemText, useMediaQuery, CircularProgress, CssBaseline } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
+import { ThemeProvider } from '@mui/material/styles';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { UsageProvider, useUsage } from './contexts/UsageContext';
+import { Container, TextField, Button, Alert, Typography, Box, CircularProgress, CssBaseline } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import { noctuaTheme } from './theme/noctuaTheme';
+import OnboardingModal from './components/OnboardingModal';
+import NavigationHandler from './components/NavigationHandler';
+import ErrorBoundary from './components/ErrorBoundary';
+import Drawer from './components/Drawer';
 import AnalysisIcon from '@mui/icons-material/Analytics';
 import AccountIcon from '@mui/icons-material/AccountCircle';
 import SubscriptionIcon from '@mui/icons-material/CardMembership';
 import TokenIcon from '@mui/icons-material/Token';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import AppRoutes from './routes';
-import AppBar from './components/AppBar';
-import Drawer from './components/Drawer';
-import UsageDashboard from './components/UsageDashboard';
-import Navbar from './components/Navbar';
-import { useUsage } from './contexts/UsageContext';
-import { theme } from './theme';
 
 // Lazy load components
-const AuthFormComponent = lazy(() => import('./components/AuthFormComponent'));
-const RhymeAnalysisTool = lazy(() => import('./components/RhymeAnalysisTool'));
 const AccountsPage = lazy(() => import('./pages/AccountsPage'));
 const SubscriptionPlansPage = lazy(() => import('./pages/SubscriptionPlansPage'));
 const TopUpTokensPage = lazy(() => import('./pages/TopUpTokensPage'));
-const Home = React.lazy(() => import('./pages/Home'));
+const ObserverHome = React.lazy(() => import('./pages/ObserverHome'));
 const Analysis = React.lazy(() => import('./pages/Analysis'));
+const AdminPage = React.lazy(() => import('./pages/AdminPage'));
+const UsageDashboard = lazy(() => import('./components/UsageDashboard'));
+const RhymeAnalysisTool = lazy(() => import('./components/RhymeAnalysisTool'));
 
-const API_BASE_URL = 'https://my-rhyme-app-bpeavbldxq-uc.a.run.app';
+const API_BASE_URL = '/api';
 
 // Real API call function
 export const analyzeText = async (text: string): Promise<AnalysisData> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/analyze`, {
+        const response = await fetch(`${API_BASE_URL}/analyze`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -100,56 +97,26 @@ const MEDIUM_CHAR_LIMIT = 2000;
 const MIN_TOKENS_FOR_LOW_WARNING = 20;
 
 const AppContent: React.FC = () => {
-    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const { currentUser, signInAnon } = useAuth();
     const { usageInfo, isLoading } = useUsage();
 
     const [isLogin, setIsLogin] = useState(true);
-    const [authError, setAuthError] = useState<string | null>(null);
-    const [authMessage, setAuthMessage] = useState("");
 
     const [textToAnalyze, setTextToAnalyze] = useState<string>("");
     const [analysisResults, setAnalysisResults] = useState<AnalysisData | null>(null);
     const [isLoadingAnalysis, setIsLoadingAnalysis] = useState<boolean>(false);
     const [analysisError, setAnalysisError] = useState<string | null>(null);
-    const [showOutOfTokensPrompt, setShowOutOfTokensPrompt] = useState<boolean>(false);
     const [showLowTokensWarning, setShowLowTokensWarning] = useState<boolean>(false);
-    const [currentAnalysisCost, setCurrentAnalysisCost] = useState<number>(TOKEN_COST_SHORT);
+    const [currentAnalysisCost, setCurrentAnalysisCost] = useState<number>(0);
 
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const theme = createTheme({
-        palette: {
-            mode: prefersDarkMode ? 'dark' : 'light',
-            primary: {
-                main: '#2196f3',
-            },
-            secondary: {
-                main: '#f50057',
-            },
-        },
-        typography: {
-            fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-        },
-        components: {
-            MuiButton: {
-                styleOverrides: {
-                    root: {
-                        borderRadius: 8,
-                    },
-                },
-            },
-            MuiCard: {
-                styleOverrides: {
-                    root: {
-                        borderRadius: 12,
-                    },
-                },
-            },
-        },
-    });
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const navigate = useNavigate();
+
+    const [anonSignInError, setAnonSignInError] = useState<string | null>(null);
+    const [loadingTimeout, setLoadingTimeout] = useState(false);
+
+    const [redirectMessage, setRedirectMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const len = textToAnalyze.length;
@@ -178,61 +145,31 @@ const AppContent: React.FC = () => {
     }, [usageInfo, isLoading, currentAnalysisCost, textToAnalyze.length]);
 
     useEffect(() => {
+        let timeout: NodeJS.Timeout;
         if (!currentUser && signInAnon) {
-            signInAnon().catch(err => setAuthError("Anon sign-in failed."));
+            signInAnon().catch(() => setAnonSignInError("Anonymous sign-in failed. Please check your connection and try again."));
+            timeout = setTimeout(() => setLoadingTimeout(true), 15000); // 15s timeout
         }
+        return () => clearTimeout(timeout);
     }, [currentUser, signInAnon]);
-
-    if (!currentUser) {
-        return (
-            <Box sx={{ 
-                display: 'flex', 
-                flexDirection: 'column',
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                minHeight: '100vh',
-                gap: 2
-            }}>
-                <CircularProgress size={60} />
-                <Typography variant="h6" color="text.secondary">
-                    Loading your rhyme journey...
-                </Typography>
-            </Box>
-        );
-    }
-
-    const { login, signup, logout } = useAuth();
 
     useEffect(() => {
         if (currentUser?.isAnonymous && (window.location.pathname === '/account' || window.location.pathname === '/subscription-plans' || window.location.pathname === '/top-up-tokens')) {
-            navigate('/');
+            setRedirectMessage('You must sign up to access this page.');
+            navigate('/', { state: { reason: 'restricted' } });
         }
     }, [currentUser, signInAnon, navigate]);
 
-    const handleAuth = async (email: string, password: string): Promise<void> => {
-        setAuthError(null);
-        setAuthMessage("");
-        try {
-            if (isLogin) await login(email, password);
-            else { 
-                await signup(email, password); 
-                setAuthMessage("Sign up successful!"); 
-                setIsLogin(true); 
-            }
-            navigate('/');
-        } catch (error: any) { 
-            setAuthError(error.message); 
-        }
-    };
-
-    const handleSignOut = async () => {
-        try {
-            await logout();
-            setAnalysisResults(null); setTextToAnalyze("");
-            navigate('/');
-            if (signInAnon) await signInAnon();
-        } catch (error: any) { setAuthError(error.message); }
-    };
+    if (!currentUser) {
+        return (
+            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', gap: 2 }}>
+                <CircularProgress size={60} />
+                <Typography variant="h6" color="text.secondary">Loading your rhyme journey...</Typography>
+                {anonSignInError && <Alert severity="error" sx={{ mt: 2 }}>{anonSignInError} <Button onClick={() => { setAnonSignInError(null); window.location.reload(); }}>Retry</Button></Alert>}
+                {loadingTimeout && <Alert severity="error" sx={{ mt: 2 }}>Loading is taking longer than expected. Please refresh or check your connection.</Alert>}
+            </Box>
+        );
+    }
 
     const handleAnalysisSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -253,6 +190,10 @@ const AppContent: React.FC = () => {
     };
 
     const canAnalyze = usageInfo && usageInfo.tokenBalance >= currentAnalysisCost && usageInfo.analysesThisMonth < usageInfo.planLimits.monthlyAnalyses;
+
+    const handleDrawerToggle = () => {
+        setIsDrawerOpen(!isDrawerOpen);
+    };
 
     const renderAnalysisContent = () => (
         <>
@@ -353,10 +294,6 @@ const AppContent: React.FC = () => {
         </>
     );
 
-    const handleDrawerToggle = () => {
-        setIsDrawerOpen(!isDrawerOpen);
-    };
-
     const menuItems = [
         { text: 'Analysis', icon: <AnalysisIcon />, path: '/' },
         { text: 'Account', icon: <AccountIcon />, path: '/account' },
@@ -408,16 +345,13 @@ const AppContent: React.FC = () => {
                     </Box>
                 }>
                     <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/analysis" element={<Analysis />} />
+                        <Route path="/" element={<ObserverHome />} />
+                        <Route path="/analyze" element={<Analysis />} />
+                        <Route path="/account" element={<AccountsPage />} />
                         <Route path="/subscription-plans" element={<SubscriptionPlansPage />} />
-                        <Route path="/top-up-tokens" element={<TopUpTokensPage navigateTo={(page) => {
-                            if (page === 'analysis') navigate('/');
-                            else if (page === 'account') navigate('/account');
-                            else if (page === 'subscriptionPlans') navigate('/subscription-plans');
-                            else if (page === 'topUpTokens') navigate('/top-up-tokens');
-                        }} />} />
-                        {currentUser && <Route path="/dashboard" element={<UsageDashboard />} />}
+                        <Route path="/top-up-tokens" element={<TopUpTokensPage />} />
+                        <Route path="/dashboard" element={<UsageDashboard />} />
+                        <Route path="/admin" element={<AdminPage />} />
                     </Routes>
                 </Suspense>
             </Container>
@@ -425,51 +359,71 @@ const AppContent: React.FC = () => {
     };
 
     return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={noctuaTheme}>
             <CssBaseline />
-            <AuthProvider>
-                <UsageProvider>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                        <Navbar />
-                        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-                            <Suspense fallback={<CircularProgress />}>
-                                <Routes>
-                                    <Route path="/" element={<Home />} />
-                                    <Route path="/analysis" element={<Analysis />} />
-                                    <Route path="/subscription-plans" element={<SubscriptionPlansPage />} />
-                                    <Route path="/top-up-tokens" element={<TopUpTokensPage navigateTo={(page) => {
-                                        if (page === 'analysis') navigate('/');
-                                        else if (page === 'account') navigate('/account');
-                                        else if (page === 'subscriptionPlans') navigate('/subscription-plans');
-                                        else if (page === 'topUpTokens') navigate('/top-up-tokens');
-                                    }} />} />
-                                    {currentUser && <Route path="/dashboard" element={<UsageDashboard />} />}
-                                </Routes>
-                            </Suspense>
+            <ErrorBoundary>
+                <AuthProvider>
+                    <UsageProvider>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                            <Navbar />
+                            {redirectMessage && <Alert severity="warning" sx={{ m: 2 }}>{redirectMessage}</Alert>}
+                            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                                <Suspense fallback={<CircularProgress />}>
+                                    <NavigationHandler>
+                                        <Routes>
+                                            <Route path="/" element={<ObserverHome />} />
+                                            <Route path="/analyze" element={<Analysis />} />
+                                            <Route path="/account" element={<AccountsPage />} />
+                                            <Route path="/subscription-plans" element={<SubscriptionPlansPage />} />
+                                            <Route path="/top-up-tokens" element={<TopUpTokensPage />} />
+                                            <Route path="/dashboard" element={<UsageDashboard />} />
+                                            <Route path="/admin" element={<AdminPage />} />
+                                        </Routes>
+                                    </NavigationHandler>
+                                </Suspense>
+                            </Box>
                         </Box>
-                    </Box>
-                </UsageProvider>
-            </AuthProvider>
+                    </UsageProvider>
+                </AuthProvider>
+            </ErrorBoundary>
         </ThemeProvider>
     );
 };
 
 const App: React.FC = () => {
+    // Onboarding state management
+    const [showOnboarding, setShowOnboarding] = useState(false);
+
+    useEffect(() => {
+        // Check if the user has seen the onboarding before
+        const hasSeenOnboarding = localStorage.getItem('hasSeenOnboarding');
+        if (!hasSeenOnboarding) {
+            setShowOnboarding(true);
+        }
+    }, []);
+
+    const handleOnboardingClose = () => {
+        setShowOnboarding(false);
+        // Mark onboarding as seen
+        localStorage.setItem('hasSeenOnboarding', 'true');
+    };
+
     return (
-        <ThemeProvider theme={theme}>
+        <ThemeProvider theme={noctuaTheme}>
             <CssBaseline />
-            <Router>
-                <Box
-                    className="star-field"
-                    sx={{
-                        minHeight: '100vh',
-                        display: 'flex',
-                        flexDirection: 'column',
-                    }}
-                >
-                    <AppRoutes />
-                </Box>
-            </Router>
+            <ErrorBoundary>
+                <AuthProvider>
+                    <UsageProvider>
+                        <Router>
+                            <AppContent />
+                            <OnboardingModal
+                                open={showOnboarding}
+                                onClose={handleOnboardingClose}
+                            />
+                        </Router>
+                    </UsageProvider>
+                </AuthProvider>
+            </ErrorBoundary>
         </ThemeProvider>
     );
 };

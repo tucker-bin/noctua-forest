@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendEmailVerification,
 } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
@@ -19,6 +20,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  sendVerification: () => Promise<void>;
+  refreshAdmin: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      // console.log('Auth state changed:', user);
       setCurrentUser(user);
       setLoading(false);
       if (user && !user.isAnonymous) {
@@ -56,7 +60,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       } else {
         setIsAdmin(false);
       }
-      console.log('Auth state changed:', user);
     });
     return unsubscribe;
   }, [auth, db]);
@@ -81,7 +84,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signup = async (email: string, password: string) => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      if (userCredential.user) {
+        await sendEmailVerification(userCredential.user);
+      }
     } catch (error) {
       console.error('Signup error:', error);
       throw error;
@@ -97,6 +103,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const sendVerification = async () => {
+    if (auth.currentUser) {
+      await sendEmailVerification(auth.currentUser);
+    }
+  };
+
+  const refreshAdmin = async () => {
+    if (currentUser && !currentUser.isAnonymous) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        setIsAdmin(!!userDoc.exists() && !!userDoc.data()?.admin);
+      } catch (e) {
+        setIsAdmin(false);
+      }
+    }
+  };
+
   const value = {
     currentUser,
     loading,
@@ -105,6 +128,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     signup,
     logout,
+    sendVerification,
+    refreshAdmin,
   };
 
   return (

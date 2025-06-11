@@ -61,6 +61,8 @@
   - This tool is for educational, personal, and non-commercial analysis only.
 - Users must agree to the [Terms of Service](src/components/TermsOfService.tsx) and [Privacy Policy](src/components/PrivacyPolicy.tsx) during sign-up.
 
+**Note:** All components that use `useUsage` must be rendered within a `UsageProvider`. This is required for the app to function correctly.
+
 ---
 
 ## 👑 Admin Instructions

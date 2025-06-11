@@ -1,469 +1,375 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
-import { updateProfile, updatePassword, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp, getDoc, updateDoc, collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
-import { useUsage } from '../contexts/UsageContext';
-import type { FormEvent } from 'react';
+import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import {
-  Container,
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Alert,
-  Paper,
-  Divider,
-  CircularProgress,
-  Stack,
-  FormControlLabel,
-  Checkbox,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Card,
-  CardContent,
-  IconButton,
-  Tooltip,
+    Box,
+    Container,
+    Typography,
+    Paper,
+    TextField,
+    Button,
+    Alert,
+    CircularProgress,
+    Tabs,
+    Tab,
+    Grid,
+    Card,
+    CardContent,
+    List,
+    ListItem,
+    ListItemText,
+    ListItemIcon,
+    Divider
 } from '@mui/material';
 import {
-  Email as EmailIcon,
-  Security as SecurityIcon,
-  History as HistoryIcon,
-  Feedback as FeedbackIcon,
-  Notifications as NotificationsIcon,
-  Delete as DeleteIcon,
-  AdminPanelSettings as AdminIcon,
+  Email,
+  Lock,
+  Person,
+  Analytics,
+  Token,
+  Logout,
 } from '@mui/icons-material';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { Layout } from '../components/Layout';
+import FeedbackForm from '../components/FeedbackForm';
+import NewsletterSignup from '../components/NewsletterSignup';
+import { useUsage } from '../contexts/UsageContext';
 
-interface AccountsPageProps {
-  navigateToSubscriptionPlans: () => void;
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
 }
 
-const AccountsPage: React.FC<AccountsPageProps> = ({ navigateToSubscriptionPlans }) => {
-  const authCtx = useContext(AuthContext);
-  const { usageInfo } = useUsage();
-  const currentUser = authCtx?.currentUser;
-
-  const [displayName, setDisplayName] = useState<string>(currentUser?.displayName || '');
-  const [newPassword, setNewPassword] = useState<string>('');
-  const [currentPassword, setCurrentPassword] = useState<string>('');
-
-  const [message, setMessage] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const [requiresReAuth, setRequiresReAuth] = useState<boolean>(false);
-  const [actionToRetry, setActionToRetry] = useState<(() => Promise<void>) | null>(null);
-
-  const [feedbackType, setFeedbackType] = useState<string>('general');
-  const [feedbackComment, setFeedbackComment] = useState<string>('');
-  const [feedbackMessage, setFeedbackMessage] = useState<string>('');
-
-  const [isSubscribedToNewsletter, setIsSubscribedToNewsletter] = useState<boolean>(false);
-  const [newsletterMessage, setNewsletterMessage] = useState<string>('');
-  
-  const [currentUserPlan, setCurrentUserPlan] = useState<string>("Free User"); 
-
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  const [allUsers, setAllUsers] = useState<any[]>([]);
-  const [feedbackList, setFeedbackList] = useState<any[]>([]);
-  const [resetLoading, setResetLoading] = useState<string | null>(null);
-  const [resetValue, setResetValue] = useState<{[uid: string]: number}>({});
-
-  useEffect(() => {
-    const auth = getAuth();
-    const db = getFirestore();
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userDocRef);
-        setIsAdmin(!!userDoc.exists() && !!userDoc.data()?.admin);
-        // Set plan based on user data if available
-        if (userDoc.exists() && userDoc.data()?.subscriptionTier) {
-          setCurrentUserPlan(userDoc.data()?.subscriptionTier);
-        }
-      } else {
-        setIsAdmin(false);
-        setCurrentUserPlan('Free User');
-      }
-    });
-    return unsubscribe;
-  }, []);
-
-  // Fetch all users and feedback for admin
-  useEffect(() => {
-    if (isAdmin) {
-      getDocs(collection(db, 'users')).then(snapshot => {
-        setAllUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-      });
-      getDocs(collection(db, 'feedback')).then(snapshot => {
-        setFeedbackList(snapshot.docs.map(doc => doc.data()));
-      });
-    }
-  }, [isAdmin]);
-
-  const clearMessages = () => {
-    setMessage(''); setError(''); setFeedbackMessage(''); setNewsletterMessage('');
-  };
-
-  const handleUpdateDisplayName = async (e: FormEvent) => {
-    e.preventDefault(); clearMessages();
-    if (!currentUser) return setError("No user logged in.");
-    if (!displayName.trim()) return setError("Display name cannot be empty.");
-    setIsLoading(true);
-    try {
-      await updateProfile(currentUser, { displayName });
-      setMessage("Display name updated successfully!");
-    } catch (err: any) { setError(err.message || "Failed to update display name."); }
-    finally { setIsLoading(false); }
-  };
-
-  const attemptPasswordChange = async () => {
-    clearMessages();
-    if (!currentUser) return setError("No user logged in.");
-    if (!newPassword) return setError("New password cannot be empty.");
-    if (newPassword.length < 6) return setError("Password should be at least 6 characters.");
-    setIsLoading(true);
-    try {
-      await updatePassword(currentUser, newPassword);
-      setMessage("Password changed successfully!"); setNewPassword(''); setCurrentPassword(''); setRequiresReAuth(false);
-    } catch (err: any) {
-      if (err.code === 'auth/requires-recent-login') {
-        setError("Re-authentication needed for password change."); setRequiresReAuth(true); setActionToRetry(() => attemptPasswordChange);
-      } else { setError(err.message || "Failed to change password."); }
-    } finally { setIsLoading(false); }
-  };
-  const handleChangePassword = (e: FormEvent) => { e.preventDefault(); attemptPasswordChange(); };
-
-  const attemptDeleteAccount = async () => {
-    clearMessages();
-    if (!currentUser) return setError("No user logged in.");
-    if (!window.confirm("Are you sure? This is permanent.")) return;
-    setIsLoading(true);
-    try {
-      await deleteUser(currentUser); setMessage("Account deleted successfully.");
-    } catch (err: any) {
-      if (err.code === 'auth/requires-recent-login') {
-        setError("Re-authentication needed for account deletion."); setRequiresReAuth(true); setActionToRetry(() => attemptDeleteAccount);
-      } else { setError(err.message || "Failed to delete account."); }
-    } finally { setIsLoading(false); }
-  };
-  const handleDeleteAccount = () => attemptDeleteAccount();
-
-  const handleReauthenticate = async (e: FormEvent) => {
-    e.preventDefault(); clearMessages();
-    if (!currentUser || !currentUser.email) return setError("User/email not found.");
-    if (!currentPassword) return setError("Please enter current password.");
-    setIsLoading(true);
-    try {
-      const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
-      await reauthenticateWithCredential(currentUser, credential);
-      setMessage("Re-authentication successful. Please try your action again.");
-      setRequiresReAuth(false); setCurrentPassword('');
-      if (actionToRetry) { await actionToRetry(); setActionToRetry(null); }
-    } catch (err: any) { setError(err.message || "Re-authentication failed."); }
-    finally { setIsLoading(false); }
-  };
-
-  const handleFeedbackSubmit = async (e: FormEvent) => {
-    e.preventDefault(); clearMessages();
-    if (!feedbackComment.trim()) return setFeedbackMessage("Feedback comment cannot be empty.");
-    setIsLoading(true);
-    try {
-      if (currentUser) {
-        await setDoc(doc(db, `feedback/${currentUser.uid}_${Date.now()}`), {
-            userId: currentUser.uid, email: currentUser.email, type: feedbackType,
-            comment: feedbackComment, submittedAt: serverTimestamp()
-        });
-      }
-      setFeedbackMessage("Thank you for your feedback!"); setFeedbackComment(''); setFeedbackType('general');
-    } catch (err:any) { setFeedbackMessage("Failed to submit feedback: " + err.message); }
-    finally { setIsLoading(false); }
-  };
-
-  const handleNewsletterToggle = async () => {
-    clearMessages(); if (!currentUser) return setNewsletterMessage("Please log in.");
-    setIsLoading(true); const newStatus = !isSubscribedToNewsletter;
-    try {
-      const userDocRef = doc(db, "users", currentUser.uid);
-      await setDoc(userDocRef, { newsletterSubscription: { subscribed: newStatus, lastUpdated: serverTimestamp() } }, { merge: true });
-      setIsSubscribedToNewsletter(newStatus);
-      setNewsletterMessage(newStatus ? "Subscribed!" : "Unsubscribed.");
-    } catch (err: any) { setNewsletterMessage("Failed to update preference: " + err.message); }
-    finally { setIsLoading(false); }
-  };
-
-  // Admin: Give Free Tokens
-  const handleGiveFreeTokens = async () => {
-    if (!currentUser) return;
-    setIsLoading(true);
-    setMessage('');
-    setError('');
-    try {
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userDocRef, {
-        tokenBalance: (usageInfo?.tokenBalance || 0) + 100,
-        lastTokenUpdate: serverTimestamp(),
-      });
-      setMessage('100 free tokens added!');
-    } catch (err: any) {
-      setError('Failed to add tokens: ' + (err.message || 'Unknown error'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleResetTokens = async (uid: string) => {
-    setResetLoading(uid);
-    try {
-      await updateDoc(doc(db, 'users', uid), { tokenBalance: resetValue[uid] || 0, lastTokenUpdate: serverTimestamp() });
-      setMessage('Token balance reset!');
-      // Refresh users
-      const snapshot = await getDocs(collection(db, 'users'));
-      setAllUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    } catch (err: any) {
-      setError('Failed to reset tokens: ' + (err.message || 'Unknown error'));
-    } finally {
-      setResetLoading(null);
-    }
-  };
-
-  if (!currentUser) return <div className="container mt-5"><p className="text-danger">You must be logged in.</p></div>;
-  if (currentUser.isAnonymous) return <div className="container mt-5"><div className="alert alert-warning">Account management is not available for anonymous users.</div></div>;
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Stack spacing={4}>
-        <Card>
-          <CardContent>
-            <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <EmailIcon /> Account Information
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`auth-tabpanel-${index}`}
+      aria-labelledby={`auth-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+const AccountsPage: React.FC = () => {
+  const { currentUser, login, signup, logout } = useAuth();
+  const { usageInfo } = useUsage();
+  const navigate = useNavigate();
+
+  const [tabValue, setTabValue] = useState(0);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+    setError(null);
+    setSuccess(null);
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      await login(email, password);
+      setSuccess('Successfully signed in!');
+      // No need to navigate, the UI will update automatically
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await signup(email, password);
+      setSuccess('Account created successfully!');
+      setTabValue(0); // Switch to sign in tab
+    } catch (err: any) {
+      setError(err.message || 'Failed to create account');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (err: any) {
+      setError(err.message || 'Failed to log out');
+    }
+  };
+
+  // If user is signed in and not anonymous, show account management
+  if (currentUser && !currentUser.isAnonymous) {
+    return (
+      <Layout owlMessage="Welcome back! Here's your account overview.">
+        <Container maxWidth="md">
+          <Box sx={{ mt: 4 }}>
+            <Typography variant="h4" component="h1" gutterBottom>
+              My Account
             </Typography>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              <strong>Email:</strong> {currentUser.email}
+
+            <Grid container spacing={3}>
+              {/* Profile Card */}
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Profile Information
+                    </Typography>
+                    <List>
+                      <ListItem>
+                        <ListItemIcon>
+                          <Email />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Email"
+                          secondary={currentUser.email}
+                        />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemIcon>
+                          <Person />
+                        </ListItemIcon>
+                        <ListItemText
+                          primary="Account Type"
+                          secondary="Registered User"
+                        />
+                      </ListItem>
+                    </List>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Usage Stats Card */}
+              <Grid item xs={12} md={6}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Usage Statistics
+                    </Typography>
+                    {usageInfo ? (
+                      <List>
+                        <ListItem>
+                          <ListItemIcon>
+                            <Analytics />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary="Analyses This Month"
+                            secondary={`${usageInfo.analysesThisMonth} / ${usageInfo.planLimits.monthlyAnalyses}`}
+                          />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemIcon>
+                            <Token />
+                          </ListItemIcon>
+                          <ListItemText
+                            primary="Token Balance"
+                            secondary={usageInfo.tokenBalance}
+                          />
+                        </ListItem>
+                      </List>
+                    ) : (
+                      <CircularProgress />
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Newsletter Section */}
+              <Grid item xs={12} md={6}>
+                <NewsletterSignup />
+              </Grid>
+
+              {/* Feedback Section */}
+              <Grid item xs={12} md={6}>
+                <FeedbackForm />
+              </Grid>
+
+              {/* Actions */}
+              <Grid item xs={12}>
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => navigate('/subscription-plans')}
+                  >
+                    Manage Subscription
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={() => navigate('/top-up-tokens')}
+                  >
+                    Buy More Tokens
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<Logout />}
+                    onClick={handleLogout}
+                  >
+                    Sign Out
+                  </Button>
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
+        </Container>
+      </Layout>
+    );
+  }
+
+  // Show sign in/sign up form for anonymous users
+  return (
+    <Layout owlMessage="Sign in to unlock all features and save your analyses!">
+      <Container component="main" maxWidth="sm">
+        <Box sx={{ mt: 8 }}>
+          <Paper elevation={3} sx={{ p: 4 }}>
+            <Typography component="h1" variant="h4" align="center" gutterBottom>
+              Account Access
             </Typography>
-            <Box sx={{ mb: 3, p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
-              <Typography variant="h6" gutterBottom>Current Subscription</Typography>
-              <Typography variant="h5" color="primary" sx={{ mb: 1 }}>{currentUserPlan}</Typography>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={navigateToSubscriptionPlans}
-                startIcon={<SecurityIcon />}
-              >
-                View Plans & Upgrade
-              </Button>
+
+            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+            {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+              <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
+                <Tab label="Sign In" />
+                <Tab label="Sign Up" />
+              </Tabs>
             </Box>
-          </CardContent>
-        </Card>
 
-        {message && <Alert severity="success">{message}</Alert>}
-        {error && <Alert severity="error">{error}</Alert>}
-
-        {requiresReAuth && (
-          <Card>
-            <CardContent>
-              <Typography variant="h6" color="warning.main" gutterBottom>
-                Re-authentication Required
-              </Typography>
-              <Typography variant="body2" sx={{ mb: 2 }}>
-                Enter your current password to continue.
-              </Typography>
-              <form onSubmit={handleReauthenticate}>
+            <TabPanel value={tabValue} index={0}>
+              <Box component="form" onSubmit={handleSignIn}>
                 <TextField
                   fullWidth
+                  label="Email Address"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  margin="normal"
+                  required
+                  autoComplete="email"
+                  InputProps={{
+                    startAdornment: <Email />,
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  label="Password"
                   type="password"
-                  label="Current Password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  sx={{ mb: 2 }}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  margin="normal"
+                  required
+                  autoComplete="current-password"
+                  InputProps={{
+                    startAdornment: <Lock />,
+                  }}
                 />
                 <Button
                   type="submit"
+                  fullWidth
                   variant="contained"
-                  color="warning"
-                  disabled={isLoading}
+                  sx={{ mt: 3, mb: 2 }}
+                  disabled={loading}
                 >
-                  {isLoading ? <CircularProgress size={24} /> : 'Re-authenticate'}
+                  {loading ? <CircularProgress size={24} /> : 'Sign In'}
                 </Button>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+              </Box>
+            </TabPanel>
 
-        <Card>
-          <CardContent>
-            <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <SecurityIcon /> Security Settings
-            </Typography>
-            <Stack spacing={3}>
-              <form onSubmit={handleUpdateDisplayName}>
-                <Typography variant="h6" gutterBottom>Update Display Name</Typography>
+            <TabPanel value={tabValue} index={1}>
+              <Box component="form" onSubmit={handleSignUp}>
                 <TextField
                   fullWidth
-                  label="Display Name"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  sx={{ mb: 2 }}
+                  label="Email Address"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  margin="normal"
+                  required
+                  autoComplete="email"
+                  InputProps={{
+                    startAdornment: <Email />,
+                  }}
                 />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={isLoading || !displayName.trim()}
-                >
-                  {isLoading ? <CircularProgress size={24} /> : 'Save Name'}
-                </Button>
-              </form>
-
-              <Divider />
-
-              <form onSubmit={handleChangePassword}>
-                <Typography variant="h6" gutterBottom>Change Password</Typography>
                 <TextField
                   fullWidth
+                  label="Password"
                   type="password"
-                  label="New Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  sx={{ mb: 2 }}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  margin="normal"
+                  required
+                  autoComplete="new-password"
+                  InputProps={{
+                    startAdornment: <Lock />,
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  label="Confirm Password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  margin="normal"
+                  required
+                  autoComplete="new-password"
+                  InputProps={{
+                    startAdornment: <Lock />,
+                  }}
                 />
                 <Button
                   type="submit"
+                  fullWidth
                   variant="contained"
-                  disabled={isLoading || !newPassword.trim()}
+                  sx={{ mt: 3, mb: 2 }}
+                  disabled={loading}
                 >
-                  {isLoading ? <CircularProgress size={24} /> : 'Set New Password'}
+                  {loading ? <CircularProgress size={24} /> : 'Sign Up'}
                 </Button>
-              </form>
-            </Stack>
-          </CardContent>
-        </Card>
+              </Box>
+            </TabPanel>
 
-        <Card>
-          <CardContent>
-            <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <HistoryIcon /> Analysis History
+            <Divider sx={{ my: 2 }} />
+            
+            <Typography variant="body2" color="text.secondary" align="center">
+              By signing up, you agree to our Terms of Service and Privacy Policy
             </Typography>
-            <Alert severity="info">
-              Your past analysis results will appear here soon. (Feature in development)
-            </Alert>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent>
-            <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FeedbackIcon /> Submit Feedback
-            </Typography>
-            {feedbackMessage && (
-              <Alert severity={feedbackMessage.startsWith("Failed") ? "error" : "success"} sx={{ mb: 2 }}>
-                {feedbackMessage}
-              </Alert>
-            )}
-            <form onSubmit={handleFeedbackSubmit}>
-              <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Feedback Type</InputLabel>
-                <Select
-                  value={feedbackType}
-                  label="Feedback Type"
-                  onChange={(e) => setFeedbackType(e.target.value)}
-                >
-                  <MenuItem value="general">General Comment</MenuItem>
-                  <MenuItem value="bug">Bug Report</MenuItem>
-                  <MenuItem value="feature">Feature Suggestion</MenuItem>
-                  <MenuItem value="accuracy">Analysis Accuracy</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                label="Comments"
-                value={feedbackComment}
-                onChange={(e) => setFeedbackComment(e.target.value)}
-                sx={{ mb: 2 }}
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={isLoading || !feedbackComment.trim()}
-              >
-                {isLoading ? <CircularProgress size={24} /> : 'Send Feedback'}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent>
-            <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <NotificationsIcon /> Newsletter
-            </Typography>
-            {newsletterMessage && (
-              <Alert severity={newsletterMessage.startsWith("Failed") ? "error" : "success"} sx={{ mb: 2 }}>
-                {newsletterMessage}
-              </Alert>
-            )}
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={isSubscribedToNewsletter}
-                  onChange={handleNewsletterToggle}
-                  disabled={isLoading}
-                />
-              }
-              label="Subscribe to newsletter"
-            />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent>
-            <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <DeleteIcon /> Advanced Settings
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Be careful with actions in this section.
-            </Typography>
-            <Button
-              variant="outlined"
-              color="error"
-              disabled={isLoading}
-              startIcon={<DeleteIcon />}
-            >
-              {isLoading ? <CircularProgress size={24} /> : 'Delete My Account'}
-            </Button>
-            <Typography variant="caption" color="error" sx={{ display: 'block', mt: 1 }}>
-              This action is irreversible.
-            </Typography>
-          </CardContent>
-        </Card>
-
-        {isAdmin && (
-          <Card>
-            <CardContent>
-              <Typography variant="h5" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <AdminIcon /> Admin Tools
-              </Typography>
-              <Button
-                variant="contained"
-                color="success"
-                onClick={handleGiveFreeTokens}
-                disabled={isLoading}
-                sx={{ mb: 2 }}
-              >
-                {isLoading ? <CircularProgress size={24} /> : 'Give Free Tokens (+100)'}
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </Stack>
-    </Container>
+          </Paper>
+        </Box>
+      </Container>
+    </Layout>
   );
 };
 

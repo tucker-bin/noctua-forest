@@ -19,8 +19,6 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import InfoIcon from '@mui/icons-material/Info';
-import debounce from 'lodash/debounce';
 
 export interface AnalysisData {
     original_text: string;
@@ -43,7 +41,6 @@ interface RhymeAnalysisToolProps {
     isLoading: boolean;
     error: string | null;
     currentCost: number;
-    tokenBalance?: number;
 }
 
 const BATCH_SIZE = 1000; // Characters per batch
@@ -55,29 +52,12 @@ const RhymeAnalysisTool: React.FC<RhymeAnalysisToolProps> = ({
     isLoading,
     error,
     currentCost,
-    tokenBalance,
 }) => {
     const [text, setText] = useState('');
-    const [debouncedText, setDebouncedText] = useState('');
     const [copySuccess, setCopySuccess] = useState<string | null>(null);
     const [batchProgress, setBatchProgress] = useState(0);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-    // Debounced text update
-    const debouncedSetText = useCallback(
-        debounce((value: string) => {
-            setDebouncedText(value);
-        }, DEBOUNCE_DELAY),
-        []
-    );
-
-    useEffect(() => {
-        debouncedSetText(text);
-        return () => {
-            debouncedSetText.cancel();
-        };
-    }, [text, debouncedSetText]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

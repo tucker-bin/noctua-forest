@@ -41,3 +41,6 @@ secrets/
 
 # Ignore Firebase Admin SDK keys and secrets
 my-rhyme-app-firebase-adminsdk-*.json
+
+.env
+.env.*

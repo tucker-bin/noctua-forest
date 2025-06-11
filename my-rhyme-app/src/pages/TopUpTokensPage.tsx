@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { useUsage } from '../contexts/UsageContext'; // To display current balance
 import { Button, Typography, Box, Card, CardContent, CardActions, Grid } from '@mui/material';
@@ -21,7 +21,7 @@ const PLAN_OPTIONS: PlanOption[] = [
 ];
 
 interface TopUpTokensPageProps {
-  onNavigate: (view: PageView) => void;
+  onNavigate?: (view: PageView) => void;
 }
 
 const TopUpTokensPage: React.FC<TopUpTokensPageProps> = ({ onNavigate }) => {
@@ -32,24 +32,37 @@ const TopUpTokensPage: React.FC<TopUpTokensPageProps> = ({ onNavigate }) => {
 
   const [isRedirecting, setIsRedirecting] = useState<string | null>(null);
 
-  const handleTopUp = (plan: PlanOption) => {
+  const handleTopUp = async (plan: PlanOption) => {
     if (!currentUser || currentUser.isAnonymous) {
       alert("Please ensure you are fully signed in to purchase tokens.");
-      // In a more integrated app, this might call onNavigate('topup') to show AuthForm
       return;
     }
-
     setIsRedirecting(plan.stripePriceId || null);
-    // Simulate payment processing and update token balance
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priceId: plan.stripePriceId, userId: currentUser.uid }),
+      });
+      const data = await response.json();
+      if (response.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || 'Failed to start checkout.');
+        setIsRedirecting(null);
+      }
+    } catch (err) {
+      alert('Failed to start checkout.');
       setIsRedirecting(null);
-      // Potentially call usageInfo?.fetchUsage(); here to refresh balance after mock purchase
-    }, 2000);
+    }
   };
 
   return (
     <Box>
       <Typography variant="h4" gutterBottom>Top Up Tokens</Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <b>Note:</b> This is a demo. No real payment is processed. Token top-up is simulated.
+      </Typography>
       <Grid container spacing={2}>
         {PLAN_OPTIONS.map((plan) => (
           <Grid item xs={12} sm={6} md={3} key={plan.name}>

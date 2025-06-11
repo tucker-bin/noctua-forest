@@ -15,14 +15,14 @@ export default defineConfig({
   ],
   build: {
     chunkSizeWarningLimit: 1000,
+    outDir: 'dist',
   },
   server: {
     proxy: {
       '/api': {
-        target: 'https://my-rhyme-app-bpeavbldxq-uc.a.run.app',
+        target: 'http://localhost:3001',
         changeOrigin: true,
-        secure: false, // Set to true if your backend uses a valid SSL certificate
-        rewrite: (path) => path.replace(/^\/api/, '/api'),
+        secure: false,
       },
     },
   },

@@ -58,7 +58,7 @@ const AppRoutes: React.FC = () => {
         />
         <Route
           path="/account"
-          element={currentUser ? <AccountsPage navigateToSubscriptionPlans={() => navigate('/subscription')} /> : <Navigate to="/login" replace />}
+          element={currentUser ? <AccountsPage /> : <Navigate to="/login" replace />}
         />
         <Route
           path="/subscription"

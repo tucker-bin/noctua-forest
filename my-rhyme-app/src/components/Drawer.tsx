@@ -6,7 +6,6 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  IconButton,
   Box,
   useMediaQuery,
   useTheme,
@@ -18,6 +17,7 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { AuthContext } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface DrawerProps {
   open: boolean;
@@ -35,12 +35,16 @@ const Drawer: React.FC<DrawerProps> = ({ open, onClose }) => {
   const currentUser = authCtx?.currentUser;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
 
   const handleSignOut = async () => {
-    try {
-      await authCtx?.signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
+    if (authCtx) {
+      try {
+        await authCtx.logout();
+        navigate('/');
+      } catch (error) {
+        console.error('Error signing out:', error);
+      }
     }
   };
 

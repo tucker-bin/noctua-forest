@@ -8,6 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <base href="/" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      img-src 'self' http://localhost:5000 https://www.google.com data:;
+      connect-src 'self' http://localhost:5000 https://securetoken.googleapis.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    ">
   </head>
   <body>
     <div id="root"></div>

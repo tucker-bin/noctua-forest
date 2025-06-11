@@ -9,8 +9,6 @@ import {
     Link,
     Stack,
     Divider,
-    useTheme,
-    useMediaQuery,
     CircularProgress,
 } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
@@ -47,10 +45,10 @@ const AuthFormComponent: React.FC<AuthFormComponentProps> = ({
     const [googleError, setGoogleError] = useState<string | null>(null);
     const [emailError, setEmailError] = useState<string | null>(null);
     const [passwordError, setPasswordError] = useState<string | null>(null);
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const authCtx = useContext(AuthContext);
-    const signInWithGoogle = authCtx?.signInWithGoogle;
+    // const theme = useTheme();
+    // const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    useContext(AuthContext);
+    // const signInWithGoogle = authCtx?.signInWithGoogle;
     const [showTos, setShowTos] = useState(false);
     const [showPrivacy, setShowPrivacy] = useState(false);
     const [tosScrolled, setTosScrolled] = useState(false);
@@ -98,7 +96,7 @@ const AuthFormComponent: React.FC<AuthFormComponentProps> = ({
         setGoogleLoading(true);
         setGoogleError(null);
         try {
-            await signInWithGoogle?.();
+            // await signInWithGoogle?.();
         } catch (err: any) {
             setGoogleError(err.message || 'Google sign-in failed.');
         } finally {
@@ -291,4 +289,4 @@ const AuthFormComponent: React.FC<AuthFormComponentProps> = ({
     );
 };
 
-export default AuthFormComponent;
+export default AuthFormComponent; 

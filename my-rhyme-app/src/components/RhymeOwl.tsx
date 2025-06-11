@@ -5,23 +5,23 @@ import { styled } from '@mui/material/styles';
 
 const OwlContainer = styled(Box)(({ theme }) => ({
   position: 'relative',
-  width: '120px',
-  height: '120px',
+  width: '100px',
+  height: '100px',
   margin: '0 auto',
 }));
 
 const SpeechBubble = styled(motion.div)(({ theme }) => ({
   position: 'absolute',
-  top: '-80px',
+  bottom: '110px',
   left: '50%',
   transform: 'translateX(-50%)',
   background: 'rgba(26, 37, 71, 0.9)',
   backdropFilter: 'blur(10px)',
-  padding: theme.spacing(2),
+  padding: theme.spacing(1.5, 2),
   borderRadius: '16px',
   border: '1px solid rgba(255, 215, 0, 0.2)',
   boxShadow: '0 4px 24px rgba(0, 0, 0, 0.2)',
-  maxWidth: '280px',
+  width: '280px',
   '&::after': {
     content: '""',
     position: 'absolute',

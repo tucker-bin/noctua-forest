@@ -1,3 +1,6 @@
+/* Import fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600;700&display=swap');
+
 :root {
   --space-blue: #2B3A67;
   --deep-space: #1A2547;
@@ -6,26 +9,19 @@
   --cosmic-dust: #B8C6DB;
 }
 
+/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  background: var(--night-sky);
-  color: #FFFFFF;
-  font-family: 'Inter', sans-serif;
-  min-height: 100vh;
-  background-image: 
-    radial-gradient(circle at 50% 50%, rgba(43, 58, 103, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
-  background-attachment: fixed;
-}
+/* Body styles are handled by MUI theme */
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -47,41 +43,14 @@ body {
   color: var(--deep-space);
 }
 
-/* Focus styles */
-:focus {
-  outline: 2px solid var(--stellar-gold);
-  outline-offset: 2px;
-}
+/* Focus styles handled by MUI theme */
 
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Loading animation */
-@keyframes starTwinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
-}
 
-.loading {
-  position: relative;
-}
-
-.loading::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, 
-    transparent 0%, 
-    rgba(255, 215, 0, 0.1) 50%, 
-    transparent 100%
-  );
-  animation: starTwinkle 2s infinite;
-}
 
 /* Glass effect utility classes */
 .glass {
@@ -115,34 +84,7 @@ html {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Typography utilities */
-.space-grotesk {
-  font-family: 'Space Grotesk', sans-serif;
-}
 
-.inter {
-  font-family: 'Inter', sans-serif;
-}
-
-/* Color utilities */
-.text-gold {
-  color: var(--stellar-gold);
-}
-
-.text-space {
-  color: var(--space-blue);
-}
-
-.text-cosmic {
-  color: var(--cosmic-dust);
-}
-
-/* Layout utilities */
-.constellation-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-}
 
 .star-field {
   position: relative;
@@ -165,172 +107,6 @@ html {
   pointer-events: none;
 }
 
-/* Global body styles from Flask app */
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  line-height: 1.6;
-  margin: 0;
-  padding: 20px;
-  background-color: #f0f2f5 !important; /* Ensure override */
-  color: #1c1e21;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* Align to top for scrollable content */
-  min-height: 100vh;
-  box-sizing: border-box;
-}
+/* Legacy Flask styles removed - using MUI theme instead */
 
-/* Styles for the main application container, mimicking Flask app's .container */
-.tool-container {
-  background-color: #ffffff;
-  padding: 25px 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 750px; /* Max width from Flask app */
-  border: 1px solid #dddfe2;
-  /* Centering is handled by body flex properties */
-}
-
-/* Styles for H1 inside the tool-container, mimicking Flask app's h1 */
-/* Targeting the specific h1.display-5 in RhymeAnalysisTool or a more specific class like .h1-rhyme-finder */
-.tool-container h1.display-5,
-.tool-container .h1-rhyme-finder {
-  color: #1877f2;
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 2em; /* Approx 32px if base is 16px, matching Flask app */
-  font-weight: 600;
-}
-
-
-/* --- Existing custom styles for RhymeAnalysisTool elements below --- */
-
-/* Main Analyze Button */
-.btn-analyze {
-  background-color: #007bff; /* Primary blue */
-  border-color: #007bff;
-  color: white;
-  padding: 0.5rem 1rem;
-  font-size: 1.1rem;
-  border-radius: 0.3rem;
-  transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
-}
-.btn-analyze:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
-  color: white;
-}
-.btn-analyze:disabled {
-  background-color: #007bff;
-  border-color: #007bff;
-  opacity: 0.65;
-}
-
-/* Text Area for Input */
-.textarea-rhymes {
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-  padding: 0.75rem;
-  font-size: 1.1rem;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.075);
-  min-height: 120px;
-}
-.textarea-rhymes:focus {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
-  outline: 0;
-}
-
-/* Filter Controls (Dropdowns, Text Inputs) */
-.filter-control {
-  font-size: 0.9rem;
-  border-radius: 0.2rem;
-}
-
-/* Analyzed Text Display Area */
-.analyzed-text-display {
-  background-color: #f8f9fa;
-  border: 1px solid #e3e3e3;
-  border-radius: 0.3rem;
-  padding: 1rem;
-  font-size: 1.2rem;
-  line-height: 1.8;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-.analyzed-text-display span[style*="backgroundColor"] { 
-  padding: 0.15em 0.2em;
-  margin: 0 0.05em;
-  border-radius: 0.25em;
-  font-weight: bold;
-  cursor: pointer;
-  transition: filter 0.15s ease-in-out;
-}
-.analyzed-text-display span[style*="backgroundColor"]:hover {
-  filter: brightness(90%);
-}
-
-
-/* Legend Item Cards */
-.legend-item-card {
-  border-left-width: 5px;
-  transition: opacity 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-.legend-item-card.active { 
-  box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15) !important;
-}
-.legend-item-card .color-swatch {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  display: inline-block;
-  border: 1px solid rgba(0,0,0,0.1);
-  flex-shrink: 0;
-}
-.legend-item-card .card-title {
-  font-size: 1rem;
-}
-.legend-item-card .card-text {
-  font-size: 0.85rem;
-}
-
-.filter-controls-row {
-    padding: 0.5rem 0;
-    margin-bottom: 1rem;
-}
-
-/* Styles for highlighted rhyme groups from Python backend CSS_TEMPLATE */
-.highlighted-word, .highlight {
-  padding: 0.15em 0.3em;
-  border-radius: 4px;
-  /* font-weight: 600; /* Optional: if you want highlighted text to be bolder */
-  margin: 0 1px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Softer shadow */
-  display: inline; /* Default behavior, good for text spans */
-}
-
-.rhyme-group-0 { background-color: #FFADAD; color: #570000; }
-.rhyme-group-1 { background-color: #FFD6A5; color: #7A3E00; }
-.rhyme-group-2 { background-color: #FDFFB6; color: #5C5E00; }
-.rhyme-group-3 { background-color: #CAFFBF; color: #005E03; }
-.rhyme-group-4 { background-color: #9BF6FF; color: #005768; }
-.rhyme-group-5 { background-color: #A0C4FF; color: #002A7A; }
-.rhyme-group-6 { background-color: #BDB2FF; color: #2A007A; }
-.rhyme-group-7 { background-color: #FFC6FF; color: #7A007A; }
-.rhyme-group-8 { background-color: #FFB3BA; color: #6F2E3B; }
-.rhyme-group-9 { background-color: #FFFFD1; color: #636335; }
-.rhyme-group-10 { background-color: #99FF99; color: #2E6B2E; }
-.rhyme-group-11 { background-color: #ACE5EE; color: #36454F; } /* LightCyan (similar to an existing one but from the Python CSS) */
-.rhyme-group-12 { background-color: #E6E6FA; color: #483D8B; } /* Lavender */
-.rhyme-group-13 { background-color: #FFDEAD; color: #8B4513; } /* NavajoWhite */
-.rhyme-group-14 { background-color: #F0E68C; color: #808000; } /* Khaki */
-.rhyme-group-15 { background-color: #D3D3D3; color: #000000; } /* LightGray */
-.rhyme-group-16 { background-color: #FFC0CB; color: #800000; } /* Pink */
-.rhyme-group-17 { background-color: #D8BFD8; color: #4B0082; } /* Thistle */
-.rhyme-group-18 { background-color: #B0E0E6; color: #008080; } /* PowderBlue */
-.rhyme-group-19 { background-color: #FAFAD2; color: #556B2F; } /* LightGoldenrodYellow */
-.rhyme-group-20 { background-color: #FFE4E1; color: #A52A2A; } /* MistyRose */
-.rhyme-group-21 { background-color: #AFEEEE; color: #2F4F4F; } /* PaleTurquoise */
-.rhyme-group-22 { background-color: #FFFACD; color: #808000; } /* LemonChiffon */
-.rhyme-group-23 { background-color: #F5DEB3; color: #8B4513; } /* Wheat */
+/* Rhyme highlighting handled by HighlightLyrics component */
