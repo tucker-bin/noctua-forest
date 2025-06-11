@@ -1,79 +1,74 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Production builds
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-*.manifest
-*.spec
-pip-log.txt
-pip-delete-this-directory.txt
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.hypothesis/
-.pytest_cache/
-celerybeat-schedule
-celerybeat.pid
-*.sage.py
+build/
+*.build/
+.cache/
 
-# Environments
+# Environment files
 .env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
 
-# Node.js / Vite (inside my-rhyme-app)
-my-rhyme-app/node_modules/
-my-rhyme-app/dist/
-my-rhyme-app/coverage/
-my-rhyme-app/.vite/
-my-rhyme-app/.env.local
-my-rhyme-app/.env.*.local
-my-rhyme-app/npm-debug.log*
-my-rhyme-app/yarn-debug.log*
-my-rhyme-app/yarn-error.log*
-my-rhyme-app/bundle-analysis.html
-
-# IDE / OS specific
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Python (from old backend)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+*.egg-info/
+
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+
+# Vite
+my-rhyme-app/.vite/
+
+# Deployment logs
+deployment_log.txt
+
+# OS files
 Thumbs.db
 
-# User-added
-old_app/
-
-# Ignore Firebase Admin SDK keys and secrets
-my-rhyme-app-firebase-adminsdk-*.json
-secrets/
+# Package manager locks (keep one, ignore others based on your choice)
+# If using npm, keep package-lock.json and ignore yarn.lock
+# yarn.lock
+# If using yarn, keep yarn.lock and ignore package-lock.json
+# package-lock.json

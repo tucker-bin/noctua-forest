@@ -41,6 +41,7 @@ interface RhymeAnalysisToolProps {
     isLoading: boolean;
     error: string | null;
     currentCost: number;
+    tokenBalance?: number;
 }
 
 const BATCH_SIZE = 1000; // Characters per batch
@@ -52,6 +53,7 @@ const RhymeAnalysisTool: React.FC<RhymeAnalysisToolProps> = ({
     isLoading,
     error,
     currentCost,
+    tokenBalance,
 }) => {
     const [text, setText] = useState('');
     const [copySuccess, setCopySuccess] = useState<string | null>(null);

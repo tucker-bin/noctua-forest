@@ -1,0 +1,14 @@
+# PASTE YOUR PARENT .ENV CONTENTS HERE
+# =====================================
+# 
+# Please paste the contents of your my-rhyme-app-main/.env file below this line.
+# I'll help you split it into the correct files:
+#
+# 1. node-backend/.env (backend variables)
+# 2. my-rhyme-app/.env.local (frontend variables)
+#
+# After you paste your .env contents here, I'll create a script 
+# that automatically sorts them into the right places.
+#
+# PASTE BELOW THIS LINE:
+# ===================== 

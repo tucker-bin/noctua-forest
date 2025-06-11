@@ -1,0 +1,641 @@
+--- a/my-rhyme-app/src/components/AuthFormComponent.tsx
++++ b/my-rhyme-app/src/components/AuthFormComponent.tsx
+@@ -48,11 +48,11 @@
+ 
+ const AuthFormComponent: React.FC<AuthFormProps> = ({ isLogin, onSubmit, onToggle, error, message }) => {
+     const theme = useTheme();
+-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
++    // const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+     const authCtx = useAuth();
+ 
+-    const signInWithGoogle = authCtx?.signInWithGoogle;
+-    
++    // const signInWithGoogle = authCtx?.signInWithGoogle;
++
+     const [email, setEmail] = useState('');
+     const [password, setPassword] = useState('');
+     const [confirmPassword, setConfirmPassword] = useState('');
+@@ -107,7 +107,7 @@
+                     </Button>
+                 )}
+ 
+-                {isLogin && signInWithGoogle &&
++                {/* {isLogin && signInWithGoogle &&
+                     <Button
+                         fullWidth
+                         variant="outlined"
+@@ -116,7 +116,7 @@
+                     >
+                         Sign in with Google
+                     </Button>
+-                }
++                } */}
+             </Stack>
+         </Paper>
+     );
+--- a/my-rhyme-app/src/components/ControlDeck.tsx
++++ b/my-rhyme-app/src/components/ControlDeck.tsx
+@@ -5,22 +5,14 @@
+   Paper,
+   Typography,
+   Switch,
+-  Chip,
+   Box,
+   Collapse,
+   IconButton,
+   Tooltip,
+ } from '@mui/material';
+ import {
+-  Visibility,
+-  VisibilityOff,
+   ExpandLess,
+   ExpandMore,
+ } from '@mui/icons-material';
+-import { noctuaColors } from '../theme/noctuaTheme';
+ 
+ export interface PatternControl {
+   id: string;
+@@ -42,8 +34,6 @@
+   onToggleCollapse: () => void;
+ }
+ 
+-const someEnabled = true;
+-
+ export const ControlDeck: React.FC<ControlDeckProps> = ({ patterns, onTogglePattern, onToggleAll, collapsed, onToggleCollapse }) => {
+   const allEnabled = patterns.every(p => p.enabled);
+-  const someEnabled = patterns.some(p => p.enabled);
+ 
+   return (
+     <Paper
+--- a/my-rhyme-app/src/components/Drawer.tsx
++++ b/my-rhyme-app/src/components/Drawer.tsx
+@@ -6,7 +6,6 @@
+   Divider,
+   List,
+   ListItem,
+-  IconButton,
+   ListItemText,
+   ListItemIcon,
+   Typography,
+@@ -37,7 +36,7 @@
+   const handleSignOut = async () => {
+     if (authCtx) {
+       try {
+-        await authCtx?.signOut();
++        await authCtx?.logout();
+         navigate('/');
+       } catch (error) {
+         console.error("Failed to sign out", error);
+--- a/my-rhyme-app/src/components/ErrorBoundary.tsx
++++ b/my-rhyme-app/src/components/ErrorBoundary.tsx
+@@ -16,8 +16,8 @@
+     }
+   }
+ 
+-  componentDidCatch(error: Error, errorInfo: any) {
+-    // You can log the error to an error reporting service
++  componentDidCatch() {
++    // console.error("Uncaught error:", error, errorInfo);
+   }
+ 
+   render() {
+--- a/my-rhyme-app/src/components/HighlightLyrics.tsx
++++ b/my-rhyme-app/src/components/HighlightLyrics.tsx
+@@ -91,7 +91,7 @@
+   };
+ 
+   const renderHighlights = (positions: number[], color: string) => {
+-    positions.forEach((start, index) => {
++    positions.forEach((start) => {
+       const end = start + 1; // Assuming single character for simplicity
+       const { top, left, width, height } = getPosition(start, end);
+       const sparkleId = `sparkle-${start}`;
+--- a/my-rhyme-app/src/components/Layout.tsx
++++ b/my-rhyme-app/src/components/Layout.tsx
+@@ -20,7 +20,7 @@
+   },
+ }));
+ 
+-const ContentWrapper = styled(Box)(({ theme }) => ({
++const ContentWrapper = styled(Box)(() => ({
+   flexGrow: 1,
+   padding: '24px',
+   display: 'flex',
+--- a/my-rhyme-app/src/components/LunarSwitch.tsx
++++ b/my-rhyme-app/src/components/LunarSwitch.tsx
+@@ -1,5 +1,3 @@
+-import React from 'react';
+ import { styled } from '@mui/material/styles';
+ import Switch from '@mui/material/Switch';
+ 
+--- a/my-rhyme-app/src/components/Navbar.tsx
++++ b/my-rhyme-app/src/components/Navbar.tsx
+@@ -5,22 +5,11 @@
+   Container,
+   Button,
+   useTheme,
+-  Drawer,
+-  List,
+-  ListItem,
+-  ListItemText,
+-  ListItemIcon,
+   IconButton,
+ } from '@mui/material';
+ import MenuIcon from '@mui/icons-material/Menu';
+ import { useAuth } from '../contexts/AuthContext';
+ import { useNavigate, Link as RouterLink } from 'react-router-dom';
+ import {
+-  Home as HomeIcon,
+-  Analytics as AnalyticsIcon,
+-  Person as PersonIcon,
+-  Dashboard as DashboardIcon,
+-  Logout as LogoutIcon,
+   Brightness4 as Brightness4Icon,
+   Brightness7 as Brightness7Icon,
+ } from '@mui/icons-material';
+--- a/my-rhyme-app/src/components/NavigationHandler.tsx
++++ b/my-rhyme-app/src/components/NavigationHandler.tsx
+@@ -8,22 +8,8 @@
+   children: React.ReactNode;
+ }
+ 
+-const NavigationHandler: React.FC<NavigationHandlerProps> = ({ children }) => {
+-    const navigate = useNavigate();
+-    const location = useLocation();
+-
+-    const handleNavigation = (path: string) => {
+-        if (location.pathname !== path) {
+-            navigate(path);
+-        }
+-    };
+-
+-    return (
+-        <>
+-            {React.Children.map(children, child => {
+-                if (React.isValidElement(child)) {
+-                    return React.cloneElement(child, { onNavigate: handleNavigation });
+-                }
+-                return child;
+-            })}
+-        </>
+-    );
++const NavigationHandler: React.FC<NavigationHandlerProps> = ({ children }) => {    
++    return <>{children}</>;
+ };
+ 
+ export default NavigationHandler;
+--- a/my-rhyme-app/src/components/NewsletterSignup.tsx
++++ b/my-rhyme-app/src/components/NewsletterSignup.tsx
+@@ -4,7 +4,6 @@
+   Typography,
+   TextField,
+   CircularProgress,
+-  Button,
+   Alert,
+   Paper,
+   Switch,
+--- a/my-rhyme-app/src/components/OrionOwl.tsx
++++ b/my-rhyme-app/src/components/OrionOwl.tsx
+@@ -19,11 +19,6 @@
+   50% { opacity: 0.9; transform: scale(1.05); }
+ `;
+ 
+-const float = keyframes`
+-  0%, 100% { transform: translateY(0px); }
+-  50% { transform: translateY(-8px); }
+-`;
+-
+ const speechBubbleAnimation = keyframes`
+   from { opacity: 0; transform: translateY(10px); }
+   to { opacity: 1; transform: translateY(0); }
+@@ -99,10 +94,10 @@
+   }, [mood, showBubble, animate]);
+ 
+   const moodColors = {
+-    happy: noctuaColors.wisdom,
+-    thinking: noctuaColors.deepIndigo,
+-    excited: noctuaColors.creativity,
+-    listening: noctuaColors.rhythm
++    happy: noctuaColors.vibrantGold,
++    thinking: noctuaColors.brightSkyBlue,
++    excited: noctuaColors.moonbeam,
++    listening: noctuaColors.mutedSilver
+   };
+ 
+   return (
+--- a/my-rhyme-app/src/components/RhymeAnalysisTool.tsx
++++ b/my-rhyme-app/src/components/RhymeAnalysisTool.tsx
+@@ -10,7 +10,6 @@
+ } from '@mui/material';
+ import SendIcon from '@mui/icons-material/Send';
+ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+-import InfoIcon from '@mui/icons-material/Info';
+ import debounce from 'lodash/debounce';
+ 
+ export interface AnalysisData {
+@@ -32,7 +31,6 @@
+     isLoading: boolean;
+     error: string | null;
+     currentCost: number;
+-    tokenBalance?: number;
+ }
+ 
+ const BATCH_SIZE = 1000; // Characters per batch
+@@ -43,18 +41,16 @@
+     results,
+     isLoading,
+     error,
+-    currentCost,
+-    tokenBalance,
++    currentCost
+ }) => {
+     const [text, setText] = useState('');
+-    const [debouncedText, setDebouncedText] = useState('');
+     const [copySuccess, setCopySuccess] = useState<string | null>(null);
+     const [batchProgress, setBatchProgress] = useState(0);
+     const theme = useTheme();
+     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+ 
+     // Debounced text update
+-    const debouncedSetText = useCallback(
++    const debouncedSetText = useCallback( 
+         debounce((value: string) => {
+-            setDebouncedText(value);
+         }, DEBOUNCE_DELAY),
+         []
+     );
+--- a/my-rhyme-app/src/components/RhymeOwl.tsx
++++ b/my-rhyme-app/src/components/RhymeOwl.tsx
+@@ -3,7 +3,7 @@
+ import { Box } from '@mui/material';
+ 
+ // A simple styled component for the owl container
+-const OwlContainer = styled(Box)(({ theme }) => ({
++const OwlContainer = styled(Box)(() => ({
+     position: 'relative',
+     width: '100px',
+     height: '100px',
+--- a/my-rhyme-app/src/components/RhymeScoreSystem.tsx
++++ b/my-rhyme-app/src/components/RhymeScoreSystem.tsx
+@@ -1,10 +1,9 @@
+-import React, { useState, useEffect } from 'react';
++import React, { useState } from 'react';
+ import {
+   Box,
+   Typography,
+   Paper,
+   LinearProgress,
+-  Tooltip,
+   Grid,
+   Chip,
+   Fade,
+@@ -67,7 +66,6 @@
+ interface RhymeScoreSystemProps {
+   totalScore: number;
+   currentStreak: number;
+-  longestStreak: number;
+   achievements: Achievement[];
+   level: number;
+   currentLevelProgress: number;
+@@ -78,7 +76,6 @@
+ export const RhymeScoreSystem: React.FC<RhymeScoreSystemProps> = ({
+   totalScore,
+   currentStreak,
+-  longestStreak,
+   achievements,
+   level,
+   currentLevelProgress,
+@@ -86,7 +83,7 @@
+   recentPatterns,
+ }) => {
+   const theme = useTheme();
+-  const [showLevelUp, setShowLevelUp] = useState(false);
++  const [showLevelUp] = useState(false);
+ 
+   const levelInfo = calculateLevel(totalScore);
+ 
+--- a/my-rhyme-app/src/components/UsageDashboard.tsx
++++ b/my-rhyme-app/src/components/UsageDashboard.tsx
+@@ -8,7 +8,6 @@
+   Paper,
+   CircularProgress,
+   Alert,
+-  Divider,
+   Grid,
+   Card,
+   CardContent,
+@@ -21,11 +20,17 @@
+   Token as TokenIcon,
+ } from '@mui/icons-material';
+ import { useAuth } from '../contexts/AuthContext';
+-import { useUsage, SubscriptionPlan } from '../contexts/UsageContext';
++import { useUsage, SubscriptionPlan as Plan } from '../contexts/UsageContext';
++
++interface SubscriptionPlan {
++  id: string;
++  name: string;
++  price: number;
++  features: string[];
++  tokenGrant: number;
++}
+ 
+ const UsageDashboard: React.FC = () => {
+-  const theme = useTheme();
+   const { currentUser } = useAuth();
+   const { usageInfo, isLoading, error } = useUsage();
+   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
+@@ -58,16 +63,6 @@
+     },
+   ];
+ 
+-  const handleSelectPlan = (plan: Plan) => {
+-    setSelectedPlan(plan);
+-    console.log('Selected plan:', plan);
+-  };
+-
+-  const handleConfirmSubscription = async () => {
+-    if (selectedPlan) {
+-      alert(`Subscribing to ${selectedPlan.name}`);
+-    }
+-  };
+-
+   if (isLoading) {
+     return <CircularProgress />;
+   }
+--- a/my-rhyme-app/src/pages/AccountsPage.tsx
++++ b/my-rhyme-app/src/pages/AccountsPage.tsx
+@@ -1,27 +1,22 @@
+ import React, { useState } from 'react';
+ import { useAuth } from '../contexts/AuthContext';
+ import {
+-    Box,
+-    Container,
+-    Typography,
+-    Paper,
+-    TextField,
+-    Button,
+-    Alert,
+-    CircularProgress,
+-    Tabs,
+-    Tab
++  Box,
++  Container,
++  Typography,
++  Paper,
++  TextField,
++  Button,
++  Alert,
++  CircularProgress,
++  Tabs,
++  Tab,
++  Grid,
++  Card,
++  CardContent,
++  List,
++  ListItem,
++  ListItemText,
++  ListItemIcon,
++  Divider,
+ } from '@mui/material';
+-import { User, updateProfile as firebaseUpdateProfile, updatePassword as firebaseUpdatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+-import { db } from '../firebase';
+ import { useUsage } from '../contexts/UsageContext';
+-import type { FormEvent } from 'react';
+-import {
+-  Divider,
+-  Stack,
+-  FormControlLabel,
+-  Checkbox,
+-  Select,
+-  MenuItem,
+-  FormControl,
+-  InputLabel,
+-  Card,
+-  CardContent,
+-  IconButton,
+-  Tooltip,
+-  Grid,
+-  List,
+-  ListItem,
+-  ListItemText,
+-  ListItemIcon,
+-} from '@mui/material';
+ import {
+   Email,
+   Lock,
+--- a/my-rhyme-app/src/pages/Analysis.tsx
++++ b/my-rhyme-app/src/pages/Analysis.tsx
+@@ -261,9 +261,9 @@
+             {results && !loading && (
+               <Box>
+                 <Typography variant="subtitle1" gutterBottom>
+-                  Found {results.rhyme_details.length} pattern groups:
++                  Found {results.rhyme_details.length} pattern groups in demo:
+                 </Typography>
+-                {results.rhyme_details.map((group, index) => (
++                {results.rhyme_details.map((group) => (
+                   <Card key={group.group_id} sx={{ mb: 2 }}>
+                     <CardContent>
+                       <Typography variant="h6" color="primary" gutterBottom>
+@@ -303,6 +303,7 @@
+               setText(newText);
+               await handleAnalyze();
+             }}
++            currentCost={0}
+           />
+         </Box>
+       )}
+--- a/my-rhyme-app/src/pages/ObserverHome.tsx
++++ b/my-rhyme-app/src/pages/ObserverHome.tsx
+@@ -1,29 +1,25 @@
+-import React, { useState, useCallback, useEffect } from 'react';
++import React, { useState, useEffect } from 'react';
+ import { 
+   Box, 
+   Typography, 
+   Button, 
+   Container,
+   Grid,
+   Card,
+   CardContent,
+-  IconButton,
+   alpha,
+   keyframes,
+-  TextField,
+-  useTheme,
+-  Fade,
+ } from '@mui/material';
+ import { 
+   AutoAwesome as SparkleIcon,
+   Psychology as BrainIcon,
+   Share as ShareIcon,
+   ArrowForward as ArrowIcon,
+ } from '@mui/icons-material';
+ import { useNavigate } from 'react-router-dom';
+ import { noctuaColors, customStyles } from '../theme/noctuaTheme';
+ import { OrionOwl } from '../components/OrionOwl';
+-import { HighlightLyrics } from '../components/HighlightLyrics';
+-import { AnalysisLegend } from '../components/AnalysisLegend';
+-import LunarSwitch from '../components/LunarSwitch';
+-import { Observatory } from '../components/Observatory';
+ import { OnboardingJourney } from '../components/OnboardingJourney';
+ import { ControlDeck, PatternControl } from '../components/ControlDeck';
+ import { RhymeScoreSystem } from '../components/RhymeScoreSystem';
+-import { processLyrics } from '../utils/lyricProcessor';
++import { Sparkle } from '../components/Sparkle';
+ 
+ // Animation keyframes
+-const twinkle = keyframes`
+-  0%, 100% { opacity: 0.3; }
+-  50% { opacity: 0.8; }
+-`;
+ 
+ const fadeInUp = keyframes`
+   from {
+@@ -43,26 +39,20 @@
+ 
+ const ObserverHome: React.FC = () => {
+   const navigate = useNavigate();
+-  const theme = useTheme();
+   const [showOrion, setShowOrion] = useState(false);
+   const [showOnboarding, setShowOnboarding] = useState(() => {
+     // Check if user has completed onboarding
+     return !localStorage.getItem('onboardingCompleted');
+   });
+   const [showControlDeck, setShowControlDeck] = useState(false);
+   const [controlDeckCollapsed, setControlDeckCollapsed] = useState(false);
+-  
+-  // Analysis state
+-  const [lyrics, setLyrics] = useState('');
+-  const [loading, setLoading] = useState(false);
+-  const [highlights, setHighlights] = useState<any[]>([]);
+-  const [analysisResult, setAnalysisResult] = useState<any>(null);
+-  
++    
+   // Pattern visibility state
+-  const [patternControls, setPatternControls] = useState([
+-    { id: 'perfectRhymes', name: 'Perfect Rhymes', color: noctuaColors.highlights.perfectRhymes, description: 'Exact sound matches', enabled: true },
+-    { id: 'assonance', name: 'Assonance', color: noctuaColors.highlights.assonance, description: 'Vowel sound patterns', enabled: true },
+-    { id: 'consonance', name: 'Consonance', color: noctuaColors.highlights.consonance, description: 'Consonant patterns', enabled: true },
+-    { id: 'alliteration', name: 'Alliteration', color: noctuaColors.highlights.alliteration, description: 'Starting sound patterns', enabled: true },
++  const [patternControls, setPatternControls] = useState<PatternControl[]>([
++    { id: 'perfectRhymes', name: 'Perfect Rhymes', color: noctuaColors.highlights.perfectRhymes, description: 'Exact sound matches', enabled: true, icon: <Sparkle /> },
++    { id: 'assonance', name: 'Assonance', color: noctuaColors.highlights.assonance, description: 'Vowel sound patterns', enabled: true, icon: <Sparkle /> },
++    { id: 'consonance', name: 'Consonance', color: noctuaColors.highlights.consonance, description: 'Consonant patterns', enabled: true, icon: <Sparkle /> },
++    { id: 'alliteration', name: 'Alliteration', color: noctuaColors.highlights.alliteration, description: 'Starting sound patterns', enabled: true, icon: <Sparkle /> },
+   ]);
+ 
+   // Gamification state
+@@ -118,41 +108,6 @@
+     );
+   };
+ 
+-  const handleAnalyze = useCallback(async () => {
+-    if (!lyrics.trim()) return;
+-    
+-    setLoading(true);
+-    try {
+-      const processed = await processLyrics(lyrics);
+-      
+-      // Update rhyme score
+-      const patternCount = Object.values(processed.patterns).reduce((sum, arr) => sum + arr.length, 0);
+-      setRhymeScore(prev => prev + patternCount * 10);
+-      setLevelProgress(prev => {
+-        const newProgress = prev + patternCount;
+-        if (newProgress >= 100) {
+-          setLevel(l => l + 1);
+-          return newProgress - 100;
+-        }
+-        return newProgress;
+-      });
+-      
+-      // Track recent patterns
+-      const newPatterns = Object.keys(processed.patterns).filter(key => processed.patterns[key].length > 0);
+-      setRecentPatterns(prev => [...newPatterns, ...prev].slice(0, 10));
+-      
+-      // Update highlights based on enabled patterns
+-      const filteredHighlights = processed.highlights.filter(h => {
+-        const control = patternControls.find(p => p.id === h.type);
+-        return control?.enabled;
+-      });
+-      
+-      setHighlights(filteredHighlights);
+-      setAnalysisResult(processed);
+-      
+-      // Check achievements
+-      if (!achievements[0].unlocked && patternCount > 0) {
+-        setAchievements(prev => prev.map(a => 
+-          a.id === 'firstRhyme' ? { ...a, unlocked: true, progress: 1 } : a
+-        ));
+-      }
+-      
+-    } catch (error) {
+-      console.error('Analysis failed:', error);
+-    } finally {
+-      setLoading(false);
+-    }
+-  }, [lyrics, patternControls, achievements]);
+-
+   if (showOnboarding) {
+     return <OnboardingJourney onComplete={handleOnboardingComplete} />;
+   }
+@@ -162,7 +117,6 @@
+       sx={{
+         minHeight: '100vh',
+         backgroundColor: noctuaColors.deepIndigo,
+-        position: 'relative',
+         overflow: 'hidden',
+         ...customStyles.starfield,
+       }}
+--- a/my-rhyme-app/src/pages/TopUpTokensPage.tsx
++++ b/my-rhyme-app/src/pages/TopUpTokensPage.tsx
+@@ -1,4 +1,4 @@
+-import React, { useContext, useState, useEffect } from 'react';
++import React, { useState } from 'react';
+ import {
+   Box,
+   Container,
+@@ -20,16 +20,12 @@
+   tokenAmount: number;
+ }
+ 
+-interface TopUpTokensPageProps {
+-  onNavigate: (path: string) => void;
+-}
+-
+-const TopUpTokensPage: React.FC<TopUpTokensPageProps> = ({ onNavigate }) => {
++const TopUpTokensPage: React.FC = () => {
+   const { currentUser } = useAuth();
+   const { usageInfo } = useUsage();
+   const [selectedPackage, setSelectedPackage] = useState<TokenPackage | null>(null);
+ 
+-  const currentTokenBalance = usageInfo?.tokenBalance;
++  // const currentTokenBalance = usageInfo?.tokenBalance;
+ 
+   const tokenPackages: TokenPackage[] = [
+     {
+--- a/my-rhyme-app/src/routes.tsx
++++ b/my-rhyme-app/src/routes.tsx
+@@ -58,7 +58,7 @@
+         <Route
+           path="/account"
+-          element={currentUser ? <AccountsPage navigateToSubscriptionPlans={() => navigate('/subscription-plans')} /> : <Navigate to="/login" replace />}
++          element={currentUser ? <AccountsPage /> : <Navigate to="/login" replace />}
+         />
+         <Route
+           path="/subscription-plans"
+--- a/my-rhyme-app/src/components/Sparkle.tsx
++++ b/my-rhyme-app/src/components/Sparkle.tsx
+@@ -0,0 +1,11 @@
++import React from 'react';
++import { SvgIcon, SvgIconProps } from '@mui/material';
++
++export const Sparkle = (props: SvgIconProps) => (
++  <SvgIcon {...props} viewBox="0 0 24 24">
++    <path d="M12 2L9.9 8.2H3l5.5 4.5L6.4 19L12 15.3L17.6 19L15.5 12.7L21 8.2h-6.9L12 2z" />
++  </SvgIcon>
++);
++
++
++

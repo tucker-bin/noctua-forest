@@ -8,16 +8,9 @@
     ],
     "rewrites": [
       {
-        "source": "/analyze",
+        "source": "/api/**",
         "run": {
-          "serviceId": "my-rhyme-app-py",
-          "region": "us-central1"
-        }
-      },
-      {
-        "source": "/api/analyze",
-        "run": {
-          "serviceId": "my-rhyme-app-py",
+          "serviceId": "my-rhyme-app",
           "region": "us-central1"
         }
       },

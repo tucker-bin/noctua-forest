@@ -18,7 +18,11 @@ import {
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  onDrawerToggle: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onDrawerToggle }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
@@ -71,6 +75,7 @@ const Navbar: React.FC = () => {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
+            onClick={onDrawerToggle}
           >
             <MenuIcon />
           </IconButton>

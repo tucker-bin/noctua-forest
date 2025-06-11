@@ -5,23 +5,25 @@ import {
   Typography,
   LinearProgress,
   Chip,
-  Avatar,
-  Tooltip,
-  IconButton,
-  Collapse,
+  Stack,
+  Card,
+  CardContent,
   useTheme,
   Badge,
+  IconButton,
+  Collapse,
+  Avatar,
 } from '@mui/material';
 import {
-  EmojiEvents,
-  LocalFireDepartment,
-  Stars,
-  TrendingUp,
-  Celebration,
-  AutoAwesome,
+  Star as StarIcon,
+  EmojiEvents as TrophyIcon,
   MusicNote,
-  ExpandMore,
+  LocalFireDepartment,
+  AutoAwesome,
+  Stars,
   ExpandLess,
+  ExpandMore,
+  Celebration,
 } from '@mui/icons-material';
 import { keyframes } from '@mui/system';
 import { noctuaColors } from '../theme/noctuaTheme';
@@ -30,11 +32,11 @@ interface Achievement {
   id: string;
   name: string;
   description: string;
-  icon: React.ReactNode;
   unlocked: boolean;
   progress: number;
   maxProgress: number;
   rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  icon?: React.ReactNode;
 }
 
 interface RhymeScoreSystemProps {
@@ -69,6 +71,7 @@ const rarityColors = {
 export const RhymeScoreSystem: React.FC<RhymeScoreSystemProps> = ({
   totalScore,
   currentStreak,
+  longestStreak,
   achievements,
   level,
   currentLevelProgress,
@@ -86,7 +89,7 @@ export const RhymeScoreSystem: React.FC<RhymeScoreSystemProps> = ({
     streakMaster: <LocalFireDepartment />,
     patternExplorer: <AutoAwesome />,
     nightOwl: <Stars />,
-    lyricist: <EmojiEvents />,
+    lyricist: <TrophyIcon />,
   };
 
   return (
@@ -272,7 +275,7 @@ export const RhymeScoreSystem: React.FC<RhymeScoreSystemProps> = ({
                     : theme.palette.action.disabled,
                 }}
               >
-                {achievementIcons[achievement.id] || <EmojiEvents />}
+                {achievementIcons[achievement.id] || <TrophyIcon />}
               </Avatar>
               
               <Box sx={{ flex: 1 }}>

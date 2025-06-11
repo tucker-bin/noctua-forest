@@ -20,7 +20,7 @@ import {
 import { useUsage } from '../contexts/UsageContext';
 import PlanComparison from './PlanComparison';
 
-// Plan interface copied from PlanComparison to unblock build
+// Plan interface for the component
 interface Plan {
   name: string;
   price: string;
@@ -43,6 +43,14 @@ const UsageDashboard: React.FC = () => {
   }
   const { usageInfo, isLoading } = useUsage();
   const [showPlanComparison, setShowPlanComparison] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+
+  const handleSelectPlan = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setShowPlanComparison(false);
+    // Here you would typically navigate to a checkout page or show a payment modal
+    console.log('Selected plan:', plan);
+  };
 
   if (isLoading || !usageInfo) {
     return (
@@ -128,12 +136,12 @@ const UsageDashboard: React.FC = () => {
           </Card>
         </Grid>
 
-        {/* Progress Cards */}
+        {/* Analysis Progress Card */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom>
-                Monthly Analysis Progress
+                Analysis Usage
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                 <Box sx={{ flexGrow: 1, mr: 1 }}>
@@ -154,6 +162,7 @@ const UsageDashboard: React.FC = () => {
           </Card>
         </Grid>
 
+        {/* Token Usage Card */}
         <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
@@ -205,7 +214,7 @@ const UsageDashboard: React.FC = () => {
       <PlanComparison
         open={showPlanComparison}
         onClose={() => setShowPlanComparison(false)}
-        onSelectPlan={() => {}}
+        onSelectPlan={handleSelectPlan}
       />
     </Box>
   );
