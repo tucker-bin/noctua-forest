@@ -84,8 +84,9 @@ const AccountsPage: React.FC = () => {
       await login(email, password);
       setSuccess('Successfully signed in!');
       // No need to navigate, the UI will update automatically
-    } catch (err: any) {
-      setError(err.message || 'Failed to sign in');
+    } catch (err: unknown) {
+      // handle error, optionally check if err is an Error
+      setError(err instanceof Error ? err.message : 'Failed to sign in');
     } finally {
       setLoading(false);
     }
@@ -111,8 +112,9 @@ const AccountsPage: React.FC = () => {
       await signup(email, password);
       setSuccess('Account created successfully!');
       setTabValue(0); // Switch to sign in tab
-    } catch (err: any) {
-      setError(err.message || 'Failed to create account');
+    } catch (err: unknown) {
+      // handle error, optionally check if err is an Error
+      setError(err instanceof Error ? err.message : 'Failed to create account');
     } finally {
       setLoading(false);
     }
@@ -122,8 +124,9 @@ const AccountsPage: React.FC = () => {
     try {
       await logout();
       navigate('/');
-    } catch (err: any) {
-      setError(err.message || 'Failed to log out');
+    } catch (err: unknown) {
+      // handle error, optionally check if err is an Error
+      setError(err instanceof Error ? err.message : 'Failed to log out');
     }
   };
 

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Box, Container } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { RhymeOwl } from './RhymeOwl';
+import NoctuaMascot from './NoctuaMascot';
+import Footer from './Footer';
 
 const StyledContainer = styled(Container)(({ theme }) => ({
   paddingTop: theme.spacing(4),
@@ -9,15 +10,6 @@ const StyledContainer = styled(Container)(({ theme }) => ({
   minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
-}));
-
-const HeaderWrapper = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: theme.spacing(2),
-  marginBottom: theme.spacing(4),
-  flexWrap: 'wrap', // Allow wrapping on smaller screens
 }));
 
 const ContentWrapper = styled(Box)(({ theme }) => ({
@@ -45,12 +37,22 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children, owlMessage, isAnalyzing }) => {
   return (
     <StyledContainer maxWidth="lg">
-      <HeaderWrapper>
-        <RhymeOwl message={owlMessage} isAnalyzing={isAnalyzing} />
-      </HeaderWrapper>
+      <Box sx={{ 
+        position: 'fixed', 
+        bottom: 20, 
+        right: 20, 
+        zIndex: 1000,
+        display: { xs: 'none', md: 'block' } // Hide on mobile
+      }}>
+        <NoctuaMascot 
+          message={owlMessage} 
+          isAnalyzing={isAnalyzing}
+        />
+      </Box>
       <ContentWrapper>
         {children}
       </ContentWrapper>
+      <Footer />
     </StyledContainer>
   );
 }; 

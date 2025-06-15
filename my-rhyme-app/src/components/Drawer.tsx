@@ -25,9 +25,10 @@ interface DrawerProps {
 }
 
 const menuItems = [
-  { text: 'Analysis', icon: <AnalyticsIcon />, path: '/' },
+  { text: 'Observatory', icon: <AnalyticsIcon />, path: '/observatory' },
   { text: 'Account', icon: <AccountIcon />, path: '/account' },
-  { text: 'Subscription', icon: <CreditCardIcon />, path: '/subscription' },
+  { text: 'Credit', icon: <CreditCardIcon />, path: '/credit' },
+  { text: 'Usage', icon: <AnalyticsIcon />, path: '/usage' },
 ];
 
 const Drawer: React.FC<DrawerProps> = ({ open, onClose }) => {

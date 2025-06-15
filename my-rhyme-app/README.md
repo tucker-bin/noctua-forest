@@ -20,6 +20,7 @@
 - [License](#license)
 - [Contact](#contact)
 - [Rhyme Analysis API](#rhyme-analysis-api)
+- [Localization & Accessibility](#localization-accessibility)
 
 ---
 
@@ -138,5 +139,14 @@ For questions or support, contact: [tucker.note@gmail.com](mailto:tucker.note@gm
 Last deployment triggered: 2025-06-10 17:40
 
 Cloud Build trigger test: 2025-06-10 17:45
+
+---
+
+## 🌐 Localization & Accessibility
+- 15+ languages supported, with automatic browser language detection and a manual LanguageSwitcher in the footer.
+- Full right-to-left (RTL) support for languages like Arabic and Hebrew.
+- Locale-aware date and number formatting throughout the UI.
+- Tooltips and feedback prompts on key actions, all translatable.
+- All new UI strings must be added to every language file. See `src/components/README_i18n.md` for workflow.
 
 ---

@@ -15,8 +15,9 @@ import {
   AccountCircle,
   AdminPanelSettings as AdminIcon,
 } from '@mui/icons-material';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import OrionOwl from './OrionOwl';
 
 interface NavbarProps {
   onDrawerToggle: () => void;
@@ -26,6 +27,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDrawerToggle }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser, logout } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -48,9 +50,13 @@ const Navbar: React.FC<NavbarProps> = ({ onDrawerToggle }) => {
         if (response.ok) {
           const data = await response.json();
           setIsAdmin(data.isAdmin);
+        } else {
+          // Silently fail for non-200 responses
+          setIsAdmin(false);
         }
       } catch (err) {
-        console.error('Failed to check admin status:', err);
+        // Silently fail - admin check is not critical for app functionality
+        setIsAdmin(false);
       }
     };
 
@@ -84,17 +90,24 @@ const Navbar: React.FC<NavbarProps> = ({ onDrawerToggle }) => {
           variant="h6"
           component={RouterLink}
           to="/"
-          sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
+          sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 1 }}
         >
-          Rhyme App
+          <OrionOwl size={24} animate={false} />
+          Noctua Forest
         </Typography>
 
-        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
-          <Button color="inherit" component={RouterLink} to="/analyze">
-            Analysis
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
+          <Button color="inherit" component={RouterLink} to="/forest">
+            The Forest
           </Button>
-          <Button color="inherit" component={RouterLink} to="/subscription-plans">
-            Pricing
+          <Button color="inherit" component={RouterLink} to="/observatory">
+            Observatory
+          </Button>
+          <Button color="inherit" component={RouterLink} to="/credit">
+            Credit
+          </Button>
+          <Button color="inherit" component={RouterLink} to="/usage">
+            Usage
           </Button>
           
           {currentUser && !currentUser.isAnonymous ? (

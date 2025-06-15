@@ -6,35 +6,51 @@
 
   # Use https://search.nixos.org/packages to find packages
   packages = [
-    # pkgs.go
-    # pkgs.python311
-    # pkgs.python311Packages.pip
-    # pkgs.nodejs_20
-    # pkgs.nodePackages.nodemon
+    pkgs.nodejs_20
+    pkgs.nodePackages.npm
+    pkgs.nodePackages.nodemon
+    pkgs.nodePackages.typescript
+    pkgs.nodePackages.ts-node
+    pkgs.git
   ];
 
   # Sets environment variables in the workspace
-  env = {};
+  env = {
+    NODE_ENV = "development";
+  };
+  
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
-      # "vscodevim.vim"
+      "ms-vscode.vscode-typescript-next"
+      "bradlc.vscode-tailwindcss"
+      "esbenp.prettier-vscode"
+      "ms-vscode.vscode-json"
     ];
 
     # Enable previews
     previews = {
       enable = true;
       previews = {
-        # web = {
-        #   # Example: run "npm run dev" with PORT set to IDX's defined port for previews,
-        #   # and show it in IDX's web preview panel
-        #   command = ["npm" "run" "dev"];
-        #   manager = "web";
-        #   env = {
-        #     # Environment variables to set for your server
-        #     PORT = "$PORT";
-        #   };
-        # };
+        web = {
+          # Run the frontend development server
+          command = ["npm" "run" "dev"];
+          manager = "web";
+          cwd = "my-rhyme-app";
+          env = {
+            # Environment variables to set for your server
+            PORT = "$PORT";
+          };
+        };
+        backend = {
+          # Run the backend development server
+          command = ["npm" "run" "dev"];
+          manager = "web";
+          cwd = "node-backend";
+          env = {
+            PORT = "3001";
+          };
+        };
       };
     };
 
@@ -42,13 +58,15 @@
     workspace = {
       # Runs when a workspace is first created
       onCreate = {
-        # Example: install JS dependencies from NPM
-        # npm-install = "npm install";
+        # Install dependencies for both frontend and backend
+        install-frontend = "cd my-rhyme-app && npm install";
+        install-backend = "cd node-backend && npm install";
       };
       # Runs when the workspace is (re)started
       onStart = {
-        # Example: start a background task to watch and re-build backend code
-        # watch-backend = "npm run watch-backend";
+        # Start both servers in development mode
+        start-backend = "cd node-backend && npm run dev &";
+        start-frontend = "cd my-rhyme-app && npm run dev";
       };
     };
   };

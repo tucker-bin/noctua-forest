@@ -1,10 +1,17 @@
 export interface Pattern {
     phonetic_link_id: string;
     pattern_description: string;
+    acoustic_features?: {
+        primary_feature?: string;
+        secondary_features?: string[];
+        ipa_notation?: string;
+    };
     segments: Array<{
         globalStartIndex: number;
         globalEndIndex: number;
         text: string;
+        phonetic_context?: string;
+        source_word?: string;
     }>;
 }
 
@@ -13,12 +20,14 @@ export interface AnalysisData {
     rhyme_details: Pattern[];
 }
 
-// Use environment variable for API URL, fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+// Correctly determine API URL for development and production
+const API_BASE_URL = import.meta.env.DEV 
+    ? 'http://localhost:3001/api' 
+    : '/api';
 
 export const analyzeText = async (text: string): Promise<AnalysisData> => {
     try {
-        const response = await fetch(`${API_BASE_URL}/analyze`, {
+        const response = await fetch(`${API_BASE_URL}/observe`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -48,10 +57,20 @@ export const analyzeText = async (text: string): Promise<AnalysisData> => {
             throw new Error(errorMessage);
         }
 
-        const data = await response.json();
+        const patterns = await response.json();
+        
+        // The backend returns either an array of patterns directly or an object with patterns property
+        let rhymeDetails: Pattern[] = [];
+        
+        if (Array.isArray(patterns)) {
+            rhymeDetails = patterns;
+        } else if (patterns && patterns.patterns && Array.isArray(patterns.patterns)) {
+            rhymeDetails = patterns.patterns;
+        }
+        
         return {
             original_text: text,
-            rhyme_details: data
+            rhyme_details: rhymeDetails
         };
     } catch (error) {
         if (error instanceof Error) {

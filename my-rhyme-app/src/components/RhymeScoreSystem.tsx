@@ -27,6 +27,7 @@ import {
 } from '@mui/icons-material';
 import { keyframes } from '@mui/system';
 import { noctuaColors } from '../theme/noctuaTheme';
+import { formatNumber } from '../utils/localeFormat';
 
 interface Achievement {
   id: string;
@@ -121,7 +122,7 @@ export const RhymeScoreSystem: React.FC<RhymeScoreSystemProps> = ({
               Rhyme Score
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 700, color: noctuaColors.moonbeam }}>
-              {totalScore.toLocaleString()}
+              {formatNumber(totalScore)}
             </Typography>
           </Box>
           

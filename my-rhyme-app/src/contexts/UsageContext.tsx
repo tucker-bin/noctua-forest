@@ -4,10 +4,28 @@ import { doc, getDoc, updateDoc, serverTimestamp, setDoc } from 'firebase/firest
 import { db } from '../firebase';
 import { AuthContext } from './AuthContext';
 
+export interface RegionalPricing {
+  tokenMultiplier: number;
+  currency: string;
+  exchangeRate: number;
+}
+
+export interface TokenConfig {
+  batchSize: number;
+  baseCost: number;
+  batchCost: number;
+  bulkDiscount: number;
+  regionalPricing: {
+    [countryCode: string]: RegionalPricing;
+  };
+  cooldownSeconds: number;
+}
+
 export interface PlanLimits {
   monthlyAnalyses: number;
   tokenLimit: number;
   features: string[];
+  regionalPricing?: RegionalPricing;
 }
 
 export interface UsageInfo {
@@ -17,14 +35,17 @@ export interface UsageInfo {
   tokensUsedThisMonth: number;
   planLimits: PlanLimits;
   lastTokenUpdate: Date | null;
+  userRegion?: string;
 }
 
 interface UsageContextType {
   usageInfo: UsageInfo | null;
   updateTokenBalance: (amount: number) => Promise<void>;
   recordAnalysis: (tokensUsed: number) => Promise<void>;
+  calculateTokenCost: (textLength: number) => number;
   isLoading: boolean;
   error: string | null;
+  tokenConfig: TokenConfig;
 }
 
 export const UsageContext = createContext<UsageContextType | undefined>(undefined);
@@ -41,6 +62,21 @@ interface UsageProviderProps {
   children: ReactNode;
 }
 
+const DEFAULT_TOKEN_CONFIG: TokenConfig = {
+  batchSize: 3000,
+  baseCost: 1,
+  batchCost: 0.5,
+  bulkDiscount: 0.1, // 10% discount for bulk
+  regionalPricing: {
+    'US': { tokenMultiplier: 1, currency: 'USD', exchangeRate: 1 },
+    'GB': { tokenMultiplier: 1, currency: 'GBP', exchangeRate: 0.79 },
+    'EU': { tokenMultiplier: 0.9, currency: 'EUR', exchangeRate: 0.92 },
+    'IN': { tokenMultiplier: 0.5, currency: 'INR', exchangeRate: 83.12 },
+    // Add more regions as needed
+  },
+  cooldownSeconds: 0,
+};
+
 const DEFAULT_PLAN_LIMITS: PlanLimits = {
   monthlyAnalyses: 10,
   tokenLimit: 1000,
@@ -51,8 +87,60 @@ export const UsageProvider: React.FC<UsageProviderProps> = ({ children }) => {
   const [usageInfo, setUsageInfo] = useState<UsageInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tokenConfig, setTokenConfig] = useState<TokenConfig>(DEFAULT_TOKEN_CONFIG);
   const authCtx = useContext(AuthContext);
   const currentUser = authCtx?.currentUser;
+
+  // Fetch token configuration from admin settings
+  useEffect(() => {
+    const fetchTokenConfig = async () => {
+      try {
+        // Only try to fetch if user is authenticated and is admin
+        if (!currentUser) {
+          console.log('Using default token config - no user authenticated');
+          return;
+        }
+        
+        const configDoc = await getDoc(doc(db, 'admin', 'tokenConfig'));
+        if (configDoc.exists()) {
+          setTokenConfig(configDoc.data() as TokenConfig);
+          console.log('Loaded token config from Firebase');
+        } else {
+          console.log('No token config found in Firebase, using defaults');
+        }
+      } catch (err: unknown) {
+        console.warn('Could not fetch token config from Firebase, using defaults:', err);
+        // Continue with default config - this is not a critical error
+      }
+    };
+    
+    // Only fetch if we have a user
+    if (currentUser) {
+      fetchTokenConfig();
+    }
+  }, [currentUser]);
+
+  // Calculate token cost based on text length and user's region
+  const calculateTokenCost = (textLength: number): number => {
+    const batches = Math.ceil(textLength / tokenConfig.batchSize);
+    let cost = tokenConfig.baseCost;
+    
+    if (batches > 1) {
+      cost += (batches - 1) * tokenConfig.batchCost;
+      // Apply bulk discount for 5+ batches
+      if (batches >= 5) {
+        cost *= (1 - tokenConfig.bulkDiscount);
+      }
+    }
+
+    // Apply regional pricing if available
+    if (usageInfo?.userRegion && tokenConfig.regionalPricing[usageInfo.userRegion]) {
+      const regionalMultiplier = tokenConfig.regionalPricing[usageInfo.userRegion].tokenMultiplier;
+      cost *= regionalMultiplier;
+    }
+
+    return Math.ceil(cost);
+  };
 
   useEffect(() => {
     const fetchUsageInfo = async () => {
@@ -75,6 +163,7 @@ export const UsageProvider: React.FC<UsageProviderProps> = ({ children }) => {
             tokensUsedThisMonth: data.tokensUsedThisMonth || 0,
             planLimits: data.planLimits || DEFAULT_PLAN_LIMITS,
             lastTokenUpdate: data.lastTokenUpdate?.toDate() || null,
+            userRegion: data.userRegion,
           });
         } else {
           // Initialize new user with default values
@@ -85,6 +174,7 @@ export const UsageProvider: React.FC<UsageProviderProps> = ({ children }) => {
             tokensUsedThisMonth: 0,
             planLimits: DEFAULT_PLAN_LIMITS,
             lastTokenUpdate: new Date(),
+            userRegion: 'US', // Default region
           };
           await setDoc(userDocRef, {
             ...newUsageInfo,
@@ -92,8 +182,8 @@ export const UsageProvider: React.FC<UsageProviderProps> = ({ children }) => {
           }, { merge: true });
           setUsageInfo(newUsageInfo);
         }
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch usage info');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch usage info');
       } finally {
         setIsLoading(false);
       }
@@ -113,8 +203,8 @@ export const UsageProvider: React.FC<UsageProviderProps> = ({ children }) => {
         lastTokenUpdate: serverTimestamp(),
       });
       setUsageInfo(prev => prev ? { ...prev, tokenBalance: newBalance } : null);
-    } catch (err: any) {
-      setError(err.message || 'Failed to update token balance');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update token balance');
     }
   };
 
@@ -141,13 +231,21 @@ export const UsageProvider: React.FC<UsageProviderProps> = ({ children }) => {
         analysesThisMonth: newAnalysesThisMonth,
         tokensUsedThisMonth: newTokensUsedThisMonth,
       } : null);
-    } catch (err: any) {
-      setError(err.message || 'Failed to record analysis');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to record analysis');
     }
   };
 
   return (
-    <UsageContext.Provider value={{ usageInfo, updateTokenBalance, recordAnalysis, isLoading, error }}>
+    <UsageContext.Provider value={{ 
+      usageInfo, 
+      updateTokenBalance, 
+      recordAnalysis, 
+      calculateTokenCost,
+      isLoading, 
+      error,
+      tokenConfig
+    }}>
       {children}
     </UsageContext.Provider>
   );

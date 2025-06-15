@@ -7,11 +7,17 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install production dependencies only
-RUN npm ci --only=production
+# Install all dependencies (for build)
+RUN npm ci
 
 # Copy application code
 COPY . .
+
+# Build TypeScript
+RUN npm run build
+
+# Only keep production dependencies
+RUN npm prune --production
 
 # Create logs directory
 RUN mkdir -p logs
@@ -23,4 +29,4 @@ EXPOSE 8080
 USER node
 
 # Start the application
-CMD ["node", "index.js"] 
+CMD ["node", "dist/index.js"] 

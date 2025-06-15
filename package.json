@@ -1,0 +1,23 @@
+{
+  "name": "my-rhyme-app-root",
+  "scripts": {
+    "dev": "concurrently \"cd my-rhyme-app && npm run dev\" \"cd node-backend && npm run dev\"",
+    "build": "cd my-rhyme-app && npm run build",
+    "start": "cd node-backend && npm start"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/node": "^24.0.0",
+    "@types/stripe": "^8.0.416",
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "@mui/icons-material": "^7.1.1",
+    "@mui/material": "^7.1.1",
+    "framer-motion": "^12.18.1",
+    "i18next": "^25.2.1",
+    "react-i18next": "^15.5.3",
+    "stripe": "^18.2.1"
+  }
+}

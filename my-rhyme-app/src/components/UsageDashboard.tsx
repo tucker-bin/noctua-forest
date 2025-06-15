@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -9,6 +10,7 @@ import {
   Button,
   Chip,
   useTheme,
+  Tooltip,
 } from '@mui/material';
 import {
   Timeline as TimelineIcon,
@@ -19,6 +21,8 @@ import {
 } from '@mui/icons-material';
 import { useUsage } from '../contexts/UsageContext';
 import PlanComparison from './PlanComparison';
+import { formatDate } from '../utils/localeFormat';
+import { useTranslation } from 'react-i18next';
 
 // Plan interface for the component
 interface Plan {
@@ -34,6 +38,21 @@ interface Plan {
   isPopular?: boolean;
 }
 
+// Mock recent activity data
+const MOCK_ACTIVITY = [
+  { id: 'a1', date: '2024-06-14', snippet: 'The owl glides through moonlit air...', result: 'Phonetic: assonance, Rhyme: ABAB' },
+  { id: 'a2', date: '2024-06-12', snippet: 'Night falls, the city hums below...', result: 'Phonetic: consonance, Rhyme: AABB' },
+];
+
+// Add fade-in animation CSS
+const fadeInStyle = {
+  animation: 'fadeIn 0.7s ease',
+  '@keyframes fadeIn': {
+    from: { opacity: 0, transform: 'translateY(20px)' },
+    to: { opacity: 1, transform: 'none' }
+  }
+};
+
 const UsageDashboard: React.FC = () => {
   // Runtime check for debugging
   try {
@@ -44,12 +63,13 @@ const UsageDashboard: React.FC = () => {
   const { usageInfo, isLoading } = useUsage();
   const [showPlanComparison, setShowPlanComparison] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleSelectPlan = (plan: Plan) => {
     setSelectedPlan(plan);
     setShowPlanComparison(false);
     // Here you would typically navigate to a checkout page or show a payment modal
-    console.log('Selected plan:', plan);
   };
 
   if (isLoading || !usageInfo) {
@@ -71,17 +91,18 @@ const UsageDashboard: React.FC = () => {
   const analysesProgress = (analysesThisMonth / planLimits.monthlyAnalyses) * 100;
   const tokensProgress = (tokensUsedThisMonth / planLimits.tokenLimit) * 100;
 
-  const formatDate = (date: Date | null) => {
-    if (!date) return 'Never';
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
+  const displayDate = lastAnalysisDate ? formatDate(lastAnalysisDate) : t('never');
 
   return (
     <Box sx={{ p: 3 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4" component="h1">
+          Usage Dashboard
+        </Typography>
+        <Button variant="contained" color="primary" onClick={() => navigate('/observatory')}>
+          Back to Observatory
+        </Button>
+      </Box>
       <Grid container spacing={3}>
         {/* Usage Overview Card */}
         <Grid item xs={12}>
@@ -89,13 +110,6 @@ const UsageDashboard: React.FC = () => {
             <CardContent>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                 <Typography variant="h6">Usage Overview</Typography>
-                <Button
-                  variant="outlined"
-                  startIcon={<UpgradeIcon />}
-                  onClick={() => setShowPlanComparison(true)}
-                >
-                  Upgrade Plan
-                </Button>
               </Box>
               <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
@@ -124,7 +138,7 @@ const UsageDashboard: React.FC = () => {
                   <Box sx={{ textAlign: 'center' }}>
                     <HistoryIcon color="primary" sx={{ fontSize: 40 }} />
                     <Typography variant="h4" sx={{ mt: 1 }}>
-                      {formatDate(lastAnalysisDate)}
+                      {displayDate}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       Last Analysis
@@ -206,6 +220,37 @@ const UsageDashboard: React.FC = () => {
                   />
                 ))}
               </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Recent Observatory Activity */}
+        <Grid item xs={12}>
+          <Card style={fadeInStyle}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Recent Observatory Activity
+              </Typography>
+              {MOCK_ACTIVITY.length ? (
+                <Box component="ul" sx={{ listStyle: 'none', p: 0, m: 0 }}>
+                  {MOCK_ACTIVITY.map(a => (
+                    <Box component="li" key={a.id} sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { md: 'center' }, justifyContent: 'space-between', borderBottom: '1px solid #f0f0f0', pb: 1, mb: 1 }}>
+                      <Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mr: 2, display: 'inline' }}>{formatDate(a.date)}</Typography>
+                        <Typography variant="body2" sx={{ display: 'inline', color: 'text.primary' }}>{a.snippet}</Typography>
+                        <Typography variant="caption" sx={{ ml: 2, color: 'primary.main' }}>{a.result}</Typography>
+                      </Box>
+                      <Tooltip title="View details" placement="top">
+                        <Button variant="outlined" size="small" sx={{ mt: { xs: 1, md: 0 } }} aria-label="View details">
+                          View
+                        </Button>
+                      </Tooltip>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Typography variant="body2" color="text.secondary">No recent activity.</Typography>
+              )}
             </CardContent>
           </Card>
         </Grid>

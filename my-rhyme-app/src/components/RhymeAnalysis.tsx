@@ -69,7 +69,7 @@ export const RhymeAnalysis: React.FC<RhymeAnalysisProps> = ({ analysis }) => {
             marginBottom: 2,
           }}
         >
-          Rhyme Patterns Discovered
+          Rhyme Patterns Found in the Forest
         </Typography>
 
         {analysis.rhymeGroups.map((group, index) => (

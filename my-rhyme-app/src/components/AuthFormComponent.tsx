@@ -97,8 +97,8 @@ const AuthFormComponent: React.FC<AuthFormComponentProps> = ({
         setGoogleError(null);
         try {
             // await signInWithGoogle?.();
-        } catch (err: any) {
-            setGoogleError(err.message || 'Google sign-in failed.');
+        } catch (err: unknown) {
+            // handle error, optionally check if err is an Error
         } finally {
             setGoogleLoading(false);
         }

@@ -1,5 +1,5 @@
 import React from 'react';
-import MascotOwl from './MascotOwl';
+import { OrionOwl } from './OrionOwl';
 import { Box, Typography, Button, Card, CardContent, Stack, LinearProgress, Chip } from '@mui/material';
 
 const ProfilePage: React.FC = () => {
@@ -14,7 +14,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Box sx={{ p: 2, maxWidth: 400, mx: 'auto', textAlign: 'center' }}>
-      <MascotOwl />
+      <OrionOwl />
       <Typography variant="h5" sx={{ mt: 2 }}>{user.name}</Typography>
       <Typography variant="body2" color="text.secondary">{user.email}</Typography>
       <Box sx={{ mt: 2, mb: 1 }}>

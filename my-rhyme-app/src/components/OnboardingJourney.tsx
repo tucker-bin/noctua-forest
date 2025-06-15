@@ -53,14 +53,14 @@ export const OnboardingJourney: React.FC<{ onComplete: () => void }> = ({ onComp
       orionMessage: "Hoot! I'm so excited to meet you! What's your name?"
     },
     {
-      title: "Discover Patterns",
+      title: "Explore the Forest",
       content: (
         <Box>
           <Typography variant="h5" gutterBottom>
             {userName ? `Nice to meet you, ${userName}!` : 'Hello there!'} 
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-            Noctua helps you discover hidden patterns in your lyrics:
+            Noctua helps you explore hidden patterns in the Forest:
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 3 }}>
             {[

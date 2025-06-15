@@ -1,4 +1,4 @@
-# Noctua Rhyme App 🦉
+# Noctua Forest 🦉
 
 A sophisticated AI-powered text analysis application that reveals hidden rhyme patterns and phonetic architectures in poetry, lyrics, and creative writing.
 
@@ -205,3 +205,20 @@ This project is proprietary software. All rights reserved.
 - Powered by Claude AI for advanced text analysis
 - Firebase for authentication and hosting
 - Material-UI for the beautiful interface 
+
+## 🌍 Internationalization (i18n) & Accessibility
+
+- Supports 15+ languages, including English, Spanish, French, Portuguese, Chinese, Vietnamese, Turkish, Korean, Japanese, Indonesian, Italian, German, Filipino, Malay, and more.
+- **Automatic Language Detection:** App detects and uses the user's browser language by default.
+- **Language Switcher:** Users can change language at any time via the footer.
+- **Right-to-Left (RTL) Support:** Layout automatically flips for RTL languages (e.g., Arabic, Hebrew).
+- **Locale-Aware Formatting:** Dates and numbers are formatted according to the user's language and region.
+- **Tooltips & Feedback:** Key actions and controls include tooltips and gentle feedback prompts, all fully translatable.
+
+### 📝 Translation Workflow
+- **Every new UI string must have a translation key.**
+- **All translation keys must be added to every supported language file.**
+- Use the `useTranslation` hook and `t('key')` in all components.
+- For backend messages, use i18n in Express and add keys to backend locale files.
+
+See [`src/components/README_i18n.md`](src/components/README_i18n.md) for more details. 

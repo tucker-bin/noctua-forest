@@ -8,37 +8,39 @@ import {
   useTheme,
   useMediaQuery,
   IconButton,
+  Stepper,
+  Step,
+  StepLabel,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Paper,
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import CloseIcon from '@mui/icons-material/Close';
 import { RhymeOwl } from './RhymeOwl';
+import { useTranslation } from 'react-i18next';
 
-interface OnboardingStep {
-  title: string;
-  message: string;
-  owlMessage: string;
-}
-
-const ONBOARDING_STEPS: OnboardingStep[] = [
+const ONBOARDING_STEPS = [
   {
-    title: "Welcome to the Rhyme Observatory",
-    message: "As a Poetic Astronomer, you'll discover the hidden patterns in lyrics and poetry, guided by the wisdom of the Rhyme Owl.",
-    owlMessage: "Greetings, fellow astronomer! I'll be your guide through the cosmic patterns of rhyme and rhythm.",
+    titleKey: 'welcome_title',
+    messageKey: 'welcome_message',
+    owlMessageKey: 'welcome_owl_message',
   },
   {
-    title: "Your Cosmic Toolkit",
-    message: "Use your tokens to analyze texts and uncover their hidden patterns. Each analysis reveals new insights into the cosmic dance of words.",
-    owlMessage: "Tokens are your telescope to the stars of rhyme. Use them wisely to explore the patterns in your favorite lyrics.",
+    titleKey: 'toolkit_title',
+    messageKey: 'toolkit_message',
+    owlMessageKey: 'toolkit_owl_message',
   },
   {
-    title: "Choose Your Path",
-    message: "Start with the free tier to explore basic patterns, or upgrade to unlock advanced features and deeper insights.",
-    owlMessage: "Every astronomer starts their journey somewhere. Choose the path that best suits your exploration needs.",
+    titleKey: 'path_title',
+    messageKey: 'path_message',
+    owlMessageKey: 'path_owl_message',
   },
   {
-    title: "Begin Your Journey",
-    message: "Ready to explore the cosmic patterns of rhyme? Let's start analyzing your first text!",
-    owlMessage: "The stars of rhyme await your discovery. Shall we begin our exploration?",
+    titleKey: 'journey_title',
+    messageKey: 'journey_message',
+    owlMessageKey: 'journey_owl_message',
   },
 ];
 
@@ -100,14 +102,26 @@ const CosmicDust: React.FC = () => (
 
 const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const [consents, setConsents] = useState({
+    terms: false,
+    privacy: false,
+    dataProcessing: false,
+  });
+  const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const handleNext = () => {
     if (currentStep < ONBOARDING_STEPS.length - 1) {
       setCurrentStep(currentStep + 1);
+    } else if (currentStep === ONBOARDING_STEPS.length - 1) {
+      // Show consent step
+      setCurrentStep(currentStep + 1);
     } else {
-      onClose();
+      // Final step - check consents and close
+      if (consents.terms && consents.privacy && consents.dataProcessing) {
+        onClose();
+      }
     }
   };
 
@@ -117,7 +131,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
     }
   };
 
-  const currentStepData = ONBOARDING_STEPS[currentStep];
+  const handleConsentChange = (type: keyof typeof consents) => {
+    setConsents(prev => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  const allConsentsGiven = consents.terms && consents.privacy && consents.dataProcessing;
+  const isConsentStep = currentStep === ONBOARDING_STEPS.length;
+  const currentStepData = currentStep < ONBOARDING_STEPS.length ? ONBOARDING_STEPS[currentStep] : null;
 
   return (
     <Dialog
@@ -125,173 +145,240 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
       onClose={onClose}
       maxWidth="md"
       fullWidth
+      fullScreen={isMobile}
       PaperProps={{
         sx: {
-          background: 'rgba(26, 37, 71, 0.95)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 215, 0, 0.2)',
-          borderRadius: 4,
+          background: 'linear-gradient(135deg, #1a1a2e 0%, #2b3a67 100%)',
+          color: 'white',
+          position: 'relative',
           overflow: 'hidden',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
-        },
+        }
       }}
     >
-      <DialogContent sx={{ p: 0, position: 'relative' }}>
-        <IconButton
-          onClick={onClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-            color: 'secondary.main',
-            zIndex: 1,
-            transition: 'transform 0.2s',
-            '&:hover': {
-              transform: 'rotate(90deg)',
-            },
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
+      <CosmicDust />
+      
+      <IconButton
+        onClick={onClose}
+        sx={{
+          position: 'absolute',
+          right: 8,
+          top: 8,
+          color: 'rgba(255, 255, 255, 0.7)',
+          zIndex: 1,
+        }}
+      >
+        <CloseIcon />
+      </IconButton>
 
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            p: 4,
-            minHeight: 400,
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          <CosmicDust />
+      <DialogContent sx={{ position: 'relative', zIndex: 1 }}>
+        <Box sx={{ py: 3 }}>
+          {/* Stepper */}
+          <Stepper 
+            activeStep={currentStep} 
+            alternativeLabel 
+            sx={{ mb: 4 }}
+          >
+            {[...ONBOARDING_STEPS, { titleKey: 'consent_title' }].map((step, index) => (
+              <Step key={index}>
+                <StepLabel 
+                  sx={{
+                    '& .MuiStepLabel-label': {
+                      color: 'rgba(255, 255, 255, 0.7)',
+                    },
+                    '& .MuiStepLabel-label.Mui-active': {
+                      color: 'white',
+                    },
+                    '& .MuiStepLabel-label.Mui-completed': {
+                      color: 'rgba(255, 215, 0, 0.8)',
+                    },
+                  }}
+                >
+                  {t(step.titleKey)}
+                </StepLabel>
+              </Step>
+            ))}
+          </Stepper>
 
-          {/* Enhanced cosmic background effect */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: `
-                radial-gradient(circle at 50% 50%, rgba(43, 58, 103, 0.2) 0%, transparent 70%),
-                radial-gradient(circle at 80% 20%, rgba(255, 215, 0, 0.05) 0%, transparent 50%)
-              `,
-              pointerEvents: 'none',
-            }}
-          />
-
+          {/* Content */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Box sx={{ textAlign: 'center', mb: 4 }}>
-                <motion.div
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Typography
-                    variant="h4"
-                    component="h2"
-                    sx={{
+              {!isConsentStep ? (
+                <Box sx={{ textAlign: 'center', minHeight: 300 }}>
+                  {/* Noctua Mascot */}
+                  <Box sx={{ mb: 3 }}>
+                    <RhymeOwl size={120} />
+                  </Box>
+
+                  <Typography 
+                    variant="h4" 
+                    gutterBottom 
+                    sx={{ 
+                      fontWeight: 700,
                       color: 'secondary.main',
                       fontFamily: '"Space Grotesk", sans-serif',
-                      mb: 2,
-                      textShadow: '0 0 20px rgba(255, 215, 0, 0.2)',
                     }}
                   >
-                    {currentStepData.title}
+                    {t(currentStepData!.titleKey)}
                   </Typography>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: 'text.secondary',
+
+                  <Typography 
+                    variant="body1" 
+                    sx={{ 
+                      mb: 3,
+                      color: 'rgba(255, 255, 255, 0.9)',
                       maxWidth: 600,
                       mx: 'auto',
-                      lineHeight: 1.6,
                     }}
                   >
-                    {currentStepData.message}
+                    {t(currentStepData!.messageKey)}
                   </Typography>
-                </motion.div>
-              </Box>
 
-              <Box sx={{ mb: 4 }}>
-                <motion.div
-                  initial={{ scale: 0.8, rotate: -5 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.5, type: "spring" }}
-                >
-                  <RhymeOwl message={currentStepData.owlMessage} />
-                </motion.div>
-              </Box>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  maxWidth: 400,
-                  mt: 'auto',
-                }}
-              >
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <Button
-                    onClick={handleBack}
-                    disabled={currentStep === 0}
+                  {/* Owl's message bubble */}
+                  <Paper
+                    elevation={3}
                     sx={{
+                      p: 2,
+                      maxWidth: 500,
+                      mx: 'auto',
+                      backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                      border: '1px solid rgba(255, 215, 0, 0.3)',
+                      position: 'relative',
+                      '&::before': {
+                        content: '""',
+                        position: 'absolute',
+                        top: '-10px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: 0,
+                        height: 0,
+                        borderLeft: '10px solid transparent',
+                        borderRight: '10px solid transparent',
+                        borderBottom: '10px solid rgba(255, 215, 0, 0.3)',
+                      }
+                    }}
+                  >
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontStyle: 'italic',
+                        color: 'rgba(255, 255, 255, 0.9)',
+                      }}
+                    >
+                      "{t(currentStepData!.owlMessageKey)}"
+                    </Typography>
+                  </Paper>
+                </Box>
+              ) : (
+                <Box sx={{ minHeight: 300 }}>
+                  <Typography 
+                    variant="h4" 
+                    gutterBottom 
+                    sx={{ 
+                      fontWeight: 700,
                       color: 'secondary.main',
-                      visibility: currentStep === 0 ? 'hidden' : 'visible',
-                      '&:hover': {
-                        transform: 'translateX(-2px)',
-                      },
-                      transition: 'transform 0.2s',
+                      fontFamily: '"Space Grotesk", sans-serif',
+                      textAlign: 'center',
+                      mb: 4,
                     }}
                   >
-                    Back
-                  </Button>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={handleNext}
-                    sx={{
-                      minWidth: 120,
-                      '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 4px 12px rgba(255, 215, 0, 0.2)',
-                      },
-                      transition: 'all 0.2s',
+                    {t('consent_title', 'Before We Begin')}
+                  </Typography>
+
+                  <Typography 
+                    variant="body1" 
+                    sx={{ 
+                      mb: 3,
+                      color: 'rgba(255, 255, 255, 0.9)',
+                      textAlign: 'center',
                     }}
                   >
-                    {currentStep === ONBOARDING_STEPS.length - 1 ? 'Begin' : 'Next'}
-                  </Button>
-                </motion.div>
-              </Box>
+                    {t('consent_message', 'Please review and accept our policies to continue')}
+                  </Typography>
+
+                  <FormGroup sx={{ maxWidth: 500, mx: 'auto' }}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox 
+                          checked={consents.terms}
+                          onChange={() => handleConsentChange('terms')}
+                          sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                        />
+                      }
+                      label={t('consent_terms', 'I accept the Terms of Service')}
+                      sx={{ mb: 2 }}
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox 
+                          checked={consents.privacy}
+                          onChange={() => handleConsentChange('privacy')}
+                          sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                        />
+                      }
+                      label={t('consent_privacy', 'I accept the Privacy Policy')}
+                      sx={{ mb: 2 }}
+                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox 
+                          checked={consents.dataProcessing}
+                          onChange={() => handleConsentChange('dataProcessing')}
+                          sx={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                        />
+                      }
+                      label={t('consent_data', 'I consent to data processing for service improvement')}
+                    />
+                  </FormGroup>
+                </Box>
+              )}
             </motion.div>
           </AnimatePresence>
+
+          {/* Navigation buttons */}
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+            <Button
+              onClick={handleBack}
+              disabled={currentStep === 0}
+              sx={{
+                color: 'rgba(255, 255, 255, 0.7)',
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                },
+              }}
+            >
+              {t('back', 'Back')}
+            </Button>
+            
+            <Button
+              onClick={handleNext}
+              variant="contained"
+              disabled={isConsentStep && !allConsentsGiven}
+              sx={{
+                backgroundColor: 'secondary.main',
+                color: 'primary.main',
+                '&:hover': {
+                  backgroundColor: 'secondary.dark',
+                },
+                '&:disabled': {
+                  backgroundColor: 'rgba(255, 215, 0, 0.3)',
+                  color: 'rgba(255, 255, 255, 0.5)',
+                },
+              }}
+            >
+              {isConsentStep 
+                ? t('finish', 'Start Your Journey') 
+                : currentStep === ONBOARDING_STEPS.length - 1 
+                  ? t('continue', 'Continue')
+                  : t('next', 'Next')
+              }
+            </Button>
+          </Box>
         </Box>
       </DialogContent>
     </Dialog>
