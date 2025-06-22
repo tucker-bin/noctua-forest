@@ -13,4 +13,15 @@ export const apiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false, 
   message: 'Too many requests from this IP, please try again after 15 minutes',
-}); 
+});
+
+// Dynamic rate limiter function for custom configurations
+export const rateLimiter = (options: { windowMs: number; max: number }) => {
+  return rateLimit({
+    windowMs: options.windowMs,
+    max: options.max,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: 'Rate limit exceeded'
+  });
+}; 

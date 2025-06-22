@@ -1,52 +1,408 @@
 {
   "welcome": "Bienvenue dans la Forêt Noctua",
-  "subtitle": "Noctua signifie 'hibou'—un foyer pour artistes et apprenants.",
+  "subtitle": "Noctua signifie 'hibou'—un foyer pour les artistes et les apprenants.",
+  "welcome_message": "Bienvenue dans ma Forêt ! Je suis Noctua, votre guide pour découvrir les motifs cachés dans vos mots.",
+  "explore_forest_title": "Explorer la Forêt",
+  "explore_forest_desc": "Découvrez les motifs cachés dans vos chansons et poèmes favoris grâce à une observation attentive.",
+  "learn_create_title": "Apprendre et Créer",
+  "learn_create_desc": "Comprenez les schémas de rimes complexes et créez vos propres chefs-d'œuvre poétiques.",
+  "share_connect_title": "Partager et Se Connecter",
+  "share_connect_desc": "Partagez vos observations et voyages lyriques dans la Forêt avec la communauté.",
+  "noctua_observatory_welcome": "Bienvenue dans mon Observatoire ! Êtes-vous prêt à découvrir la musique dans vos mots ?",
+  "noctua_forest_welcome": "Bienvenue dans ma Forêt ! Ici, vous pouvez découvrir des créateurs partageant les mêmes idées et explorer la communauté qui appelle cet endroit sa maison.",
   "enter_forest": "Entrer dans la Forêt (Créer votre profil)",
   "view_profile": "Voir le profil",
   "artist": "Artiste",
   "owl": "Hibou",
   "tester": "Testeur",
-  "signup_as": "Je m'inscris en tant que:",
+  "signup_as": "Je m'inscris en tant que :",
   "first_name": "Prénom",
-  "last_name": "Nom",
+  "last_name": "Nom de famille",
   "artist_name": "Nom d'artiste",
   "location": "Lieu (Ville, Pays)",
   "select_genre": "Sélectionner un genre",
   "email": "Adresse e-mail",
   "password": "Mot de passe",
+  "auth": {
+    "signin_title": "Se connecter",
+    "signin_subtitle": "Bon retour dans la Forêt Noctua",
+    "signin_button": "Se connecter",
+    "signup_link": "S'inscrire",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "forgot_password": "Mot de passe oublié ?",
+    "no_account": "Pas de compte ?",
+    "or": "Ou",
+    "errors": {
+      "fill_all_fields": "Veuillez remplir tous les champs",
+      "invalid_email": "Adresse e-mail invalide",
+      "user_disabled": "Ce compte a été désactivé",
+      "user_not_found": "Aucun compte trouvé avec cette adresse e-mail",
+      "wrong_password": "Mot de passe incorrect",
+      "too_many_requests": "Trop de tentatives échouées. Veuillez réessayer plus tard",
+      "signin_failed": "Échec de la connexion. Veuillez réessayer.",
+      "popup_closed": "Connexion annulée",
+      "google_signin_failed": "Échec de la connexion avec Google"
+    },
+    "signin_with_google": "Se connecter avec Google"
+  },
   "invite_code_optional": "Code d'invitation (optionnel)",
-  "signing_up": "Inscription...",
+  "signing_up": "Inscription en cours...",
   "sign_up": "S'inscrire",
   "privacy_policy": "Politique de confidentialité",
   "terms_and_agreements": "Conditions générales",
-  "releases": "Sorties",
+  "releases": "Publications",
   "latest_news": "Dernières nouvelles",
   "upcoming_events": "Événements à venir",
   "share_profile": "Partager le profil",
   "contact": "Contact",
   "share_this_profile": "Partager ce profil",
-  "copied": "Copié!",
+  "copied": "Copié !",
   "copy_link": "Copier le lien",
-  "send_message": "Envoyer le message",
-  "want_to_connect": "Vous souhaitez connecter ou réclamer ce profil?",
-  "sign_up_to_join": "S'inscrire pour rejoindre Noctua Rhyme",
-  "observatory_title": "Observatoire de Rimes Noctua",
-  "observatory_subtitle": "Analysez votre texte pour les motifs phonétiques et les rimes. Chaque analyse coûte des jetons selon la longueur du texte.",
+  "send_message": "Envoyer un message",
+  "want_to_connect": "Vous voulez vous connecter ou revendiquer ce profil ?",
+  "sign_up_to_join": "Inscrivez-vous pour rejoindre la Forêt Noctua",
+  "observatory_title": "L'Observatoire",
+  "observatory_subtitle": "Observez les motifs phonétiques et les rimes dans le texte. Chaque session d'observation utilise des jetons basés sur la longueur du texte.",
   "token_balance": "Solde de jetons",
   "estimated_cost": "Coût estimé",
-  "enter_text_to_analyze": "Entrez le texte à analyser",
+  "enter_text_to_observe": "Entrez le texte à observer",
   "character_count": "{{count}} caractères",
   "batches": "lots",
-  "analyzing": "Analyse en cours...",
+  "observing": "Observation des motifs...",
   "wait_seconds": "Attendez {{count}}s...",
-  "analyze_text": "Analyser le texte",
-  "wait_tooltip": "Pour éviter les abus, veuillez patienter avant votre prochaine analyse.",
+  "begin_observation": "Commencer l'observation",
+  "wait_tooltip": "Pour assurer des observations de qualité, veuillez attendre entre les sessions.",
   "error": "Erreur",
   "footer": {
-    "copyright": "© {{year}} Observatoire de Rimes Noctua",
+    "copyright": "© {{year}} Forêt Noctua",
     "about": "À propos",
     "contact": "Contact",
     "privacy": "Confidentialité",
-    "terms": "Conditions"
+    "terms": "Conditions",
+    "rights": "Tous droits réservés",
+    "explore": "Explorer",
+    "observatory": "Observatoire",
+    "community": "Communauté",
+    "stargazing": "Observation des étoiles",
+    "learning_paths": "Parcours d'apprentissage",
+    "resources": "Ressources",
+    "documentation": "Documentation",
+    "api": "API",
+    "guides": "Guides",
+    "faq": "FAQ",
+    "legal": "Légal",
+    "cookies": "Cookies",
+    "licenses": "Licences"
+  },
+  "tooltip": {
+    "change_language": "Changer la langue",
+    "follow": "Suivre",
+    "unfollow": "Ne plus suivre"
+  },
+  "follow": "Suivre",
+  "unfollow": "Ne plus suivre",
+  "pattern_types": {
+    "rhyme": "Motifs de rime",
+    "assonance": "Motifs de voyelles",
+    "consonance": "Motifs de consonnes",
+    "alliteration": "Motifs de son initial",
+    "rhythm": "Motifs rythmiques"
+  },
+  "observatory": {
+    "save_observation": "Sauvegarder l'observation",
+    "share_observation": "Partager l'observation",
+    "pattern_strength": "Force du motif",
+    "pattern_frequency": "Fréquence du motif",
+    "view_all_patterns": "Voir tous les motifs",
+    "filter_patterns": "Filtrer les motifs",
+    "sort_by": "Trier par",
+    "export_observation": "Exporter l'observation",
+    "pattern": {
+      "examples": "Exemples",
+      "features": "Caractéristiques sonores",
+      "strength": "Force du motif",
+      "context": "Contexte",
+      "relationships": "Relations du motif",
+      "analysis": {
+        "primary": "Effet sonore principal",
+        "secondary": "Effets secondaires",
+        "intensity": "Intensité du motif",
+        "distribution": "Distribution sonore",
+        "interaction": "Interaction avec d'autres motifs"
+      },
+      "cultural": {
+        "writing_system": "Système d'écriture",
+        "sound_patterns": "Motifs sonores",
+        "cultural_emphasis": "Accent culturel",
+        "traditional_forms": "Formes traditionnelles"
+      }
+    },
+    "language": {
+      "detected": "Langue détectée",
+      "direction": "Direction du texte",
+      "cultural_info": "Informations culturelles",
+      "script_features": "Caractéristiques du script",
+      "change_language": "Changer la langue"
+    },
+    "title": "L'Observatoire",
+    "description": "Découvrez les motifs cachés dans votre texte. Comme un hibou observant la forêt la nuit, nous vous aiderons à voir les motifs subtils dans votre écriture.",
+    "try_examples": "Essayez ces exemples pour commencer",
+    "input_placeholder": "Entrez votre texte ici pour découvrir ses motifs...",
+    "observe": "Observer les motifs",
+    "observing": "Observation...",
+    "results": "Motifs trouvés",
+    "pattern_found": "J'ai découvert des motifs fascinants ! Jetez un œil à ce que j'ai trouvé.",
+    "ready": "Bienvenue dans l'Observatoire ! Quels motifs découvrirons-nous aujourd'hui ?",
+    "welcome": "Bienvenue dans l'Observatoire",
+    "instructions": "Entrez du texte ci-dessus pour découvrir ses motifs cachés.",
+    "patterns_found": "Motifs découverts",
+    "hover_for_details": "Survolez un motif pour voir les détails",
+    "tabs": {
+      "highlighted": "Vue du texte",
+      "celestial": "Carte stellaire",
+      "constellations": "Constellations de motifs"
+    },
+    "reportIssue": "Signaler un problème",
+    "feedback": {
+      "title": "Signaler un problème de l'Observatoire",
+      "description": "Aidez-nous à améliorer l'Observatoire en nous disant s'il fonctionne pour vous.",
+      "working": "Ça marche",
+      "notWorking": "Ça ne marche pas",
+      "messageLabel": "Dites-nous en plus (optionnel)",
+      "messagePlaceholder": "Veuillez décrire ce qui s'est passé...",
+      "submitError": "Erreur lors de l'envoi des commentaires. Veuillez réessayer.",
+      "thankYou": "Merci pour vos commentaires !"
+    },
+    "pronunciation": {
+      "guide": "Guide de prononciation",
+      "original_text": "Texte original",
+      "ipa": "Transcription IPA",
+      "romanization": "Romanisation",
+      "your_language": "Votre langue",
+      "phonology_comparison": "Comparaison phonologique",
+      "similarities": "Caractéristiques similaires",
+      "differences": "Différences",
+      "sound_correspondences": "Correspondances sonores",
+      "has_tips": "A des conseils ! 🌟",
+      "features": {
+        "stress": "Motif d'accent",
+        "tone": "Motif tonal",
+        "length": "Motif de longueur",
+        "special": "Caractéristiques spéciales"
+      },
+      "error": "Erreur lors de l'analyse de la prononciation"
+    }
+  },
+  "nav": {
+    "observatory": "Observatoire",
+    "forest": "Forêt",
+    "community": "Communauté",
+    "learn": "Apprendre",
+    "profile": "Profil",
+    "sign_in": "Se connecter",
+    "sign_out": "Se déconnecter"
+  },
+  "forest": {
+    "welcome": "Bienvenue dans la Forêt Noctua",
+    "welcome_subtitle": "Un royaume mystique où les motifs du langage dansent parmi les étoiles",
+    "journey_begins": "Votre voyage de découverte commence ici. Choisissez votre chemin...",
+    "start_observing": "Commencer l'observation",
+    "back_to_forest": "Retour à la Forêt",
+    "areas": {
+      "observatory": "Observatoire",
+      "observatory_desc": "Découvrez les motifs cachés dans le texte sous la canopée étoilée",
+      "community": "Bosquet communautaire",
+      "community_desc": "Partagez vos découvertes avec d'autres observateurs",
+      "stargazing": "Observation des étoiles",
+      "stargazing_desc": "Connectez-vous avec d'autres cartographes de constellations",
+      "pathways": "Sentiers d'apprentissage",
+      "pathways_desc": "Suivez des chemins guidés pour approfondir vos compétences d'observation"
+    },
+    "explore_features": "Explorer la Forêt",
+    "discover_more": "Découvrez la magie de l'observation des motifs",
+    "languages_supported": "Langues",
+    "pattern_types": "Types de motifs",
+    "discoveries_await": "Découvertes"
+  },
+  "patterns_found": "Motifs trouvés",
+  "begin_observation": "Commencer l'observation",
+  "observing": "Observation des motifs...",
+  "cultural_context": {
+    "french_poetry": "Poésie française",
+    "classical_forms": "Formes classiques",
+    "alexandrine": "Alexandrin",
+    "sonnet": "Sonnet",
+    "villanelle": "Villanelle",
+    "rondeau": "Rondeau"
+  },
+  "patterns": {
+    "rhyme": {
+      "title": "Rime finale",
+      "description": "Mots qui partagent des sons finaux similaires, créant une harmonie musicale dans le texte.",
+      "example": "lumière/mystère, amour/toujours"
+    },
+    "slant_rhyme": {
+      "title": "Rime imparfaite",
+      "description": "Mots aux sons similaires mais non identiques, créant des connexions sonores subtiles.",
+      "example": "âme/calme, yeux/cieux"
+    },
+    "internal_rhyme": {
+      "title": "Rime interne",
+      "description": "Mots qui riment à l'intérieur de la même ligne ou de lignes proches.",
+      "example": "Je pleure et soupire dans le ciel sombre"
+    },
+    "assonance": {
+      "title": "Assonance",
+      "description": "Répétition de sons vocaliques similaires dans les mots, créant une mélodie interne.",
+      "example": "mer bleue, soleil d'or"
+    },
+    "consonance": {
+      "title": "Consonance",
+      "description": "Répétition de sons consonantiques, créant souvent de la texture dans le texte.",
+      "example": "murmure mélodieux, souffle suave"
+    },
+    "alliteration": {
+      "title": "Allitération",
+      "description": "Répétition de consonnes initiales dans des mots voisins.",
+      "example": "doux soleil d'été"
+    },
+    "rhythm": {
+      "title": "Motif rythmique",
+      "description": "Motifs réguliers de syllabes accentuées et non accentuées créant un rythme musical.",
+      "example": "TA-ta TA-ta TA-ta"
+    },
+    "euphony": {
+      "title": "Euphonie",
+      "description": "Combinaison harmonieuse de sons agréables à l'oreille.",
+      "example": "murmurantes prairies matinales"
+    }
+  },
+  "features": {
+    "end_rhyme": {
+      "name": "Rime finale",
+      "explanation": "Sons correspondants à la fin des mots ou des vers"
+    },
+    "internal_rhyme": {
+      "name": "Rime interne",
+      "explanation": "Mots qui riment dans la même ligne"
+    },
+    "vowel_harmony": {
+      "name": "Harmonie vocalique",
+      "explanation": "Sons vocaliques similaires créant une unité mélodique"
+    },
+    "consonant_harmony": {
+      "name": "Harmonie consonantique",
+      "explanation": "Sons consonantiques similaires créant une unité texturale"
+    }
+  },
+  "faq": {
+    "title": "Questions fréquemment posées",
+    "search_placeholder": "Rechercher des questions...",
+    "no_results": "Aucune question correspondante trouvée",
+    "more_questions": "Vous avez d'autres questions ?",
+    "contact_support": "Contactez notre équipe de support",
+    "categories": {
+      "general": "Général",
+      "usage": "Utiliser Noctua",
+      "patterns": "Types de motifs",
+      "advanced": "Fonctionnalités avancées"
+    },
+    "what_is_noctua": {
+      "question": "Qu'est-ce que Noctua Forest ?",
+      "answer": "Noctua Forest est une plateforme unique pour découvrir et comprendre les motifs dans le texte. Comme un hibou observant la forêt la nuit, elle vous aide à voir les motifs cachés dans votre écriture."
+    },
+    "how_to_observe": {
+      "question": "Comment faire une observation ?",
+      "answer": "Pour faire une observation :\n1. Entrez votre texte dans l'Observatoire\n2. Cliquez sur 'Commencer l'observation'\n3. Explorez les motifs que Noctua découvre\n4. Cliquez sur les motifs pour voir des explications détaillées"
+    }
+  },
+  "accounts": {
+    "title": "Mon compte",
+    "usage": "Utilisation",
+    "profile": "Profil",
+    "billing": "Facturation",
+    "ai_models": "Modèles IA",
+    "settings": "Paramètres",
+    "token_balance": "Solde de jetons",
+    "tokens_remaining": "jetons restants",
+    "buy_tokens": "Acheter plus de jetons",
+    "monthly_usage": "Utilisation mensuelle",
+    "observations_this_month": "observations ce mois-ci",
+    "profile_info": "Informations du profil",
+    "display_name": "Nom d'affichage",
+    "email": "E-mail",
+    "update_profile": "Mettre à jour le profil",
+    "account_status": "Statut du compte",
+    "member_since": "Membre depuis",
+    "email_verified": "E-mail vérifié"
+  },
+  "onboarding": {
+    "welcome_title": "Bienvenue dans Noctua Forest",
+    "welcome_description": "Je suis Orion, votre guide dans le monde fascinant de l'observation des motifs. Ensemble, nous explorerons les motifs cachés dans le langage et le son.",
+    "welcome_owl": "Je suis ravi d'être votre guide !",
+    "first_lesson_title": "Votre première leçon",
+    "first_lesson_description": "Nous commencerons par une exploration simple des motifs. Comme apprendre à repérer les étoiles dans le ciel nocturne, nous commencerons simplement par observer et remarquer.",
+    "ready_title": "Prêt à commencer",
+    "ready_description": "Rappelez-vous, il n'y a pas d'urgence. Prenez votre temps pour observer et profitez du processus. Je serai là pour vous aider à chaque étape.",
+    "start_journey": "Commencer la première leçon"
+  },
+  "common": {
+    "back": "Retour",
+    "next": "Suivant",
+    "yes": "Oui",
+    "no": "Non",
+    "cancel": "Annuler",
+    "submit": "Soumettre",
+    "submitting": "Envoi en cours...",
+    "save": "Sauvegarder",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès"
+  },
+  "lessons": {
+    "title": "Parcours d'apprentissage",
+    "subtitle": "Choisissez votre parcours et commencez votre voyage de découverte",
+    "owl_encouragement": "Vous vous débrouillez très bien ! Continuez à explorer !",
+    "path_complete": "Félicitations ! Vous avez terminé toutes les leçons de ce parcours.",
+    "unlock_more": "Terminez les leçons précédentes pour débloquer plus de contenu."
+  },
+  "profile": {
+    "welcome_back": "Bon retour, {{name}} ! Prêt à continuer votre voyage ?",
+    "your_journey": "Votre parcours d'apprentissage",
+    "learning_journey": "Progrès d'apprentissage",
+    "continue_learning": "Continuer votre voyage",
+    "start_next_lesson": "Commencer la leçon suivante",
+    "lesson_encouragement": "Découvrons quelque chose d'incroyable !"
+  },
+  "landing": {
+    "title": "Entrez dans la Forêt",
+    "subtitle": "Un royaume mystique où les motifs linguistiques dansent parmi les étoiles, et chaque mot recèle un potentiel de découverte.",
+    "premiumOnly": "Premium Seulement",
+    "upgradeToPremium": "Passer à Premium",
+    "viewAchievements": "Voir les Réussites",
+    "dailyChallenge": "Défi Quotidien",
+    "cards": {
+      "journey": {
+        "title": "Votre Voyage",
+        "description": "Suivez des sentiers guidés pour approfondir vos compétences d'observation et débloquer de nouveaux chemins.",
+        "button": "Commencer le Voyage"
+      },
+      "observatory": {
+        "title": "Observatory",
+        "description": "Contemplez les étoiles et explorez les motifs cosmiques et les données stellaires.",
+        "button": "Entrer dans l'Observatory"
+      },
+      "scriptorium": {
+        "title": "Scriptorium",
+        "description": "Accédez aux textes anciens et contribuez avec vos propres connaissances à la bibliothèque.",
+        "button": "Entrer dans le Scriptorium"
+      },
+      "comingSoon": {
+        "title": "Nouveaux Bosquets",
+        "description": "D'autres environnements d'apprentissage sont en cours de développement pour votre voyage.",
+        "button": "Bientôt Disponible"
+      }
+    }
   }
 } 

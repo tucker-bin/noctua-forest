@@ -1,29 +1,34 @@
-import * as admin from 'firebase-admin';
-import logger from './logger';
+import { initializeApp, cert, getApps, App } from 'firebase-admin/app';
+import { getFirestore, Firestore } from 'firebase-admin/firestore';
+import { getAuth, Auth } from 'firebase-admin/auth';
+import * as path from 'path';
+import { logger } from '../utils/logger';
+
+let app: App;
+let db: Firestore;
+let auth: Auth;
 
 try {
-  // Check if the app is already initialized to prevent errors
-  if (!admin.apps.length) {
-    const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || './firebase-service-account.json';
+  // Check if Firebase is already initialized
+  if (getApps().length === 0) {
+    const serviceAccountPath = path.resolve(__dirname, '../../../../firebase-service-account.json');
     
-    logger.info(`Initializing Firebase from: ${serviceAccountPath}`);
-
-    const serviceAccount = require(serviceAccountPath);
-
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      projectId: process.env.FIREBASE_PROJECT_ID || 'your-project-id-here' // Fallback
+    app = initializeApp({
+      credential: cert(serviceAccountPath),
+      projectId: process.env.FIREBASE_PROJECT_ID || 'my-rhyme-app'
     });
+  } else {
+    app = getApps()[0];
   }
+
+  db = getFirestore(app);
+  auth = getAuth(app);
+
+  logger.info('✅ Firebase Admin initialized successfully');
 } catch (error) {
-  logger.error({
-    message: 'Firebase Admin SDK initialization failed.',
-    error: error
-  });
-  // Depending on the application's needs, you might want to exit the process
-  // if Firebase is critical for all operations.
-  // process.exit(1);
+  logger.error('❌ Firebase Admin initialization failed:', { error: error instanceof Error ? error.message : String(error) }, error instanceof Error ? error : undefined);
+  throw error;
 }
 
-export const db = admin.firestore();
-export const auth = admin.auth(); 
+export { app as admin, db, auth };
+export default { admin: app, db, auth }; 

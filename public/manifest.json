@@ -1,0 +1,70 @@
+{
+  "name": "Noctua Forest - Pattern Observatory",
+  "short_name": "Noctua Forest",
+  "description": "Discover hidden patterns in language through observation. A progressive web app for pattern analysis and linguistic exploration.",
+  "theme_color": "#1a1f2e",
+  "background_color": "#0a0f1a",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "start_url": "/",
+  "categories": ["education", "productivity", "utilities"],
+  "lang": "en",
+  "dir": "auto",
+  "icons": [
+    {
+      "src": "/pwa-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Observatory",
+      "short_name": "Observatory",
+      "description": "Open pattern observatory",
+      "url": "/observatory",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Lessons",
+      "short_name": "Lessons", 
+      "description": "Start learning journey",
+      "url": "/lessons",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+noctua",
+      "url": "/pattern?text=%s"
+    }
+  ]
+} 

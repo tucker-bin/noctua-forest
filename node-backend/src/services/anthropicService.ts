@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { AnalysisResult } from '../types/analysisTypes';
-import logger from '../config/logger';
+import { logger } from '../utils/logger';
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!

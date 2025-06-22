@@ -1,52 +1,378 @@
 {
-  "welcome": "Bem-vindo à Floresta Noctua",
+  "welcome": "Bem-vindos à Floresta Noctua",
   "subtitle": "Noctua significa 'coruja'—um lar para artistas e aprendizes.",
-  "enter_forest": "Entrar na Floresta (Criar seu perfil)",
+  "welcome_message": "Bem-vindos à minha Floresta! Eu sou Noctua, o vosso guia para descobrir os padrões ocultos nas vossas palavras.",
+  "explore_forest_title": "Explorar a Floresta",
+  "explore_forest_desc": "Descubram os padrões ocultos nas vossas canções e poemas favoritos através da observação cuidadosa.",
+  "learn_create_title": "Aprender e Criar",
+  "learn_create_desc": "Compreendam esquemas de rima complexos e criem as vossas próprias obras-primas poéticas.",
+  "share_connect_title": "Partilhar e Conectar",
+  "share_connect_desc": "Partilhem as vossas observações e jornadas líricas na Floresta com a comunidade.",
+  "noctua_observatory_welcome": "Bem-vindos ao meu Observatório! Estão prontos para descobrir a música nas vossas palavras?",
+  "noctua_forest_welcome": "Bem-vindos à minha Floresta! Aqui podem descobrir criadores afins e explorar a comunidade que chama a este lugar casa.",
+  "enter_forest": "Entrar na Floresta (Criar o vosso perfil)",
   "view_profile": "Ver perfil",
   "artist": "Artista",
   "owl": "Coruja",
   "tester": "Testador",
-  "signup_as": "Estou me cadastrando como:",
-  "first_name": "Nome",
-  "last_name": "Sobrenome",
+  "signup_as": "Registo-me como:",
+  "first_name": "Nome próprio",
+  "last_name": "Apelido",
   "artist_name": "Nome artístico",
   "location": "Localização (Cidade, País)",
-  "select_genre": "Selecionar gênero",
-  "email": "Endereço de e-mail",
-  "password": "Senha",
+  "select_genre": "Selecionar género",
+  "email": "Endereço de email",
+  "password": "Palavra-passe",
+  "auth": {
+    "signin_title": "Iniciar sessão",
+    "signin_subtitle": "Bem-vindos de volta à Floresta Noctua",
+    "signin_button": "Iniciar sessão",
+    "signup_link": "Registar",
+    "email": "Endereço de email",
+    "password": "Palavra-passe",
+    "forgot_password": "Esqueceu a palavra-passe?",
+    "no_account": "Não tem conta?",
+    "or": "Ou",
+    "errors": {
+      "fill_all_fields": "Por favor preencham todos os campos",
+      "invalid_email": "Endereço de email inválido",
+      "user_disabled": "Esta conta foi desativada",
+      "user_not_found": "Nenhuma conta encontrada com este email",
+      "wrong_password": "Palavra-passe incorreta",
+      "too_many_requests": "Demasiadas tentativas falhadas. Tentem novamente mais tarde",
+      "signin_failed": "Falha no início de sessão. Tentem novamente.",
+      "popup_closed": "Início de sessão cancelado",
+      "google_signin_failed": "Falha no início de sessão com Google"
+    },
+    "signin_with_google": "Iniciar sessão com Google"
+  },
   "invite_code_optional": "Código de convite (opcional)",
-  "signing_up": "Cadastrando...",
-  "sign_up": "Cadastrar",
-  "privacy_policy": "Política de Privacidade",
-  "terms_and_agreements": "Termos e Condições",
+  "signing_up": "A registar...",
+  "sign_up": "Registar",
+  "privacy_policy": "Política de privacidade",
+  "terms_and_agreements": "Termos e condições",
   "releases": "Lançamentos",
   "latest_news": "Últimas notícias",
-  "upcoming_events": "Próximos eventos",
-  "share_profile": "Compartilhar perfil",
-  "contact": "Contato",
-  "share_this_profile": "Compartilhe este perfil",
+  "upcoming_events": "Eventos próximos",
+  "share_profile": "Partilhar perfil",
+  "contact": "Contacto",
+  "share_this_profile": "Partilhar este perfil",
   "copied": "Copiado!",
-  "copy_link": "Copiar link",
+  "copy_link": "Copiar ligação",
   "send_message": "Enviar mensagem",
-  "want_to_connect": "Quer se conectar ou reivindicar este perfil?",
-  "sign_up_to_join": "Cadastre-se para entrar no Noctua Rhyme",
-  "observatory_title": "Observatório de Rimas Noctua",
-  "observatory_subtitle": "Analise seu texto para padrões fonéticos e rimas. Cada análise custa tokens de acordo com o tamanho do texto.",
+  "want_to_connect": "Querem conectar ou reclamar este perfil?",
+  "sign_up_to_join": "Registem-se para se juntarem à Floresta Noctua",
+  "observatory_title": "O Observatório",
+  "observatory_subtitle": "Observem padrões fonéticos e rimas no texto. Cada sessão de observação usa tokens baseados no comprimento do texto.",
   "token_balance": "Saldo de tokens",
   "estimated_cost": "Custo estimado",
-  "enter_text_to_analyze": "Digite o texto para analisar",
+  "enter_text_to_observe": "Introduzam o texto a observar",
   "character_count": "{{count}} caracteres",
   "batches": "lotes",
-  "analyzing": "Analisando...",
-  "wait_seconds": "Aguarde {{count}}s...",
-  "analyze_text": "Analisar texto",
-  "wait_tooltip": "Para evitar abusos, aguarde antes da próxima análise.",
+  "observing": "A observar padrões...",
+  "wait_seconds": "Aguardem {{count}}s...",
+  "begin_observation": "Começar observação",
+  "wait_tooltip": "Para assegurar observações de qualidade, aguardem entre sessões.",
   "error": "Erro",
   "footer": {
-    "copyright": "© {{year}} Observatório de Rimas Noctua",
+    "copyright": "© {{year}} Floresta Noctua",
     "about": "Sobre",
-    "contact": "Contato",
+    "contact": "Contacto",
     "privacy": "Privacidade",
-    "terms": "Termos"
+    "terms": "Termos",
+    "rights": "Todos os direitos reservados",
+    "explore": "Explorar",
+    "observatory": "Observatório",
+    "community": "Comunidade",
+    "stargazing": "Observação de estrelas",
+    "learning_paths": "Caminhos de aprendizagem",
+    "resources": "Recursos",
+    "documentation": "Documentação",
+    "api": "API",
+    "guides": "Guias",
+    "faq": "FAQ",
+    "legal": "Legal",
+    "cookies": "Cookies",
+    "licenses": "Licenças"
+  },
+  "tooltip": {
+    "change_language": "Mudar idioma",
+    "follow": "Seguir",
+    "unfollow": "Deixar de seguir"
+  },
+  "follow": "Seguir",
+  "unfollow": "Deixar de seguir",
+  "pattern_types": {
+    "rhyme": "Padrões de rima",
+    "assonance": "Padrões de vogais",
+    "consonance": "Padrões de consoantes",
+    "alliteration": "Padrões de som inicial",
+    "rhythm": "Padrões rítmicos"
+  },
+  "observatory": {
+    "save_observation": "Guardar observação",
+    "share_observation": "Partilhar observação",
+    "pattern_strength": "Força do padrão",
+    "pattern_frequency": "Frequência do padrão",
+    "view_all_patterns": "Ver todos os padrões",
+    "filter_patterns": "Filtrar padrões",
+    "sort_by": "Ordenar por",
+    "export_observation": "Exportar observação",
+    "pattern": {
+      "examples": "Exemplos",
+      "features": "Características sonoras",
+      "strength": "Força do padrão",
+      "context": "Contexto",
+      "relationships": "Relações do padrão",
+      "analysis": {
+        "primary": "Efeito sonoro principal",
+        "secondary": "Efeitos secundários",
+        "intensity": "Intensidade do padrão",
+        "distribution": "Distribuição sonora",
+        "interaction": "Interação com outros padrões"
+      },
+      "cultural": {
+        "writing_system": "Sistema de escrita",
+        "sound_patterns": "Padrões sonoros",
+        "cultural_emphasis": "Ênfase cultural",
+        "traditional_forms": "Formas tradicionais"
+      }
+    },
+    "language": {
+      "detected": "Idioma detetado",
+      "direction": "Direção do texto",
+      "cultural_info": "Informação cultural",
+      "script_features": "Características do script",
+      "change_language": "Mudar idioma"
+    },
+    "title": "O Observatório",
+    "description": "Descubram os padrões ocultos no vosso texto. Como uma coruja observando a floresta à noite, ajudamos-vos a ver os padrões subtis na vossa escrita.",
+    "try_examples": "Experimentem estes exemplos para começar",
+    "input_placeholder": "Introduzam o vosso texto aqui para descobrir os seus padrões...",
+    "observe": "Observar padrões",
+    "observing": "A observar...",
+    "results": "Padrões encontrados",
+    "pattern_found": "Descobri padrões fascinantes! Vejam o que encontrei.",
+    "ready": "Bem-vindos ao Observatório! Que padrões descobriremos hoje?",
+    "welcome": "Bem-vindos ao Observatório",
+    "instructions": "Introduzam texto acima para descobrir os seus padrões ocultos.",
+    "patterns_found": "Padrões descobertos",
+    "hover_for_details": "Passem sobre um padrão para ver detalhes",
+    "tabs": {
+      "highlighted": "Vista do texto",
+      "celestial": "Mapa estelar",
+      "constellations": "Constelações de padrões"
+    },
+    "reportIssue": "Reportar problema",
+    "feedback": {
+      "title": "Reportar problema do Observatório",
+      "description": "Ajudem-nos a melhorar o Observatório dizendo-nos se está a funcionar para vocês.",
+      "working": "Está a funcionar",
+      "notWorking": "Não funciona",
+      "messageLabel": "Digam-nos mais (opcional)",
+      "messagePlaceholder": "Descrevam o que aconteceu...",
+      "submitError": "Erro ao enviar comentários. Tentem novamente.",
+      "thankYou": "Obrigado pelos vossos comentários!"
+    },
+    "pronunciation": {
+      "guide": "Guia de pronúncia",
+      "original_text": "Texto original",
+      "ipa": "Transcrição IPA",
+      "romanization": "Romanização",
+      "your_language": "O vosso idioma",
+      "phonology_comparison": "Comparação fonológica",
+      "similarities": "Características similares",
+      "differences": "Diferenças",
+      "sound_correspondences": "Correspondências sonoras",
+      "has_tips": "Tem dicas! 🌟",
+      "features": {
+        "stress": "Padrão de acentuação",
+        "tone": "Padrão tonal",
+        "length": "Padrão de comprimento",
+        "special": "Características especiais"
+      },
+      "error": "Erro ao analisar a pronúncia"
+    }
+  },
+  "nav": {
+    "observatory": "Observatório",
+    "forest": "Floresta",
+    "community": "Comunidade",
+    "learn": "Aprender",
+    "profile": "Perfil",
+    "sign_in": "Iniciar sessão",
+    "sign_out": "Terminar sessão"
+  },
+  "forest": {
+    "welcome": "Bem-vindos à Floresta Noctua",
+    "welcome_subtitle": "Um reino místico onde os padrões da linguagem dançam entre as estrelas",
+    "journey_begins": "A vossa jornada de descoberta começa aqui. Escolham o vosso caminho...",
+    "start_observing": "Começar a observar",
+    "back_to_forest": "Voltar à Floresta",
+    "areas": {
+      "observatory": "Observatório",
+      "observatory_desc": "Descubram padrões ocultos no texto sob o dossel estrelado",
+      "community": "Bosque comunitário",
+      "community_desc": "Partilhem as vossas descobertas com outros observadores",
+      "stargazing": "Observação de estrelas",
+      "stargazing_desc": "Conectem-se com outros cartógrafos de constelações",
+      "pathways": "Trilhos de aprendizagem",
+      "pathways_desc": "Sigam caminhos guiados para aprofundar as vossas competências de observação"
+    },
+    "explore_features": "Explorar a Floresta",
+    "discover_more": "Descubram a magia da observação de padrões",
+    "languages_supported": "Idiomas",
+    "pattern_types": "Tipos de padrões",
+    "discoveries_await": "Descobertas"
+  },
+  "patterns_found": "Padrões encontrados",
+  "begin_observation": "Começar observação",
+  "observing": "A observar padrões...",
+  "cultural_context": {
+    "portuguese_poetry": "Poesia portuguesa",
+    "classical_forms": "Formas clássicas",
+    "sonnet": "Soneto",
+    "canção": "Canção",
+    "endecha": "Endecha",
+    "trova": "Trova"
+  },
+  "patterns": {
+    "rhyme": {
+      "title": "Rima Final",
+      "description": "Palavras que partilham sons finais similares, criando harmonia musical no texto.",
+      "example": "luz/cruz, amor/dor"
+    },
+    "slant_rhyme": {
+      "title": "Rima Imperfeita",
+      "description": "Palavras com sons similares mas não idênticos, criando conexões sonoras subtis.",
+      "example": "alma/calma, olhos/sonhos"
+    },
+    "internal_rhyme": {
+      "title": "Rima Interna",
+      "description": "Palavras que rimam dentro da mesma linha ou linhas próximas.",
+      "example": "Choro e suspiro no céu sombrio"
+    },
+    "assonance": {
+      "title": "Assonância",
+      "description": "Repetição de sons vocálicos similares dentro das palavras, criando melodia interna.",
+      "example": "mar azul, sol dourado"
+    },
+    "consonance": {
+      "title": "Consonância",
+      "description": "Repetição de sons consonânticos, frequentemente criando textura no texto.",
+      "example": "sussurro suave, murmúrio melodioso"
+    },
+    "alliteration": {
+      "title": "Aliteração",
+      "description": "Repetição de consoantes iniciais em palavras próximas.",
+      "example": "doce sol de verão"
+    },
+    "rhythm": {
+      "title": "Padrão Rítmico",
+      "description": "Padrões regulares de sílabas acentuadas e não acentuadas criando um ritmo musical.",
+      "example": "TA-ta TA-ta TA-ta"
+    },
+    "euphony": {
+      "title": "Eufonia",
+      "description": "Combinação harmoniosa de sons agradáveis ao ouvido.",
+      "example": "murmurantes prados matinais"
+    }
+  },
+  "features": {
+    "end_rhyme": {
+      "name": "Rima Final",
+      "explanation": "Sons correspondentes no final de palavras ou versos"
+    },
+    "internal_rhyme": {
+      "name": "Rima Interna",
+      "explanation": "Palavras que rimam dentro da mesma linha"
+    },
+    "vowel_harmony": {
+      "name": "Harmonia Vocálica",
+      "explanation": "Sons vocálicos similares criando unidade melódica"
+    },
+    "consonant_harmony": {
+      "name": "Harmonia Consonântica",
+      "explanation": "Sons consonânticos similares criando unidade textural"
+    }
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "search_placeholder": "Pesquisar perguntas...",
+    "no_results": "Nenhuma pergunta correspondente encontrada",
+    "more_questions": "Tem mais perguntas?",
+    "contact_support": "Contacte a nossa equipa de apoio",
+    "categories": {
+      "general": "Geral",
+      "usage": "Usar o Noctua",
+      "patterns": "Tipos de Padrões",
+      "advanced": "Funcionalidades Avançadas"
+    },
+    "what_is_noctua": {
+      "question": "O que é o Noctua Forest?",
+      "answer": "Noctua Forest é uma plataforma única para descobrir e compreender padrões no texto. Como uma coruja observando a floresta à noite, ajuda-o a ver os padrões ocultos na sua escrita."
+    },
+    "how_to_observe": {
+      "question": "Como fazer uma observação?",
+      "answer": "Para fazer uma observação:\n1. Introduza o seu texto no Observatório\n2. Clique em 'Começar Observação'\n3. Explore os padrões que o Noctua descobre\n4. Clique nos padrões para ver explicações detalhadas"
+    }
+  },
+  "accounts": {
+    "title": "A Minha Conta",
+    "usage": "Utilização",
+    "profile": "Perfil",
+    "billing": "Faturação",
+    "ai_models": "Modelos IA",
+    "settings": "Definições",
+    "token_balance": "Saldo de Tokens",
+    "tokens_remaining": "tokens restantes",
+    "buy_tokens": "Comprar Mais Tokens",
+    "monthly_usage": "Utilização Mensal",
+    "observations_this_month": "observações este mês",
+    "profile_info": "Informações do Perfil",
+    "display_name": "Nome de Exibição",
+    "email": "E-mail",
+    "update_profile": "Actualizar Perfil",
+    "account_status": "Estado da Conta",
+    "member_since": "Membro Desde",
+    "email_verified": "E-mail Verificado"
+  },
+  "onboarding": {
+    "welcome_title": "Bem-vindo ao Noctua Forest",
+    "welcome_description": "Sou o Orion, o seu guia através do fascinante mundo da observação de padrões. Juntos, exploraremos os padrões ocultos na linguagem e no som.",
+    "welcome_owl": "Estou entusiasmado por ser o seu guia!",
+    "first_lesson_title": "A Sua Primeira Lição",
+    "first_lesson_description": "Começaremos com exploração simples de padrões. Como aprender a avistar estrelas no céu nocturno, começaremos simplesmente observando e notando.",
+    "ready_title": "Pronto para Começar",
+    "ready_description": "Lembre-se, não há pressa. Tome o seu tempo para observar e desfrute do processo. Estarei aqui para ajudar em cada passo.",
+    "start_journey": "Começar Primeira Lição"
+  },
+  "common": {
+    "back": "Voltar",
+    "next": "Seguinte",
+    "yes": "Sim",
+    "no": "Não",
+    "cancel": "Cancelar",
+    "submit": "Submeter",
+    "submitting": "A submeter...",
+    "save": "Guardar",
+    "loading": "A carregar...",
+    "error": "Erro",
+    "success": "Sucesso"
+  },
+  "lessons": {
+    "title": "Percursos de Aprendizagem",
+    "subtitle": "Escolha o seu percurso e comece a sua jornada de descoberta",
+    "owl_encouragement": "Está a fazer muito bem! Continue a explorar!",
+    "path_complete": "Parabéns! Completou todas as lições neste percurso.",
+    "unlock_more": "Complete as lições anteriores para desbloquear mais conteúdo."
+  },
+  "profile": {
+    "welcome_back": "Bem-vindo de volta, {{name}}! Pronto para continuar a sua jornada?",
+    "your_journey": "A Sua Jornada de Aprendizagem",
+    "learning_journey": "Progresso de Aprendizagem",
+    "continue_learning": "Continuar a Sua Jornada",
+    "start_next_lesson": "Começar Próxima Lição",
+    "lesson_encouragement": "Vamos descobrir algo incrível!"
   }
 } 

@@ -6,7 +6,7 @@ import {
   updateSystemSettings,
   getAdminMetrics
 } from '../controllers/adminController';
-import logger from '../config/logger';
+import { logger } from '../utils/logger';
 
 const router = Router();
 

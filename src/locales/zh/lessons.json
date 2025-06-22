@@ -1,0 +1,520 @@
+{
+  "celestial_observer": {
+    "first_light": {
+      "title": "初光：声音观察入门",
+      "welcome": {
+        "title": "欢迎进入模式观察",
+        "description": "在这第一课中，我们将培养识别语言中声音模式的基本技能。就像学习观察任何新领域中的细微差别一样，这需要练习和耐心。"
+      },
+      "basic_recognition": {
+        "title": "基本模式识别",
+        "starting_simple": {
+          "title": "从简单开始",
+          "description": "让我们从一个包含清晰模式的熟悉文本开始：",
+          "example": {
+            "text": "明月几时有？\n把酒问青天。\n不知天上宫阙，\n今夕是何年。",
+            "focus_points": [
+              "重复的声音",
+              "自然的节奏",
+              "声音的流动",
+              "模式组合"
+            ]
+          }
+        },
+        "building_awareness": {
+          "title": "培养意识",
+          "points": [
+            "注意哪些声音重复",
+            "感受模式如何发展",
+            "观察词语如何连接",
+            "聆听自然的分组"
+          ]
+        }
+      },
+      "practice_exercises": {
+        "title": "练习题",
+        "sound_groups": {
+          "title": "声音组",
+          "description": "观察这些词对之间的关系：",
+          "pairs": [
+            {
+              "words": ["低语", "呢喃"],
+              "type": "柔和持续的声音"
+            },
+            {
+              "words": ["飘扬", "闪烁"],
+              "type": "快速运动的声音"
+            },
+            {
+              "words": ["光芒", "微风"],
+              "type": "扩展的声音"
+            },
+            {
+              "words": ["漂浮", "飞翔"],
+              "type": "轻盈运动的声音"
+            }
+          ]
+        },
+        "pattern_flow": {
+          "title": "模式流动",
+          "description": "阅读这段文字，注意自然突出的部分：",
+          "text": "轻风细雨润无声，\n草木青青入梦来。\n深谷幽林藏古意，\n清泉流淌诉衷肠。"
+        }
+      },
+      "cultural_perspectives": {
+        "title": "文化视角",
+        "description": "不同的语言以独特的方式处理声音模式。以下是一些例子：",
+        "chinese": {
+          "title": "中文模式",
+          "examples": [
+            {
+              "text": "淅淅沥沥",
+              "meaning": "细雨声"
+            },
+            {
+              "text": "叮叮当当",
+              "meaning": "清脆的铃声"
+            },
+            {
+              "text": "哗哗啦啦",
+              "meaning": "流水声"
+            },
+            {
+              "text": "沙沙",
+              "meaning": "树叶摇动的声音"
+            }
+          ]
+        },
+        "classical": {
+          "title": "古典诗词",
+          "examples": [
+            {
+              "text": "床前明月光，\n疑是地上霜。\n举头望明月，\n低头思故乡。",
+              "meaning": "展示声音和意境的和谐"
+            }
+          ]
+        }
+      },
+      "practice": {
+        "title": "开始练习",
+        "observation_notes": {
+          "title": "个人观察笔记",
+          "steps": [
+            "找到一个安静的地方",
+            "聆听自然的声音",
+            "不加标签地注意模式",
+            "记录你的观察"
+          ]
+        },
+        "key_points": {
+          "title": "关键点",
+          "points": [
+            "每个观察都是有效的",
+            "不同的观察者会注意到不同的模式",
+            "文化背景增添深度",
+            "花时间体验声音"
+          ]
+        }
+      },
+      "suggestions": {
+        "title": "练习建议",
+        "points": [
+          "每天进行观察",
+          "分享你的发现",
+          "尝试不同的声音环境",
+          "为更复杂的模式做准备"
+        ]
+      },
+      "community": {
+        "title": "社区学习",
+        "description": "与其他学习者分享观察。你注意到了什么模式？什么让你感到惊讶？"
+      },
+      "note": "专注于发展你识别模式的自然能力。不需要分析一切——只需观察并注意突出的部分。"
+    },
+    "star_patterns": {
+      "title": "星辰模式：基本通用模式",
+      "welcome": {
+        "title": "欢迎来到星辰模式",
+        "description": "在这节课中，我们将探索不同语言和文化中出现的基本模式。就像星星在各种文化中形成熟悉的形状一样，某些声音模式在人类表达中创造了普遍的联系。"
+      },
+      "pattern_types": {
+        "title": "通用模式类型",
+        "description": "让我们探索在许多语言中出现的一些模式：",
+        "sections": {
+          "repetition": {
+            "title": "重复模式",
+            "description": "像星星的规律脉动一样，重复创造节奏和强调。",
+            "example": {
+              "text": "叮叮当当，滴滴答答，咚咚锵锵\n乒乒乓乓，哗哗啦啦，铛铛铮铮",
+              "focus_points": [
+                "相似的声音对",
+                "节奏结构",
+                "模式变化",
+                "声音象征"
+              ]
+            }
+          },
+          "assonance": {
+            "title": "韵母和谐",
+            "description": "就像相似亮度的星星聚集在一起，韵母声音经常形成自然的群组。",
+            "example": {
+              "text": "清风徐来，水波不兴\n明月何皎，照我心明",
+              "focus_points": [
+                "韵母声音",
+                "声音流动",
+                "意义连接",
+                "模式强度"
+              ]
+            }
+          },
+          "consonance": {
+            "title": "声母集群",
+            "description": "就像星座形成独特的形状，声母模式在语言中创造质地。",
+            "example": {
+              "text": "潺潺溪水流，\n沙沙松风起。",
+              "focus_points": [
+                "硬音",
+                "软音",
+                "声音组合",
+                "模式节奏"
+              ]
+            }
+          }
+        }
+      },
+      "pattern_recognition": {
+        "title": "模式识别",
+        "exercises": {
+          "basic": {
+            "title": "基本模式识别",
+            "description": "在以下例子中听取这些常见模式：",
+            "examples": [
+              {
+                "text": "潺潺清泉流",
+                "pattern": "声母重复"
+              },
+              {
+                "text": "明月照清风",
+                "pattern": "韵母和谐"
+              },
+              {
+                "text": "轻声，细语，低吟",
+                "pattern": "声音进展"
+              }
+            ]
+          },
+          "advanced": {
+            "title": "模式组合",
+            "description": "观察不同模式如何协同工作：",
+            "examples": [
+              {
+                "text": "细雨潇潇落花飘，\n轻风袅袅柳枝摇。",
+                "patterns": [
+                  "叠字在'潇潇'和'袅袅'中",
+                  "韵脚在'飘'和'摇'中",
+                  "声母协调在'轻'和'清'中"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "cultural_variations": {
+        "title": "文化变体",
+        "description": "不同文化以独特的方式识别相似的模式：",
+        "examples": {
+          "chinese": {
+            "title": "中文声音象征",
+            "pairs": [
+              {
+                "pattern": "潺-",
+                "words": ["潺潺", "潺湲", "潺流"],
+                "association": "流水声和动态"
+              },
+              {
+                "pattern": "飘-",
+                "words": ["飘飘", "飘逸", "飘然"],
+                "association": "轻盈的动作"
+              }
+            ]
+          },
+          "universal": {
+            "title": "通用模式",
+            "examples": [
+              {
+                "type": "大小声音象征",
+                "description": "小物体常用高音，而大物体用低音",
+                "examples": ["叮咚/轰隆", "滴答/咚咚", "铃铛/鼓声"]
+              },
+              {
+                "type": "动作模式",
+                "description": "快速动作常用短音，而缓慢动作用长音",
+                "examples": ["咻/飘", "啪/流", "闪/漂"]
+              }
+            ]
+          }
+        }
+      },
+      "practice": {
+        "title": "模式练习",
+        "exercises": {
+          "identification": {
+            "title": "模式识别",
+            "instructions": "识别这些段落中的模式：",
+            "examples": [
+              {
+                "text": "细雨轻轻落叶间，\n微风缓缓拂花面。\n淡影轻移闪烁处，\n暮色渐渐消散远。",
+                "patterns_to_find": [
+                  "叠字声音",
+                  "韵母模式",
+                  "声母组合"
+                ]
+              }
+            ]
+          },
+          "creation": {
+            "title": "模式创作",
+            "instructions": "使用这些结构练习创建自己的模式：",
+            "templates": [
+              {
+                "structure": "重复：___ ___, ___ ___",
+                "example": "轻轻飘飘，缓缓悠悠"
+              },
+              {
+                "structure": "声音流动：___ ___ ___ ___",
+                "example": "清风徐徐拂面来"
+              }
+            ]
+          }
+        }
+      },
+      "assessment": {
+        "title": "模式评估",
+        "description": "观察这些段落并注意你识别的模式：",
+        "examples": [
+          {
+            "text": "缠绕枝条间隙处，\n影子舞动轻柔美。\n月光穿行既定路，\n化暗为明新日来。",
+            "patterns": [
+              "叠字模式",
+              "内部韵律",
+              "声母集群",
+              "韵母和谐"
+            ]
+          }
+        ]
+      },
+      "reflection": {
+        "title": "模式反思",
+        "prompts": [
+          "你最容易注意到哪些模式？",
+          "不同的模式如何影响文本的感觉？",
+          "在你的语言中自然出现哪些模式？",
+          "你如何在自己的表达中使用这些模式？"
+        ]
+      }
+    },
+    "constellation_mapping": {
+      "title": "星座映射：连接相关声音",
+      "welcome": {
+        "title": "欢迎来到星座映射",
+        "description": "就像星星在夜空中形成有意义的模式，声音创造出意义和情感的复杂网络。在这节课中，我们将探索不同的声音如何相互关联并形成更大的意义模式。"
+      },
+      "sound_relationships": {
+        "title": "声音关系",
+        "description": "探索不同声音如何连接和相互影响：",
+        "categories": {
+          "emotional": {
+            "title": "情感共鸣",
+            "description": "声音如何唤起情感反应：",
+            "examples": [
+              {
+                "emotion": "平静",
+                "sounds": ["轻柔", "流淌", "安宁", "梦幻"],
+                "pattern": "柔和声母，长韵母"
+              },
+              {
+                "emotion": "活力",
+                "sounds": ["闪烁", "跳跃", "迅速", "明亮"],
+                "pattern": "锐利声母，短韵母"
+              },
+              {
+                "emotion": "神秘",
+                "sounds": ["低语", "阴影", "秘密", "迷雾"],
+                "pattern": "气音，暗韵母"
+              }
+            ]
+          },
+          "physical": {
+            "title": "物理特质",
+            "description": "声音如何暗示物理特性：",
+            "examples": [
+              {
+                "quality": "动作",
+                "patterns": [
+                  {
+                    "type": "快速",
+                    "sounds": ["闪", "跃", "飞", "奔"]
+                  },
+                  {
+                    "type": "流畅",
+                    "sounds": ["滑", "流", "漂", "游"]
+                  }
+                ]
+              },
+              {
+                "quality": "质地",
+                "patterns": [
+                  {
+                    "type": "粗糙",
+                    "sounds": ["刮", "擦", "粗", "硬"]
+                  },
+                  {
+                    "type": "光滑",
+                    "sounds": ["丝", "滑", "亮", "润"]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "pattern_networks": {
+        "title": "模式网络",
+        "description": "发现模式如何连接形成更大的意义网络：",
+        "networks": {
+          "water": {
+            "title": "水的声音",
+            "description": "唤起水和流动运动的模式：",
+            "examples": [
+              {
+                "text": "溪水潺潺流淌，\n波浪荡漾奔涌。\n细浪轻声低语，\n无尽流水永动。",
+                "patterns": [
+                  "流动声母（l, r）",
+                  "气音（s, sh）",
+                  "与水相关的词",
+                  "流动节奏"
+                ]
+              }
+            ]
+          },
+          "light": {
+            "title": "光的模式",
+            "description": "暗示光和亮度的模式：",
+            "examples": [
+              {
+                "text": "金光闪闪耀眼，\n星辰璀璨生辉。\n银光流转不息，\n月影笼罩梦中。",
+                "patterns": [
+                  "明亮声母组合",
+                  "与光相关的词",
+                  "明亮韵母音",
+                  "节奏结构"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "pattern_mapping": {
+        "title": "模式映射",
+        "exercises": {
+          "basic": {
+            "title": "基本模式映射",
+            "description": "创建相关声音模式的地图：",
+            "examples": [
+              {
+                "theme": "自然声音",
+                "central_pattern": "风",
+                "related_patterns": [
+                  "低语，呼啸，旋转",
+                  "微风，吹拂，呼吸",
+                  "叹息，飞翔，扫过"
+                ]
+              }
+            ]
+          },
+          "advanced": {
+            "title": "复杂模式网络",
+            "description": "探索多个模式网络如何相互作用：",
+            "example": {
+              "text": "星光流转遇月梦，\n银色低语织缠绕。\n夜的寂静轻轻闪，\n待寻模式藏其中。",
+              "networks": [
+                "光的模式（星光，月，闪）",
+                "动作模式（流转，织，缠绕）",
+                "声音模式（低语，寂静）",
+                "质地模式（轻轻，寂静）"
+              ]
+            }
+          }
+        }
+      },
+      "cultural_connections": {
+        "title": "文化模式连接",
+        "description": "探索不同文化如何连接声音模式：",
+        "examples": {
+          "nature": {
+            "title": "自然模式",
+            "description": "不同文化如何通过声音表现自然现象：",
+            "examples": [
+              {
+                "phenomenon": "雨",
+                "patterns": [
+                  {
+                    "culture": "中文",
+                    "words": ["淅淅沥沥", "哗哗啦啦"]
+                  },
+                  {
+                    "culture": "日语",
+                    "words": ["ざーざー", "しとしと"]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "practice": {
+        "title": "连接模式",
+        "exercises": {
+          "creation": {
+            "title": "模式创作",
+            "instructions": "创建你自己的模式网络：",
+            "prompts": [
+              {
+                "theme": "早晨",
+                "elements": ["光", "声音", "动作", "感觉"]
+              },
+              {
+                "theme": "森林",
+                "elements": ["质地", "声音", "光", "动作"]
+              }
+            ]
+          },
+          "observation": {
+            "title": "模式观察",
+            "instructions": "观察并映射这些段落中的模式：",
+            "examples": [
+              {
+                "text": "晨雾轻柔渐散，\n露珠舞动风过。\n晓光织就金路，\n夜转新日初来。",
+                "pattern_types": [
+                  "光的模式",
+                  "动作模式",
+                  "时间模式",
+                  "转变模式"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "reflection": {
+        "title": "模式连接反思",
+        "prompts": [
+          "不同类型的模式如何协同工作？",
+          "在你的经验中哪些模式自然连接？",
+          "你如何在自己的表达中使用模式网络？",
+          "哪些文化模式连接与你产生共鸣？"
+        ]
+      }
+    }
+  }
+} 

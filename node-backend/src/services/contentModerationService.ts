@@ -1,4 +1,4 @@
-import logger from '../config/logger';
+import { logger } from '../utils/logger';
 
 interface ModerationResult {
   isApproved: boolean;

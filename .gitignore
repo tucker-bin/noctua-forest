@@ -11,6 +11,9 @@ build/
 .parcel-cache/
 out/
 
+# App Images and Assets (generated)
+AppImages/
+
 # Environment files
 .env
 .env.*
@@ -156,6 +159,9 @@ PASTE_YOUR_ENV_HERE.txt
 production-fixes.patch
 old.env
 contextual-info
+
+# Local development scripts (not for git)
+scripts/local/
 
 # Old/deprecated files to clean up
 src/App.js

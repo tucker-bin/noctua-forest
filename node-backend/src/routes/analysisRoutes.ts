@@ -1,17 +1,14 @@
 import { Router, Request, Response, NextFunction, RequestHandler } from 'express';
-import { authenticateUser } from '../middleware/auth';
-import { analyzeText } from '../services/anthropicService';
-import { AnalysisResult } from '../types/analysisTypes';
-import ContentModerationService from '../services/contentModerationService';
+
+import { requireAuth } from '../middleware/auth';
+
+import { analysisService } from '../services/analysisService';
+import { logger } from '../utils/logger';
 
 const router = Router();
 
 // Middleware to authenticate all routes
-router.use(authenticateUser as RequestHandler);
-
-// Mock database - in production, this would be a real database
-let analyses: any[] = [];
-let nextId = 1;
+// Auth middleware applied per route
 
 // Save a new analysis
 router.post('/save', async (req: Request, res: Response) => {
@@ -26,27 +23,10 @@ router.post('/save', async (req: Request, res: Response) => {
       tags
     } = req.body;
 
-    // TODO: Get user ID from authentication middleware
-    const userId = req.headers['user-id'] || 'mock-user-id';
+    // Get user ID from authentication middleware
+    const userId = (req as any).user.uid;
 
-    // Content moderation check
-    const moderationResult = await ContentModerationService.moderateContent(
-      originalText,
-      { title, description, tags }
-    );
-
-    if (!moderationResult.isApproved) {
-      return res.status(400).json({
-        success: false,
-        error: 'Content moderation failed',
-        moderationIssues: moderationResult.issues,
-        suggestions: moderationResult.suggestions
-      });
-    }
-
-    const newAnalysis = {
-      id: nextId.toString(),
-      userId,
+    const newAnalysis = await analysisService.createAnalysis(userId, {
       title,
       description,
       originalText,
@@ -54,27 +34,20 @@ router.post('/save', async (req: Request, res: Response) => {
       isPublic,
       isDraft,
       tags: tags || [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      viewCount: 0,
-      likeCount: 0,
-      shareCount: 0,
-      thumbnail: null
-    };
-
-    analyses.push(newAnalysis);
-    nextId++;
+      thumbnail: undefined
+    });
 
     res.status(201).json({
       success: true,
       analysis: newAnalysis
     });
+      return;
   } catch (error) {
-    console.error('Error saving analysis:', error);
+    logger.error('Error saving analysis:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to save analysis'
-    });
+      error: error instanceof Error ? error.message : 'Failed to save analysis'
+    }); return;
   }
 });
 
@@ -82,170 +55,230 @@ router.post('/save', async (req: Request, res: Response) => {
 router.get('/user/:userId', async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
+    const requestingUserId = (req as any).user.uid;
+
+    const userAnalyses = await analysisService.getUserAnalyses(userId, requestingUserId);
     
-    const requestingUserId = req.headers['user-id'];
-    const canSeePrivate = requestingUserId === userId;
-
-    let userAnalyses = analyses.filter(analysis => analysis.userId === userId);
-
-    // Filter based on privacy settings
-    if (!canSeePrivate) {
-      userAnalyses = userAnalyses.filter(analysis => 
-        !analysis.isDraft && analysis.isPublic
-      );
-    }
-
-    // Add author information
-    const analysesWithAuthor = userAnalyses.map(analysis => ({
-      ...analysis,
-      author: {
-        id: userId,
-        name: 'Mock User',
-        email: 'user@example.com',
-        avatar: null
-      },
-      isLiked: false
-    }));
+    // Add author information to each analysis
+    const analysesWithAuthor = await Promise.all(
+      userAnalyses.map(async (analysis) => {
+        const author = await analysisService.getAnalysisAuthor(analysis.userId);
+        const isLiked = await analysisService.isLikedByUser(analysis.id, requestingUserId);
+        
+        return {
+          ...analysis,
+          author,
+          isLiked
+        };
+      })
+    );
 
     res.json({
       success: true,
       analyses: analysesWithAuthor
     });
   } catch (error) {
-    console.error('Error fetching user analyses:', error);
+    logger.error('Error fetching user analyses:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch analyses'
+    }); return;
+  }
+});
+
+// Get public analyses (feed)
+router.get('/public', async (req: Request, res: Response) => {
+  try {
+    const { limit = 20, startAfter } = req.query;
+    const requestingUserId = (req as any).user.uid;
+
+    const publicAnalyses = await analysisService.getPublicAnalyses(
+      Number(limit),
+      startAfter as string
+    );
+    
+    // Add author information to each analysis
+    const analysesWithAuthor = await Promise.all(
+      publicAnalyses.map(async (analysis) => {
+        const author = await analysisService.getAnalysisAuthor(analysis.userId);
+        const isLiked = await analysisService.isLikedByUser(analysis.id, requestingUserId);
+        
+        return {
+          ...analysis,
+          author,
+          isLiked
+        };
+      })
+    );
+
+    res.json({
+      success: true,
+      analyses: analysesWithAuthor
     });
+  } catch (error) {
+    logger.error('Error fetching public analyses:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch public analyses'
+    }); return;
   }
 });
 
 // Get a specific analysis by ID
-router.get('/:analysisId', (req: Request, res: Response) => {
+router.get('/:analysisId', async (req: Request, res: Response) => {
   try {
-    const analysisId = req.params.analysisId;
-    const analysis = analyses.find(a => a.id === analysisId);
+    const { analysisId } = req.params;
+    const requestingUserId = (req as any).user.uid;
+
+    const analysis = await analysisService.getAnalysis(analysisId, requestingUserId);
 
     if (!analysis) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'Analysis not found'
       });
+      return;
     }
-
-    // Check if user has permission to view this analysis
-    const requestingUserId = req.headers['user-id'];
-    const canView = analysis.isPublic || 
-                   (!analysis.isDraft && analysis.isPublic) ||
-                   (requestingUserId === analysis.userId);
-
-    if (!canView) {
-      return res.status(403).json({
-        success: false,
-        error: 'Access denied'
-      });
-    }
-
-    // Increment view count
-    analysis.viewCount++;
 
     // Add author information
-    const analysisWithAuthor = {
-      ...analysis,
-      author: {
-        id: analysis.userId,
-        name: 'Mock User',
-        email: 'user@example.com',
-        avatar: null
-      },
-      isLiked: false
-    };
+    const author = await analysisService.getAnalysisAuthor(analysis.userId);
+    const isLiked = await analysisService.isLikedByUser(analysis.id, requestingUserId);
 
     res.json({
       success: true,
-      analysis: analysisWithAuthor
+      analysis: {
+        ...analysis,
+        author,
+        isLiked
+      }
     });
   } catch (error) {
-    console.error('Error fetching analysis:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch analysis'
+    logger.error('Error fetching analysis:', error);
+    
+    if (error instanceof Error && error.message === 'Access denied') {
+      res.status(403).json({
+        success: false,
+        error: 'Access denied'
+      });
+      return;
+    } else {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch analysis'
+      }); return;
+    }
+  }
+});
+
+// Update an analysis
+router.put('/:analysisId', async (req: Request, res: Response) => {
+  try {
+    const { analysisId } = req.params;
+    const userId = (req as any).user.uid;
+    const updates = req.body;
+
+    const updatedAnalysis = await analysisService.updateAnalysis(
+      analysisId,
+      userId,
+      updates
+    );
+
+    res.json({
+      success: true,
+      analysis: updatedAnalysis
     });
+  } catch (error) {
+    logger.error('Error updating analysis:', error);
+    
+    if (error instanceof Error) {
+      if (error.message === 'Access denied') {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied'
+        });
+      return;
+      } else if (error.message === 'Analysis not found') {
+        res.status(404).json({
+          success: false,
+          error: 'Analysis not found'
+        });
+      return;
+      } else {
+        res.status(500).json({
+          success: false,
+          error: error.message
+        }); return;
+      }
+    } else {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to update analysis'
+      }); return;
+    }
   }
 });
 
 // Delete an analysis
-router.delete('/:analysisId', (req: Request, res: Response) => {
+router.delete('/:analysisId', async (req: Request, res: Response) => {
   try {
-    const analysisId = req.params.analysisId;
-    const analysisIndex = analyses.findIndex(a => a.id === analysisId);
-    
-    if (analysisIndex === -1) {
-      return res.status(404).json({
-        success: false,
-        error: 'Analysis not found'
-      });
-    }
+    const { analysisId } = req.params;
+    const userId = (req as any).user.uid;
 
-    const analysis = analyses[analysisIndex];
-    
-    // Check if user owns this analysis
-    const requestingUserId = req.headers['user-id'];
-    if (requestingUserId !== analysis.userId) {
-      return res.status(403).json({
-        success: false,
-        error: 'Access denied'
-      });
-    }
-
-    // Remove the analysis
-    analyses.splice(analysisIndex, 1);
+    await analysisService.deleteAnalysis(analysisId, userId);
 
     res.json({
       success: true,
       message: 'Analysis deleted successfully'
     });
   } catch (error) {
-    console.error('Error deleting analysis:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to delete analysis'
-    });
+    logger.error('Error deleting analysis:', error);
+    
+    if (error instanceof Error) {
+      if (error.message === 'Access denied') {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied'
+        });
+      return;
+      } else if (error.message === 'Analysis not found') {
+        res.status(404).json({
+          success: false,
+          error: 'Analysis not found'
+        });
+      return;
+      } else {
+        res.status(500).json({
+          success: false,
+          error: error.message
+        }); return;
+      }
+    } else {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete analysis'
+      }); return;
+    }
   }
 });
 
 // Like/unlike an analysis
-router.post('/:analysisId/like', (req: Request, res: Response) => {
+router.post('/:analysisId/like', async (req: Request, res: Response) => {
   try {
-    const analysisId = req.params.analysisId;
-    const analysis = analyses.find(a => a.id === analysisId);
+    const { analysisId } = req.params;
+    const userId = (req as any).user.uid;
 
-    if (!analysis) {
-      return res.status(404).json({
-        success: false,
-        error: 'Analysis not found'
-      });
-    }
-
-    const { isLiked } = req.body;
-    
-    if (isLiked) {
-      analysis.likeCount++;
-    } else {
-      analysis.likeCount = Math.max(0, analysis.likeCount - 1);
-    }
+    const result = await analysisService.toggleLike(analysisId, userId);
 
     res.json({
       success: true,
-      likeCount: analysis.likeCount,
-      isLiked
+      ...result
     });
   } catch (error) {
-    console.error('Error toggling like:', error);
+    logger.error('Error toggling like:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to toggle like'
-    });
+    }); return;
   }
 });
 

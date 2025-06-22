@@ -1,6 +1,6 @@
 import express from 'express';
 import { db } from '../config/firebase';
-import logger from '../config/logger';
+import { logger } from '../utils/logger';
 
 const router = express.Router();
 
@@ -10,7 +10,8 @@ router.get('/users', async (req, res) => {
         const snapshot = await usersRef.get();
 
         if (snapshot.empty) {
-            return res.status(404).json({ message: 'No users found' });
+            res.status(404).json({ message: 'No users found' });
+            return;
         }
 
         const usersList = snapshot.docs.map(doc => {
@@ -33,6 +34,7 @@ router.get('/users', async (req, res) => {
             path: '/users'
         });
         res.status(500).json({ error: 'Could not fetch users from database.' });
+        return;
     }
 });
 

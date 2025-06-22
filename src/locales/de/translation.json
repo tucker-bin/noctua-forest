@@ -1,8 +1,17 @@
 {
   "welcome": "Willkommen im Noctua-Wald",
   "subtitle": "Noctua bedeutet 'Eule'—ein Zuhause für Künstler und Lernende.",
-  "enter_forest": "Betrete den Wald (Erstelle dein Profil)",
-  "view_profile": "Profil anzeigen",
+  "welcome_message": "Willkommen bei Noctua Forest! Ich bin Noctua, dein Guide zum Finden von Mustern in deinem Text.",
+  "explore_forest_title": "Entdecken",
+  "explore_forest_desc": "Finde Muster in deinen Lieblingsliedern und Gedichten.",
+  "learn_create_title": "Lernen & Erstellen",
+  "learn_create_desc": "Lerne über Reimmuster und erstelle deine eigene Poesie.",
+  "share_connect_title": "Teilen & Vernetzen",
+  "share_connect_desc": "Teile deine Entdeckungen und vernetze dich mit der Community.",
+  "noctua_observatory_welcome": "Willkommen im Observatory! Bereit, Muster in deinem Text zu finden?",
+  "noctua_forest_welcome": "Willkommen bei Noctua Forest! Hier kannst du andere Creators kennenlernen und die Community erkunden.",
+  "enter_forest": "Den Wald betreten (Euer Profil erstellen)",
+  "view_profile": "Profil ansehen",
   "artist": "Künstler",
   "owl": "Eule",
   "tester": "Tester",
@@ -14,11 +23,34 @@
   "select_genre": "Genre auswählen",
   "email": "E-Mail-Adresse",
   "password": "Passwort",
+  "auth": {
+    "signin_title": "Anmelden",
+    "signin_subtitle": "Willkommen zurück im Noctua-Wald",
+    "signin_button": "Anmelden",
+    "signup_link": "Registrieren",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "forgot_password": "Passwort vergessen?",
+    "no_account": "Kein Konto?",
+    "or": "Oder",
+    "errors": {
+      "fill_all_fields": "Bitte füllt alle Felder aus",
+      "invalid_email": "Ungültige E-Mail-Adresse",
+      "user_disabled": "Dieses Konto wurde deaktiviert",
+      "user_not_found": "Kein Konto mit dieser E-Mail gefunden",
+      "wrong_password": "Falsches Passwort",
+      "too_many_requests": "Zu viele fehlgeschlagene Versuche. Versucht es später erneut",
+      "signin_failed": "Anmeldung fehlgeschlagen. Versucht es erneut.",
+      "popup_closed": "Anmeldung abgebrochen",
+      "google_signin_failed": "Anmeldung mit Google fehlgeschlagen"
+    },
+    "signin_with_google": "Mit Google anmelden"
+  },
   "invite_code_optional": "Einladungscode (optional)",
-  "signing_up": "Registriere...",
+  "signing_up": "Registrierung läuft...",
   "sign_up": "Registrieren",
-  "privacy_policy": "Datenschutzerklärung",
-  "terms_and_agreements": "Nutzungsbedingungen & Vereinbarungen",
+  "privacy_policy": "Datenschutzrichtlinie",
+  "terms_and_agreements": "Nutzungsbedingungen",
   "releases": "Veröffentlichungen",
   "latest_news": "Neueste Nachrichten",
   "upcoming_events": "Kommende Veranstaltungen",
@@ -28,25 +60,359 @@
   "copied": "Kopiert!",
   "copy_link": "Link kopieren",
   "send_message": "Nachricht senden",
-  "want_to_connect": "Möchten Sie sich verbinden oder dieses Profil beanspruchen?",
-  "sign_up_to_join": "Registrieren Sie sich, um Noctua Rhyme beizutreten",
-  "observatory_title": "Noctua Rhyme Observatorium",
-  "observatory_subtitle": "Analysieren Sie Ihren Text auf phonetische Muster und Reime. Jede Analyse kostet Token basierend auf der Textlänge.",
+  "want_to_connect": "Möchtet ihr euch verbinden oder dieses Profil beanspruchen?",
+  "sign_up_to_join": "Registriert euch, um dem Noctua-Wald beizutreten",
+  "observatory_title": "Observatory",
+  "observatory_subtitle": "Finde Muster und Reime im Text. Jede Session verwendet Tokens basierend auf der Textlänge.",
   "token_balance": "Token-Guthaben",
   "estimated_cost": "Geschätzte Kosten",
-  "enter_text_to_analyze": "Text zur Analyse eingeben",
+  "enter_text_to_observe": "Text eingeben, um Muster zu finden",
   "character_count": "{{count}} Zeichen",
-  "batches": "Chargen",
-  "analyzing": "Analysiere...",
-  "wait_seconds": "Warte {{count}}s...",
-  "analyze_text": "Text analysieren",
-  "wait_tooltip": "Um Missbrauch zu verhindern, warten Sie bitte vor Ihrer nächsten Analyse.",
+  "batches": "Stapel",
+  "observing": "Suche nach Mustern...",
+  "wait_seconds": "Wartet {{count}}s...",
+  "begin_observation": "Muster finden",
+  "wait_tooltip": "Für bessere Ergebnisse warte kurz zwischen den Sessions.",
   "error": "Fehler",
   "footer": {
-    "copyright": "© {{year}} Noctua Reim-Observatorium",
+    "copyright": "© {{year}} Noctua-Wald",
     "about": "Über uns",
     "contact": "Kontakt",
     "privacy": "Datenschutz",
-    "terms": "Bedingungen"
+    "terms": "Bedingungen",
+    "rights": "Alle Rechte vorbehalten",
+    "explore": "Erkunden",
+    "observatory": "Observatorium",
+    "community": "Gemeinschaft",
+    "stargazing": "Sternenbeobachtung",
+    "learning_paths": "Lernpfade",
+    "resources": "Ressourcen",
+    "documentation": "Dokumentation",
+    "api": "API",
+    "guides": "Leitfäden",
+    "faq": "FAQ",
+    "legal": "Rechtliches",
+    "cookies": "Cookies",
+    "licenses": "Lizenzen"
+  },
+  "tooltip": {
+    "change_language": "Sprache ändern",
+    "follow": "Folgen",
+    "unfollow": "Entfolgen"
+  },
+  "follow": "Folgen",
+  "unfollow": "Entfolgen",
+  "pattern_types": {
+    "rhyme": "Reimmuster",
+    "assonance": "Vokalmuster",
+    "consonance": "Konsonantenmuster",
+    "alliteration": "Anfangsklangmuster",
+    "rhythm": "Rhythmusmuster"
+  },
+  "observatory": {
+    "save_observation": "Ergebnisse speichern",
+    "share_observation": "Ergebnisse teilen",
+    "pattern_strength": "Wie stark",
+    "pattern_frequency": "Wie oft",
+    "view_all_patterns": "Alle Muster anzeigen",
+    "filter_patterns": "Muster filtern",
+    "sort_by": "Sortieren",
+    "export_observation": "Ergebnisse exportieren",
+    "pattern": {
+      "examples": "Beispiele",
+      "features": "Klangmerkmale",
+      "strength": "Musterstärke",
+      "context": "Kontext",
+      "relationships": "Musterbeziehungen",
+      "analysis": {
+        "primary": "Hauptklangeffekt",
+        "secondary": "Sekundäreffekte",
+        "intensity": "Musterintensität",
+        "distribution": "Klangverteilung",
+        "interaction": "Interaktion mit anderen Mustern"
+      },
+      "cultural": {
+        "writing_system": "Schreibsystem",
+        "sound_patterns": "Klangmuster",
+        "cultural_emphasis": "Kulturelle Betonung",
+        "traditional_forms": "Traditionelle Formen"
+      }
+    },
+    "language": {
+      "detected": "Erkannte Sprache",
+      "direction": "Textrichtung",
+      "cultural_info": "Kulturelle Informationen",
+      "script_features": "Schriftmerkmale",
+      "change_language": "Sprache ändern"
+    },
+    "title": "Observatory",
+    "description": "Finde Muster in deinem Text. Wir helfen dir, interessante Muster in deinem Schreiben zu entdecken.",
+    "try_examples": "Probiere diese Beispiele zum Starten",
+    "input_placeholder": "Gib hier deinen Text ein, um Muster zu finden...",
+    "observe": "Muster finden",
+    "observing": "Suche...",
+    "results": "Gefundene Muster",
+    "pattern_found": "Ich habe interessante Muster gefunden! Schau, was ich entdeckt habe.",
+    "ready": "Willkommen im Observatory! Welche Muster sollen wir heute finden?",
+    "welcome": "Willkommen im Observatory",
+    "instructions": "Gib oben Text ein, um Muster zu finden.",
+    "patterns_found": "Gefundene Muster",
+    "hover_for_details": "Bewegt die Maus über ein Muster für Details",
+    "tabs": {
+      "highlighted": "Textansicht",
+      "celestial": "Sternenkarte",
+      "constellations": "Musterkonstellation"
+    },
+    "reportIssue": "Problem melden",
+    "feedback": {
+      "title": "Observatoriumsproblem melden",
+      "description": "Helft uns, das Observatorium zu verbessern, indem ihr uns mitteilt, ob es für euch funktioniert.",
+      "working": "Es funktioniert",
+      "notWorking": "Es funktioniert nicht",
+      "messageLabel": "Erzählt uns mehr (optional)",
+      "messagePlaceholder": "Beschreibt bitte, was passiert ist...",
+      "submitError": "Fehler beim Senden des Feedbacks. Versucht es erneut.",
+      "thankYou": "Danke für euer Feedback!"
+    },
+    "pronunciation": {
+      "guide": "Ausspracheführer",
+      "original_text": "Originaltext",
+      "ipa": "IPA-Transkription",
+      "romanization": "Romanisierung",
+      "your_language": "Eure Sprache",
+      "phonology_comparison": "Phonologischer Vergleich",
+      "similarities": "Ähnliche Merkmale",
+      "differences": "Unterschiede",
+      "sound_correspondences": "Klangentsprechungen",
+      "has_tips": "Hat Tipps! 🌟",
+      "features": {
+        "stress": "Betonungsmuster",
+        "tone": "Tonmuster",
+        "length": "Längenmuster",
+        "special": "Besondere Merkmale"
+      },
+      "error": "Fehler bei der Ausspracheanalyse"
+    }
+  },
+  "nav": {
+    "observatory": "Observatorium",
+    "forest": "Wald",
+    "community": "Gemeinschaft",
+    "learn": "Lernen",
+    "profile": "Profil",
+    "sign_in": "Anmelden",
+    "sign_out": "Abmelden"
+  },
+  "forest": {
+    "welcome": "Willkommen bei Noctua Forest",
+    "welcome_subtitle": "Entdecke Muster in Sprache und Text",
+    "journey_begins": "Bereit zum Erkunden? Wähle, was du machen möchtest...",
+    "start_observing": "Mit Suchen beginnen",
+    "back_to_forest": "Zurück zur Startseite",
+    "areas": {
+      "observatory": "Observatory",
+      "observatory_desc": "Finde Muster in deinem Text",
+      "community": "Community",
+      "community_desc": "Teile deine Entdeckungen mit anderen",
+      "stargazing": "Vernetzen",
+      "stargazing_desc": "Lerne andere User und Creators kennen",
+      "pathways": "Lernen",
+      "pathways_desc": "Nimm Lektionen, um deine Fähigkeiten zu verbessern"
+    },
+    "pathways_coming_soon": "Lern-Lektionen kommen bald...",
+    "pathways_description": "Lerne durch geführte Lektionen und Übung",
+    "explore_features": "Features erkunden",
+    "discover_more": "Entdecke Muster im Text",
+    "languages_supported": "Sprachen",
+    "pattern_types": "Muster-Typen",
+    "discoveries_await": "Bereit zum Starten"
+  },
+  "patterns_found": "Gefundene Muster",
+  "begin_observation": "Beobachtung beginnen",
+  "observing": "Muster werden beobachtet...",
+  "cultural_context": {
+    "german_poetry": "Deutsche Poesie",
+    "classical_forms": "Klassische Formen",
+    "sonnet": "Sonett",
+    "ballade": "Ballade",
+    "lied": "Lied",
+    "minnelied": "Minnelied"
+  },
+  "patterns": {
+    "rhyme": {
+      "title": "Endreim",
+      "description": "Wörter, die ähnliche Endlaute teilen und musikalische Harmonie im Text schaffen.",
+      "example": "Licht/Nacht, Traum/Raum"
+    },
+    "slant_rhyme": {
+      "title": "Unreiner Reim",
+      "description": "Wörter mit ähnlichen, aber nicht identischen Lauten, die subtile klangliche Verbindungen schaffen.",
+      "example": "Herz/Schmerz, Auge/Lauge"
+    },
+    "internal_rhyme": {
+      "title": "Binnenreim",
+      "description": "Reimende Wörter innerhalb derselben Zeile oder benachbarter Zeilen.",
+      "example": "Ich weine und klage in dunkler Nacht"
+    },
+    "assonance": {
+      "title": "Assonanz",
+      "description": "Wiederholung ähnlicher Vokallaute innerhalb von Wörtern, die innere Melodie schaffen.",
+      "example": "tiefes Meer, heller Stern"
+    },
+    "consonance": {
+      "title": "Konsonanz",
+      "description": "Wiederholung von Konsonantenlauten, die oft Textur im Text schaffen.",
+      "example": "sanftes Säuseln, leises Lispeln"
+    },
+    "alliteration": {
+      "title": "Alliteration",
+      "description": "Wiederholung von Anfangskonsonanten in benachbarten Wörtern.",
+      "example": "süße Sommersonne"
+    },
+    "rhythm": {
+      "title": "Rhythmusmuster",
+      "description": "Regelmäßige Muster betonter und unbetonter Silben, die einen musikalischen Takt schaffen.",
+      "example": "TA-ta TA-ta TA-ta"
+    },
+    "euphony": {
+      "title": "Wohlklang",
+      "description": "Harmonische Kombination von Lauten, die angenehm für das Ohr sind.",
+      "example": "murmelnde Morgenwiesen"
+    }
+  },
+  "features": {
+    "end_rhyme": {
+      "name": "Endreim",
+      "explanation": "Übereinstimmende Laute am Ende von Wörtern oder Zeilen"
+    },
+    "internal_rhyme": {
+      "name": "Binnenreim",
+      "explanation": "Reimende Wörter innerhalb derselben Zeile"
+    },
+    "vowel_harmony": {
+      "name": "Vokalharmonie",
+      "explanation": "Ähnliche Vokallaute schaffen melodische Einheit"
+    },
+    "consonant_harmony": {
+      "name": "Konsonantenharmonie",
+      "explanation": "Ähnliche Konsonantenlaute schaffen strukturelle Einheit"
+    },
+    "stress_pattern": {
+      "name": "Betonungsmuster",
+      "explanation": "Regelmäßige Anordnung betonter und unbetonter Silben"
+    }
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "search_placeholder": "Fragen durchsuchen...",
+    "no_results": "Keine passenden Fragen gefunden",
+    "more_questions": "Haben Sie weitere Fragen?",
+    "contact_support": "Kontaktieren Sie unser Support-Team",
+    "categories": {
+      "general": "Allgemein",
+      "usage": "Noctua verwenden",
+      "patterns": "Mustertypen",
+      "advanced": "Erweiterte Funktionen"
+    },
+    "what_is_noctua": {
+      "question": "Was ist Noctua Forest?",
+      "answer": "Noctua Forest ist eine einzigartige Plattform zum Entdecken und Verstehen von Mustern in Texten. Wie eine Eule, die nachts den Wald beobachtet, hilft es Ihnen, die verborgenen Muster in Ihrem Schreiben zu sehen, von Reimen bis zu subtilen Klangbeziehungen."
+    },
+    "how_to_observe": {
+      "question": "Wie führe ich eine Beobachtung durch?",
+      "answer": "Um eine Beobachtung durchzuführen:\n1. Geben Sie Ihren Text in das Observatorium ein\n2. Klicken Sie auf 'Beobachtung beginnen'\n3. Erkunden Sie die Muster, die Noctua entdeckt\n4. Klicken Sie auf Muster für detaillierte Erklärungen"
+    },
+    "pattern_types": {
+      "question": "Welche Arten von Mustern kann Noctua finden?",
+      "answer": "Noctua kann verschiedene Arten von Klangmustern identifizieren:\n- Reime (End- und Binnenreime)\n- Assonanz (wiederholte Vokallaute)\n- Konsonanz (wiederholte Konsonantenlaute)\n- Alliteration (wiederholte Anfangslaute)\n- Rhythmusmuster (Betonungsmuster)"
+    }
+  },
+  "accounts": {
+    "title": "Mein Konto",
+    "usage": "Nutzung",
+    "profile": "Profil",
+    "billing": "Abrechnung",
+    "ai_models": "KI-Modelle",
+    "settings": "Einstellungen",
+    "token_balance": "Token-Guthaben",
+    "tokens_remaining": "verbleibende Token",
+    "buy_tokens": "Mehr Token kaufen",
+    "monthly_usage": "Monatliche Nutzung",
+    "observations_this_month": "Beobachtungen in diesem Monat",
+    "profile_info": "Profilinformationen",
+    "display_name": "Anzeigename",
+    "email": "E-Mail",
+    "update_profile": "Profil aktualisieren",
+    "account_status": "Kontostatus",
+    "member_since": "Mitglied seit",
+    "email_verified": "E-Mail verifiziert"
+  },
+  "onboarding": {
+    "welcome_title": "Willkommen in Noctua Forest",
+    "welcome_description": "Ich bin Orion, Ihr Führer durch die faszinierende Welt der Musterbeobachtung. Gemeinsam werden wir die verborgenen Muster in Sprache und Klang erforschen.",
+    "welcome_owl": "Ich freue mich, Ihr Führer zu sein!",
+    "first_lesson_title": "Ihre erste Lektion",
+    "first_lesson_description": "Wir beginnen mit einfacher Mustererkundung. Wie das Lernen, Sterne am Nachthimmel zu erkennen, beginnen wir einfach mit Beobachten und Bemerken.",
+    "ready_title": "Bereit zum Beginnen",
+    "ready_description": "Denken Sie daran, es gibt keine Eile. Nehmen Sie sich Zeit zum Beobachten und genießen Sie den Prozess. Ich werde bei jedem Schritt da sein, um zu helfen.",
+    "start_journey": "Erste Lektion beginnen"
+  },
+  "common": {
+    "back": "Zurück",
+    "next": "Weiter",
+    "yes": "Ja",
+    "no": "Nein",
+    "cancel": "Abbrechen",
+    "submit": "Senden",
+    "submitting": "Wird gesendet...",
+    "save": "Speichern",
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "success": "Erfolg"
+  },
+  "lessons": {
+    "title": "Lernpfade",
+    "subtitle": "Wählen Sie Ihren Pfad und beginnen Sie Ihre Entdeckungsreise",
+    "owl_encouragement": "Sie machen das großartig! Erkunden Sie weiter!",
+    "path_complete": "Herzlichen Glückwunsch! Sie haben alle Lektionen in diesem Pfad abgeschlossen.",
+    "unlock_more": "Schließen Sie vorherige Lektionen ab, um mehr Inhalt freizuschalten."
+  },
+  "profile": {
+    "welcome_back": "Willkommen zurück, {{name}}! Bereit, Ihre Reise fortzusetzen?",
+    "your_journey": "Ihre Lernreise",
+    "learning_journey": "Lernfortschritt",
+    "continue_learning": "Ihre Reise fortsetzen",
+    "start_next_lesson": "Nächste Lektion beginnen",
+    "lesson_encouragement": "Lassen Sie uns etwas Erstaunliches entdecken!"
+  },
+  "landing": {
+    "title": "Betritt den Wald",
+    "subtitle": "Ein mystisches Reich, wo Sprachmuster zwischen den Sternen tanzen und jedes Wort das Potenzial für Entdeckungen birgt.",
+    "premiumOnly": "Nur Premium",
+    "upgradeToPremium": "Auf Premium upgraden",
+    "viewAchievements": "Erfolge anzeigen",
+    "dailyChallenge": "Tägliche Herausforderung",
+    "cards": {
+      "journey": {
+        "title": "Deine Reise",
+        "description": "Folge geführten Pfaden, um deine Beobachtungsfähigkeiten zu vertiefen und neue Wege freizuschalten.",
+        "button": "Reise beginnen"
+      },
+      "observatory": {
+        "title": "Observatory",
+        "description": "Blicke zu den Sternen und erkunde kosmische Muster und stellare Daten.",
+        "button": "Observatory betreten"
+      },
+      "scriptorium": {
+        "title": "Scriptorium",
+        "description": "Zugang zu alten Texten und trage dein eigenes Wissen zur Bibliothek bei.",
+        "button": "Scriptorium betreten"
+      },
+      "comingSoon": {
+        "title": "Neue Haine",
+        "description": "Weitere Lernumgebungen werden für deine Reise kultiviert.",
+        "button": "Bald verfügbar"
+      }
+    }
   }
 } 

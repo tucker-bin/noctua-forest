@@ -1,15 +1,15 @@
 {
   "welcome": "Welcome to Noctua Forest",
   "subtitle": "Noctua means 'owl'—a home for artists and learners.",
-  "welcome_message": "Welcome to my Forest! I'm Noctua, your guide to discovering the hidden patterns in your words.",
-  "explore_forest_title": "Explore the Forest",
-  "explore_forest_desc": "Uncover the hidden patterns in your favorite songs and poems with data-rich analysis.",
+  "welcome_message": "Welcome to Noctua Forest! I'm Noctua, your guide to finding patterns in your text.",
+  "explore_forest_title": "Explore",
+  "explore_forest_desc": "Find patterns in your favorite songs and poems.",
   "learn_create_title": "Learn & Create",
-  "learn_create_desc": "Understand complex rhyme schemes and create your own poetic masterpieces.",
+  "learn_create_desc": "Learn about rhyme patterns and create your own poetry.",
   "share_connect_title": "Share & Connect",
-  "share_connect_desc": "Export your findings and share your lyrical journeys in the Forest with the community.",
-  "noctua_observatory_welcome": "Welcome to my Observatory! Ready to unlock the music in your words?",
-  "noctua_forest_welcome": "Welcome to my Forest! Here you can discover fellow creators and explore the community that calls this place home.",
+  "share_connect_desc": "Share your findings and connect with the community.",
+  "noctua_observatory_welcome": "Welcome to the Observatory! Ready to find patterns in your text?",
+  "noctua_forest_welcome": "Welcome to Noctua Forest! Here you can meet other creators and explore the community.",
   "enter_forest": "Enter the Forest (Create Your Profile)",
   "view_profile": "View Profile",
   "artist": "Artist",
@@ -23,6 +23,29 @@
   "select_genre": "Select Genre",
   "email": "Email Address",
   "password": "Password",
+  "auth": {
+    "signin_title": "Sign In",
+    "signin_subtitle": "Welcome back to Noctua Forest",
+    "signin_button": "Sign In",
+    "signup_link": "Sign up",
+    "email": "Email Address",
+    "password": "Password",
+    "forgot_password": "Forgot password?",
+    "no_account": "Don't have an account?",
+    "or": "OR",
+    "errors": {
+      "fill_all_fields": "Please fill in all fields",
+      "invalid_email": "Invalid email address",
+      "user_disabled": "This account has been disabled",
+      "user_not_found": "No account found with this email",
+      "wrong_password": "Incorrect password",
+      "too_many_requests": "Too many failed attempts. Please try again later",
+      "signin_failed": "Failed to sign in. Please try again.",
+      "popup_closed": "Sign-in cancelled",
+      "google_signin_failed": "Failed to sign in with Google"
+    },
+    "signin_with_google": "Sign in with Google"
+  },
   "invite_code_optional": "Invite Code (optional)",
   "signing_up": "Signing Up...",
   "sign_up": "Sign Up",
@@ -39,24 +62,45 @@
   "send_message": "Send Message",
   "want_to_connect": "Want to connect or claim this profile?",
   "sign_up_to_join": "Sign Up to Join Noctua Forest",
-  "observatory_title": "Noctua Forest",
-  "observatory_subtitle": "Analyze your text for phonetic patterns and rhymes. Each analysis costs tokens based on text length.",
+  "observatory_title": "Observatory",
+  "observatory_subtitle": "Find patterns and rhymes in text. Each session uses tokens based on text length.",
   "token_balance": "Token Balance",
   "estimated_cost": "Estimated Cost",
-  "enter_text_to_analyze": "Enter Text to Analyze",
+  "enter_text_to_observe": "Enter Text to Observe",
   "character_count": "{{count}} characters",
   "batches": "batches",
-  "analyzing": "Analyzing...",
+  "observing": "Finding patterns...",
   "wait_seconds": "Wait {{count}}s...",
-  "analyze_text": "Analyze Text",
-  "wait_tooltip": "To prevent abuse, please wait before your next analysis.",
+  "begin_observation": "Find Patterns",
+  "wait_tooltip": "To ensure quality observations, please wait between sessions.",
   "error": "Error",
   "footer": {
     "copyright": "© {{year}} Noctua Forest",
     "about": "About",
     "contact": "Contact",
     "privacy": "Privacy",
-    "terms": "Terms"
+    "terms": "Terms",
+    "rights": "All rights reserved",
+    "explore": "Explore",
+    "observatory": "Observatory",
+    "community": "Community",
+    "stargazing": "Star Gazing",
+    "learning_paths": "Learning Paths",
+    "resources": "Resources",
+    "documentation": "Documentation",
+    "api": "API",
+    "guides": "Guides",
+    "faq": "FAQ",
+    "legal": "Legal",
+    "cookies": "Cookies",
+    "licenses": "Licenses",
+    "scriptorium": "Scriptorium",
+    "flowFinder": "Flow Finder",
+    "forest_map": "Forest Map",
+    "profile": "Profile",
+    "accounts": "Account Settings",
+    "support": "Support",
+    "achievements": "Achievements"
   },
   "tooltip": {
     "change_language": "Change language",
@@ -64,5 +108,821 @@
     "unfollow": "Unfollow"
   },
   "follow": "Follow",
-  "unfollow": "Unfollow"
+  "unfollow": "Unfollow",
+  "pattern_types": {
+    "rhyme": "Rhyme Patterns",
+    "assonance": "Vowel Patterns",
+    "consonance": "Consonant Patterns",
+    "alliteration": "Initial Sound Patterns",
+    "rhythm": "Rhythmic Patterns"
+  },
+  "observatory": {
+    "save_observation": "Save Results",
+    "share_observation": "Share Results",
+    "pattern_strength": "How Strong",
+    "pattern_frequency": "How Often",
+    "view_all_patterns": "View All Patterns",
+    "filter_patterns": "Filter Patterns",
+    "sort_by": "Sort By",
+    "export_observation": "Export Results",
+    "pattern": {
+      "examples": "Examples",
+      "features": "Sound Features",
+      "strength": "How Strong",
+      "context": "Context",
+      "relationships": "Related Patterns",
+      "analysis": {
+        "primary": "Main Effect",
+        "secondary": "Other Effects",
+        "intensity": "Strength",
+        "distribution": "Where Found",
+        "interaction": "Works With Other Patterns"
+      },
+      "cultural": {
+        "writing_system": "Writing System",
+        "sound_patterns": "Sound Patterns",
+        "cultural_emphasis": "Cultural Style",
+        "traditional_forms": "Traditional Forms"
+      }
+    },
+    "language": {
+      "detected": "Language Detected",
+      "direction": "Text Direction",
+      "cultural_info": "Cultural Info",
+      "script_features": "Writing Features",
+      "change_language": "Change Language"
+    },
+    "title": "Observatory",
+    "description": "Find patterns in your text. We'll help you discover interesting patterns in your writing.",
+    "try_examples": "Try these examples to get started",
+    "input_placeholder": "Enter your text here to discover its patterns...",
+    "observe": "Find Patterns",
+    "observing": "Finding patterns...",
+    "results": "Patterns Found",
+    "pattern_found": "I found some interesting patterns! Take a look at what I found.",
+    "ready": "Welcome to the Observatory! What patterns should we find today?",
+    "welcome": "Welcome to the Phonetic Observatory",
+    "instructions": "Enter any English text—like song lyrics, a poem, or a phrase you're practicing—to see how its sounds create rhythm and flow. This is a powerful tool for improving your pronunciation.",
+    "howItWorksTitle": "How to Explore:",
+    "howItWorksDescription": "We analyze the phonetic structure of your text. After analysis, click on words in the text or patterns in the legend on the right. This bidirectional exploration helps you connect written words to their spoken sounds, improving your accent and flow.",
+    "patterns_found": "Patterns Found",
+    "hover_for_details": "Hover over a pattern to see details",
+    "tabs": {
+      "highlighted": "Text View",
+      "celestial": "Star Map",
+      "constellations": "Pattern Constellations"
+    },
+    "reportIssue": "Report Issue",
+    "shareToPost": "Create a post to share this observation",
+    "createPost": "Create Post",
+    "feedback": {
+      "title": "Report Observatory Issue",
+      "description": "Help us improve the Observatory by letting us know if it's working for you.",
+      "working": "It's working",
+      "notWorking": "Not working",
+      "messageLabel": "Tell us more (optional)",
+      "messagePlaceholder": "Please describe what happened...",
+      "submitError": "Failed to submit feedback. Please try again.",
+      "thankYou": "Thank you for your feedback!"
+    },
+    "pronunciation": {
+      "guide": "Pronunciation Guide",
+      "original_text": "Original Text",
+      "ipa": "IPA Transcription",
+      "romanization": "Romanization",
+      "your_language": "Your Language",
+      "phonology_comparison": "Phonology Comparison",
+      "similarities": "Similar Features",
+      "differences": "Different Features",
+      "sound_correspondences": "Sound Correspondences",
+      "has_tips": "Has Tips! 🌟",
+      "features": {
+        "stress": "Stress Pattern",
+        "tone": "Tone Pattern",
+        "length": "Length Pattern",
+        "special": "Special Features"
+      },
+      "error": "Failed to analyze pronunciation",
+      "teen": {
+        "tip_intro": "Quick Tip!",
+        "practice_intro": "Try This:",
+        "pop_culture": "From Pop Culture",
+        "social_media": "Trending",
+        "encouragement": [
+          "You're doing great! 🌟",
+          "Keep it up! 💪",
+          "Almost there! 🎯",
+          "You've got this! ✨"
+        ]
+      }
+    },
+    "user": {
+      "age_group": "Age Group",
+      "age": {
+        "child": "Child",
+        "teen": "Teen",
+        "adult": "Adult"
+      }
+    },
+    "error": {
+      "no_text": "Please enter text to observe",
+      "observation_failed": "An error occurred during observation"
+    },
+    "text_cleaned": "Text cleaned - removed metadata and formatting for better analysis",
+    "characters": "characters",
+    "batches": "batches",
+    "subtitle": "Observe the hidden patterns in text through the lens of sound and meaning",
+    "textPlaceholder": "Enter text here to observe its phonetic patterns...",
+    "focusMode": "Focus Mode",
+    "sensitivity": "Sensitivity",
+    "comprehensive": "Comprehensive",
+    "rhymeOnly": "Rhyme Focus",
+    "rhythmOnly": "Rhythm Focus",
+    "alliterationOnly": "Alliteration Focus",
+    "advanced": "Advanced Analysis",
+    "subtle": "Subtle",
+    "moderate": "Moderate",
+    "strong": "Strong",
+    "lightTheme": "Clean Theme",
+    "export": "Export",
+    "exportTooltip": "Export your analysis results",
+    "exportSuccess": "Analysis exported successfully!",
+    "exportJson": "Export as JSON",
+    "exportText": "Export as Text",
+    "exportCsv": "Export as CSV",
+    "share": "Share",
+    "shareTooltip": "Share your analysis",
+    "copiedToClipboard": "Analysis copied to clipboard!",
+    "clear": "Clear Analysis",
+    "analysis": {
+      "rhymeScheme": "Rhyme Scheme",
+      "rhymeSchemePattern": "Pattern",
+      "metricalAnalysis": "Metrical Analysis",
+      "legend": "Pattern Legend",
+      "noPatterns": "No patterns found in the current text."
+    }
+  },
+  "patterns": {
+    "rhyme": {
+      "title": "End Rhyme",
+      "description": "Words that share similar ending sounds, creating musical harmony in the text.",
+      "example": "light/night, dream/stream"
+    },
+    "slant_rhyme": {
+      "title": "Slant Rhyme",
+      "description": "Words with similar but not identical sounds, creating subtle sonic connections.",
+      "example": "soul/all, eyes/light"
+    },
+    "internal_rhyme": {
+      "title": "Internal Rhyme",
+      "description": "Rhyming words within the same line or nearby lines.",
+      "example": "I cry and sigh in the twilight sky"
+    },
+    "assonance": {
+      "title": "Assonance",
+      "description": "Repetition of similar vowel sounds within words, creating internal melody.",
+      "example": "deep sea, fleet feet"
+    },
+    "consonance": {
+      "title": "Consonance",
+      "description": "Repetition of consonant sounds, often creating texture in the text.",
+      "example": "pitter patter, whisper whistle"
+    },
+    "alliteration": {
+      "title": "Alliteration",
+      "description": "Repetition of initial consonant sounds in nearby words.",
+      "example": "sweet summer sun"
+    },
+    "sibilance": {
+      "title": "Sibilance",
+      "description": "Repetition of 's' and 'sh' sounds, creating a hushing or whistling effect.",
+      "example": "soft silver shadows sliding silently"
+    },
+    "plosive": {
+      "title": "Plosive Sounds",
+      "description": "Repetition of explosive consonants (p, b, t, d, k, g), adding percussive effects.",
+      "example": "the proud peacock pranced"
+    },
+    "liquid_consonants": {
+      "title": "Liquid Consonants",
+      "description": "Repetition of flowing sounds (l, r), creating smooth, fluid effects.",
+      "example": "lovely lilies line the lake"
+    },
+    "nasal_consonants": {
+      "title": "Nasal Consonants",
+      "description": "Repetition of nasal sounds (m, n, ng), adding resonance.",
+      "example": "morning mist making memories"
+    },
+    "rhythm": {
+      "title": "Rhythmic Pattern",
+      "description": "Regular patterns of stressed and unstressed syllables creating a musical beat.",
+      "example": "DA-dum DA-dum DA-dum"
+    },
+    "meter": {
+      "title": "Metrical Pattern",
+      "description": "Specific arrangements of stressed and unstressed syllables in formal patterns.",
+      "subtypes": {
+        "iambic": "Unstressed followed by stressed (da-DUM)",
+        "trochaic": "Stressed followed by unstressed (DUM-da)",
+        "anapestic": "Two unstressed followed by stressed (da-da-DUM)",
+        "dactylic": "Stressed followed by two unstressed (DUM-da-da)"
+      }
+    },
+    "caesura": {
+      "title": "Caesura",
+      "description": "Natural pauses or breaks in the rhythm, creating emphasis or pacing.",
+      "example": "The woods are lovely || dark and deep"
+    },
+    "enjambment": {
+      "title": "Enjambment",
+      "description": "Continuation of a sentence beyond the line break, creating flow and tension.",
+      "example": "The morning light\nbreaks through clouds"
+    },
+    "parallelism": {
+      "title": "Sound Parallelism",
+      "description": "Similar sound patterns repeated in parallel structures.",
+      "example": "singing sweetly, moving meetly"
+    },
+    "onomatopoeia": {
+      "title": "Onomatopoeia",
+      "description": "Words that phonetically imitate the sound they describe.",
+      "example": "buzz, hiss, clang"
+    },
+    "euphony": {
+      "title": "Euphony",
+      "description": "Harmonious combination of sounds that are pleasing to the ear.",
+      "example": "murmuring morning meadows"
+    },
+    "cacophony": {
+      "title": "Cacophony",
+      "description": "Harsh or discordant sound combinations for dramatic effect.",
+      "example": "grating, scratching, clashing"
+    },
+    "generic": {
+      "description": "A recurring sound pattern in the text."
+    }
+  },
+  "features": {
+    "end_rhyme": {
+      "name": "End Rhyme",
+      "explanation": "Matching sounds at the ends of words or lines"
+    },
+    "internal_rhyme": {
+      "name": "Internal Rhyme",
+      "explanation": "Rhyming words within the same line"
+    },
+    "vowel_harmony": {
+      "name": "Vowel Harmony",
+      "explanation": "Similar vowel sounds creating melodic unity"
+    },
+    "consonant_harmony": {
+      "name": "Consonant Harmony",
+      "explanation": "Similar consonant sounds creating textural unity"
+    },
+    "stress_pattern": {
+      "name": "Stress Pattern",
+      "explanation": "Regular arrangement of stressed and unstressed syllables"
+    },
+    "sound_quality": {
+      "name": "Sound Quality",
+      "explanation": "The acoustic characteristics of the sounds (smooth, harsh, etc.)"
+    },
+    "sound_position": {
+      "name": "Sound Position",
+      "explanation": "Where the repeated sounds occur in words"
+    },
+    "sound_frequency": {
+      "name": "Sound Frequency",
+      "explanation": "How often the sound pattern appears"
+    },
+    "sound_intensity": {
+      "name": "Sound Intensity",
+      "explanation": "The strength or prominence of the sound pattern"
+    },
+    "sound_relationship": {
+      "name": "Sound Relationship",
+      "explanation": "How different sound patterns interact or complement each other"
+    },
+    "generic": {
+      "explanation": "A distinctive sound feature in the text"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "search_placeholder": "Search FAQs...",
+    "no_results": "No matching questions found",
+    "more_questions": "Still have questions?",
+    "contact_support": "Contact our support team",
+    "categories": {
+      "general": "General",
+      "usage": "Using Noctua",
+      "patterns": "Pattern Types",
+      "advanced": "Advanced Features"
+    },
+    "what_is_noctua": {
+      "question": "What is Noctua Forest?",
+      "answer": "Noctua Forest is a unique platform for discovering and understanding patterns in text. Like an owl observing the forest at night, it helps you see the hidden patterns in your writing, from rhymes to subtle sound relationships."
+    },
+    "how_to_observe": {
+      "question": "How do I make an observation?",
+      "answer": "To make an observation:\n1. Enter your text in the Observatory\n2. Click 'Begin Observation'\n3. Explore the patterns that Noctua discovers\n4. Click on patterns to see detailed explanations"
+    },
+    "pattern_types": {
+      "question": "What types of patterns can Noctua find?",
+      "answer": "Noctua can identify several types of sound patterns:\n- Rhymes (end rhymes and internal rhymes)\n- Assonance (repeated vowel sounds)\n- Consonance (repeated consonant sounds)\n- Alliteration (repeated initial sounds)\n- Rhythmic patterns (stress patterns)"
+    },
+    "batch_processing": {
+      "question": "Can I analyze multiple texts at once?",
+      "answer": "Yes! You can use batch processing to analyze multiple texts simultaneously. This feature is perfect for comparing patterns across different pieces or processing a collection of texts efficiently."
+    },
+    "save_observations": {
+      "question": "Can I save my observations?",
+      "answer": "Yes, you can save your observations to your profile. This allows you to:\n- Build a collection of analyzed texts\n- Track patterns over time\n- Share observations with others\n- Export your findings"
+    }
+  },
+  "forest": {
+    "welcome": "Welcome to Noctua Forest",
+    "welcome_subtitle": "Discover patterns in language and text",
+    "journey_begins": "Ready to explore? Choose what you'd like to do...",
+    "start_observing": "Start Observing",
+    "back_to_forest": "Back to Home",
+    "areas": {
+      "observatory": "Observatory",
+      "observatory_desc": "Find patterns in your text",
+      "community": "Community",
+      "community_desc": "Share your discoveries with others",
+      "stargazing": "Connect",
+      "stargazing_desc": "Meet other users and creators",
+      "pathways": "Learn",
+      "pathways_desc": "Take lessons to improve your skills",
+      "scriptorium": "Song Scriptorium",
+      "scriptorium_desc": "Discover patterns in music and lyrics"
+    },
+    "pathways_coming_soon": "Learning lessons coming soon...",
+    "pathways_description": "Learn through guided lessons and practice",
+    "explore_features": "Explore Features",
+    "discover_more": "Discover patterns in text",
+    "languages_supported": "Languages",
+    "pattern_types": "Pattern Types",
+    "discoveries_await": "Ready to Start"
+  },
+  "paths": {
+    "explorer": "Beginner",
+    "navigator": "Advanced",
+    "celestial_observer": "Pattern Basics",
+    "celestial_observer.description": "Learn the basics of finding patterns in text",
+    "pattern_navigator": "Advanced Patterns",
+    "pattern_navigator.description": "Advanced techniques for complex pattern analysis"
+  },
+  "lessons": {
+    "title": "Learning Paths",
+    "subtitle": "Choose your level and start learning",
+    "owl_encouragement": "You're doing great! Keep going!",
+    "path_complete": "Congratulations! You finished all lessons in this path.",
+    "unlock_more": "Complete previous lessons to unlock more.",
+    "celestial_observer": {
+      "first_light": {
+        "title": "Getting Started: Introduction to Pattern Finding"
+      },
+      "star_patterns": {
+        "title": "Basic Patterns: Common Types"
+      },
+      "constellation_mapping": {
+        "title": "Pattern Connections: How Patterns Work Together"
+      }
+    }
+  },
+  "profile": {
+    "welcome_back": "Welcome back, {{name}}! Ready to continue?",
+    "your_journey": "Your Progress",
+    "journey_description": "Start with the basics, then move to advanced techniques.",
+    "learning_journey": "Learning Progress",
+    "continue_learning": "Continue Learning",
+    "next_lesson_description": "Your next lesson is ready. Keep learning!",
+    "start_next_lesson": "Start Next Lesson",
+    "lesson_encouragement": "Let's learn something new!"
+  },
+  "onboarding": {
+    "welcome_title": "Welcome to Noctua Forest",
+    "welcome_description": "I'm Orion, your guide to finding patterns in text. We'll help you discover interesting patterns in language and writing.",
+    "welcome_owl": "I'm here to help you learn!",
+    "first_lesson_title": "Your First Lesson",
+    "first_lesson_description": "We'll start simple. Just like learning to notice details, we'll begin by looking and learning.",
+    "first_lesson_owl": "Ready to find your first patterns?",
+    "ready_title": "Ready to Start",
+    "ready_description": "Take your time and enjoy learning. I'll help you every step of the way.",
+    "ready_owl": "Let's get started!",
+    "start_journey": "Start First Lesson"
+  },
+  "common": {
+    "back": "Back",
+    "next": "Next",
+    "yes": "Yes",
+    "no": "No",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "save": "Save",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "explorer": "Explorer",
+    "quit": "Quit",
+    "backToForest": "Back to Forest",
+    "close": "Close"
+  },
+  "forest": {
+    "title": "Noctua Forest",
+    "level": "Level",
+    "dayStreak": "day streak",
+    "experience": "Experience",
+    "tokens": "Tokens",
+    "dailyLimit": "5/day",
+    "achievements": "Achievements",
+    "flowFinder": "Flow Finder",
+    "findPatterns": "Find the patterns",
+    "startChallenge": "Start Challenge",
+    "areas": {
+      "observatory": {
+        "name": "Observatory Clearing",
+        "description": "Observe patterns in text and poetry. Your gateway to discovery."
+      },
+      "learning": {
+        "name": "Learning Groves",
+        "description": "Master the art of pattern recognition through guided lessons."
+      },
+      "scriptorium": {
+        "name": "Scriptorium Sanctuary",
+        "description": "Professional music and lyrics analysis for creative writers."
+      },
+      "community": {
+        "name": "Community Forest",
+        "description": "Connect with fellow pattern explorers and share discoveries."
+      }
+    },
+    "enter": "Enter",
+    "locked": "Locked",
+    "premiumOnly": "Premium Only",
+    "upgradeToPremium": "Upgrade to Premium",
+    "premiumRequired": "Premium Required",
+    "premiumBenefits": "Unlock unlimited access to all areas and features",
+    "tokenCost": "Token Cost",
+    "currentTokens": "Current Tokens",
+    "insufficientTokens": "Insufficient Tokens",
+    "needMoreTokens": "You need more tokens to enter this area.",
+    "earnTokens": "Earn tokens by",
+    "levelUp": "Leveling up",
+    "weeklyStreak": "Weekly streaks",
+    "upgradePremium": "Upgrading to premium"
+  },
+  "flowFinder": {
+    "title": "Flow Finder",
+    "hub": "Flow Finder Hub",
+    "notFound": "No challenge available",
+    "progress": "Progress",
+    "type": "Type",
+    "gameInstructions": "Click on words to reveal patterns. Avoid clicking on mines! Find all patterns to win.",
+    "success": "Challenge completed successfully!",
+    "failed": "Challenge failed! You hit a mine:",
+    "patternLegend": "Pattern Legend",
+    "mine": "Mine",
+    "howToPlay": "How to Play",
+    "instruction1": "Your goal is to find all the pattern words in the text without hitting any mines.",
+    "instruction2": "Click on words to reveal them. Pattern words will be highlighted in different colors.",
+    "instruction3": "Avoid clicking on mine words - they will end the game immediately!",
+    "instruction4": "Find all pattern words within the time limit to win tokens and XP.",
+    "warning": "Be careful! Some words are mines that will end the game.",
+    "startPlaying": "Start Playing",
+    "instructions": "Instructions",
+    "tryAgain": "Try Again",
+    "dailyChallenges": "Daily Challenges",
+    "weeklyPacks": "Weekly Packs",
+    "archive": "Archive",
+    "grid4x4": "4x4 Grid",
+    "grid8x8": "8x8 Grid",
+    "easy": "Easy",
+    "hard": "Hard",
+    "premiumFeature": "Premium Feature",
+    "upgradeNow": "Upgrade Now",
+    "playPack": "Play Pack",
+    "todaysChallenge": "Today's Challenge",
+    "playNow": "Play Now",
+    "weekOf": "Week of",
+    "challengesCompleted": "challenges completed",
+    "unlimitedAccess": "Unlimited access to Flow Finder",
+    "premiumBenefits": {
+      "archivedPacks": "Access to all archived weekly packs",
+      "unlimitedChallenges": "Unlimited daily challenges", 
+      "noTokenCosts": "No token costs for gameplay",
+      "exclusiveTypes": "Exclusive premium-only challenge types",
+      "priorityAccess": "Priority access to new features"
+    }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "subtitle": "Track your progress and unlock new rewards",
+    "unlocked": "Unlocked",
+    "currentLevel": "Current Level",
+    "currentStreak": "Current Streak",
+    "days": "Days",
+    "achievementXP": "Achievement XP",
+    "totalEarned": "Total Earned",
+    "all": "All Achievements",
+    "categories": {
+      "learning": "Learning",
+      "discovery": "Discovery",
+      "community": "Community",
+      "professional": "Professional",
+      "streak": "Streak"
+    },
+    "categoryDescriptions": {
+      "learning": "Achievements for completing lessons and educational content",
+      "discovery": "Achievements for finding patterns and exploring the Observatory",
+      "community": "Achievements for social interactions and community participation",
+      "professional": "Achievements for advanced analysis and professional development",
+      "streak": "Achievements for maintaining daily activity streaks"
+    },
+    "progress": "Progress",
+    "unlockedOn": "Unlocked on",
+    "reward": "Reward",
+    "howToUnlock": "How to unlock",
+    "hints": {
+      "first_observation": "Complete your first text analysis in the Observatory",
+      "week_warrior": "Use the Observatory for 7 consecutive days",
+      "pattern_pioneer": "Discover 100 unique patterns across all your observations",
+      "forest_sage": "Complete all available learning paths and lessons"
+    }
+  },
+  "accounts": {
+    "title": "My Account",
+    "usage": "Usage",
+    "profile": "Profile",
+    "billing": "Billing",
+    "ai_models": "AI Models",
+    "settings": "Settings",
+    "token_balance": "Token Balance",
+    "tokens_remaining": "tokens remaining",
+    "buy_tokens": "Buy More Tokens",
+    "monthly_usage": "Monthly Usage",
+    "observations_this_month": "observations this month",
+    "usage_breakdown": "Usage Breakdown",
+    "base_cost": "Base cost per observation",
+    "characters_per_batch": "Characters per batch",
+    "bulk_discount": "Bulk discount (5+ batches)",
+    "your_region": "Your region",
+    "profile_info": "Profile Information",
+    "display_name": "Display Name",
+    "email": "Email",
+    "update_profile": "Update Profile",
+    "account_status": "Account Status",
+    "member_since": "Member Since",
+    "email_verified": "Email Verified",
+    "billing_info": "Billing features coming soon. For now, all features are free during beta.",
+    "view_plans": "View Available Plans",
+    "preferences": "Preferences",
+    "email_notifications": "Email Notifications",
+    "dark_mode": "Dark Mode",
+    "developer_options": "Developer Options",
+    "reset_onboarding": "Reset Onboarding",
+    "onboarding_reset": "Onboarding has been reset. It will show again on your next visit."
+  },
+  "nav": {
+    "observatory": "Observatory",
+    "forest": "Forest",
+    "community": "Community",
+    "learn": "Learn",
+    "profile": "Profile",
+    "achievements": "Achievements",
+    "scriptorium": "Scriptorium",
+    "journey": "Journey",
+    "sign_in": "Sign In",
+    "sign_out": "Sign Out"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "last_updated": "Last updated: {{date}}",
+    "introduction": "Welcome to Noctua Forest. These Terms of Service govern your use of our platform. By accessing or using Noctua Forest, you agree to be bound by these terms.",
+    "acceptance": {
+      "title": "Acceptance of Terms",
+      "content": "By creating an account or using our services, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service and our Privacy Policy."
+    },
+    "service": {
+      "title": "Description of Service",
+      "content": "Noctua Forest provides pattern observation and learning services, including:",
+      "observatory": "The Observatory - Text pattern analysis and visualization",
+      "lessons": "Interactive lessons on pattern recognition and creation",
+      "community": "Community features for sharing and discovering patterns",
+      "storage": "Storage and organization of your observations"
+    },
+    "ai": {
+      "title": "AI-Powered Services",
+      "content": "Our pattern analysis uses artificial intelligence. You should understand that:",
+      "analysis": "AI analysis may not always be 100% accurate",
+      "ownership": "You retain ownership of all content you submit",
+      "accuracy": "We strive for accuracy but cannot guarantee perfection",
+      "improvement": "Your usage helps improve our AI models"
+    },
+    "conduct": {
+      "title": "User Conduct",
+      "content": "When using Noctua Forest, you agree to:",
+      "respect": "Treat all users with respect and kindness",
+      "legal": "Use the service only for lawful purposes",
+      "authentic": "Provide accurate information about yourself",
+      "security": "Not attempt to breach our security measures"
+    },
+    "intellectual": {
+      "title": "Intellectual Property",
+      "content": "You retain all rights to content you create. By using our service, you grant us a license to process and display your content as necessary to provide our services. Our platform, including the Observatory and lesson content, is protected by intellectual property laws."
+    },
+    "changes": {
+      "title": "Changes to Terms",
+      "content": "We may update these terms from time to time. We will notify you of significant changes via email or through the platform. Continued use after changes constitutes acceptance."
+    },
+    "contact": {
+      "title": "Contact Information",
+      "content": "If you have questions about these terms, please contact our legal team."
+    },
+    "agreement": {
+      "title": "Your Agreement",
+      "content": "By using Noctua Forest, you confirm that you have read and agree to these Terms of Service."
+    },
+    "questions": "Questions about our terms?",
+    "email": "legal@noctuaforest.com"
+  },
+  "privacy": {
+    "title": "Privacy & Data Center",
+    "login_required": "Sign In Required",
+    "login_description": "Please sign in to access your privacy settings and data management options.",
+    "data_summary": "Your Data Summary",
+    "profile_data": "Profile Data",
+    "learning_progress": "Learning Progress",
+    "observations": "Pattern Observations",
+    "preferences": "App Preferences",
+    "items_count": "{{count}} items",
+    "essential": "Essential",
+    "personal": "Personal",
+    "content": "Content",
+    "settings": "Settings",
+    "total_size": "Total data size: {{size}}",
+    "settings_title": "Privacy Settings",
+    "data_processing": "Allow data processing for app improvement",
+    "analytics": "Enable usage analytics",
+    "marketing": "Receive feature updates and tips",
+    "profile_public": "Make profile discoverable",
+    "share_progress": "Share learning progress with community",
+    "export_title": "Export Your Data",
+    "export_description": "Download a complete copy of your data in JSON format. This includes your profile, learning progress, and all observations.",
+    "export_progress": "Preparing your data...",
+    "export_ready": "Your data export is ready and has been downloaded!",
+    "export_error": "Failed to export data. Please try again or contact support.",
+    "exporting": "Exporting...",
+    "export_data": "Export My Data",
+    "deletion_title": "Delete Account",
+    "deletion_description": "Permanently delete your account and all associated data. This action cannot be undone.",
+    "deletion_warning": "This will delete all your learning progress, observations, and account data within 30 days.",
+    "delete_account": "Delete My Account",
+    "confirm_deletion": "Confirm Account Deletion",
+    "deletion_irreversible": "This action is irreversible!",
+    "deletion_details": "Deleting your account will permanently remove:",
+    "deletion_list": {
+      "profile": "• Your profile and account information",
+      "progress": "• All learning progress and achievements",
+      "observations": "• Pattern observations and saved content",
+      "preferences": "• App preferences and settings"
+    },
+    "deletion_confirmation_prompt": "To confirm deletion, please type \"DELETE\" in the field below:",
+    "cancel": "Cancel",
+    "confirm_delete": "Delete My Account",
+    "deletion": {
+      "success": "Your account and data have been scheduled for deletion within 30 days.",
+      "error": "Failed to process deletion request. Please contact support."
+    }
+  },
+  "pwa": {
+    "install": {
+      "title": "Install Noctua Forest",
+      "description": "Get the full experience with offline access, faster loading, and native app features.",
+      "button": "Install App",
+      "later": "Maybe Later"
+    }
+  },
+  "notifications": {
+    "enable": "Enable Notifications",
+    "disable": "Disable",
+    "test": "Test",
+    "permission": {
+      "title": "Enable Notifications",
+      "description": "Stay engaged with your pattern observation journey! We'll send you:",
+      "blocked": "Notifications are blocked. Please enable them in your browser settings.",
+      "later": "Maybe Later",
+      "enable": "Enable Notifications"
+    },
+    "benefits": {
+      "reminders": "Gentle reminders for daily practice",
+      "progress": "Weekly progress updates",
+      "insights": "New pattern insights and discoveries",
+      "community": "Community highlights and achievements"
+    },
+    "test": {
+      "title": "Noctua Forest",
+      "body": "Your pattern observation journey continues!"
+    },
+    "actions": {
+      "open": "Open App"
+    }
+  },
+  "share": {
+    "button": "Share",
+    "copy_link": "Copy Link",
+    "twitter": "Twitter",
+    "facebook": "Facebook",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "copy_success": "Link copied to clipboard!"
+  },
+  "offline": {
+    "title": "You're offline",
+    "description": "Some features may be limited. Your progress is saved locally.",
+    "indicator": "Offline"
+  },
+  "online": {
+    "message": "Back online! Syncing your progress..."
+  },
+  "scriptorium": {
+    "title": "Song Scriptorium",
+    "subtitle": "Observe the hidden patterns in music - from structural elements to emotional landscapes",
+    "search_placeholder": "Search by song title, artist, or lyrics...",
+    "observe": "Observe",
+    "signin_prompt": "Sign in to save your musical observations",
+    "try_demo": "Try Demo with Sample Song",
+    "search_error": "Failed to search for song. Please try again.",
+    "refresh": "Refresh Analysis",
+    "save": "Save Observation",
+    "share": "Share"
+  },
+  "accessibility": {
+    "title": "Accessibility",
+    "open_settings": "Open accessibility settings",
+    "settings_title": "Accessibility Settings",
+    "settings_updated": "Accessibility settings updated",
+    "visual_title": "Visual Settings",
+    "high_contrast": "High Contrast Mode",
+    "large_text": "Large Text",
+    "reduced_motion": "Reduce Motion",
+    "font_size": "Font Size",
+    "screen_reader_title": "Screen Reader Settings",
+    "screen_reader_optimized": "Screen Reader Optimized",
+    "speech_rate": "Speech Rate",
+    "reset": "Reset to Defaults",
+    "save": "Save Settings"
+  },
+  "community": {
+    "forest_title": "Community Forest",
+    "forest_subtitle": "Share discoveries and connect with fellow observers",
+    "feed": "Discovery Feed",
+    "stargazers": "Star Gazers",
+    "patterns_found": "Patterns Found:",
+    "view_details": "View Details",
+    "share": "Share"
+  },
+  "landing": {
+    "title": "Enter the Forest",
+    "subtitle": "A mystical realm where language patterns dance among the stars, and every word holds the potential for discovery.",
+    "premiumOnly": "Premium Only",
+    "upgradeToPremium": "Upgrade to Premium",
+    "viewAchievements": "View Achievements",
+    "flowFinder": "Flow Finder",
+    "cards": {
+      "journey": {
+        "title": "Your Journey",
+        "description": "Follow guided trails to deepen your observation skills and unlock new paths.",
+        "button": "Start Journey"
+      },
+      "observatory": {
+        "title": "The Observatory",
+        "description": "Gaze upon the stars and explore cosmic patterns and stellar data.",
+        "button": "Enter Observatory"
+      },
+      "scriptorium": {
+        "title": "The Scriptorium",
+        "description": "Access ancient texts and contribute your own knowledge to the library.",
+        "button": "Enter Scriptorium"
+      },
+      "gameGrove": {
+        "title": "Game Grove",
+        "description": "Master patterns through strategic gameplay and fun challenges.",
+        "button": "Play Games"
+      },
+      "achievements": {
+        "title": "Achievements",
+        "description": "Track your progress and unlock new milestones on your journey.",
+        "button": "View Achievements"
+      },
+      "comingSoon": {
+        "title": "New Groves",
+        "description": "More learning environments are being cultivated for your journey.",
+        "button": "Coming Soon"
+      }
+    }
+  }
 } 

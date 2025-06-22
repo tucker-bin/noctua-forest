@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
-import logger from '../config/logger';
+import { logger } from '../utils/logger';
 import cache from '../config/cache';
 import { Request, Response, NextFunction } from 'express';
+import { AuthRequest } from '../middleware/auth';
 
 // This would be the performance monitor instance from the main app
 // This is a placeholder as it needs to be shared from the main app instance
@@ -16,17 +17,19 @@ export function getAdminStats(req: Request, res: Response) {
     });
 }
 
-export function getAdminLogs(req: Request, res: Response) {
+export function getAdminLogs(req: Request, res: Response): void {
     logger.info('Admin access: /admin/logs');
     const logDir = path.join(__dirname, '..', '..', 'logs');
     fs.readdir(logDir, (err, files) => {
         if (err) {
             logger.error('Error reading log directory', err);
-            return res.status(500).send('Error reading log directory.');
+            res.status(500).send('Error reading log directory.');
+            return;
         }
         const latestLog = files.sort().pop();
         if (!latestLog) {
-            return res.status(404).send('No logs found.');
+            res.status(404).send('No logs found.');
+            return;
         }
         res.sendFile(path.join(logDir, latestLog));
     });
@@ -55,10 +58,12 @@ export function clearAdminCache(req: Request, res: Response) {
 
 export const getSystemStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
+    // --- DEBUGGING STEP ---
+    // Return a hardcoded status to isolate the cache issue.
     const status = {
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      cacheStats: cache.stats(),
+      cacheStats: { message: "Cache stats currently disabled for debugging" },
       environment: process.env.NODE_ENV
     };
     res.json(status);

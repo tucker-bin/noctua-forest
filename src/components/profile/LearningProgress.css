@@ -1,0 +1,87 @@
+/* Forest Theme Animations */
+@keyframes twinkling {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+@keyframes floatingLeaves {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.forest-background {
+  position: relative;
+  overflow: hidden;
+}
+
+.forest-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0));
+  background-repeat: repeat;
+  animation: twinkling 4s infinite;
+  pointer-events: none;
+}
+
+.leaf {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: rgba(139, 195, 74, 0.3);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation: floatingLeaves 10s linear infinite;
+}
+
+.path-node {
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.path-node:hover {
+  transform: translateY(-5px);
+}
+
+.progress-trail {
+  position: relative;
+}
+
+.progress-trail::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, 
+    rgba(139, 195, 74, 0.5), 
+    rgba(33, 150, 243, 0.5));
+  transform: translateY(-50%);
+  z-index: -1;
+}
+
+.node-icon {
+  transition: transform 0.3s ease;
+}
+
+.node-icon:hover {
+  transform: scale(1.1);
+} 

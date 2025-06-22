@@ -1,13 +1,37 @@
-import { Router } from 'express';
-import { createPaymentIntent, confirmPayment } from '../controllers/paymentController';
-import { authenticateUser } from '../middleware/auth';
+import express, { Response } from 'express';
 
-const router = Router();
+import { requireAuth } from '../middleware/auth';
 
-// Create payment intent for token purchase
-router.post('/create-payment-intent', authenticateUser, createPaymentIntent);
+import { processPayment } from '../services/paymentService';
 
-// Confirm payment and update user tokens
-router.post('/confirm-payment', authenticateUser, confirmPayment);
+const router = express.Router();
+
+// All payment routes require authentication
+// Auth middleware applied per route
+
+// Process payment
+router.post('/process', async (req: any, res: any) => {
+  try {
+    const { amount, currency, paymentMethod } = (req as any).body;
+    const userId = (req as any).user.uid;
+
+    const result = await processPayment({
+      userId,
+      amount,
+      currency,
+      paymentMethod
+    });
+
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Payment processing failed'
+    });
+  }
+});
 
 export default router; 

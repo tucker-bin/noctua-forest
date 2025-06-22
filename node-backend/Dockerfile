@@ -19,8 +19,9 @@ RUN npm run build
 # Only keep production dependencies
 RUN npm prune --production
 
-# Create logs directory
-RUN mkdir -p logs
+# Create logs directory and set permissions
+RUN mkdir -p logs && \
+    chown -R node:node /app
 
 # Expose port (Cloud Run will set PORT env variable)
 EXPOSE 8080

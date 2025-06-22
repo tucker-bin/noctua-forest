@@ -1,7 +1,16 @@
 {
-  "welcome": "Maligayang pagdating sa Gubat ng Noctua",
+  "welcome": "Maligayang pagdating sa Noctua Forest",
   "subtitle": "Ang Noctua ay nangangahulugang 'kuwago'—isang tahanan para sa mga artista at mag-aaral.",
-  "enter_forest": "Pumasok sa Gubat (Gumawa ng Iyong Profile)",
+  "welcome_message": "Maligayang pagdating sa Noctua Forest! Ako si Noctua, ang inyong gabay sa paghahanap ng mga pattern sa inyong teksto.",
+  "explore_forest_title": "Tuklasin",
+  "explore_forest_desc": "Hanapin ang mga pattern sa inyong mga paboritong kanta at tula.",
+  "learn_create_title": "Matuto at Lumikha",
+  "learn_create_desc": "Alamin ang mga pattern ng tugma at gumawa ng sariling tula.",
+  "share_connect_title": "Magbahagi at Makipag-ugnayan",
+  "share_connect_desc": "Ibahagi ang inyong mga nahanap at makipag-connect sa komunidad.",
+  "noctua_observatory_welcome": "Maligayang pagdating sa Observatory! Handa na ba kayong maghanap ng mga pattern sa inyong teksto?",
+  "noctua_forest_welcome": "Maligayang pagdating sa Noctua Forest! Dito ninyo makikilala ang ibang mga creator at makakasama ang komunidad.",
+  "enter_forest": "Pumasok sa Forest (Gumawa ng Profile)",
   "view_profile": "Tingnan ang Profile",
   "artist": "Artista",
   "owl": "Kuwago",
@@ -14,6 +23,29 @@
   "select_genre": "Pumili ng Genre",
   "email": "Email Address",
   "password": "Password",
+  "auth": {
+    "signin_title": "Mag-sign in",
+    "signin_subtitle": "Maligayang pagbabalik sa Noctua Forest",
+    "signin_button": "Mag-sign in",
+    "signup_link": "Mag-sign up",
+    "email": "Email Address",
+    "password": "Password",
+    "forgot_password": "Nakalimutan ang password?",
+    "no_account": "Walang account?",
+    "or": "O",
+    "errors": {
+      "fill_all_fields": "Pakikumpletuhin ang lahat ng fields",
+      "invalid_email": "Hindi valid na email address",
+      "user_disabled": "Ang account na ito ay na-disable",
+      "user_not_found": "Walang nakitang account sa email na ito",
+      "wrong_password": "Mali ang password",
+      "too_many_requests": "Masyadong maraming pagsubok. Subukan ulit mamaya",
+      "signin_failed": "Hindi makapag-sign in. Subukan ulit.",
+      "popup_closed": "Na-cancel ang pag-sign in",
+      "google_signin_failed": "Hindi makapag-sign in sa Google"
+    },
+    "signin_with_google": "Mag-sign in gamit ang Google"
+  },
   "invite_code_optional": "Invite Code (opsyonal)",
   "signing_up": "Nag-sign up...",
   "sign_up": "Mag-sign up",
@@ -30,23 +62,206 @@
   "send_message": "Magpadala ng Mensahe",
   "want_to_connect": "Gusto mong kumonekta o i-claim ang profile na ito?",
   "sign_up_to_join": "Mag-sign up para Sumali sa Noctua Forest",
-  "observatory_title": "Noctua Forest",
-  "observatory_subtitle": "Suriin ang iyong teksto para sa mga phonetic pattern at rhyme. Bawat pagsusuri ay may gastos na tokens batay sa haba ng teksto.",
+  "observatory_title": "Observatory",
+  "observatory_subtitle": "Hanapin ang mga pattern at tugma sa teksto. Bawat session ay gumagamit ng mga token base sa haba ng teksto.",
   "token_balance": "Balanse ng Token",
   "estimated_cost": "Tinatayang Gastos",
-  "enter_text_to_analyze": "Maglagay ng Teksto para Suriin",
+  "enter_text_to_observe": "Ilagay ang Teksto para Hanapin ang Pattern",
   "character_count": "{{count}} karakter",
   "batches": "mga batch",
-  "analyzing": "Sinusuri...",
+  "observing": "Naghahanap ng mga pattern...",
   "wait_seconds": "Maghintay ng {{count}}s...",
-  "analyze_text": "Suriin ang Teksto",
-  "wait_tooltip": "Para maiwasan ang pang-aabuso, mangyaring maghintay bago ang susunod mong pagsusuri.",
+  "begin_observation": "Hanapin ang mga Pattern",
+  "wait_tooltip": "Para sa magandang resulta, maghintay muna sa pagitan ng mga session.",
   "error": "Error",
   "footer": {
     "copyright": "© {{year}} Noctua Forest",
     "about": "Tungkol",
     "contact": "Kontak",
     "privacy": "Pribasiya",
-    "terms": "Mga Tuntunin"
+    "terms": "Mga Tuntunin",
+    "rights": "Lahat ng karapatan ay nakataan",
+    "explore": "Tuklasin",
+    "observatory": "Observatory",
+    "community": "Komunidad",
+    "stargazing": "Makipag-connect",
+    "learning_paths": "Mga Aralin",
+    "resources": "Mga Mapagkukunan",
+    "documentation": "Dokumentasyon",
+    "api": "API",
+    "guides": "Mga Gabay",
+    "faq": "FAQ",
+    "legal": "Legal",
+    "cookies": "Cookies",
+    "licenses": "Mga Lisensya"
+  },
+  "tooltip": {
+    "change_language": "Baguhin ang wika",
+    "follow": "Sundan",
+    "unfollow": "Hindi na sundan"
+  },
+  "follow": "Sundan",
+  "unfollow": "Hindi na sundan",
+  "pattern_types": {
+    "rhyme": "Mga Pattern ng Tugma",
+    "assonance": "Mga Pattern ng Patinig",
+    "consonance": "Mga Pattern ng Katinig",
+    "alliteration": "Mga Pattern ng Unang Tunog",
+    "rhythm": "Mga Pattern ng Ritmo"
+  },
+  "observatory": {
+    "save_observation": "I-save ang Resulta",
+    "share_observation": "Ibahagi ang Resulta",
+    "pattern_strength": "Gaano Kalakas",
+    "pattern_frequency": "Gaano Kadalas",
+    "view_all_patterns": "Tingnan ang Lahat ng Pattern",
+    "filter_patterns": "I-filter ang mga Pattern",
+    "sort_by": "Ayusin",
+    "export_observation": "I-export ang Resulta",
+    "pattern": {
+      "examples": "Mga Halimbawa",
+      "features": "Mga Katangian ng Tunog",
+      "strength": "Gaano Kalakas",
+      "context": "Konteksto",
+      "relationships": "Mga Kaugnay na Pattern",
+      "analysis": {
+        "primary": "Pangunahing Epekto",
+        "secondary": "Ibang mga Epekto",
+        "intensity": "Lakas",
+        "distribution": "Saan Makikita",
+        "interaction": "Gumagana kasama ng Ibang Pattern"
+      },
+      "cultural": {
+        "writing_system": "Sistema ng Pagsulat",
+        "sound_patterns": "Mga Pattern ng Tunog",
+        "cultural_emphasis": "Estilo ng Kultura",
+        "traditional_forms": "Mga Tradisyonal na Anyo"
+      }
+    },
+    "language": {
+      "detected": "Nakitang Wika",
+      "direction": "Direksyon ng Teksto",
+      "cultural_info": "Info sa Kultura",
+      "script_features": "Mga Feature ng Pagsulat",
+      "change_language": "Baguhin ang Wika"
+    },
+    "title": "Observatory",
+    "description": "Hanapin ang mga pattern sa inyong teksto. Tutulungan namin kayong makita ang mga interesting na pattern sa inyong pagsulat.",
+    "try_examples": "Subukan ang mga halimbawang ito para magsimula",
+    "input_placeholder": "Ilagay ang inyong teksto dito para hanapin ang mga pattern...",
+    "observe": "Hanapin ang mga Pattern",
+    "observing": "Naghahanap...",
+    "results": "Nahanap na mga Pattern",
+    "pattern_found": "Nahanap ko ang mga interesting na pattern! Tingnan ninyo kung ano ang nakita ko.",
+    "ready": "Maligayang pagdating sa Observatory! Anong mga pattern ang hahanapin natin ngayon?",
+    "welcome": "Maligayang pagdating sa Observatory",
+    "instructions": "Maglagay ng teksto sa itaas para hanapin ang mga pattern.",
+    "patterns_found": "Nahanap na mga Pattern",
+    "hover_for_details": "Mag-hover sa pattern para sa mga detalye",
+    "tabs": {
+      "highlighted": "Text View",
+      "celestial": "Star Map",
+      "constellations": "Mga Pattern Connection"
+    },
+    "reportIssue": "Mag-report ng Problema",
+    "feedback": {
+      "title": "Mag-report ng Problema sa Observatory",
+      "description": "Tulungan ninyo kami na mapabuti ang Observatory sa pamamagitan ng pagsasabi sa amin kung gumagana ba ito para sa inyo.",
+      "working": "Gumagana",
+      "notWorking": "Hindi gumagana",
+      "messageLabel": "Sabihin ninyo sa amin ang higit pa (opsyonal)",
+      "messagePlaceholder": "Pakipakwento kung ano ang nangyari...",
+      "submitError": "Hindi mapadala ang feedback. Subukan ulit.",
+      "thankYou": "Salamat sa inyong feedback!"
+    },
+    "pronunciation": {
+      "guide": "Gabay sa Pagbigkas",
+      "original_text": "Orihinal na Teksto",
+      "ipa": "IPA Transcription",
+      "romanization": "Romanization",
+      "your_language": "Inyong Wika",
+      "phonology_comparison": "Paghahambing ng Phonology",
+      "similarities": "Mga Katulad na Feature",
+      "differences": "Mga Pagkakaiba",
+      "sound_correspondences": "Mga Tugma ng Tunog",
+      "has_tips": "May mga Tip! 🌟",
+      "features": {
+        "stress": "Pattern ng Stress",
+        "tone": "Pattern ng Tono",
+        "length": "Pattern ng Haba",
+        "special": "Mga Espesyal na Feature"
+      },
+      "error": "Hindi ma-analyze ang pronunciation"
+    }
+  },
+  "nav": {
+    "observatory": "Observatory",
+    "forest": "Forest",
+    "community": "Komunidad",
+    "learn": "Matuto",
+    "profile": "Profile",
+    "sign_in": "Mag-sign in",
+    "sign_out": "Mag-sign out"
+  },
+  "forest": {
+    "welcome": "Maligayang pagdating sa Gubat ng Noctua",
+    "welcome_subtitle": "Isang mahiwagang kaharian kung saan ang mga pattern ng wika ay sumasayaw sa mga bituin",
+    "journey_begins": "Ang inyong paglalakbay ng pagtuklas ay nagsisimula dito. Pumili ng inyong landas...",
+    "start_observing": "Simulan ang Pagmamasid",
+    "back_to_forest": "Bumalik sa Gubat",
+    "areas": {
+      "observatory": "Obserbatoryo",
+      "observatory_desc": "Tuklasin ang mga nakatagong pattern sa teksto sa ilalim ng bituin",
+      "community": "Community Grove",
+      "community_desc": "Ibahagi ang inyong mga natuklasan sa ibang mga observer",
+      "stargazing": "Pagmamasid sa Bituin",
+      "stargazing_desc": "Makipag-ugnayan sa ibang constellation mapper",
+      "pathways": "Mga Landas ng Pag-aaral",
+      "pathways_desc": "Sundan ang mga gabay na landas para mapalalim ang inyong kakayahan sa pagmamasid"
+    },
+    "explore_features": "Tuklasin ang Gubat",
+    "discover_more": "Tuklasin ang mahika ng pagmamasid ng pattern",
+    "languages_supported": "Mga Wika",
+    "pattern_types": "Mga Uri ng Pattern",
+    "discoveries_await": "Mga Naghihintay na Pagtuklas"
+  },
+  "patterns_found": "Nahanap na mga pattern",
+  "begin_observation": "Simulan ang obserbasyon",
+  "observing": "Nag-oobserba ng mga pattern...",
+  "cultural_context": {
+    "filipino_poetry": "Tulang Filipino",
+    "classical_forms": "Mga Klasikong Anyo",
+    "tanaga": "Tanaga",
+    "awit": "Awit",
+    "korido": "Korido",
+    "kundiman": "Kundiman"
+  },
+  "cookies": {
+    "title": "Mga Kagustuhan sa Cookie",
+    "description": "Ginagamit namin ang mga cookie para mapabuti ang inyong karanasan, suriin ang paggamit, at i-personalize ang nilalaman. May kumpletong kontrol kayo sa inyong mga kagustuhan.",
+    "accept_all": "Tanggapin Lahat",
+    "reject_all": "Tanggihan Lahat", 
+    "customize": "I-customize",
+    "save_preferences": "I-save ang mga Kagustuhan",
+    "required": "Kailangan",
+    "learn_more": "Matuto pa tungkol sa aming mga patakaran sa data sa aming",
+    "privacy_policy": "Patakaran sa Privacy",
+    "terms_of_service": "Mga Tuntunin ng Serbisyo",
+    "necessary": {
+      "title": "Mga Kinakailangang Cookie",
+      "description": "Mahalagang para sa authentication, security, at basic functionality. Hindi maaaring i-disable."
+    },
+    "analytics": {
+      "title": "Mga Cookie para sa Analytics",
+      "description": "Tumutulong sa amin na maintindihan ang paggamit ng app, makita ang mga problema, at mapabuti ang performance. Kasama dito ang Web Vitals at error tracking."
+    },
+    "preferences": {
+      "title": "Mga Cookie para sa Preferences",
+      "description": "Naaalala ang inyong wika, theme, accessibility settings, at learning preferences."
+    },
+    "marketing": {
+      "title": "Mga Cookie para sa Marketing",
+      "description": "Nagbibigay-daan sa personalized content recommendations at sumusukat ng effectiveness ng mga feature."
+    }
   }
 } 

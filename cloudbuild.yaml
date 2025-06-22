@@ -1,4 +1,4 @@
-# Cloud Build configuration for Noctua Rhyme Observatory
+# Cloud Build configuration for Noctua Forest
 # This deploys both the Node.js backend to Cloud Run and the React frontend to Firebase Hosting
 
 options:
@@ -11,9 +11,9 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-node:${BUILD_ID}'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/noctua-forest-images/noctua-forest-node:${BUILD_ID}'
       - '-t'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-node:latest'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/noctua-forest-images/noctua-forest-node:latest'
       - '.'
     dir: 'node-backend'
     id: 'Build Backend Docker Image'
@@ -23,7 +23,7 @@ steps:
     args:
       - 'push'
       - '--all-tags'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-node'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/noctua-forest-images/noctua-forest-node'
     id: 'Push Backend Image'
     waitFor: ['Build Backend Docker Image']
 
@@ -33,9 +33,9 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'my-rhyme-app-backend'
+      - 'noctua-forest-backend'
       - '--image'
-      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-node:${BUILD_ID}'
+      - 'us-central1-docker.pkg.dev/${PROJECT_ID}/noctua-forest-images/noctua-forest-node:${BUILD_ID}'
       - '--region'
       - 'us-central1'
       - '--platform'
@@ -44,8 +44,8 @@ steps:
       - '--port'
       - '8080'
       - '--set-secrets=ANTHROPIC_API_KEY=apikey:latest'
-      - '--set-env-vars=NODE_ENV=production,CORS_ORIGIN=https://my-rhyme-app.web.app'
-      - '--service-account=my-rhyme-app-service@${PROJECT_ID}.iam.gserviceaccount.com'
+      - '--set-env-vars=NODE_ENV=production,CORS_ORIGIN=https://noctua-forest.web.app'
+      - '--service-account=noctua-forest-service@${PROJECT_ID}.iam.gserviceaccount.com'
       - '--min-instances=0'
       - '--max-instances=100'
       - '--memory=512Mi'
@@ -60,7 +60,7 @@ steps:
     args:
       - '-c'
       - |
-        SERVICE_URL=$(gcloud run services describe my-rhyme-app-backend --region=us-central1 --format='value(status.url)')
+        SERVICE_URL=$(gcloud run services describe noctua-forest-backend --region=us-central1 --format='value(status.url)')
         echo "Backend URL: $$SERVICE_URL"
         echo "$$SERVICE_URL" > /workspace/backend_url.txt
     id: 'Get Backend URL'
@@ -74,15 +74,15 @@ steps:
       - |
         BACKEND_URL=$(cat /workspace/backend_url.txt)
         echo "Creating frontend .env file..."
-        echo "VITE_FIREBASE_API_KEY=${_VITE_FIREBASE_API_KEY}" > my-rhyme-app/.env
-        echo "VITE_FIREBASE_AUTH_DOMAIN=${_VITE_FIREBASE_AUTH_DOMAIN}" >> my-rhyme-app/.env
-        echo "VITE_FIREBASE_PROJECT_ID=${_VITE_FIREBASE_PROJECT_ID}" >> my-rhyme-app/.env
-        echo "VITE_FIREBASE_STORAGE_BUCKET=${_VITE_FIREBASE_STORAGE_BUCKET}" >> my-rhyme-app/.env
-        echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${_VITE_FIREBASE_MESSAGING_SENDER_ID}" >> my-rhyme-app/.env
-        echo "VITE_FIREBASE_APP_ID=${_VITE_FIREBASE_APP_ID}" >> my-rhyme-app/.env
-        echo "VITE_API_URL=$$BACKEND_URL/api" >> my-rhyme-app/.env
+        echo "VITE_FIREBASE_API_KEY=${_VITE_FIREBASE_API_KEY}" > noctua-forest/.env
+        echo "VITE_FIREBASE_AUTH_DOMAIN=${_VITE_FIREBASE_AUTH_DOMAIN}" >> noctua-forest/.env
+        echo "VITE_FIREBASE_PROJECT_ID=${_VITE_FIREBASE_PROJECT_ID}" >> noctua-forest/.env
+        echo "VITE_FIREBASE_STORAGE_BUCKET=${_VITE_FIREBASE_STORAGE_BUCKET}" >> noctua-forest/.env
+        echo "VITE_FIREBASE_MESSAGING_SENDER_ID=${_VITE_FIREBASE_MESSAGING_SENDER_ID}" >> noctua-forest/.env
+        echo "VITE_FIREBASE_APP_ID=${_VITE_FIREBASE_APP_ID}" >> noctua-forest/.env
+        echo "VITE_API_URL=$$BACKEND_URL/api" >> noctua-forest/.env
         echo "--- Frontend .env file contents ---"
-        cat my-rhyme-app/.env
+        cat noctua-forest/.env
     id: 'Write Frontend .env'
     waitFor: ['Get Backend URL']
 
@@ -90,7 +90,7 @@ steps:
   - name: 'node:20'
     entrypoint: 'npm'
     args: ['ci', '--legacy-peer-deps']
-    dir: 'my-rhyme-app'
+    dir: 'noctua-forest'
     id: 'Install Frontend Dependencies'
     waitFor: ['Write Frontend .env']
 
@@ -98,7 +98,7 @@ steps:
   - name: 'node:20'
     entrypoint: 'npm'
     args: ['run', 'build']
-    dir: 'my-rhyme-app'
+    dir: 'noctua-forest'
     id: 'Build Frontend'
     waitFor: ['Install Frontend Dependencies']
 
@@ -110,20 +110,20 @@ steps:
 
 # Images to be pushed to Artifact Registry
 images:
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-node:${BUILD_ID}'
-  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/my-rhyme-app-images/my-rhyme-app-node:latest'
+  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/noctua-forest-images/noctua-forest-node:${BUILD_ID}'
+  - 'us-central1-docker.pkg.dev/${PROJECT_ID}/noctua-forest-images/noctua-forest-node:latest'
 
 # Build timeout
 timeout: '1800s' # 30 minutes
 
 # Substitutions - These should be set in your Cloud Build trigger or passed as arguments
 substitutions:
-  _VITE_FIREBASE_API_KEY: 'AIzaSyDkrIV0Ji28ULmGHDl6mLTMvRWQsyR4XFg'
-  _VITE_FIREBASE_AUTH_DOMAIN: 'my-rhyme-app.firebaseapp.com'
-  _VITE_FIREBASE_PROJECT_ID: 'my-rhyme-app'
-  _VITE_FIREBASE_STORAGE_BUCKET: 'my-rhyme-app.appspot.com'
-  _VITE_FIREBASE_MESSAGING_SENDER_ID: '487322724536'
-  _VITE_FIREBASE_APP_ID: '1:487322724536:web:a5eb91460b22e57e2b2c4d'
+  _VITE_FIREBASE_API_KEY: '${_VITE_FIREBASE_API_KEY}'
+  _VITE_FIREBASE_AUTH_DOMAIN: 'noctua-forest.firebaseapp.com'
+  _VITE_FIREBASE_PROJECT_ID: 'noctua-forest'
+  _VITE_FIREBASE_STORAGE_BUCKET: 'noctua-forest.appspot.com'
+  _VITE_FIREBASE_MESSAGING_SENDER_ID: '${_VITE_FIREBASE_MESSAGING_SENDER_ID}'
+  _VITE_FIREBASE_APP_ID: '${_VITE_FIREBASE_APP_ID}'
 
 steps:
   - name: 'gcr.io/cloud-builders/gcloud'

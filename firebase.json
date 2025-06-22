@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "my-rhyme-app/dist",
+    "public": "noctua-forest/dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -10,7 +10,7 @@
       {
         "source": "/api/**",
         "run": {
-          "serviceId": "my-rhyme-app",
+          "serviceId": "noctua-forest",
           "region": "us-central1"
         }
       },

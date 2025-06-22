@@ -49,7 +49,7 @@ A sophisticated AI-powered text analysis application that reveals hidden rhyme p
    npm install
 
    # Install frontend dependencies
-   cd ../my-rhyme-app
+   cd ../noctua-forest
    npm install
    ```
 
@@ -57,19 +57,19 @@ A sophisticated AI-powered text analysis application that reveals hidden rhyme p
 
    Create `node-backend/.env`:
    ```env
-   ANTHROPIC_API_KEY=your_anthropic_api_key_here
+   ANTHROPIC_API_KEY=your_anthropic_api_key
    FRONTEND_URL=http://localhost:5173
    PORT=3001
    # Optional: Firebase Admin SDK path
    # FIREBASE_ADMIN_CREDENTIALS=path/to/firebase-adminsdk.json
    ```
 
-   Create `my-rhyme-app/.env.local`:
+   Create `noctua-forest/.env.local`:
    ```env
-   VITE_FIREBASE_API_KEY=your_firebase_api_key
-   VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
+   VITE_FIREBASE_API_KEY=your_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_domain
    VITE_FIREBASE_PROJECT_ID=your_project_id
-   VITE_FIREBASE_STORAGE_BUCKET=your_storage_bucket
+   VITE_FIREBASE_STORAGE_BUCKET=your_bucket
    VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
    VITE_FIREBASE_APP_ID=your_app_id
    ```
@@ -102,7 +102,7 @@ This will:
 ### Option 2: Manual Deployment
 1. **Build the frontend**
    ```bash
-   cd my-rhyme-app
+   cd noctua-forest
    npm run build
    ```
 
@@ -113,29 +113,23 @@ This will:
 
 3. **Deploy backend to Google Cloud Run**
    ```bash
-   gcloud run deploy my-rhyme-app-backend \
+   gcloud run deploy noctua-forest-backend \
      --source . \
      --region us-central1 \
-     --allow-unauthenticated
+     --allow-unauthenticated \
+     --set-env-vars=NODE_ENV=production \
+     --project=your-project-id
    ```
 
 ## 📁 Project Structure
 
 ```
-my-rhyme-app-main/
-├── my-rhyme-app/          # React frontend
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── contexts/      # React contexts (Auth, Usage)
-│   │   ├── pages/         # Page components
-│   │   ├── theme/         # Custom MUI theme
-│   │   └── utils/         # Utility functions
-│   ├── public/            # Static assets
-│   └── dist/              # Production build
-├── node-backend/          # Express backend
-│   ├── index.js           # Main server file
-│   └── logs/              # Application logs
-└── Various config files
+noctua-forest/
+├── node-backend/          # Node.js/Express backend
+├── noctua-forest/        # React frontend
+├── docker-compose.yml    # Docker configuration
+├── cloudbuild.yaml      # Cloud Build configuration
+└── README.md            # This file
 ```
 
 ## 🔑 Key Features Explained

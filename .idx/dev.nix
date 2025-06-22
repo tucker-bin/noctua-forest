@@ -36,7 +36,7 @@
           # Run the frontend development server
           command = ["npm" "run" "dev"];
           manager = "web";
-          cwd = "my-rhyme-app";
+          cwd = "noctua-forest";
           env = {
             # Environment variables to set for your server
             PORT = "$PORT";
@@ -59,14 +59,14 @@
       # Runs when a workspace is first created
       onCreate = {
         # Install dependencies for both frontend and backend
-        install-frontend = "cd my-rhyme-app && npm install";
+        install-frontend = "cd noctua-forest && npm install";
         install-backend = "cd node-backend && npm install";
       };
       # Runs when the workspace is (re)started
       onStart = {
         # Start both servers in development mode
         start-backend = "cd node-backend && npm run dev &";
-        start-frontend = "cd my-rhyme-app && npm run dev";
+        start-frontend = "cd noctua-forest && npm run dev";
       };
     };
   };

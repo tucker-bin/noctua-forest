@@ -1,9 +1,11 @@
 import NodeCache from 'node-cache';
 
 interface CacheStats {
+  keys: number;
   hits: number;
   misses: number;
-  keys: number;
+  ksize: number;
+  vsize: number;
 }
 
 interface Cache {
@@ -13,17 +15,15 @@ interface Cache {
   stats: () => CacheStats;
 }
 
-const cache = new NodeCache();
+// Initialize with a standard TTL and check period for better performance
+const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
 
 const cacheWrapper: Cache = {
   get: (key: string) => cache.get(key),
-  set: (key: string, value: any, ttl?: number) => cache.set(key, value, ttl),
+  set: (key: string, value: any, ttl?: number) => cache.set(key, value, ttl || 3600),
   clear: () => cache.flushAll(),
-  stats: () => ({
-    hits: cache.getStats().hits,
-    misses: cache.getStats().misses,
-    keys: cache.keys().length
-  })
+  // Directly return the stats object from the library
+  stats: () => cache.getStats()
 };
 
 export default cacheWrapper; 
