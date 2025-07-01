@@ -1,156 +1,534 @@
-import React, { useState, useEffect } from 'react';
-import { Snackbar, Alert, Box, Typography, Button } from '@mui/material';
-import { WifiOff, Wifi, CloudOff, Refresh } from '@mui/icons-material';
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Alert,
+  Chip,
+  LinearProgress,
+  Stack,
+  IconButton,
+  Collapse,
+  useTheme,
+  Tooltip,
+  Badge
+} from '@mui/material';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import WifiOffIcon from '@mui/icons-material/WifiOff';
+import WifiIcon from '@mui/icons-material/Wifi';
+import CloudOffIcon from '@mui/icons-material/CloudOff';
+import CloudDoneIcon from '@mui/icons-material/CloudDone';
+import SyncIcon from '@mui/icons-material/Sync';
+import DownloadIcon from '@mui/icons-material/Download';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StorageIcon from '@mui/icons-material/Storage';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { useAuth } from '../../contexts/AuthContext';
+import { useExperience } from '../../contexts/ExperienceContext';
+
+interface CachedGame {
+  id: string;
+  mode: string;
+  difficulty: number;
+  data: any;
+  cachedAt: number;
+  lastPlayed?: number;
+}
+
+interface OfflineData {
+  games: CachedGame[];
+  userProgress: any;
+  settings: any;
+  lastSync: number;
+}
+
+interface NetworkStatus {
+  isOnline: boolean;
+  connectionType: string;
+  effectiveType: string;
+  downlink: number;
+  rtt: number;
+}
 
 const OfflineIndicator: React.FC = () => {
   const { t } = useTranslation();
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [showOfflineMessage, setShowOfflineMessage] = useState(false);
-  const [showOnlineMessage, setShowOnlineMessage] = useState(false);
+  const theme = useTheme();
+  const { currentUser } = useAuth();
+  const { level } = useExperience();
 
+  const [networkStatus, setNetworkStatus] = useState<NetworkStatus>({
+    isOnline: navigator.onLine,
+    connectionType: 'unknown',
+    effectiveType: 'unknown',
+    downlink: 0,
+    rtt: 0
+  });
+
+  const [offlineData, setOfflineData] = useState<OfflineData>({
+    games: [],
+    userProgress: {},
+    settings: {},
+    lastSync: 0
+  });
+
+  const [syncing, setSyncing] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
+  const [showDetails, setShowDetails] = useState(false);
+  const [pendingSync, setPendingSync] = useState(0);
+  const [cacheSize, setCacheSize] = useState(0);
+
+  // Monitor network status
   useEffect(() => {
-    const handleOnline = () => {
-      setIsOnline(true);
-      setShowOfflineMessage(false);
-      setShowOnlineMessage(true);
+    const updateNetworkStatus = () => {
+      const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
       
-      // Hide online message after 3 seconds
-      setTimeout(() => setShowOnlineMessage(false), 3000);
+      setNetworkStatus({
+        isOnline: navigator.onLine,
+        connectionType: connection?.type || 'unknown',
+        effectiveType: connection?.effectiveType || 'unknown',
+        downlink: connection?.downlink || 0,
+        rtt: connection?.rtt || 0
+      });
+    };
+
+    const handleOnline = () => {
+      updateNetworkStatus();
+      syncPendingData();
     };
 
     const handleOffline = () => {
-      setIsOnline(false);
-      setShowOnlineMessage(false);
-      setShowOfflineMessage(true);
+      updateNetworkStatus();
     };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
-    // Show offline message if starting offline
-    if (!navigator.onLine) {
-      setShowOfflineMessage(true);
+    
+    // Listen for connection changes
+    const connection = (navigator as any).connection;
+    if (connection) {
+      connection.addEventListener('change', updateNetworkStatus);
     }
+
+    updateNetworkStatus();
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      if (connection) {
+        connection.removeEventListener('change', updateNetworkStatus);
+      }
     };
   }, []);
 
-  const handleRetry = () => {
-    if (navigator.onLine) {
-      // Force a cache refresh
-      window.location.reload();
+  // Load cached data on component mount
+  useEffect(() => {
+    loadOfflineData();
+    calculateCacheSize();
+  }, []);
+
+  // Auto-sync when coming back online
+  useEffect(() => {
+    if (networkStatus.isOnline && pendingSync > 0) {
+      const timer = setTimeout(() => {
+        syncPendingData();
+      }, 2000); // Wait 2 seconds after reconnection
+
+      return () => clearTimeout(timer);
+    }
+  }, [networkStatus.isOnline, pendingSync]);
+
+  const loadOfflineData = useCallback(() => {
+    try {
+      const cached = localStorage.getItem('rhymetime-offline-data');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        setOfflineData(parsed);
+        
+        // Count pending sync items
+        const pending = parsed.userProgress?.pendingSync?.length || 0;
+        setPendingSync(pending);
+      }
+    } catch (error) {
+      console.error('Error loading offline data:', error);
+    }
+  }, []);
+
+  const calculateCacheSize = useCallback(() => {
+    try {
+      let totalSize = 0;
+      for (let key in localStorage) {
+        if (key.startsWith('rhymetime-')) {
+          totalSize += localStorage[key].length;
+        }
+      }
+      setCacheSize(Math.round(totalSize / 1024)); // KB
+    } catch (error) {
+      console.error('Error calculating cache size:', error);
+    }
+  }, []);
+
+  const downloadGamesForOffline = useCallback(async () => {
+    if (!networkStatus.isOnline) return;
+
+    setDownloading(true);
+    setDownloadProgress(0);
+
+    try {
+      // Download different game modes and difficulties
+      const gameModes = ['rhyme_time', 'alli_time', 'flow_time'];
+      const difficulties = [1, 2, 3];
+      const totalGames = gameModes.length * difficulties.length * 3; // 3 games per combination
+      let downloadedCount = 0;
+
+      const cachedGames: CachedGame[] = [];
+
+      for (const mode of gameModes) {
+        for (const difficulty of difficulties) {
+          for (let i = 0; i < 3; i++) {
+            try {
+              const response = await fetch(`/api/games/generate?mode=${mode}&difficulty=${difficulty}&offline=true`);
+              if (response.ok) {
+                const gameData = await response.json();
+                
+                cachedGames.push({
+                  id: `offline-${mode}-${difficulty}-${i}`,
+                  mode,
+                  difficulty,
+                  data: gameData,
+                  cachedAt: Date.now()
+                });
+              }
+            } catch (error) {
+              console.error(`Error downloading ${mode} game:`, error);
+            }
+
+            downloadedCount++;
+            setDownloadProgress((downloadedCount / totalGames) * 100);
+            
+            // Small delay to prevent overwhelming the server
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+        }
+      }
+
+      // Save to offline storage
+      const newOfflineData = {
+        ...offlineData,
+        games: cachedGames,
+        lastSync: Date.now()
+      };
+
+      localStorage.setItem('rhymetime-offline-data', JSON.stringify(newOfflineData));
+      setOfflineData(newOfflineData);
+      calculateCacheSize();
+
+      console.log(`Downloaded ${cachedGames.length} games for offline play`);
+    } catch (error) {
+      console.error('Error downloading offline games:', error);
+    } finally {
+      setDownloading(false);
+      setDownloadProgress(0);
+    }
+  }, [networkStatus.isOnline, offlineData, calculateCacheSize]);
+
+  const syncPendingData = useCallback(async () => {
+    if (!networkStatus.isOnline || !currentUser) return;
+
+    setSyncing(true);
+
+    try {
+      // Get pending sync data
+      const pendingData = offlineData.userProgress?.pendingSync || [];
+      
+      if (pendingData.length > 0) {
+        // Sync game completions
+        for (const item of pendingData) {
+          await fetch('/api/user/sync-progress', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${await currentUser.getIdToken()}`
+            },
+            body: JSON.stringify(item)
+          });
+        }
+
+        // Clear pending sync data
+        const updatedData = {
+          ...offlineData,
+          userProgress: {
+            ...offlineData.userProgress,
+            pendingSync: []
+          },
+          lastSync: Date.now()
+        };
+
+        localStorage.setItem('rhymetime-offline-data', JSON.stringify(updatedData));
+        setOfflineData(updatedData);
+        setPendingSync(0);
+
+        console.log('Synced offline progress successfully');
+      }
+    } catch (error) {
+      console.error('Error syncing offline data:', error);
+    } finally {
+      setSyncing(false);
+    }
+  }, [networkStatus.isOnline, currentUser, offlineData]);
+
+  const clearOfflineData = useCallback(() => {
+    localStorage.removeItem('rhymetime-offline-data');
+    setOfflineData({
+      games: [],
+      userProgress: {},
+      settings: {},
+      lastSync: 0
+    });
+    setPendingSync(0);
+    calculateCacheSize();
+  }, [calculateCacheSize]);
+
+  const getConnectionQuality = () => {
+    if (!networkStatus.isOnline) return { label: 'Offline', color: 'error', icon: <WifiOffIcon /> };
+    
+    const { effectiveType, downlink } = networkStatus;
+    
+    if (effectiveType === '4g' || downlink > 10) {
+      return { label: 'Excellent', color: 'success', icon: <WifiIcon /> };
+    } else if (effectiveType === '3g' || downlink > 1.5) {
+      return { label: 'Good', color: 'warning', icon: <WifiIcon /> };
+    } else {
+      return { label: 'Slow', color: 'error', icon: <WifiIcon /> };
     }
   };
 
-  const handleDismissOffline = () => {
-    setShowOfflineMessage(false);
-  };
+  const connectionQuality = getConnectionQuality();
+  const hasOfflineGames = offlineData.games.length > 0;
+  const lastSyncFormatted = offlineData.lastSync ? 
+    new Date(offlineData.lastSync).toLocaleDateString() : 'Never';
 
   return (
-    <>
-      {/* Offline Banner */}
-      <Snackbar
-        open={showOfflineMessage}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        sx={{
-          '& .MuiSnackbarContent-root': {
-            backgroundColor: 'transparent',
-            boxShadow: 'none',
-            padding: 0
-          }
-        }}
+    <Box>
+      {/* Connection Status Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
       >
         <Alert
-          severity="warning"
-          icon={<WifiOff />}
+          severity={networkStatus.isOnline ? 'success' : 'warning'}
+          icon={connectionQuality.icon}
           sx={{
-            background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-            color: 'white',
-            minWidth: 350,
-            '& .MuiAlert-icon': { color: 'white' }
+            mb: 2,
+            border: '1px solid',
+            borderColor: `${theme.palette[connectionQuality.color as 'success' | 'warning' | 'error'].main}30`,
+            bgcolor: `${theme.palette[connectionQuality.color as 'success' | 'warning' | 'error'].main}08`
           }}
           action={
-            <Box display="flex" gap={1}>
-              <Button
-                size="small"
-                onClick={handleRetry}
-                sx={{ color: 'white', minWidth: 'auto' }}
-              >
-                <Refresh fontSize="small" />
-              </Button>
-              <Button
-                size="small"
-                onClick={handleDismissOffline}
-                sx={{ color: 'white' }}
-              >
-                ×
-              </Button>
-            </Box>
+            <Stack direction="row" spacing={1} alignItems="center">
+              {pendingSync > 0 && (
+                <Badge badgeContent={pendingSync} color="error">
+                  <CloudOffIcon fontSize="small" />
+                </Badge>
+              )}
+              {networkStatus.isOnline && pendingSync > 0 && (
+                <IconButton size="small" onClick={syncPendingData} disabled={syncing}>
+                  <SyncIcon sx={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
+                </IconButton>
+              )}
+            </Stack>
           }
         >
-          <Box>
-            <Typography variant="body2" fontWeight="bold">
-              {t('offline.title', 'You\'re offline')}
+          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+            {networkStatus.isOnline ? 
+              `Connected • ${connectionQuality.label} Connection` : 
+              'Offline Mode Active'
+            }
+          </Typography>
+          {!networkStatus.isOnline && hasOfflineGames && (
+            <Typography variant="body2">
+              {offlineData.games.length} games available offline
             </Typography>
-            <Typography variant="caption">
-              {t('offline.description', 'Some features may be limited. Your progress is saved locally.')}
-            </Typography>
+          )}
+        </Alert>
+      </motion.div>
+
+      {/* Offline Gaming Panel */}
+      <Card>
+        <CardContent>
+          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
+                  background: hasOfflineGames ? 
+                    `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.primary.main})` :
+                    `linear-gradient(135deg, ${theme.palette.grey[400]}, ${theme.palette.grey[600]})`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white'
+                }}
+              >
+                <StorageIcon />
+              </Box>
+              <Box>
+                <Typography variant="h6" gutterBottom>
+                  Offline Gaming
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {hasOfflineGames ? 
+                    `${offlineData.games.length} games cached • Last sync: ${lastSyncFormatted}` :
+                    'Download games to play offline'
+                  }
+                </Typography>
+              </Box>
+            </Box>
+            <Chip
+              label={hasOfflineGames ? 'Ready' : 'Setup Required'}
+              color={hasOfflineGames ? 'success' : 'default'}
+              variant={hasOfflineGames ? 'filled' : 'outlined'}
+            />
           </Box>
-        </Alert>
-      </Snackbar>
 
-      {/* Back Online Message */}
-      <Snackbar
-        open={showOnlineMessage}
-        autoHideDuration={3000}
-        onClose={() => setShowOnlineMessage(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert
-          severity="success"
-          icon={<Wifi />}
-          sx={{
-            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-            color: 'white',
-            '& .MuiAlert-icon': { color: 'white' }
-          }}
-        >
-          <Typography variant="body2">
-            {t('online.message', 'Back online! Syncing your progress...')}
-          </Typography>
-        </Alert>
-      </Snackbar>
+          {/* Download Progress */}
+          <AnimatePresence>
+            {downloading && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+              >
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="body2" gutterBottom>
+                    Downloading games for offline play...
+                  </Typography>
+                  <LinearProgress 
+                    variant="determinate" 
+                    value={downloadProgress}
+                    sx={{ 
+                      height: 8, 
+                      borderRadius: 4,
+                      bgcolor: theme.palette.grey[200],
+                      '& .MuiLinearProgress-bar': {
+                        borderRadius: 4,
+                        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+                      }
+                    }}
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    {Math.round(downloadProgress)}% complete
+                  </Typography>
+                </Box>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-      {/* Status Indicator in Corner (subtle) */}
-      {!isOnline && (
-        <Box
-          sx={{
-            position: 'fixed',
-            bottom: 16,
-            left: 16,
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            background: 'rgba(0, 0, 0, 0.8)',
-            color: 'white',
-            padding: '8px 12px',
-            borderRadius: 2,
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
-          }}
-        >
-          <CloudOff fontSize="small" />
-          <Typography variant="caption">
-            {t('offline.indicator', 'Offline')}
-          </Typography>
-        </Box>
-      )}
-    </>
+          {/* Action Buttons */}
+          <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+            {!hasOfflineGames ? (
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={downloadGamesForOffline}
+                disabled={!networkStatus.isOnline || downloading}
+                sx={{ flex: 1 }}
+              >
+                {downloading ? 'Downloading...' : 'Download Games'}
+              </Button>
+            ) : (
+              <>
+                <Button
+                  variant="contained"
+                  startIcon={<PlayArrowIcon />}
+                  href="/games"
+                  sx={{ flex: 1 }}
+                >
+                  Play Offline
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<DownloadIcon />}
+                  onClick={downloadGamesForOffline}
+                  disabled={!networkStatus.isOnline || downloading}
+                >
+                  Refresh
+                </Button>
+              </>
+            )}
+          </Stack>
+
+          {/* Advanced Details */}
+          <Box>
+            <Button
+              onClick={() => setShowDetails(!showDetails)}
+              startIcon={showDetails ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              size="small"
+              sx={{ mb: 1 }}
+            >
+              Details
+            </Button>
+
+            <Collapse in={showDetails}>
+              <Stack spacing={2}>
+                <Box>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>
+                    Cache Information
+                  </Typography>
+                  <Typography variant="body2">
+                    • Storage used: {cacheSize} KB
+                    <br />
+                    • Games cached: {offlineData.games.length}
+                    <br />
+                    • Pending sync: {pendingSync} items
+                    <br />
+                    • Connection: {networkStatus.effectiveType?.toUpperCase()} 
+                    {networkStatus.downlink > 0 && ` (${networkStatus.downlink} Mbps)`}
+                  </Typography>
+                </Box>
+
+                <Box display="flex" gap={1}>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={syncPendingData}
+                    disabled={!networkStatus.isOnline || syncing || pendingSync === 0}
+                    startIcon={<SyncIcon />}
+                  >
+                    Sync Now
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={clearOfflineData}
+                    color="error"
+                  >
+                    Clear Cache
+                  </Button>
+                </Box>
+              </Stack>
+            </Collapse>
+          </Box>
+        </CardContent>
+      </Card>
+
+      {/* CSS for spinning animation */}
+      <style>
+        {`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
+    </Box>
   );
 };
 

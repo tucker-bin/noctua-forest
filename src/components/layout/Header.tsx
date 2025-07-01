@@ -22,21 +22,21 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import MenuIcon from '@mui/icons-material/Menu';
-import TelescopeIcon from '@mui/icons-material/Visibility';
-import GroupsIcon from '@mui/icons-material/Groups';
-import ExploreIcon from '@mui/icons-material/Explore';
-import AutoStoriesIcon from '@mui/icons-material/AutoStories';
+import HomeIcon from '@mui/icons-material/Home';
+import GamesIcon from '@mui/icons-material/Games';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import StarIcon from '@mui/icons-material/Star';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useAuth } from '../../contexts/AuthContext';
 import { log } from '../../utils/logger';
 
 const navigationItems = [
-  { path: '/observatory', label: 'nav.observatory', icon: <TelescopeIcon /> },
-  { path: '/scriptorium', label: 'nav.scriptorium', icon: <GroupsIcon /> },
-  { path: '/lessons', label: 'nav.journey', icon: <ExploreIcon /> },
-  { path: '/achievements', label: 'nav.achievements', icon: <EmojiEventsIcon /> },
+  { path: '/', label: 'nav.home', icon: <HomeIcon /> },
+  { path: '/games', label: 'nav.games', icon: <GamesIcon /> },
+  { path: '/leaderboard', label: 'nav.rankings', icon: <TrendingUpIcon /> },
+  { path: '/profile', label: 'nav.profile', icon: <AccountCircleIcon /> },
+  { path: '/subscribe', label: 'nav.premium', icon: <StarIcon /> },
 ];
 
 export const Header: React.FC = () => {
@@ -190,75 +190,71 @@ export const Header: React.FC = () => {
             WebkitTextFillColor: 'transparent',
           }}
         >
-          Noctua Forest
+          RhymeTime Games
         </Typography>
 
         {!isMobile && (
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             {renderNavItems()}
+
+            <LanguageSwitcher />
+
+            {currentUser ? (
+              <>
+                <Tooltip title={currentUser.displayName || currentUser.email || t('nav.profile')}>
+                  <IconButton onClick={handleUserMenuClick} sx={{ ml: 2 }}>
+                    <Avatar
+                      src={currentUser.photoURL || undefined}
+                      alt={currentUser.displayName || 'User'}
+                      sx={{ width: 32, height: 32 }}
+                    >
+                      {currentUser.displayName?.[0] || currentUser.email?.[0] || 'U'}
+                    </Avatar>
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  anchorEl={userMenuAnchor}
+                  open={Boolean(userMenuAnchor)}
+                  onClose={handleUserMenuClose}
+                  PaperProps={{
+                    sx: {
+                      bgcolor: theme.palette.forest.card,
+                      backdropFilter: 'blur(10px)',
+                      border: `1px solid ${theme.palette.forest.border}30`,
+                    },
+                  }}
+                >
+                  <MenuItem onClick={() => { handleNavigate('/profile'); handleUserMenuClose(); }}>
+                    {t('nav.profile')}
+                  </MenuItem>
+                  <MenuItem onClick={() => { handleNavigate('/accounts'); handleUserMenuClose(); }}>
+                    {t('nav.settings')}
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={handleSignOut}>
+                    {t('nav.signOut')}
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Box sx={{ ml: 2 }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleNavigate('/signin')}
+                  sx={{ mr: 1 }}
+                >
+                  {t('nav.signIn')}
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => handleNavigate('/signup')}
+                >
+                  {t('nav.signUp')}
+                </Button>
+              </Box>
+            )}
           </Box>
         )}
-
-        <Box sx={{ display: 'flex', alignItems: 'center', ml: 2 }}>
-          <LanguageSwitcher />
-          
-          {!currentUser && !isMobile && (
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => navigate('/signin')}
-              sx={{
-                ml: 2,
-                borderColor: theme.palette.forest.blue,
-                color: theme.palette.forest.blue,
-                '&:hover': {
-                  borderColor: theme.palette.forest.blue,
-                  backgroundColor: `${theme.palette.forest.blue}20`,
-                },
-              }}
-            >
-              {t('nav.sign_in', 'Sign In')}
-            </Button>
-          )}
-          
-          <IconButton
-            onClick={handleUserMenuClick}
-            sx={{
-              ml: 1,
-              color: userMenuAnchor ? theme.palette.forest.primary : 'text.primary',
-            }}
-          >
-            <AccountCircleIcon />
-          </IconButton>
-        </Box>
-
-        <Menu
-          anchorEl={userMenuAnchor}
-          open={Boolean(userMenuAnchor)}
-          onClose={handleUserMenuClose}
-          PaperProps={{
-            sx: {
-              bgcolor: theme.palette.forest.card,
-              backdropFilter: 'blur(10px)',
-              border: `1px solid ${theme.palette.forest.border}50`,
-              mt: 1.5,
-            },
-          }}
-        >
-          {currentUser ? (
-            <>
-              <MenuItem onClick={() => { handleNavigate('/profile'); handleUserMenuClose(); }}>
-                {t('nav.profile')}
-              </MenuItem>
-              <Divider sx={{ borderColor: `${theme.palette.forest.border}30` }} />
-              <MenuItem onClick={handleSignOut}>{t('nav.sign_out')}</MenuItem>
-            </>
-          ) : (
-            <MenuItem onClick={() => { handleNavigate('/signin'); handleUserMenuClose(); }}>
-              {t('nav.sign_in')}
-            </MenuItem>
-          )}
-        </Menu>
 
         {renderMobileDrawer()}
       </Toolbar>

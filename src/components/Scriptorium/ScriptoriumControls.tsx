@@ -5,28 +5,41 @@ import { SongObservation } from './types';
 import ShareIcon from '@mui/icons-material/Share';
 import SaveIcon from '@mui/icons-material/Save';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import EditIcon from '@mui/icons-material/Edit';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { log } from '../../utils/logger';
 
 interface ScriptoriumControlsProps {
   observation: SongObservation;
+  onCreateLesson: () => void;
 }
 
-export const ScriptoriumControls: React.FC<ScriptoriumControlsProps> = ({ observation }) => {
+export const ScriptoriumControls: React.FC<ScriptoriumControlsProps> = ({ 
+  observation,
+  onCreateLesson
+}) => {
   const { t } = useTranslation();
   const { currentUser } = useAuth();
   const navigate = useNavigate();
 
   const handleShare = () => {
-    // Navigate to post creation with the observation data
+    // Share using Web Share API if available, otherwise fallback to copy
     log.info('Sharing song observation');
-    navigate('/forest/create-post', { 
-      state: { 
-        type: 'song',
-        observation 
-      } 
-    });
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `Song Analysis: ${observation.songDetails.title}`,
+        text: `Check out this analysis of "${observation.songDetails.title}" by ${observation.songDetails.artistName}`,
+        url: window.location.href
+      }).catch(console.error);
+    } else {
+      // Fallback: copy to clipboard
+      const shareText = `Song Analysis: "${observation.songDetails.title}" by ${observation.songDetails.artistName} - ${window.location.href}`;
+      navigator.clipboard.writeText(shareText).then(() => {
+        alert('Analysis link copied to clipboard!');
+      }).catch(console.error);
+    }
   };
 
   const handleSave = () => {
@@ -91,6 +104,21 @@ export const ScriptoriumControls: React.FC<ScriptoriumControlsProps> = ({ observ
             <SaveIcon />
           </IconButton>
         </Tooltip>
+
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<EditIcon />}
+          onClick={onCreateLesson}
+          sx={{
+            background: 'linear-gradient(45deg, #4ECDC4, #45B7D1)',
+            '&:hover': {
+              background: 'linear-gradient(45deg, #3DBCB3, #34A6C0)',
+            }
+          }}
+        >
+          {t('scriptorium.create_lesson', 'Create Lesson')}
+        </Button>
         
         <Button
           variant="contained"

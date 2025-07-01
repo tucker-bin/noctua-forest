@@ -45,37 +45,27 @@ export const settings = {
   models: {
     available: [
       {
-        id: 'claude-3-5-haiku-20241022',
-        name: 'Claude 3 Haiku',
+        id: 'claude-2.0',
+        name: 'Claude 2.0',
         provider: 'anthropic',
-        costPerToken: 0.00025, // $0.25 per 1K tokens
+        costPerToken: 0.00025,
         maxTokens: 4096,
         description: 'Fastest and most affordable - great for basic pattern detection',
         tier: 'basic',
         strengths: ['speed', 'cost-effective', 'simple patterns']
       },
       {
-        id: 'claude-3-5-sonnet-20241022',
-        name: 'Claude 3 Sonnet',
+        id: 'claude-2.1',
+        name: 'Claude 2.1',
         provider: 'anthropic',
-        costPerToken: 0.003, // $3 per 1K tokens
+        costPerToken: 0.003,
         maxTokens: 4096,
         description: 'Balanced performance and cost - ideal for most observations',
         tier: 'standard',
         strengths: ['balanced', 'reliable', 'cultural context']
-      },
-      {
-        id: 'claude-3-opus-20240229',
-        name: 'Claude 3 Opus',
-        provider: 'anthropic',
-        costPerToken: 0.015, // $15 per 1K tokens
-        maxTokens: 4096,
-        description: 'Most capable model - best for complex poetry and cultural analysis',
-        tier: 'premium',
-        strengths: ['complex patterns', 'cultural nuance', 'deep analysis']
       }
     ],
-    default: 'claude-3-5-sonnet-20241022',
+    default: 'claude-2.1',
     
     // Model selection logic
     getRecommendedModel: (textLength: number, language: string, complexity: 'simple' | 'standard' | 'complex' = 'standard') => {
@@ -84,11 +74,9 @@ export const settings = {
       const isComplexLanguage = ['ja', 'zh', 'ko', 'ar', 'he', 'fa', 'ur'].includes(language);
       
       if (complexity === 'complex' || isRTL || (isComplexLanguage && textLength > 500)) {
-        return 'claude-3-opus-20240229';
-      } else if (textLength > 1000 || complexity === 'standard') {
-        return 'claude-3-5-sonnet-20241022';
+        return 'claude-2.1';
       } else {
-        return 'claude-3-5-haiku-20241022';
+        return 'claude-2.0';
       }
     },
 

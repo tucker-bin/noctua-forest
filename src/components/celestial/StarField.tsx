@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Pattern } from '../../types/observatory';
+import { Pattern, Segment } from '../../types/observation';
 import { Box, Typography, Tooltip } from '@mui/material';
 
 interface StarFieldProps {
@@ -135,8 +135,7 @@ export const StarField: React.FC<StarFieldProps> = ({
         // Check if patterns share any text segments
         const hasSharedSegment = pattern.segments.some(seg1 =>
           otherPattern.segments.some(seg2 =>
-            Math.abs(seg1.globalStartIndex - seg2.globalStartIndex) < 20 ||
-            seg1.text.toLowerCase() === seg2.text.toLowerCase()
+            areSegmentsRelated(seg1, seg2)
           )
         );
         
@@ -147,6 +146,13 @@ export const StarField: React.FC<StarFieldProps> = ({
     });
     
     return connections;
+  };
+
+  const areSegmentsRelated = (seg1: Segment, seg2: Segment): boolean => {
+    return (
+      Math.abs(seg1.globalStartIndex - seg2.globalStartIndex) < 20 ||
+      seg1.text.toLowerCase() === seg2.text.toLowerCase()
+    );
   };
 
   const handleMouseMove = (event: React.MouseEvent, patternId: string) => {
@@ -396,7 +402,7 @@ export const StarField: React.FC<StarFieldProps> = ({
                   {pattern.type.charAt(0).toUpperCase() + pattern.type.slice(1)}
                 </Typography>
                 <Typography variant="caption" display="block">
-                  {pattern.segments.length} segments: {pattern.segments.map(s => s.text).join(', ')}
+                  {pattern.segments.length} segments: {pattern.segments.map((s: Segment) => s.text).join(', ')}
                 </Typography>
                 {pattern.acousticFeatures?.primaryFeature && (
                   <Typography variant="caption" display="block" sx={{ opacity: 0.8 }}>

@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
-import { Box, Typography } from '@mui/material';
-import { Pattern } from '../../types/observatory';
-import { getPatternColor } from './colorSystem';
+import React, { useMemo, useState } from 'react';
+import { Box, Typography, Tooltip } from '@mui/material';
+import { Pattern, Segment } from '../../types/observatory';
+import { getPatternColor, getPatternZIndex, getPatternSignificance } from './colorSystem';
 import { ObservatoryTheme } from './ObservatoryCustomizer';
 
 // Function to determine if text should be black or white based on background color
@@ -22,192 +22,196 @@ const getContrastTextColor = (backgroundColor: string): string => {
 };
 
 interface HighlightedTextProps {
-  originalText: string;
+  text: string;
   patterns: Pattern[];
-  activeFilters: Set<string>;
-  palette?: { [key: string]: string };
+  segments: Segment[];
+  showHighlights?: boolean;
+  onPatternClick?: (pattern: Pattern) => void;
+  onPatternHover?: (pattern: Pattern | null) => void;
   isLightTheme?: boolean;
   theme?: ObservatoryTheme;
 }
 
 export const HighlightedText: React.FC<HighlightedTextProps> = ({
-  originalText,
+  text,
   patterns,
-  activeFilters,
-  isLightTheme = false,
-  theme
+  segments,
+  showHighlights = true,
+  onPatternClick,
+  onPatternHover
 }) => {
-  // Split text into words with indices, preserving character positions and formatting
-  const words = useMemo(() => {
-    const result: Array<{ text: string; index: number; isWord: boolean; isLineBreak: boolean; startPos: number; endPos: number }> = [];
-    // Split on both whitespace and line breaks to preserve formatting
-    const parts = originalText.split(/(\s+|\n)/);
-    let currentPos = 0;
-    
-    parts.forEach((part, index) => {
-      const startPos = currentPos;
-      const endPos = currentPos + part.length;
-      
-      result.push({
-        text: part,
-        index,
-        isWord: /\S/.test(part),
-        isLineBreak: part.includes('\n'),
-        startPos,
-        endPos
-      });
-      
-      currentPos = endPos;
-    });
-    
-    return result;
-  }, [originalText]);
+  const [hoveredPattern, setHoveredPattern] = useState<Pattern | null>(null);
 
-  // Create word-to-patterns mapping using accurate character positions
-  const wordToPatterns = useMemo(() => {
-    const mapping = new Map<number, Pattern[]>();
+  // Create a map of character positions to patterns
+  const patternMap = useMemo(() => {
+    const map = new Map<number, Pattern[]>();
     
-    // Filter patterns based on active filters
-    const filteredPatterns = activeFilters.size === 0 
-      ? patterns 
-      : patterns.filter(pattern => activeFilters.has(pattern.type));
-    
-    filteredPatterns.forEach(pattern => {
-      pattern.segments.forEach(segment => {
-        const segmentStart = segment.startIndex;
-        const segmentEnd = segment.endIndex;
-        
-        // Find words that intersect with this pattern segment
-        words.forEach((word, wordIndex) => {
-          // Check if word intersects with pattern segment using actual character positions
-          if (word.startPos < segmentEnd && word.endPos > segmentStart) {
-            if (!mapping.has(wordIndex)) {
-              mapping.set(wordIndex, []);
-            }
-            mapping.get(wordIndex)!.push(pattern);
-          }
-        });
-      });
-    });
-    
-    return mapping;
-  }, [words, patterns, activeFilters]);
-
-  const getWordStyle = (wordIndex: number) => {
-    const hasPatterns = wordToPatterns.has(wordIndex);
-    
-    if (!hasPatterns) {
-      return {
-        color: theme?.textColor || (isLightTheme ? '#1a1a1a' : 'inherit')
+    // Sort patterns by significance and type priority
+    const sortedPatterns = [...patterns].sort((a, b) => {
+      const sigDiff = (b.significance || 0) - (a.significance || 0);
+      if (sigDiff !== 0) return sigDiff;
+      
+      // If significance is equal, use type priority
+      const typeOrder = {
+        'code_switching': 5,
+        'rhyme': 4,
+        'internal_rhyme': 3,
+        'alliteration': 2,
+        'assonance': 1
       };
-    }
-
-    // Show highlights by default - solid highlighter effect with theme customization
-    const patterns = wordToPatterns.get(wordIndex)!;
-    const primaryPattern = patterns[0];
-    const patternColor = getPatternColor(primaryPattern.type);
+      return (typeOrder[b.type as keyof typeof typeOrder] || 0) - 
+             (typeOrder[a.type as keyof typeof typeOrder] || 0);
+    });
     
-    return {
-      backgroundColor: patternColor,
-      color: getContrastTextColor(patternColor),
-      fontWeight: 'bold',
-      borderRadius: `${theme?.highlightBorderRadius || 4}px`,
-      padding: `${(theme?.highlightPadding || 6) / 2}px ${theme?.highlightPadding || 6}px`,
-      margin: '0 2px',
-      display: 'inline-block',
-      boxShadow: theme?.highlightShadow !== false 
-        ? (isLightTheme 
-          ? 'inset 0 -2px 0 rgba(0,0,0,0.2), 0 1px 3px rgba(0,0,0,0.1)' 
-          : 'inset 0 -2px 0 rgba(0,0,0,0.1)')
-        : 'none',
-      opacity: theme?.highlightOpacity || 1,
-    };
-  };
+    sortedPatterns.forEach(pattern => {
+      pattern.segments.forEach(segmentId => {
+        const segment = segments.find(s => s.id === segmentId);
+        if (segment) {
+          for (let i = segment.startIndex; i < segment.endIndex; i++) {
+            if (!map.has(i)) map.set(i, []);
+            map.get(i)!.push(pattern);
+          }
+        }
+      });
+    });
+    
+    return map;
+  }, [patterns, segments]);
 
-  // Generate background style from theme
-  const generateBackgroundStyle = () => {
-    if (!theme) return {};
+  // Render text with highlights
+  const renderText = () => {
+    if (!showHighlights) return text;
 
-    const baseStyle: React.CSSProperties = {
-      opacity: theme.backgroundOpacity,
-      filter: theme.backgroundBlur > 0 ? `blur(${theme.backgroundBlur}px)` : 'none'
-    };
+    const elements: JSX.Element[] = [];
+    let currentPos = 0;
 
-    switch (theme.backgroundType) {
-      case 'gradient':
-        return {
-          ...baseStyle,
-          background: `linear-gradient(${theme.gradientDirection}deg, ${theme.gradientColors[0]}, ${theme.gradientColors[1]})`
-        };
-      case 'image':
-        return {
-          ...baseStyle,
-          backgroundImage: `url(${theme.backgroundImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        };
-      case 'pattern':
-        return {
-          ...baseStyle,
-          backgroundColor: theme.backgroundColor,
-          backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0)`,
-          backgroundSize: '20px 20px'
-        };
-      default:
-        return {
-          ...baseStyle,
-          backgroundColor: theme.backgroundColor
-        };
+    while (currentPos < text.length) {
+      const patternsAtPos = patternMap.get(currentPos) || [];
+      
+      if (patternsAtPos.length === 0) {
+        // No pattern - render plain text
+        let plainTextEnd = currentPos + 1;
+        while (plainTextEnd < text.length && !patternMap.has(plainTextEnd)) {
+          plainTextEnd++;
+        }
+        elements.push(
+          <span key={`plain-${currentPos}`}>
+            {text.slice(currentPos, plainTextEnd)}
+          </span>
+        );
+        currentPos = plainTextEnd;
+      } else {
+        // Find the end of the current pattern segment
+        let patternEnd = currentPos + 1;
+        while (patternEnd < text.length && 
+               JSON.stringify(patternMap.get(patternEnd)) === JSON.stringify(patternsAtPos)) {
+          patternEnd++;
+        }
+
+        // Get all patterns at this position
+        const isHovered = patternsAtPos.some(p => hoveredPattern?.id === p.id);
+
+        // Create layered highlights for each pattern
+        const patternElements = patternsAtPos.map((pattern, idx) => {
+          const isPatternHovered = hoveredPattern?.id === pattern.id;
+          const zIndex = getPatternZIndex(pattern, isPatternHovered);
+          const significance = getPatternSignificance(pattern.type);
+          
+          return (
+            <span
+              key={`${pattern.id}-${idx}`}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0,
+                backgroundColor: getPatternColor(pattern.type),
+                opacity: significance,
+                zIndex,
+                transition: 'all 0.2s ease',
+                pointerEvents: 'none'
+              }}
+            />
+          );
+        });
+        
+        elements.push(
+          <Tooltip
+            key={`pattern-${currentPos}`}
+            title={
+              <Box>
+                {patternsAtPos.map((pattern, idx) => (
+                  <Box key={idx} sx={{ mb: idx < patternsAtPos.length - 1 ? 1 : 0 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: '50%',
+                          bgcolor: getPatternColor(pattern.type)
+                        }}
+                      />
+                      {pattern.type} ({Math.round((pattern.significance || 0) * 100)}%)
+                    </Typography>
+                    {pattern.description && (
+                      <Typography variant="body2">
+                        {pattern.description}
+                      </Typography>
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            }
+            arrow
+            placement="top"
+          >
+            <span
+              style={{
+                position: 'relative',
+                cursor: 'pointer',
+                padding: '0 1px',
+                borderRadius: '2px',
+                transition: 'all 0.2s ease',
+                boxShadow: isHovered ? '0 1px 3px rgba(0,0,0,0.2)' : 'none'
+              }}
+              onClick={() => onPatternClick?.(patternsAtPos[0])}
+              onMouseEnter={() => {
+                setHoveredPattern(patternsAtPos[0]);
+                onPatternHover?.(patternsAtPos[0]);
+              }}
+              onMouseLeave={() => {
+                setHoveredPattern(null);
+                onPatternHover?.(null);
+              }}
+            >
+              {patternElements}
+              <span style={{ position: 'relative', zIndex: 1 }}>
+                {text.slice(currentPos, patternEnd)}
+              </span>
+            </span>
+          </Tooltip>
+        );
+        currentPos = patternEnd;
+      }
     }
+
+    return elements;
   };
 
   return (
     <Box sx={{ 
-      mb: 3,
-      ...(theme && {
-        ...generateBackgroundStyle(),
-        padding: `${theme.padding}px`,
-        borderRadius: 2,
-        position: 'relative',
-        overflow: 'hidden'
-      })
+      fontFamily: 'monospace',
+      fontSize: '1.1rem',
+      lineHeight: 2,
+      whiteSpace: 'pre-wrap',
+      wordBreak: 'break-word',
+      letterSpacing: '0.02em',
+      '& > span': {
+        transition: 'all 0.2s ease'
+      }
     }}>
-      {/* Text display with highlights and custom formatting */}
-      <Typography 
-        variant="body1" 
-        sx={{ 
-          lineHeight: theme?.lineHeight || 2,
-          fontSize: theme?.fontSize ? `${theme.fontSize}px` : '1.1rem',
-          fontFamily: theme?.fontFamily || 'Georgia, serif',
-          fontWeight: theme?.fontWeight || 400,
-          color: theme?.textColor || (isLightTheme ? '#000000' : 'inherit'),
-          letterSpacing: theme?.letterSpacing ? `${theme.letterSpacing}px` : 'normal',
-          textAlign: theme?.textAlign || 'left',
-          maxWidth: theme?.maxWidth ? `${theme.maxWidth}px` : 'none',
-          mx: theme?.textAlign === 'center' ? 'auto' : 'initial',
-          whiteSpace: 'pre-wrap' // Preserve whitespace and line breaks
-        }}
-      >
-        {words.map((word, index) => {
-          if (word.isLineBreak) {
-            // Line break - render as actual line break
-            return <br key={index} />;
-          }
-          
-          if (!word.isWord) {
-            // Whitespace - render as-is
-            return <span key={index}>{word.text}</span>;
-          }
-
-          // Apply highlighting styles
-          return (
-            <span key={index} style={getWordStyle(index)}>
-              {word.text}
-            </span>
-          );
-        })}
-      </Typography>
+      {renderText()}
     </Box>
   );
 }; 

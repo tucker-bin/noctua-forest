@@ -44,7 +44,9 @@
       "popup_closed": "Sign-in cancelled",
       "google_signin_failed": "Failed to sign in with Google"
     },
-    "signin_with_google": "Sign in with Google"
+    "signin_with_google": "Sign in with Google",
+    "signup": "Sign Up Free",
+    "signin": "Sign In"
   },
   "invite_code_optional": "Invite Code (optional)",
   "signing_up": "Signing Up...",
@@ -96,6 +98,7 @@
     "licenses": "Licenses",
     "scriptorium": "Scriptorium",
     "flowFinder": "Flow Finder",
+    "daily_challenge": "Daily Challenges & Weekly Packs",
     "forest_map": "Forest Map",
     "profile": "Profile",
     "accounts": "Account Settings",
@@ -250,10 +253,13 @@
     "exportJson": "Export as JSON",
     "exportText": "Export as Text",
     "exportCsv": "Export as CSV",
+    "save": "Save Observation",
     "share": "Share",
     "shareTooltip": "Share your analysis",
     "copiedToClipboard": "Analysis copied to clipboard!",
     "clear": "Clear Analysis",
+    "expandText": "Expand text view",
+    "collapseText": "Collapse text view",
     "analysis": {
       "rhymeScheme": "Rhyme Scheme",
       "rhymeSchemePattern": "Pattern",
@@ -264,102 +270,56 @@
   },
   "patterns": {
     "rhyme": {
-      "title": "End Rhyme",
-      "description": "Words that share similar ending sounds, creating musical harmony in the text.",
-      "example": "light/night, dream/stream"
-    },
-    "slant_rhyme": {
-      "title": "Slant Rhyme",
-      "description": "Words with similar but not identical sounds, creating subtle sonic connections.",
-      "example": "soul/all, eyes/light"
-    },
-    "internal_rhyme": {
-      "title": "Internal Rhyme",
-      "description": "Rhyming words within the same line or nearby lines.",
-      "example": "I cry and sigh in the twilight sky"
+      "name": "Rhyme",
+      "description": "Words with similar ending sounds."
     },
     "assonance": {
-      "title": "Assonance",
-      "description": "Repetition of similar vowel sounds within words, creating internal melody.",
-      "example": "deep sea, fleet feet"
+      "name": "Assonance",
+      "description": "Repetition of vowel sounds."
     },
     "consonance": {
-      "title": "Consonance",
-      "description": "Repetition of consonant sounds, often creating texture in the text.",
-      "example": "pitter patter, whisper whistle"
+      "name": "Consonance",
+      "description": "Repetition of consonant sounds."
     },
     "alliteration": {
-      "title": "Alliteration",
-      "description": "Repetition of initial consonant sounds in nearby words.",
-      "example": "sweet summer sun"
-    },
-    "sibilance": {
-      "title": "Sibilance",
-      "description": "Repetition of 's' and 'sh' sounds, creating a hushing or whistling effect.",
-      "example": "soft silver shadows sliding silently"
-    },
-    "plosive": {
-      "title": "Plosive Sounds",
-      "description": "Repetition of explosive consonants (p, b, t, d, k, g), adding percussive effects.",
-      "example": "the proud peacock pranced"
-    },
-    "liquid_consonants": {
-      "title": "Liquid Consonants",
-      "description": "Repetition of flowing sounds (l, r), creating smooth, fluid effects.",
-      "example": "lovely lilies line the lake"
-    },
-    "nasal_consonants": {
-      "title": "Nasal Consonants",
-      "description": "Repetition of nasal sounds (m, n, ng), adding resonance.",
-      "example": "morning mist making memories"
+      "name": "Alliteration",
+      "description": "Words with the same starting sounds."
     },
     "rhythm": {
-      "title": "Rhythmic Pattern",
-      "description": "Regular patterns of stressed and unstressed syllables creating a musical beat.",
-      "example": "DA-dum DA-dum DA-dum"
+      "name": "Rhythm",
+      "description": "A strong, regular repeated pattern of sound."
     },
-    "meter": {
-      "title": "Metrical Pattern",
-      "description": "Specific arrangements of stressed and unstressed syllables in formal patterns.",
-      "subtypes": {
-        "iambic": "Unstressed followed by stressed (da-DUM)",
-        "trochaic": "Stressed followed by unstressed (DUM-da)",
-        "anapestic": "Two unstressed followed by stressed (da-da-DUM)",
-        "dactylic": "Stressed followed by two unstressed (DUM-da-da)"
-      }
+    "sibilance": {
+      "name": "Sibilance",
+      "description": "Repetition of 's' or 'sh' sounds."
     },
-    "caesura": {
-      "title": "Caesura",
-      "description": "Natural pauses or breaks in the rhythm, creating emphasis or pacing.",
-      "example": "The woods are lovely || dark and deep"
+    "internal_rhyme": {
+      "name": "Internal Rhyme",
+      "description": "Rhyming words within the same line."
     },
-    "enjambment": {
-      "title": "Enjambment",
-      "description": "Continuation of a sentence beyond the line break, creating flow and tension.",
-      "example": "The morning light\nbreaks through clouds"
+    "slant_rhyme": {
+      "name": "Slant Rhyme",
+      "description": "Words with similar but not identical sounds."
+    },
+    "repetition": {
+      "name": "Repetition",
+      "description": "Repeating a word or phrase."
     },
     "parallelism": {
-      "title": "Sound Parallelism",
-      "description": "Similar sound patterns repeated in parallel structures.",
-      "example": "singing sweetly, moving meetly"
+      "name": "Parallelism",
+      "description": "Similar grammatical structures."
     },
-    "onomatopoeia": {
-      "title": "Onomatopoeia",
-      "description": "Words that phonetically imitate the sound they describe.",
-      "example": "buzz, hiss, clang"
+    "sound_parallelism": {
+      "name": "Sound Parallelism",
+      "description": "Parallel structures with similar sounds."
     },
-    "euphony": {
-      "title": "Euphony",
-      "description": "Harmonious combination of sounds that are pleasing to the ear.",
-      "example": "murmuring morning meadows"
+    "meter": {
+      "name": "Meter",
+      "description": "The rhythmic structure of a line."
     },
-    "cacophony": {
-      "title": "Cacophony",
-      "description": "Harsh or discordant sound combinations for dramatic effect.",
-      "example": "grating, scratching, clashing"
-    },
-    "generic": {
-      "description": "A recurring sound pattern in the text."
+    "caesura": {
+      "name": "Caesura",
+      "description": "A pause or break in a line of poetry."
     }
   },
   "features": {
@@ -448,15 +408,19 @@
     "back_to_forest": "Back to Home",
     "areas": {
       "observatory": "Observatory",
-      "observatory_desc": "Find patterns in your text",
-      "community": "Community",
-      "community_desc": "Share your discoveries with others",
+      "observatory_desc": "Discover patterns hidden in text under the starlit canopy",
+      "community": "Community Forest",
+      "community_desc": "Share discoveries and connect with fellow observers",
       "stargazing": "Connect",
       "stargazing_desc": "Meet other users and creators",
-      "pathways": "Learn",
-      "pathways_desc": "Take lessons to improve your skills",
+      "pathways": "Learning Pathways",
+      "pathways_desc": "Follow guided trails to deepen your observation skills",
       "scriptorium": "Song Scriptorium",
-      "scriptorium_desc": "Discover patterns in music and lyrics"
+      "scriptorium_desc": "Discover patterns in music and lyrics",
+      "games": "Game Grove",
+      "games_desc": "Challenge your mind with word puzzles and pattern games",
+      "achievements": "Achievement Hall",
+      "achievements_desc": "Celebrate your journey and unlock new milestones"
     },
     "pathways_coming_soon": "Learning lessons coming soon...",
     "pathways_description": "Learn through guided lessons and practice",
@@ -480,6 +444,15 @@
     "owl_encouragement": "You're doing great! Keep going!",
     "path_complete": "Congratulations! You finished all lessons in this path.",
     "unlock_more": "Complete previous lessons to unlock more.",
+    "signup_prompt_title": "Unlock Your Learning Journey!",
+    "signup_prompt_message": "Sign up for free to access all lessons, track your progress, and earn more Observatory observations. Join thousands of language explorers discovering the hidden patterns in text!",
+    "modal": {
+      "title": "Ready to Learn More?",
+      "description": "You've explored your free example! Our lessons teach you how to find these patterns yourself and unlock more Observatory observations.",
+      "benefits": "✨ Learn pattern recognition techniques\n🔍 Earn more free Observatory uses\n🌟 Track your progress and achievements",
+      "visit_lessons": "Visit Lessons",
+      "maybe_later": "Maybe Later"
+    },
     "celestial_observer": {
       "first_light": {
         "title": "Getting Started: Introduction to Pattern Finding"
@@ -503,16 +476,65 @@
     "lesson_encouragement": "Let's learn something new!"
   },
   "onboarding": {
-    "welcome_title": "Welcome to Noctua Forest",
-    "welcome_description": "I'm Orion, your guide to finding patterns in text. We'll help you discover interesting patterns in language and writing.",
-    "welcome_owl": "I'm here to help you learn!",
-    "first_lesson_title": "Your First Lesson",
-    "first_lesson_description": "We'll start simple. Just like learning to notice details, we'll begin by looking and learning.",
-    "first_lesson_owl": "Ready to find your first patterns?",
-    "ready_title": "Ready to Start",
-    "ready_description": "Take your time and enjoy learning. I'll help you every step of the way.",
-    "ready_owl": "Let's get started!",
-    "start_journey": "Start First Lesson"
+    "welcome_title": "Welcome to Noctua Forest! 🦉",
+    "welcome_message": "Welcome to Noctua Forest! I'm Noctua, your guide to finding patterns in your text.",
+    "welcome_owl_message": "Hoot! I'm excited to show you how language comes alive with hidden patterns. Think of me as your cosmic guide through the forest of words!",
+    
+    "toolkit_title": "Your Pattern Discovery Toolkit 🔍",
+    "toolkit_message": "The Observatory is your main tool for discovering patterns in any text—from song lyrics to poetry to your own writing.",
+    "toolkit_owl_message": "Try this example: 'The rain in Spain stays mainly in the plain' - I'll show you the amazing sound patterns hidden inside!",
+    
+    "path_title": "Choose Your Adventure Path 🌟",
+    "path_message": "Whether you're a poet, songwriter, language learner, or just curious, there's a path for you to explore.",
+    "path_owl_message": "Want a quick test? Paste these lyrics: 'I see trees of green, red roses too' and watch me find the vowel patterns that make it so musical!",
+    
+    "journey_title": "Ready to Begin? 🚀",
+    "journey_message": "You're all set to start discovering the hidden music in language. Every word has a story to tell!",
+    "journey_owl_message": "Here's a fun starter: 'Peter Piper picked a peck of pickled peppers' - classic alliteration! Try it and see what other patterns I can find.",
+    
+    "consent_title": "Privacy & Terms",
+    "consent_message": "Please review and accept our terms to complete your setup and start exploring.",
+    "consent_terms": "I accept the Terms of Service",
+    "consent_privacy": "I accept the Privacy Policy", 
+    "consent_data": "I consent to data processing for pattern analysis",
+    "example_loaded": "Example text loaded! Click 'Find Patterns' to see what patterns are hidden inside."
+  },
+  "examples": {
+    "beginner": {
+      "title": "Try These Beginner Examples:",
+      "rain_spain": "The rain in Spain stays mainly in the plain",
+      "peter_piper": "Peter Piper picked a peck of pickled peppers",
+      "roses_red": "Roses are red, violets are blue",
+      "twinkle_star": "Twinkle, twinkle, little star"
+    },
+    "intermediate": {
+      "title": "Ready for More Complex Patterns?",
+      "shakespeare": "Shall I compare thee to a summer's day?",
+      "song_lyrics": "I see trees of green, red roses too",
+      "tongue_twister": "She sells seashells by the seashore",
+      "poetry": "Once upon a midnight dreary, while I pondered, weak and weary"
+    },
+    "advanced": {
+      "title": "Challenge Yourself:",
+      "rap_lyrics": "Started from the bottom now we're here",
+      "multilingual": "Hello, hola, bonjour, guten Tag",
+      "free_verse": "In the silence between raindrops, whispers dance on autumn leaves",
+      "technical": "Alliteration amplifies auditory appeal through artful arrangement"
+    }
+  },
+  "quick_start": {
+    "title": "Quick Start Guide",
+    "step1": "1. Enter any text in the Observatory",
+    "step2": "2. Click 'Find Patterns' to analyze",
+    "step3": "3. Hover over highlighted words to explore",
+    "step4": "4. Click patterns in the legend for details",
+    "or_try": "Or try one of these examples:",
+    "test_phrases": [
+      "The rain in Spain stays mainly in the plain",
+      "Peter Piper picked a peck of pickled peppers", 
+      "I see trees of green, red roses too",
+      "Shall I compare thee to a summer's day?"
+    ]
   },
   "common": {
     "back": "Back",
@@ -687,13 +709,18 @@
     "onboarding_reset": "Onboarding has been reset. It will show again on your next visit."
   },
   "nav": {
+    "home": "Home",
+    "games": "Games",
+    "rankings": "Rankings",
+    "profile": "Profile",
+    "premium": "Premium",
     "observatory": "Observatory",
     "forest": "Forest",
     "community": "Community",
     "learn": "Learn",
-    "profile": "Profile",
     "achievements": "Achievements",
     "scriptorium": "Scriptorium",
+    "flowFinder": "Flow Finder",
     "journey": "Journey",
     "sign_in": "Sign In",
     "sign_out": "Sign Out"

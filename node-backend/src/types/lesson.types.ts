@@ -1,7 +1,23 @@
-export type LearningPath = 'explorer' | 'navigator';
+import { PatternType } from './observation';
+
+export type LearningPath = 'celestial-observer' | 'pattern-navigator' | 'cultural-astronomer';
+
+export interface PatternGroup {
+  id: string;
+  title: string;
+  description: string;
+  patterns: Array<{
+    type: PatternType;
+    examples: string[];
+    explanation: string;
+    significance: number;
+  }>;
+  learningObjective: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+}
 
 export interface LessonSection {
-  type: 'welcome' | 'practice' | 'examples' | 'exercise';
+  type: 'welcome' | 'practice' | 'examples' | 'exercise' | 'pattern_sequence';
   title: string;
   content: string;
   examples?: Array<{
@@ -14,6 +30,14 @@ export interface LessonSection {
     correctAnswer: string;
     hint?: string;
   }>;
+  learningObjective?: string;
+  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  patterns?: Array<{
+    type: PatternType;
+    examples: string[];
+    explanation: string;
+    significance: number;
+  }>;
 }
 
 export interface Lesson {
@@ -23,6 +47,8 @@ export interface Lesson {
   title: string;
   description: string;
   order: number;
+  duration: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
   content: {
     sections: LessonSection[];
   };
@@ -38,6 +64,7 @@ export interface LessonProgress {
   lessonId: string;
   path: LearningPath;
   status: 'started' | 'completed';
+  progress: number; // 0-100
   exercises: Array<{
     exerciseId: string;
     completed: boolean;
@@ -51,16 +78,46 @@ export interface LessonProgress {
 
 export interface UserProgress {
   currentPath: LearningPath;
-  progress: {
-    explorer: {
+  paths: {
+    [key in LearningPath]: {
       completedLessons: string[];
       currentLesson: string | null;
-      progress: number;
-    };
-    navigator: {
-      completedLessons: string[];
-      currentLesson: string | null;
-      progress: number;
+      totalProgress: number;
     };
   };
+}
+
+export interface ScriptoriumLesson extends Lesson {
+  sourceAnalysis: {
+    songDetails: {
+      title: string;
+      artist: string;
+      album?: string;
+    };
+    patterns: Array<{
+      type: PatternType;
+      examples: string[];
+      explanation: string;
+      significance: number;
+    }>;
+    emotionalAnalysis?: {
+      emotions: Array<{
+        name: string;
+        value: number;
+      }>;
+    };
+    culturalContext?: string;
+  };
+  exercises: Array<{
+    type: 'pattern_recognition' | 'cultural_context' | 'emotional_analysis';
+    question: string;
+    options?: string[];
+    correctAnswer: string;
+    explanation: string;
+  }>;
+}
+
+export interface LessonWithStatus extends Lesson {
+  status: 'draft' | 'published';
+  userId?: string;
 } 

@@ -1,222 +1,432 @@
 import React, { useState } from 'react';
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  Grid, 
+  Card, 
+  CardContent, 
+  Button, 
+  Chip, 
+  Stack,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Alert,
+  LinearProgress,
+  useTheme
+} from '@mui/material';
+import { 
+  CheckCircle as CheckIcon,
+  Cancel as CancelIcon,
+  Star as StarIcon,
+  Speed as SpeedIcon,
+  Psychology as PsychologyIcon,
+  Groups as GroupsIcon,
+  School as SchoolIcon,
+  Token as TokenIcon,
+  EmojiEvents as TrophyIcon,
+  LocalFireDepartment as StreakIcon
+} from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
+import { useUsage } from '../contexts/UsageContext';
+import { useExperience } from '../contexts/ExperienceContext';
 import { CryptoPaymentModal } from './modals/CryptoPaymentModal';
 import { log } from '../utils/logger';
-import { useAuth } from '../contexts/AuthContext';
 
-interface Plan {
+interface PlanFeature {
   name: string;
-  price: string;
-  priceFrequency: string;
-  features: {
-    name: string;
-    included: boolean;
+  free: boolean | string | number;
+  premium: boolean | string | number;
+  icon: React.ReactElement;
     highlight?: boolean;
-  }[];
-  color: 'primary' | 'success' | 'warning';
-  isPopular?: boolean;
 }
 
-const plans: Plan[] = [
+const PLAN_FEATURES: PlanFeature[] = [
   {
-    name: "Free",
-    price: "$0",
-    priceFrequency: "/month",
-    features: [
-      { name: "5 initial analyses (anonymous)", included: true },
-      { name: "1 daily analysis (anonymous)", included: true },
-      { name: "10 analyses/month (signed-in)", included: true },
-      { name: "Standard rhyme detection", included: true },
-      { name: "Community support", included: true },
-      { name: "Advanced rhyme patterns", included: false },
-      { name: "Analysis history", included: false },
-      { name: "Ad-free experience", included: false },
-      { name: "Email support", included: false },
-      { name: "Priority support", included: false },
-      { name: "Early access to new features", included: false },
-    ],
-    color: "primary",
+    name: 'Daily Token Allowance',
+    free: '5 tokens',
+    premium: '20 tokens',
+    icon: <TokenIcon />,
+    highlight: true
   },
   {
-    name: "Rhyme Enthusiast",
-    price: "$1.89", // Reduced from $7
-    priceFrequency: "/month",
-    features: [
-      { name: "5 initial analyses (anonymous)", included: true },
-      { name: "1 daily analysis (anonymous)", included: true },
-      { name: "10 analyses/month (signed-in)", included: true },
-      { name: "Standard rhyme detection", included: true },
-      { name: "Community support", included: true },
-      { name: "Advanced rhyme patterns", included: true, highlight: true },
-      { name: "Analysis history (30 days)", included: true, highlight: true },
-      { name: "Ad-free experience", included: true },
-      { name: "Email support", included: true },
-      { name: "Priority support", included: false },
-      { name: "Early access to new features", included: false },
-    ],
-    color: "success",
-    isPopular: true,
+    name: 'Observatory Analysis',
+    free: 'Basic patterns',
+    premium: 'Advanced patterns + AI insights',
+    icon: <PsychologyIcon />,
+    highlight: true
   },
   {
-    name: "Pro Poet",
-    price: "$4.05", // Reduced from $15
-    priceFrequency: "/month",
-    features: [
-      { name: "5 initial analyses (anonymous)", included: true },
-      { name: "1 daily analysis (anonymous)", included: true },
-      { name: "10 analyses/month (signed-in)", included: true },
-      { name: "Standard rhyme detection", included: true },
-      { name: "Community support", included: true },
-      { name: "Advanced rhyme patterns", included: true },
-      { name: "Analysis history (30 days)", included: true },
-      { name: "Ad-free experience", included: true },
-      { name: "Email support", included: true },
-      { name: "Priority support", included: true, highlight: true },
-      { name: "Early access to new features", included: true, highlight: true },
-    ],
-    color: "warning",
+    name: 'Scriptorium (Music Tool)',
+    free: 'Demo mode only',
+    premium: 'Full access + lyrics lookup',
+    icon: <SpeedIcon />,
+    highlight: true
   },
+  {
+    name: 'Analysis History',
+    free: false,
+    premium: 'Unlimited saves',
+    icon: <CheckIcon />
+  },
+  {
+    name: 'XP & Achievement Bonuses',
+    free: 'Standard rates',
+    premium: '2x XP + exclusive achievements',
+    icon: <TrophyIcon />,
+    highlight: true
+  },
+  {
+    name: 'Streak Rewards',
+    free: 'Basic rewards',
+    premium: 'Premium bonuses + token gifts',
+    icon: <StreakIcon />
+  },
+  {
+    name: 'Token Gifting',
+    free: false,
+    premium: 'Gift tokens to other users',
+    icon: <GroupsIcon />
+  },
+  {
+    name: 'Learning Paths',
+    free: 'Basic lessons',
+    premium: 'Advanced courses + personalized',
+    icon: <SchoolIcon />
+  },
+  {
+    name: 'Community Features',
+    free: 'View public observations',
+    premium: 'Share, comment, collaborate',
+    icon: <GroupsIcon />
+  },
+  {
+    name: 'Support',
+    free: 'Community forums',
+    premium: 'Priority email support',
+    icon: <CheckIcon />
+  }
 ];
 
 export const PlanComparison: React.FC = () => {
+  const { t } = useTranslation();
+  const theme = useTheme();
   const { currentUser } = useAuth();
+  const { usageInfo } = useUsage();
+  const { tokens, dailyTokens, maxDailyTokens, xp, level, streak, isPremium } = useExperience();
+  
   const [cryptoModalOpen, setCryptoModalOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<{ type: 'enthusiast' | 'pro', amount: number } | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<{ type: 'premium', amount: number } | null>(null);
 
-  const handleCryptoPay = (planType: 'enthusiast' | 'pro', amount: number) => {
-    setSelectedPlan({ type: planType, amount });
+  const handleCryptoPay = () => {
+    setSelectedPlan({ type: 'premium', amount: 4.05 });
     setCryptoModalOpen(true);
   };
 
-  const handleStripePayment = async (planType: string, amount: number) => {
+  const handleStripePayment = async () => {
     log.userAction('Stripe payment initiated', { 
-      planType, 
-      amount,
+      planType: 'premium',
+      amount: 4.05,
       userId: currentUser?.uid 
     });
     
-    // Implement Stripe payment logic here
-    // This would typically redirect to Stripe Checkout or use Stripe Elements
+    // TODO: Implement Stripe payment logic
+    console.log('Stripe payment would be initiated here');
+  };
+
+  const renderFeatureValue = (value: boolean | string | number, isPremiumPlan: boolean) => {
+    if (typeof value === 'boolean') {
+      return value ? (
+        <CheckIcon color="success" fontSize="small" />
+      ) : (
+        <CancelIcon color="disabled" fontSize="small" />
+      );
+    }
+    
+    return (
+      <Typography 
+        variant="body2" 
+        color={isPremiumPlan && typeof value === 'string' ? 'primary' : 'text.secondary'}
+        fontWeight={isPremiumPlan && typeof value === 'string' ? 600 : 400}
+      >
+        {value}
+      </Typography>
+    );
   };
 
   return (
-    <div className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Choose Your Plan
-          </h2>
-          <p className="text-lg text-gray-600">
-            Unlock the full potential of pattern observation with our flexible pricing options
-          </p>
-        </div>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Typography variant="h3" sx={{ 
+          fontWeight: 700, 
+          mb: 2,
+          background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+        }}>
+          {t('subscription.title', 'Unlock Your Creative Potential')}
+        </Typography>
+        <Typography variant="h6" color="text.secondary" sx={{ maxWidth: 600, mx: 'auto' }}>
+          {t('subscription.subtitle', 'Choose the plan that fits your creative journey')}
+        </Typography>
+      </Box>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {plans.map((plan, index) => (
-            <div
-              key={plan.name}
-              className={`bg-white rounded-lg shadow-lg overflow-hidden relative ${
-                plan.isPopular ? 'ring-2 ring-blue-500' : ''
-              }`}
-            >
-              {plan.isPopular && (
-                <div className="bg-blue-500 text-white text-center py-2 text-sm font-medium">
-                  Most Popular
-                </div>
-              )}
-              
-              <div className="p-6">
-                <div className="text-center mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                  <div className="mb-4">
-                    <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                    <span className="text-gray-600">{plan.priceFrequency}</span>
-                  </div>
-                </div>
+      {/* Current Status for Authenticated Users */}
+      {currentUser && (
+        <Alert 
+          severity={isPremium ? 'success' : 'info'} 
+          sx={{ mb: 4, borderRadius: 2 }}
+          icon={isPremium ? <StarIcon /> : <TokenIcon />}
+        >
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <Box>
+              <Typography variant="subtitle1" fontWeight={600}>
+                {isPremium ? 'Premium Member' : 'Free Plan Active'}
+              </Typography>
+              <Typography variant="body2">
+                {isPremium 
+                  ? `Level ${level} • ${tokens} tokens • ${streak} day streak`
+                  : `${dailyTokens}/${maxDailyTokens} daily tokens used • Level ${level}`
+                }
+              </Typography>
+            </Box>
+            {!isPremium && (
+              <Box sx={{ minWidth: 120 }}>
+                <Typography variant="caption" color="text.secondary">
+                  Daily Usage
+                </Typography>
+                <LinearProgress 
+                  variant="determinate" 
+                  value={(dailyTokens / maxDailyTokens) * 100}
+                  sx={{ mt: 0.5 }}
+                />
+              </Box>
+            )}
+          </Box>
+        </Alert>
+      )}
 
-                <ul className="space-y-3 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <li key={featureIndex} className="flex items-start">
-                      <div className={`flex-shrink-0 w-5 h-5 rounded-full mr-3 mt-0.5 ${
-                        feature.included 
-                          ? 'bg-green-500 text-white flex items-center justify-center'
-                          : 'bg-gray-200'
-                      }`}>
-                        {feature.included && (
-                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        )}
-                      </div>
-                      <span className={`text-sm ${
-                        feature.included ? 'text-gray-900' : 'text-gray-400'
-                      } ${
-                        feature.highlight ? 'font-semibold' : ''
-                      }`}>
+      {/* Plans Comparison */}
+      <Grid container spacing={4} sx={{ mb: 6 }}>
+        {/* Free Plan */}
+        <Grid item xs={12} md={6}>
+          <Card 
+            sx={{ 
+              height: '100%',
+              border: '2px solid',
+              borderColor: 'grey.300',
+              position: 'relative'
+            }}
+          >
+            <CardContent sx={{ p: 4 }}>
+              <Box sx={{ textAlign: 'center', mb: 3 }}>
+                <Typography variant="h4" fontWeight={700}>
+                  Free
+                </Typography>
+                <Typography variant="h3" sx={{ my: 2 }}>
+                  $0<Typography component="span" variant="h6" color="text.secondary">/month</Typography>
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Perfect for getting started
+                </Typography>
+              </Box>
+
+              <List dense>
+                {PLAN_FEATURES.map((feature, index) => (
+                  <ListItem key={index} sx={{ px: 0 }}>
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {feature.icon}
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary={feature.name}
+                      secondary={renderFeatureValue(feature.free, false)}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+
+              <Button
+                fullWidth
+                variant="outlined"
+                size="large"
+                disabled={currentUser ? !isPremium : false}
+                sx={{ mt: 3 }}
+              >
+                {currentUser && !isPremium ? 'Current Plan' : 'Get Started Free'}
+              </Button>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Premium Plan */}
+        <Grid item xs={12} md={6}>
+          <Card 
+            sx={{ 
+              height: '100%',
+              border: '3px solid',
+              borderColor: 'primary.main',
+              position: 'relative',
+              background: `linear-gradient(135deg, ${theme.palette.primary.main}08, ${theme.palette.secondary.main}08)`
+            }}
+          >
+            <Chip
+              label="Most Popular"
+              color="primary"
+              sx={{
+                position: 'absolute',
+                top: -12,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                fontWeight: 600
+              }}
+            />
+            
+            <CardContent sx={{ p: 4 }}>
+              <Box sx={{ textAlign: 'center', mb: 3 }}>
+                <Typography variant="h4" fontWeight={700} color="primary">
+                  Premium
+                </Typography>
+                <Typography variant="h3" sx={{ my: 2 }}>
+                  $4.05<Typography component="span" variant="h6" color="text.secondary">/month</Typography>
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  For serious creative explorers
+                </Typography>
+              </Box>
+
+              <List dense>
+                {PLAN_FEATURES.map((feature, index) => (
+                  <ListItem key={index} sx={{ px: 0 }}>
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {feature.icon}
+                    </ListItemIcon>
+                    <ListItemText 
+                      primary={
+                        <Typography 
+                          variant="body2" 
+                          fontWeight={feature.highlight ? 600 : 400}
+                          color={feature.highlight ? 'primary' : 'text.primary'}
+                        >
                         {feature.name}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                        </Typography>
+                      }
+                      secondary={renderFeatureValue(feature.premium, true)}
+                    />
+                  </ListItem>
+                ))}
+              </List>
 
-                {plan.name !== 'Free' && (
-                  <div className="space-y-3">
-                    <button
-                      onClick={() => handleStripePayment(
-                        plan.name === 'Rhyme Enthusiast' ? 'enthusiast' : 'pro',
-                        parseFloat(plan.price.replace('$', ''))
-                      )}
-                      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
-                        plan.color === 'success'
-                          ? 'bg-green-600 hover:bg-green-700 text-white'
-                          : plan.color === 'warning'
-                          ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                          : 'bg-blue-600 hover:bg-blue-700 text-white'
-                      }`}
-                    >
-                      Pay with Card
-                    </button>
-                    
-                    <button
-                      onClick={() => handleCryptoPay(
-                        plan.name === 'Rhyme Enthusiast' ? 'enthusiast' : 'pro',
-                        parseFloat(plan.price.replace('$', ''))
-                      )}
-                      className="w-full py-2 px-4 rounded-lg font-medium border-2 border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition-colors"
+              {!isPremium && (
+                <Stack spacing={2} sx={{ mt: 3 }}>
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    onClick={handleStripePayment}
+                    sx={{ fontWeight: 600 }}
+                  >
+                    Upgrade with Card
+                  </Button>
+                  
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    size="large"
+                    onClick={handleCryptoPay}
                     >
                       Pay with Crypto
-                    </button>
-                  </div>
-                )}
+                  </Button>
+                </Stack>
+              )}
 
-                {plan.name === 'Free' && (
-                  <button className="w-full py-2 px-4 rounded-lg font-medium bg-gray-100 text-gray-500 cursor-not-allowed">
-                    Current Plan
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+              {isPremium && (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  disabled
+                  sx={{ mt: 3 }}
+                >
+                  Current Plan ✨
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-        <div className="text-center mt-12">
-          <p className="text-sm text-gray-600 mb-4">
-            💰 Pay with Bitcoin, Ethereum, Litecoin, and other major cryptocurrencies
-          </p>
-          <p className="text-xs text-gray-500">
-            All prices are in USD. Cryptocurrency payments are processed instantly and securely.
-          </p>
-        </div>
-      </div>
+      {/* Anonymous User CTA */}
+      {!currentUser && (
+        <Alert severity="info" sx={{ mb: 4 }}>
+          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+            🎯 New to Noctua Forest?
+          </Typography>
+          <Typography variant="body2">
+            Try our free example in the Observatory first, then sign up to unlock your daily tokens and start your creative journey!
+          </Typography>
+        </Alert>
+      )}
 
+      {/* Value Propositions */}
+      <Box sx={{ textAlign: 'center', mb: 6 }}>
+        <Typography variant="h5" fontWeight={600} gutterBottom>
+          Why Upgrade to Premium?
+        </Typography>
+        <Grid container spacing={3} sx={{ mt: 2 }}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Box sx={{ p: 2 }}>
+              <TokenIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+              <Typography variant="h6" fontWeight={600}>4x More Tokens</Typography>
+              <Typography variant="body2" color="text.secondary">
+                20 daily tokens vs 5 free tokens
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Box sx={{ p: 2 }}>
+              <PsychologyIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+              <Typography variant="h6" fontWeight={600}>Advanced AI</Typography>
+              <Typography variant="body2" color="text.secondary">
+                Deeper pattern analysis with AI insights
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Box sx={{ p: 2 }}>
+              <TrophyIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+              <Typography variant="h6" fontWeight={600}>2x XP Rewards</Typography>
+              <Typography variant="body2" color="text.secondary">
+                Level up faster with premium bonuses
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Box sx={{ p: 2 }}>
+              <SpeedIcon color="primary" sx={{ fontSize: 40, mb: 1 }} />
+              <Typography variant="h6" fontWeight={600}>Full Scriptorium</Typography>
+              <Typography variant="body2" color="text.secondary">
+                Complete music analysis with lyrics lookup
+              </Typography>
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+
+      {/* Crypto Payment Modal */}
       {selectedPlan && (
         <CryptoPaymentModal
           isOpen={cryptoModalOpen}
           onClose={() => setCryptoModalOpen(false)}
-          planType={selectedPlan.type}
+          planType="pro"
           amount={selectedPlan.amount}
         />
       )}
-    </div>
+    </Container>
   );
 };
 

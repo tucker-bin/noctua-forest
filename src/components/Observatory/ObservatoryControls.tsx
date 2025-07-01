@@ -16,6 +16,7 @@ import {
   Divider,
   Collapse,
   IconButton,
+  Slider,
   alpha,
   CircularProgress
 } from '@mui/material';
@@ -24,7 +25,8 @@ import {
   ExpandLess, 
   Tune,
   Search,
-  Psychology
+  Psychology,
+  FilterList
 } from '@mui/icons-material';
 import { ModelSelector } from './ModelSelector';
 
@@ -49,6 +51,8 @@ interface ObservatoryControlsProps {
   }) => void;
   isLightTheme?: boolean;
   onThemeToggle?: (isLight: boolean) => void;
+  significanceThreshold?: number;
+  onSignificanceThresholdChange?: (threshold: number) => void;
 }
 
 // Removed AnalysisOptions interface - now using the props interface directly
@@ -74,7 +78,9 @@ export const ObservatoryControls: React.FC<ObservatoryControlsProps> = ({
   analysisOptions,
   onAnalysisOptionsChange,
   isLightTheme,
-  onThemeToggle
+  onThemeToggle,
+  significanceThreshold,
+  onSignificanceThresholdChange
 }) => {
   const { t } = useTranslation();
   // Use external options if provided, otherwise use defaults
@@ -317,6 +323,48 @@ export const ObservatoryControls: React.FC<ObservatoryControlsProps> = ({
               </Box>
             </Box>
 
+            {/* Significance Threshold Control */}
+            <Box sx={{ mt: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                <FilterList sx={{ fontSize: 18, color: 'text.secondary' }} />
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                  Pattern Significance Threshold
+                </Typography>
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                Filter patterns by significance level. Higher values show only the most important patterns.
+              </Typography>
+              <Box sx={{ px: 2 }}>
+                <Slider
+                  value={significanceThreshold || 0.3}
+                  onChange={(_, value) => onSignificanceThresholdChange?.(value as number)}
+                  min={0.1}
+                  max={1.0}
+                  step={0.1}
+                  disabled={isObserving}
+                  marks={[
+                    { value: 0.1, label: 'All' },
+                    { value: 0.3, label: 'Decent' },
+                    { value: 0.6, label: 'Good' },
+                    { value: 0.8, label: 'Strong' }
+                  ]}
+                  sx={{
+                    '& .MuiSlider-mark': {
+                      backgroundColor: 'text.secondary',
+                      opacity: 0.5
+                    },
+                    '& .MuiSlider-markLabel': {
+                      fontSize: '0.7rem',
+                      color: 'text.secondary'
+                    }
+                  }}
+                />
+              </Box>
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+                Current: {((significanceThreshold || 0.3) * 100).toFixed(0)}% minimum significance
+              </Typography>
+            </Box>
+
             <Divider sx={{ my: 2 }} />
             
             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
@@ -370,7 +418,7 @@ export const ObservatoryControls: React.FC<ObservatoryControlsProps> = ({
           }}
           startIcon={isObserving ? <CircularProgress size={20} /> : <Search />}
         >
-          {isObserving ? t('observatory.observing') : 'Analyze All Patterns'}
+          {isObserving ? t('observatory.observing') : t('observatory.findPatterns', 'Find Patterns')}
         </Button>
 
         {/* Progress Display */}

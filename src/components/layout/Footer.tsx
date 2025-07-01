@@ -28,9 +28,9 @@ const footerSections = [
   {
     title: 'footer.resources',
     links: [
-      { label: 'footer.daily_challenge', path: '/daily-challenge' },
-      { label: 'footer.forest_map', path: '/map' },
-      { label: 'footer.community', path: '/forest' },
+      { label: 'footer.daily_challenge', path: '/forest?area=games&tab=challenges' },
+      { label: 'footer.flowFinder', path: '/forest?area=games' },
+      { label: 'footer.community', path: '/forest?area=community' },
       { label: 'footer.profile', path: '/profile' },
     ],
   },

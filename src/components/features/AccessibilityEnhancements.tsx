@@ -263,8 +263,8 @@ const AccessibilityEnhancements: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* CSS for accessibility classes */}
-      <style jsx global>{`
+      {/* Global CSS for accessibility classes */}
+      <style>{`
         .high-contrast {
           filter: contrast(150%) brightness(120%);
         }

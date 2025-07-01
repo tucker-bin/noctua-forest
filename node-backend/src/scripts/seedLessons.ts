@@ -1,170 +1,169 @@
 import { db } from '../config/firebase';
-import { Lesson } from '../types/lesson.types';
+import { Lesson, LearningPath } from '../types/lesson.types';
 import { logger } from '../utils/logger';
 
-const lessons: Omit<Lesson, 'id' | 'createdAt' | 'updatedAt'>[] = [
+const sampleLessons: Omit<Lesson, 'id' | 'createdAt' | 'updatedAt'>[] = [
   {
-    path: 'explorer',
-    slug: 'first-patterns',
-    title: 'First Patterns',
-    description: 'Introduction to basic patterns in text',
+    path: 'celestial-observer',
+    slug: 'first-light',
+    title: 'First Light: Introduction to Observation',
+    description: 'Introduction to sound observation and basic pattern recognition',
     order: 1,
+    duration: '20 min',
+    difficulty: 'beginner',
     content: {
       sections: [
         {
           type: 'welcome',
-          title: 'Welcome to Pattern Explorer',
-          content: 'In this lesson, you will learn to identify basic patterns in text. Just like stars in the night sky form constellations, words can form patterns that help us understand language better.'
+          title: 'Welcome to Pattern Observation',
+          content: 'In this first lesson, we\'ll develop basic observation skills for recognizing sound patterns in language. Like learning to spot subtle details in any new field, this takes practice and patience.',
         },
         {
-          type: 'examples',
-          title: 'Pattern Examples',
-          content: 'Let\'s look at some simple patterns:',
+          type: 'practice',
+          title: 'Basic Pattern Recognition',
+          content: 'Let\'s begin with a familiar text that contains clear patterns:',
           examples: [
             {
-              text: 'cat - hat - mat',
-              explanation: 'Words that rhyme follow a pattern'
-            },
-            {
-              text: 'run - ran - running',
-              explanation: 'Words can change in predictable ways'
+              text: 'Twinkle, twinkle, little star,\nHow I wonder what you are.',
+              explanation: 'Notice the repeated sounds and natural rhythm'
             }
           ]
         },
         {
           type: 'exercise',
           title: 'Pattern Practice',
-          content: 'Try identifying the pattern:',
+          content: 'Try to identify patterns in the following text:',
           exercises: [
             {
-              question: 'Which word follows the pattern: sing, ring, ___?',
-              options: ['bring', 'song', 'dance', 'music'],
-              correctAnswer: 'bring',
-              hint: 'Look for words that rhyme with "sing"'
+              question: 'Which words in "The silver stream slips slowly by" share similar starting sounds?',
+              options: ['silver, stream, slips, slowly', 'the, silver', 'stream, by', 'slips, by'],
+              correctAnswer: 'silver, stream, slips, slowly',
+              hint: 'Look for words that start with the same sound'
             }
           ]
         }
       ]
-    }
+    },
+    requirements: [],
+    nextLesson: 'star-patterns'
   },
   {
-    path: 'explorer',
-    slug: 'sound-pairs',
-    title: 'Sound Pairs',
-    description: 'Discover words that naturally go together',
+    path: 'celestial-observer',
+    slug: 'star-patterns',
+    title: 'Star Patterns: Universal Sounds',
+    description: 'Explore universal patterns that appear across languages',
     order: 2,
+    duration: '25 min',
+    difficulty: 'beginner',
     content: {
       sections: [
         {
           type: 'welcome',
-          title: 'Welcome to Sound Pairs',
-          content: 'Just as stars often appear in pairs, words can have natural partners too. In this lesson, we\'ll explore words that work together.'
+          title: 'Universal Sound Patterns',
+          content: 'Some sound patterns appear in many languages and cultures. These are like the brightest stars - easy to spot once you know what to look for.',
         },
         {
           type: 'examples',
-          title: 'Word Pair Examples',
-          content: 'Here are some common word pairs:',
+          title: 'Cross-Language Patterns',
+          content: 'Here are examples of similar patterns in different languages:',
           examples: [
             {
-              text: 'day and night',
-              explanation: 'Opposites that often appear together'
-            },
-            {
-              text: 'salt and pepper',
-              explanation: 'Common pairs in everyday life'
+              text: 'English: "Peter Piper picked"\nSpanish: "Tres tristes tigres"',
+              explanation: 'Both use repeated consonant sounds at the beginning of words'
             }
           ]
         },
         {
           type: 'exercise',
-          title: 'Pair Practice',
-          content: 'Complete the pair:',
+          title: 'Universal Pattern Recognition',
+          content: 'Identify the pattern type in these examples:',
           exercises: [
             {
-              question: 'What goes with "thunder"?',
-              options: ['rain', 'lightning', 'wind', 'cloud'],
-              correctAnswer: 'lightning',
-              hint: 'Think about what usually comes with thunder in nature'
+              question: 'What type of pattern is shown in "Round and round the rugged rock"?',
+              options: ['Rhyme', 'Alliteration', 'Rhythm', 'Assonance'],
+              correctAnswer: 'Alliteration',
+              hint: 'Focus on the beginning sounds of the words'
             }
           ]
         }
       ]
-    }
+    },
+    requirements: ['first-light'],
+    nextLesson: 'constellation-mapping'
   },
   {
-    path: 'navigator',
-    slug: 'advanced-patterns',
-    title: 'Advanced Pattern Recognition',
-    description: 'Explore complex patterns in language',
+    path: 'pattern-navigator',
+    slug: 'advanced-mapping',
+    title: 'Advanced Pattern Mapping',
+    description: 'Master complex pattern relationships and networks',
     order: 1,
+    duration: '40 min',
+    difficulty: 'advanced',
     content: {
       sections: [
         {
           type: 'welcome',
-          title: 'Welcome to Advanced Patterns',
-          content: 'Like complex constellations, language can form intricate patterns. We\'ll explore these deeper connections.'
+          title: 'Complex Pattern Networks',
+          content: 'Advanced pattern recognition involves understanding how different patterns interact and create complex networks of sound relationships.',
         },
         {
-          type: 'examples',
-          title: 'Complex Pattern Examples',
-          content: 'Observe these pattern sequences:',
+          type: 'practice',
+          title: 'Multi-layered Analysis',
+          content: 'Learn to identify multiple overlapping patterns in the same text.',
           examples: [
             {
-              text: 'walk - walked - walking - walks',
-              explanation: 'Verb conjugation patterns'
-            },
-            {
-              text: 'happy - happier - happiest',
-              explanation: 'Comparative and superlative patterns'
-            }
-          ]
-        },
-        {
-          type: 'exercise',
-          title: 'Pattern Analysis',
-          content: 'Identify the pattern rule:',
-          exercises: [
-            {
-              question: 'What\'s the pattern: teach, taught, catch, ___?',
-              options: ['caught', 'teached', 'teaching', 'catches'],
-              correctAnswer: 'caught',
-              hint: 'Look at how the first pair of words changes'
+              text: 'In the deep dark woods where the wild wind wails',
+              explanation: 'This contains alliteration (w sounds), assonance (ee sounds), and rhythm patterns'
             }
           ]
         }
       ]
-    }
+    },
+    requirements: ['star-patterns', 'constellation-mapping']
   }
 ];
 
 const seedLessons = async () => {
   try {
+    console.log('Starting lesson seeding...');
+    
     const lessonsRef = db.collection('lessons');
-    const batch = db.batch();
-
-    // Delete existing lessons
-    const snapshot = await lessonsRef.get();
-    snapshot.docs.forEach(doc => {
-      batch.delete(doc.ref);
-    });
-
-    // Add new lessons
-    lessons.forEach(lesson => {
-      const docRef = lessonsRef.doc();
-      batch.set(docRef, {
-        ...lesson,
+    
+    for (const lessonData of sampleLessons) {
+      const lesson: Omit<Lesson, 'id'> = {
+        ...lessonData,
         createdAt: new Date(),
         updatedAt: new Date()
-      });
-    });
-
-    await batch.commit();
-    logger.info('Successfully seeded lessons');
-    process.exit(0);
+      };
+      
+      // Check if lesson already exists
+      const existingSnapshot = await lessonsRef
+        .where('path', '==', lesson.path)
+        .where('slug', '==', lesson.slug)
+        .get();
+      
+      if (existingSnapshot.empty) {
+        await lessonsRef.add(lesson);
+        console.log(`Added lesson: ${lesson.title}`);
+      } else {
+        console.log(`Lesson already exists: ${lesson.title}`);
+      }
+    }
+    
+    console.log('Lesson seeding completed!');
   } catch (error) {
-    logger.error('Error seeding lessons:', error);
-    process.exit(1);
+    console.error('Error seeding lessons:', error);
   }
 };
 
-seedLessons(); 
+// Run the seeding if this file is executed directly
+if (require.main === module) {
+  seedLessons().then(() => {
+    process.exit(0);
+  }).catch((error) => {
+    console.error('Seeding failed:', error);
+    process.exit(1);
+  });
+}
+
+export { seedLessons }; 

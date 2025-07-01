@@ -2,7 +2,7 @@ import React from 'react';
 import { Tooltip, Card, Typography, Box, Paper } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import { useTranslation } from 'react-i18next';
-import { Pattern } from '../../types/observatory';
+import { Pattern, Segment } from '../../types/observation';
 
 interface PatternExplanationProps {
   pattern?: Pattern;
@@ -60,19 +60,9 @@ export const PatternExplanation: React.FC<PatternExplanationProps> = ({ pattern 
         <Typography variant="subtitle2" color="primary" gutterBottom>
           {t('observatory.pattern.examples')}:
         </Typography>
-        {segments.map((segment, index) => (
-          <Box 
-            key={index}
-            sx={{ 
-              p: 1, 
-              mb: 1, 
-              backgroundColor: 'action.hover',
-              borderRadius: 1,
-              display: 'inline-block',
-              mr: 1
-            }}
-          >
-            <Typography variant="body2">"{segment.text}"</Typography>
+        {segments.map((segment: unknown) => (
+          <Box key={(segment as Segment).text} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Typography variant="body2">"{(segment as Segment).text}"</Typography>
           </Box>
         ))}
       </Box>

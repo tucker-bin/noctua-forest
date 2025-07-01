@@ -5,7 +5,22 @@ import { Redis } from 'ioredis';
 import { settings } from '../config/settings';
 import { logger } from '../utils/logger';
 
-const redis = new Redis(settings.redis.url);
+let redis: Redis | null = null;
+
+try {
+  redis = new Redis(settings.redis.url, {
+    maxRetriesPerRequest: 0,
+    lazyConnect: true
+  });
+  redis.on('error', (err) => {
+    logger.warn('Redis not available, monitoring disabled');
+    redis?.disconnect();
+    redis = null;
+  });
+} catch (error) {
+  logger.warn('Redis not available, monitoring disabled:', error);
+  redis = null;
+}
 
 export const monitorRequest = async (
   req: Request | Request,
@@ -16,14 +31,18 @@ export const monitorRequest = async (
   const userId = (req as any).user?.uid || 'anonymous';
 
   // Track active user
-  redis.zadd('active_users', Date.now(), userId).catch(error => {
-    logger.error('Error tracking active user:', error);
-  });
+  if (redis) {
+    redis.zadd('active_users', Date.now(), userId).catch(error => {
+      logger.error('Error tracking active user:', error);
+    });
+  }
 
   // Track active connection
-  redis.sadd('active_connections', req.ip || 'unknown').catch(error => {
-    logger.error('Error tracking active connection:', error);
-  });
+  if (redis) {
+    redis.sadd('active_connections', req.ip || 'unknown').catch(error => {
+      logger.error('Error tracking active connection:', error);
+    });
+  }
 
   // Track request metrics
   try {
@@ -60,9 +79,11 @@ export const monitorRequest = async (
     }
 
     // Remove connection from active set
-    redis.srem('active_connections', req.ip || 'unknown').catch(error => {
-      logger.error('Error removing active connection:', error);
-    });
+    if (redis) {
+      redis.srem('active_connections', req.ip || 'unknown').catch(error => {
+        logger.error('Error removing active connection:', error);
+      });
+    }
   });
 
   next();
@@ -95,8 +116,10 @@ export const trackBatchOperation = (operation: 'submitted' | 'completed' | 'fail
 // Clean up old monitoring data periodically
 setInterval(() => {
   try {
-    const oldestTime = Date.now() - (30 * 24 * 60 * 60 * 1000); // 30 days
-    redis.zremrangebyscore('active_users', '-inf', oldestTime);
+    if (redis) {
+      const oldestTime = Date.now() - (30 * 24 * 60 * 60 * 1000); // 30 days
+      redis.zremrangebyscore('active_users', '-inf', oldestTime);
+    }
   } catch (error) {
     logger.error('Error cleaning up monitoring data:', error);
   }

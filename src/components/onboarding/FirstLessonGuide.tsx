@@ -109,7 +109,7 @@ export const FirstLessonGuide: React.FC<FirstLessonGuideProps> = ({ onComplete }
         <Box sx={{ mb: 4 }}>
           <Grid container spacing={3}>
             {patternPreviews.map((pattern) => (
-              <Grid size={{ xs: 12, sm: 6 }} key={pattern.type}>
+              <Grid item xs={12} sm={6} key={pattern.type}>
                 <Paper
                   elevation={2}
                   sx={{

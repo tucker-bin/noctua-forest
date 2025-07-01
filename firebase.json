@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "noctua-forest/dist",
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",

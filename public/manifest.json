@@ -1,54 +1,65 @@
 {
-  "name": "Noctua Forest - Pattern Observatory",
-  "short_name": "Noctua Forest",
-  "description": "Discover hidden patterns in language through observation. A progressive web app for pattern analysis and linguistic exploration.",
-  "theme_color": "#1a1f2e",
-  "background_color": "#0a0f1a",
+  "name": "RhymeTime Games",
+  "short_name": "RhymeTime",
+  "description": "AI-powered word puzzle games that make you a better writer. Play daily rhyming challenges and compete on leaderboards.",
+  "theme_color": "#3182ce",
+  "background_color": "#1a202c",
   "display": "standalone",
   "orientation": "portrait-primary",
   "scope": "/",
   "start_url": "/",
-  "categories": ["education", "productivity", "utilities"],
+  "categories": ["games", "education", "entertainment"],
   "lang": "en",
   "dir": "auto",
   "icons": [
     {
-      "src": "/pwa-64x64.png",
+      "src": "pwa-64x64.png",
       "sizes": "64x64",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/pwa-192x192.png",
+      "src": "pwa-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "/pwa-512x512.png",
+      "src": "pwa-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/maskable-icon-512x512.png",
+      "src": "maskable-icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "RhymeTime Games - Daily word puzzles"
+    }
+  ],
   "shortcuts": [
     {
-      "name": "Observatory",
-      "short_name": "Observatory",
-      "description": "Open pattern observatory",
-      "url": "/observatory",
-      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+      "name": "Play Daily Challenge",
+      "short_name": "Daily",
+      "description": "Jump straight into today's rhyme puzzle",
+      "url": "/games",
+      "icons": [{"src": "pwa-192x192.png", "sizes": "192x192"}]
     },
     {
-      "name": "Lessons",
-      "short_name": "Lessons", 
-      "description": "Start learning journey",
-      "url": "/lessons",
-      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+      "name": "View Leaderboards",
+      "short_name": "Rankings",
+      "description": "Check your ranking and compete with friends",
+      "url": "/profile",
+      "icons": [{"src": "pwa-192x192.png", "sizes": "192x192"}]
     }
   ],
   "share_target": {

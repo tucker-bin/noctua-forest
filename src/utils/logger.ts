@@ -54,7 +54,8 @@ class Logger {
         console.info('%cContext:', 'font-weight: bold; color: #666;', entry.context);
       }
       if (entry.error) {
-        console.error('%cError:', 'font-weight: bold; color: #ff4444;', entry.error instanceof Error ? entry.error : String(entry.error));
+        console.error('%cError:', 'font-weight: bold; color: #ff4444;', 
+          entry.error instanceof Error ? entry.error : JSON.stringify(entry.error, null, 2));
       }
       console.info('%cTimestamp:', 'font-weight: bold; color: #888;', entry.timestamp);
       console.groupEnd();

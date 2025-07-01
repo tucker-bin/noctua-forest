@@ -28,7 +28,11 @@ import {
   CardContent,
   Tooltip,
   Snackbar,
-  LinearProgress
+  LinearProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -47,10 +51,13 @@ import {
   AutoAwesome as AutoAwesomeIcon,
   Lightbulb as LightbulbIcon,
   Palette as PaletteIcon,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  UnfoldMore as UnfoldMoreIcon,
+  UnfoldLess as UnfoldLessIcon,
+  Save as SaveIcon
 } from '@mui/icons-material';
 
-import { Pattern, Segment } from '../../types/observatory';
+import { Pattern, PatternType, ObservationData, ObservationResult } from '../../types/observatory';
 import { generatePatternColors } from './colorSystem';
 import { HighlightedText } from './HighlightedText';
 import { ObservatoryFeedback } from './ObservatoryFeedback';
@@ -61,6 +68,12 @@ import { useObservation } from '../../hooks/useObservation';
 import { useCache } from '../../hooks/useCache';
 import { useExperience } from '../../contexts/ExperienceContext';
 import { log } from '../../utils/logger';
+import { observationService, observeAnonymousExample } from '../../services/observationService';
+import { PatternCard } from './PatternCard';
+import PatternControls from './PatternControls';
+import { ObservatoryState, PatternFilterOptions, PatternSortOptions, filterPatterns, sortPatterns } from './types';
+import { PatternList } from './PatternList';
+import { ObservatoryTabs } from './TabPanels/ObservatoryTabs';
 
 // Tab panel component
 interface TabPanelProps {
@@ -121,17 +134,28 @@ const Observatory: React.FC = () => {
   const { cachedObservations, saveToCache } = useCache();
   
   // UI State
-  const [activeTab, setActiveTab] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedPatternTypes, setSelectedPatternTypes] = useState<Set<string>>(new Set());
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
-  const [showHighlights, setShowHighlights] = useState(true);
+  const [state, setState] = useState<ObservatoryState>({
+    isCreativeMode: false,
+    viewMode: 'list',
+    sortBy: 'frequency',
+    selectedPatternTypes: new Set(),
+    searchQuery: '',
+    expandedPattern: null,
+    showHighlights: true,
+    isTextExpanded: false
+  });
+
+  // Significance threshold state
+  const [significanceThreshold, setSignificanceThreshold] = useState<number>(0.3);
 
   const [feedbackOpen, setFeedbackOpen] = useState(false);
-  const [serviceErrorMessage, setServiceErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [lastXpGained, setLastXpGained] = useState({ xp: 0, bonusType: '', trigger: 0 });
+  const [showLessonsModal, setShowLessonsModal] = useState(false);
+  const [hasShownLessonsModal, setHasShownLessonsModal] = useState(false);
+  const [isAnonymousExample, setIsAnonymousExample] = useState(false);
+  const [hasUsedAnonymousExample, setHasUsedAnonymousExample] = useState(false);
+  const [anonymousObservation, setAnonymousObservation] = useState<ObservationResult | null>(null);
 
   // Customizer state
   const [customizerOpen, setCustomizerOpen] = useState(false);
@@ -141,12 +165,35 @@ const Observatory: React.FC = () => {
     return saved ? JSON.parse(saved) : DEFAULT_THEME;
   });
 
+  const [payloadOptimizationInfo, setPayloadOptimizationInfo] = useState<{ wasOptimized: boolean; originalCount: number; optimizedCount: number } | null>(null);
+
+  // Move isCreativeMode state to the top
+  const [isCreativeMode, setIsCreativeMode] = useState(false);
+
+  // Handle error state
+  const [serviceErrorMessage, setServiceErrorMessage] = useState<string | null>(null);
+
+  // Initialize hasUsedAnonymousExample from localStorage
+  useEffect(() => {
+    const storedValue = localStorage.getItem('hasUsedAnonymousExample');
+    if (storedValue === 'true') {
+      setHasUsedAnonymousExample(true);
+    }
+  }, []);
+
+  // Handle errors
+  const handleError = (message: string) => {
+    setServiceErrorMessage(message);
+    setFeedbackOpen(true);
+  };
+
   // Group patterns by type
   const patternsByType = useMemo(() => {
-    if (!observation) return new Map<string, Pattern[]>();
+    const currentObservation = observation || anonymousObservation;
+    if (!currentObservation) return new Map<PatternType, Pattern[]>();
     
-    const grouped = new Map<string, Pattern[]>();
-    observation.patterns.forEach(pattern => {
+    const grouped = new Map<PatternType, Pattern[]>();
+    currentObservation.patterns.forEach((pattern: Pattern) => {
       const type = pattern.type;
       if (!grouped.has(type)) {
         grouped.set(type, []);
@@ -155,16 +202,17 @@ const Observatory: React.FC = () => {
     });
     
     // Sort each group by frequency
-    grouped.forEach((patterns, type) => {
+    grouped.forEach((patterns) => {
       patterns.sort((a, b) => b.segments.length - a.segments.length);
     });
     
     return grouped;
-  }, [observation]);
+  }, [observation, anonymousObservation]);
 
   // Get pattern statistics
   const patternStats = useMemo(() => {
-    if (!observation) return [];
+    const currentObservation = observation || anonymousObservation;
+    if (!currentObservation) return [];
     
     return Array.from(patternsByType.entries()).map(([type, patterns]) => ({
       type,
@@ -172,45 +220,156 @@ const Observatory: React.FC = () => {
       instances: patterns.reduce((sum, p) => sum + p.segments.length, 0),
       patterns
     })).sort((a, b) => b.instances - a.instances);
-  }, [patternsByType]);
+  }, [patternsByType, observation, anonymousObservation]);
 
-  // Filter patterns based on search and selected types
-  const filteredPatterns = useMemo(() => {
-    if (!observation) return [];
+  // Get available pattern types from current observation
+  const availableTypes = useMemo(() => {
+    const currentObservation = observation || anonymousObservation;
+    if (!currentObservation) return [];
     
-    let patterns = observation.patterns;
-    
-    // Filter by type if any are selected (if none selected, show all)
-    if (selectedPatternTypes.size > 0) {
-      patterns = patterns.filter(p => selectedPatternTypes.has(p.type));
+    return Array.from(new Set(currentObservation.patterns.map((p: Pattern) => p.type)));
+  }, [observation, anonymousObservation]);
+
+  // Exit intent handler for anonymous users
+  useEffect(() => {
+    if (!currentUser && anonymousObservation && !hasShownLessonsModal) {
+      const handleMouseLeave = (e: MouseEvent) => {
+        // Check if mouse is leaving the top of the viewport (likely going to address bar or close button)
+        if (e.clientY <= 0) {
+          setShowLessonsModal(true);
+          setHasShownLessonsModal(true);
+        }
+      };
+
+      document.addEventListener('mouseleave', handleMouseLeave);
+      
+      return () => {
+        document.removeEventListener('mouseleave', handleMouseLeave);
+      };
     }
-    
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      patterns = patterns.filter(p => 
-        p.type.toLowerCase().includes(query) ||
-        p.segments.some((s: Segment) => s.text.toLowerCase().includes(query)) ||
-        p.description?.toLowerCase().includes(query)
-      );
+  }, [currentUser, anonymousObservation, hasShownLessonsModal]);
+
+  // Handle anonymous example observation
+  const handleAnonymousExample = useCallback(async (exampleText: string, isOnboardingExample: boolean = false) => {
+    try {
+      const exampleId = `example_${Date.now()}`;
+      const result = await observeAnonymousExample(exampleText, exampleId, i18n.language);
+      
+      // Clear any existing observation first
+      clearObservation();
+      
+      // Check if patterns were reduced (backend might include metadata)
+      if (result && result.metadata?.payloadOptimized) {
+        setPayloadOptimizationInfo({
+          wasOptimized: true,
+          originalCount: result.metadata.originalPatternCount || 0,
+          optimizedCount: result.patterns?.length || 0
+        });
+      }
+      
+      // Set anonymous observation if we got a valid result
+      if (result) {
+        setAnonymousObservation(result);
+      }
+      
+      // Only mark usage limit if this is NOT an onboarding example
+      if (!isOnboardingExample) {
+        localStorage.setItem('hasUsedAnonymousExample', 'true');
+        setHasUsedAnonymousExample(true);
+      }
+      
+      setSuccessMessage('🎉 Free example analyzed! Take your time to explore the patterns above.');
+      
+      // After 30 seconds, show a gentle modal prompt to visit lessons (no auto-redirect)
+      setTimeout(() => {
+        if (!hasShownLessonsModal) {
+          setShowLessonsModal(true);
+          setHasShownLessonsModal(true);
+        }
+      }, 30000);
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      log.error('Anonymous example failed:', { error: errorMessage });
+      handleError('Sorry, there was an error with the example. Please try signing up for full access.');
     }
+  }, [i18n.language, clearObservation, hasShownLessonsModal]);
+
+  // Check for example text from onboarding or saved observation
+  useEffect(() => {
+    const exampleText = localStorage.getItem('exampleText');
+    const savedObservationText = localStorage.getItem('savedObservationText');
     
-    return patterns;
-  }, [observation, selectedPatternTypes, searchQuery]);
-  
+    if (exampleText) {
+      setText(exampleText);
+      localStorage.removeItem('exampleText'); // Clean up after use
+      setIsAnonymousExample(true);
+      
+      // Always auto-submit for examples from onboarding (regardless of previous usage)
+      // Onboarding examples should always work, even if user has used anonymous example before
+      if (!currentUser) {
+        // Mark this as an onboarding example (not subject to usage limits)
+        handleAnonymousExample(exampleText, true); // true = isOnboardingExample
+      } else {
+        // Authenticated users can analyze normally
+        setSuccessMessage(t('onboarding.example_loaded', 'Example text loaded! Click "Find Patterns" to see what patterns are hidden inside.'));
+      }
+    } else if (savedObservationText) {
+      setText(savedObservationText);
+      localStorage.removeItem('savedObservationText'); // Clean up after use
+      setSuccessMessage(t('observatory.saved_loaded', 'Saved observation loaded! You can now re-analyze or make changes.'));
+    }
+  }, [setText, t, currentUser, handleAnonymousExample]);
+
   // Effect to save observation to cache after it's been fetched
   useEffect(() => {
     if (observation && !cachedObservations[text]) {
+      // Safe date conversion
+      const getISOString = (dateValue: any): string => {
+        try {
+          // Debug logging to see what we're getting
+          console.log('getISOString received:', dateValue, 'type:', typeof dateValue);
+          
+          if (!dateValue) return new Date().toISOString();
+          
+          if (dateValue instanceof Date) {
+            // Check if it's a valid date
+            return isNaN(dateValue.getTime()) ? new Date().toISOString() : dateValue.toISOString();
+          }
+          
+          if (typeof dateValue === 'string') {
+            const parsedDate = new Date(dateValue);
+            console.log('Parsed string date:', parsedDate, 'isValid:', !isNaN(parsedDate.getTime()));
+            return isNaN(parsedDate.getTime()) ? new Date().toISOString() : parsedDate.toISOString();
+          }
+          
+          if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+            try {
+              return dateValue.toDate().toISOString();
+            } catch {
+              return new Date().toISOString();
+            }
+          }
+          
+          console.log('Fallback for dateValue:', dateValue);
+          return new Date().toISOString(); // fallback
+        } catch (error) {
+          console.error('Error in getISOString:', error, 'for value:', dateValue);
+          return new Date().toISOString(); // Ultimate fallback
+        }
+      };
+
       // Transform ObservationResult to ObservationData for caching
-      const observationData = {
+      const observationData: ObservationData = {
+        text: observation.text,
         patterns: observation.patterns,
-        originalText: observation.originalText || observation.text || '',
-        timestamp: observation.createdAt.toISOString(),
+        segments: observation.segments,
+        language: observation.language,
         metadata: {
-          userId: observation.userId,
+          userId: currentUser?.uid || 'anonymous',
           language: observation.language,
-          createdAt: observation.createdAt.toISOString(),
-          updatedAt: observation.createdAt.toISOString()
+          createdAt: getISOString(observation.createdAt),
+          updatedAt: getISOString(observation.createdAt)
         }
       };
       saveToCache(text, observationData);
@@ -235,34 +394,54 @@ const Observatory: React.FC = () => {
   // Handle observation
   const handleObserve = async () => {
     if (!currentUser) {
-      setServiceErrorMessage('Please sign in to use the Observatory. You can sign in using the button in the top right corner.');
-      setFeedbackOpen(true);
-      return;
+      if (isAnonymousExample && !hasUsedAnonymousExample) {
+        // Allow one anonymous example (not from onboarding)
+        await handleAnonymousExample(text, false); // false = not onboarding example
+        return;
+      } else {
+        handleError('You\'ve used your free example! Sign up to unlock lessons and earn more observations.');
+        return;
+      }
     }
     
     try {
       await observeText(text, i18n.language);
+      
+      // The text cleaning info is already handled in the hook
+      // We just need to check if we got it from the hook's state
+      if (textCleaningInfo?.wasCleaned) {
+        // This is already set by the hook
+        log.info('Text was cleaned during observation');
+      }
     } catch (error) {
-      log.error('Observation failed:', { error: error instanceof Error ? error.message : String(error) }, error instanceof Error ? error : undefined);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      log.error('Observation failed:', { error: errorMessage });
+      handleError('Failed to analyze text. Please try again.');
     }
   };
 
-  // Handle pattern type selection
-  const togglePatternType = (type: string) => {
-    setSelectedPatternTypes(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(type)) {
-        newSet.delete(type);
-      } else {
-        newSet.add(type);
-      }
-      return newSet;
-    });
-  };
+  // Handle pattern interactions
+  const handlePatternClick = useCallback((pattern: Pattern) => {
+    if (state.isCreativeMode) {
+      setState(prev => ({
+        ...prev,
+        expandedPattern: prev.expandedPattern === pattern.id ? null : pattern.id
+      }));
+    }
+  }, [state.isCreativeMode]);
+
+  const handlePatternExpand = useCallback((patternId: string) => {
+    setState(prev => ({
+      ...prev,
+      expandedPattern: prev.expandedPattern === patternId ? null : patternId
+    }));
+  }, []);
 
   // Customizer handlers
   const handleThemeChange = (newTheme: ObservatoryTheme) => {
     setObservatoryTheme(newTheme);
+    // Auto-save theme changes to localStorage
+    localStorage.setItem('observatory-theme', JSON.stringify(newTheme));
   };
 
   const handleThemeSave = (theme: ObservatoryTheme) => {
@@ -276,64 +455,78 @@ const Observatory: React.FC = () => {
     setSuccessMessage('Theme reset to default!');
   };
 
-
-
-  // Handle share
-  const handleShare = useCallback(() => {
-    if (!observation) return;
+  // Handle save observation
+  const handleSave = useCallback(async () => {
+    const currentObservation = observation || anonymousObservation;
+    if (!currentObservation || !currentUser) return;
     
-    navigate('/forest/create-post', { 
-      state: { 
-        observationData: {
-          originalText: observation.originalText || observation.text || '',
-          patterns: observation.patterns,
-          language: i18n.language,
-          timestamp: new Date().toISOString()
+    try {
+      const title = `Observation - ${new Date().toLocaleDateString()}`;
+      const observationData: ObservationData = {
+        text: currentObservation.text,
+        patterns: currentObservation.patterns,
+        segments: currentObservation.segments,
+        language: currentObservation.language,
+        metadata: {
+          userId: currentUser.uid,
+          language: currentObservation.language,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         }
-      }
-    });
-  }, [observation, navigate, i18n.language]);
+      };
+      
+      const result = await observationService.saveObservation({
+        observation: observationData,
+        title,
+        tags: [],
+        isPublic: false
+      });
+      
+      setSuccessMessage(`Observation saved successfully! ID: ${result.id}`);
+    } catch (error) {
+      handleError('Failed to save observation. Please try again.');
+    }
+  }, [observation, anonymousObservation, currentUser]);
+
+  // Handle create lesson from observation
+  const handleCreateLesson = useCallback(() => {
+    const currentObservation = observation || anonymousObservation;
+    if (!currentObservation || !currentUser) {
+      handleError('Please sign in to create lessons');
+      return;
+    }
+
+    // Save the observation text for the Scriptorium
+    localStorage.setItem('savedObservationText', currentObservation.text);
+    
+    // Navigate to Scriptorium
+    navigate('/scriptorium');
+  }, [observation, anonymousObservation, currentUser, navigate]);
 
   // Handle clear
   const handleClear = useCallback(() => {
     clearObservation();
     setText('');
-    setSelectedPatternTypes(new Set());
-    setSearchQuery('');
-    setActiveTab(0);
-    setExpandedPattern(null);
+    setState(prev => ({
+      ...prev,
+      selectedPatternTypes: new Set(),
+      searchQuery: '',
+      expandedPattern: null
+    }));
   }, [clearObservation]);
 
-  // Pattern detail component
-  const PatternDetail = ({ pattern }: { pattern: Pattern }) => (
-    <Card 
-      variant="outlined" 
-      sx={{ 
-        mb: 1
-      }}
+  // Add creative mode toggle
+  const toggleCreativeMode = useCallback(() => {
+    setState(prev => ({
+      ...prev,
+      isCreativeMode: !prev.isCreativeMode
+    }));
+  }, []);
 
-    >
-      <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2 }}>
-          <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: 1.6 }}>
-            {pattern.segments.map((s: Segment) => s.text).join(' • ')}
-          </Typography>
-          <Chip 
-            label={pattern.segments.length}
-            size="small"
-            color="primary"
-            variant="outlined"
-            sx={{ minWidth: 32 }}
-          />
-        </Box>
-        {pattern.description && (
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-            {pattern.description}
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
-  );
+  // Handle state changes
+  const handleStateChange = useCallback((newState: Partial<ObservatoryState>) => {
+    setState(prev => ({ ...prev, ...newState }));
+  }, []);
 
   return (
     <Box sx={{ 
@@ -343,28 +536,47 @@ const Observatory: React.FC = () => {
     }}>
       <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
         {/* Header */}
-        <Box sx={{ mb: 3, textAlign: 'center' }}>
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              fontWeight: 700,
-              fontSize: { xs: '1.75rem', sm: '2.125rem' },
-              background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              mb: 1
-            }}
-          >
-            🔭 {t('observatory.title', 'Observatory')}
+        <Box sx={{ mb: 3, textAlign: 'center', position: 'relative' }}>
+          <Typography variant="h4" sx={{ 
+            fontWeight: 700,
+            fontSize: { xs: '1.75rem', sm: '2.125rem' },
+            background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>
+            {state.isCreativeMode ? 'Pattern Studio' : 'Pattern Observatory'}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {t('observatory.subtitle', 'Discover hidden patterns in any text')}
-          </Typography>
+          
+          <Tooltip title={state.isCreativeMode ? "Switch to Analysis Mode" : "Switch to Creative Mode"}>
+            <IconButton
+              onClick={toggleCreativeMode}
+              sx={{
+                position: 'absolute',
+                right: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                bgcolor: 'background.paper',
+                '&:hover': { bgcolor: 'action.hover' }
+              }}
+            >
+              {state.isCreativeMode ? <VisibilityIcon /> : <CreateIcon />}
+            </IconButton>
+          </Tooltip>
         </Box>
 
         {/* Input Section */}
-        <Paper elevation={2} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+        <Paper
+          elevation={3}
+          sx={{
+            p: 3,
+            mb: 4,
+            borderRadius: 3,
+            background: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(20px)',
+            border: `1px solid ${theme.palette.divider}`
+          }}
+        >
           <TextField
             fullWidth
             multiline
@@ -404,16 +616,26 @@ const Observatory: React.FC = () => {
             >
               {isObserving ? t('observatory.observing', 'Observing...') : t('observatory.observe', 'Observe Patterns')}
             </Button>
-              {observation && (
+              {(observation || anonymousObservation) && (
               <>
                     <Button
                       variant="outlined"
-                      startIcon={<CreateIcon />}
-                      onClick={handleShare}
+                      startIcon={<SaveIcon />}
+                      onClick={handleSave}
+                      disabled={!currentUser}
                   sx={{ flex: { xs: 1, sm: 'none' } }}
                 >
-                  {t('observatory.share', 'Create Post')}
+                  {t('observatory.save', 'Save Observation')}
                     </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<CreateIcon />}
+                  onClick={handleCreateLesson}
+                  disabled={!currentUser}
+                  sx={{ flex: { xs: 1, sm: 'none' } }}
+                >
+                  {t('observatory.create_lesson', 'Create Lesson')}
+                </Button>
                 <Tooltip title={t('observatory.clearTooltip', 'Clear all data')}>
                   <IconButton onClick={handleClear} color="error">
                     <ClearIcon />
@@ -434,7 +656,7 @@ const Observatory: React.FC = () => {
                         color="inherit" 
                         size="small"
                         onClick={() => {
-                          setServiceErrorMessage(observationError);
+                          setServiceErrorMessage(observationError?.message || 'Unknown error');
                           setFeedbackOpen(true);
                         }}
                       >
@@ -442,7 +664,7 @@ const Observatory: React.FC = () => {
                       </Button>
                   }
                 >
-                  {observationError}
+                  {observationError?.message || 'An error occurred'}
                 </Alert>
               )}
 
@@ -462,347 +684,50 @@ const Observatory: React.FC = () => {
           </Alert>
         )}
 
-        {/* Results Section */}
-        {observation && !isObserving && (
-          <>
-            {/* Quick Stats */}
-            <Paper elevation={1} sx={{ p: 2, mb: 3, borderRadius: 2 }}>
-              <Stack 
-                direction="row" 
-                spacing={2} 
-                sx={{ 
-                  overflowX: 'auto', 
-                  pb: 1,
-                  '&::-webkit-scrollbar': { height: 4 },
-                  '&::-webkit-scrollbar-thumb': { 
-                    backgroundColor: 'rgba(0,0,0,0.2)',
-                    borderRadius: 2
-                  }
-                }}
-              >
-                <Chip
-                  icon={<CategoryIcon />}
-                  label={`${patternStats.length} ${t('observatory.patternTypes', 'Types')}`}
-                  color="primary"
-                  sx={{ fontWeight: 600 }}
-                />
-                <Chip
-                  icon={<AutoAwesomeIcon />}
-                  label={`${observation.patterns.length} ${t('observatory.totalPatterns', 'Patterns')}`}
-                  sx={{ fontWeight: 600 }}
-                />
-                <Chip
-                  icon={<TextFieldsIcon />}
-                  label={`${observation.patterns.reduce((sum, p) => sum + p.segments.length, 0)} ${t('observatory.instances', 'Instances')}`}
-                  sx={{ fontWeight: 600 }}
-                />
-              </Stack>
-            </Paper>
-
-            {/* Main Content Area */}
-            <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-              {/* Tabs */}
-              <Tabs
-                value={activeTab}
-                onChange={(_, newValue) => setActiveTab(newValue)}
-                variant="fullWidth"
-                sx={{ 
-                  borderBottom: 1, 
-                  borderColor: 'divider',
-                  bgcolor: 'background.paper'
-                }}
-              >
-                <Tab 
-                  label={t('observatory.overview', 'Overview')} 
-                  icon={<CategoryIcon />}
-                  iconPosition="start"
-                />
-                <Tab 
-                  label={t('observatory.patterns', 'Patterns')} 
-                  icon={<FilterIcon />}
-                  iconPosition="start"
-                />
-                <Tab 
-                  label={t('observatory.text', 'Text')} 
-                  icon={<TextFieldsIcon />}
-                  iconPosition="start"
-                />
-                <Tab 
-                  label={t('observatory.customize', 'Customize')} 
-                  icon={<PaletteIcon />}
-                  iconPosition="start"
-                />
-              </Tabs>
-
-              <Box sx={{ minHeight: 400, maxHeight: { xs: 600, md: 700 }, overflow: 'auto' }}>
-                {/* Overview Tab */}
-                <TabPanel value={activeTab} index={0}>
-                  <Box sx={{ p: { xs: 2, sm: 3 } }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      <LightbulbIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'text-bottom' }} />
-                      {t('observatory.overviewHint', 'Click any pattern to highlight it in the text')}
-                    </Typography>
-                    
-                    <Stack spacing={1}>
-                      {patternStats.map(stat => (
-                        <Accordion
-                          key={stat.type}
-                          expanded={expandedPattern === stat.type}
-                          onChange={(_, isExpanded) => setExpandedPattern(isExpanded ? stat.type : null)}
-                          sx={{
-                            '&:before': { display: 'none' },
-                            boxShadow: 1,
-                            '&.Mui-expanded': { margin: '8px 0' }
-                          }}
-                        >
-                          <AccordionSummary 
-                            expandIcon={<ExpandMoreIcon />}
-                            sx={{ 
-                              '&:hover': { bgcolor: 'action.hover' },
-                              minHeight: 56
-                            }}
-                          >
-                            <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2 }}>
-                              <Box sx={{ color: 'primary.main' }}>
-                                {patternIcons[stat.type] || patternIcons.default}
-                              </Box>
-                              <Typography sx={{ flexGrow: 1, textTransform: 'capitalize', fontWeight: 500 }}>
-                                {stat.type}
-                              </Typography>
-                              <Stack direction="row" spacing={1} alignItems="center">
-                                <Chip 
-                                  label={`${stat.count} ${t('observatory.patternsLower', 'patterns')}`} 
-                                  size="small"
-                                  variant="outlined"
-                                />
-                                <Badge badgeContent={stat.instances} color="primary" max={999}>
-                                  <Box sx={{ width: 20 }} />
-                                </Badge>
-                              </Stack>
-                </Box>
-                          </AccordionSummary>
-                          <AccordionDetails sx={{ pt: 0 }}>
-                            <Divider sx={{ mb: 2 }} />
-                            <Stack spacing={1}>
-                              {stat.patterns.slice(0, 5).map((pattern, idx) => (
-                                <PatternDetail key={idx} pattern={pattern} />
-                              ))}
-                              {stat.patterns.length > 5 && (
-                                <Button 
-                                  size="small" 
-                                  onClick={() => {
-                                    setActiveTab(1);
-                                    togglePatternType(stat.type);
-                                  }}
-                                  sx={{ alignSelf: 'flex-start' }}
-                                >
-                                  {t('observatory.viewAll', 'View all')} ({stat.patterns.length})
-                                </Button>
-                              )}
-                            </Stack>
-                          </AccordionDetails>
-                        </Accordion>
-                      ))}
-                    </Stack>
-                  </Box>
-                </TabPanel>
-
-                {/* Patterns Tab */}
-                <TabPanel value={activeTab} index={1}>
-                  <Box sx={{ p: { xs: 2, sm: 3 } }}>
-                    {/* Search */}
-                    <TextField
-                      fullWidth
-                      size="small"
-                      placeholder={t('observatory.searchPatterns', 'Search patterns...')}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      InputProps={{
-                        startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
-                      }}
-                      sx={{ mb: 3 }}
-                    />
-                    
-                    {/* Type Filters */}
-                    <Box sx={{ mb: 3 }}>
-                      <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-                        {t('observatory.filterByType', 'Filter by Type')}
-                      </Typography>
-                      <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1 }}>
-                        {Array.from(patternsByType.keys()).map(type => (
-                          <Chip
-                            key={type}
-                            label={type}
-                            onClick={() => togglePatternType(type)}
-                            color={selectedPatternTypes.has(type) ? 'primary' : 'default'}
-                            variant={selectedPatternTypes.has(type) ? 'filled' : 'outlined'}
-                            icon={patternIcons[type] || patternIcons.default}
-                            sx={{ textTransform: 'capitalize' }}
-                          />
-                        ))}
-                      </Stack>
-                    </Box>
-                    
-                    <Divider sx={{ my: 2 }} />
-                    
-                    {/* Pattern List */}
-                    <Stack spacing={1}>
-                      {filteredPatterns.length === 0 ? (
-                        <Typography color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-                          {t('observatory.noPatterns', 'No patterns found matching your criteria')}
-                        </Typography>
-                      ) : (
-                        filteredPatterns.map((pattern, idx) => (
-                          <PatternDetail key={idx} pattern={pattern} />
-                        ))
-                      )}
-                    </Stack>
-                  </Box>
-                </TabPanel>
-
-                {/* Text Tab */}
-                <TabPanel value={activeTab} index={2}>
-                  <Box sx={{ p: { xs: 2, sm: 3 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                        {t('observatory.textView', 'Highlighted Text')}
-                      </Typography>
-                      <Stack direction="row" spacing={1}>
-                        <Tooltip title={showHighlights ? t('observatory.hideHighlights', 'Hide highlights') : t('observatory.showHighlights', 'Show highlights')}>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => setShowHighlights(!showHighlights)}
-                            color={showHighlights ? 'primary' : 'default'}
-                          >
-                            {showHighlights ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title={t('observatory.customizeAppearance', 'Customize appearance')}>
-                          <IconButton 
-                            size="small" 
-                            onClick={() => setActiveTab(3)}
-                            color="default"
-                          >
-                            <PaletteIcon />
-                          </IconButton>
-                        </Tooltip>
-
-                      </Stack>
-                    </Box>
-                    
-                    <Paper 
-                      id="observatory-text-display"
-                      variant="outlined" 
-                      sx={{ 
-                        p: observatoryTheme.expandedView ? 0 : 2,
-                        minHeight: observatoryTheme.expandedView ? observatoryTheme.viewportHeight : 200,
-                        maxHeight: observatoryTheme.expandedView ? 'none' : 500,
-                        overflow: observatoryTheme.expandedView ? 'visible' : 'auto',
-                        bgcolor: observatoryTheme.expandedView ? 'transparent' : 'background.default',
-                        border: observatoryTheme.expandedView ? 'none' : undefined
-                      }}
-                    >
-                      <HighlightedText
-                        originalText={observation.originalText || observation.text || ''} 
-                        patterns={showHighlights ? filteredPatterns : []}
-                        activeFilters={selectedPatternTypes}
-                        isLightTheme={false}
-                        theme={observatoryTheme}
-                      />
-                    </Paper>
-                    
-
-                  </Box>
-                </TabPanel>
-
-                {/* Customize Tab */}
-                <TabPanel value={activeTab} index={3}>
-                  <Box sx={{ p: { xs: 2, sm: 3 } }}>
-                    <ObservatoryCustomizer
-                      theme={observatoryTheme}
-                      onThemeChange={handleThemeChange}
-                      onSave={handleThemeSave}
-                      onReset={handleThemeReset}
-                    />
-                  </Box>
-                </TabPanel>
-              </Box>
-            </Paper>
-          </>
+        {/* Payload Optimization Notification */}
+        {payloadOptimizationInfo?.wasOptimized && (
+          <Alert 
+            severity="warning" 
+            sx={{ mb: 2 }}
+            onClose={() => setPayloadOptimizationInfo(null)}
+          >
+            {t('observatory.payload_optimized', 'Pattern results optimized for performance')}
+            <Typography variant="caption" display="block" sx={{ mt: 0.5, opacity: 0.8 }}>
+              Showing {payloadOptimizationInfo.optimizedCount} of {payloadOptimizationInfo.originalCount} patterns found. 
+              The most significant patterns have been preserved.
+            </Typography>
+          </Alert>
         )}
 
-        {/* Empty State */}
-        {!observation && !isObserving && !observationError && (
-          <Paper elevation={0} sx={{ p: 4, textAlign: 'center', borderRadius: 2 }}>
-            <AutoAwesomeIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-            <Typography variant="h6" gutterBottom>
-              {t('observatory.welcome', 'Ready to Explore?')}
+        {/* Main Content */}
+        {(observation || anonymousObservation) ? (
+          <ObservatoryTabs
+            observation={observation || anonymousObservation}
+            state={state}
+            onStateChange={handleStateChange}
+            onPatternClick={handlePatternClick}
+            onPatternExpand={handlePatternExpand}
+            theme={observatoryTheme}
+            onThemeChange={handleThemeChange}
+            significanceThreshold={significanceThreshold}
+            onSignificanceThresholdChange={setSignificanceThreshold}
+          />
+        ) : !text && !isObserving ? (
+          <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              {t('observatory.welcome', 'Welcome to the Observatory')}
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 400, mx: 'auto' }}>
-              {t('observatory.instructions', 'Paste any text above and click "Observe Patterns" to discover rhymes, alliteration, and other linguistic patterns.')}
+            <Typography variant="body2" color="text.secondary">
+              {t('observatory.welcome_desc', 'Enter text below to discover hidden patterns')}
             </Typography>
-          </Paper>
-        )}
+          </Box>
+        ) : null}
       </Container>
       
       {/* Floating XP Display */}
       <FloatingXpDisplay {...lastXpGained} />
 
-      {/* Mobile FAB for pattern filters */}
-      {isMobile && observation && activeTab === 1 && (
-        <Fab
-          color="primary"
-            sx={{ position: 'fixed', bottom: 16, right: 16 }}
-          onClick={() => setIsDrawerOpen(true)}
-          >
-          <FilterIcon />
-          </Fab>
-      )}
-      
-      {/* Filter Drawer for Mobile */}
-          <SwipeableDrawer
-            anchor="bottom"
-        open={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        onOpen={() => setIsDrawerOpen(true)}
-        PaperProps={{
-          sx: {
-                borderTopLeftRadius: 16,
-                borderTopRightRadius: 16,
-            maxHeight: '80vh'
-          }
-        }}
-      >
-        <Box sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            {t('observatory.filters', 'Filters')}
-          </Typography>
-          <Typography variant="subtitle2" sx={{ mb: 2 }}>
-            {t('observatory.selectTypes', 'Select pattern types to display')}
-          </Typography>
-          <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1 }}>
-            {Array.from(patternsByType.keys()).map(type => (
-              <Chip
-                key={type}
-                label={type}
-                onClick={() => togglePatternType(type)}
-                color={selectedPatternTypes.has(type) ? 'primary' : 'default'}
-                variant={selectedPatternTypes.has(type) ? 'filled' : 'outlined'}
-                icon={patternIcons[type] || patternIcons.default}
-                sx={{ textTransform: 'capitalize' }}
-              />
-            ))}
-          </Stack>
-          <Button 
-            fullWidth 
-            variant="contained" 
-            sx={{ mt: 3 }}
-            onClick={() => setIsDrawerOpen(false)}
-          >
-            {t('observatory.apply', 'Apply Filters')}
-          </Button>
-            </Box>
-          </SwipeableDrawer>
+
       
       {/* Feedback Dialog */}
       <ObservatoryFeedback
@@ -822,6 +747,54 @@ const Observatory: React.FC = () => {
         message={successMessage}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
+
+      {/* Lessons Modal for Anonymous Users */}
+      <Dialog
+        open={showLessonsModal}
+        onClose={() => setShowLessonsModal(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 1
+          }
+        }}
+      >
+        <DialogTitle sx={{ textAlign: 'center', pb: 1, fontWeight: 600 }}>
+          🎓 {t('lessons.modal.title', 'Ready to Learn More?')}
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: 'center', px: 3, py: 2 }}>
+          <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
+            {t('lessons.modal.description', "You've explored your free example! Our lessons teach you how to find these patterns yourself and unlock more Observatory observations.")}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, whiteSpace: 'pre-line' }}>
+            {t('lessons.modal.benefits', '✨ Learn pattern recognition techniques\n🔍 Earn more free Observatory uses\n🌟 Track your progress and achievements')}
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', gap: 2, pb: 3, px: 3 }}>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => {
+              setShowLessonsModal(false);
+              navigate('/lessons');
+            }}
+            sx={{ minWidth: 120 }}
+          >
+            {t('lessons.modal.visit_lessons', 'Visit Lessons')}
+          </Button>
+          <Button
+            variant="outlined"
+            size="large"
+            onClick={() => setShowLessonsModal(false)}
+            sx={{ minWidth: 120 }}
+          >
+            {t('lessons.modal.maybe_later', 'Maybe Later')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
     </Box>
   );
 };

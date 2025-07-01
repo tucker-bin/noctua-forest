@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Anthropic from '@anthropic-ai/sdk';
 import { logger } from '../utils/logger';
-import { ObservationData, Pattern, PatternType, Observation } from '../types/observation';
+import { ObservationData, Pattern, PatternType, Observation, Constellation } from '../types/observation';
 import { findEnhancedPatterns } from './patternRecognition';
 import { rateLimiter } from './rateLimiter';
 import { cacheService } from './cacheService';
@@ -126,23 +126,25 @@ export class MusicAnalysisService {
       // STEP 3: Add music-specific analysis
       const musicAnalysis = await this.performMusicSpecificAnalysis(textToAnalyze, lyricsResult.songMetadata);
       
-      // STEP 4: Create unified music observation
+      // STEP 4: Create unified music observation with proper structure
       const musicObservation: Omit<MusicObservation, 'id'> = {
-        data: {
-          patterns: observationResult.patterns,
-          originalText: observationResult.text,
-          timestamp: new Date().toISOString(),
-          constellations: observationResult.constellations || []
-        },
+        text: observationResult.text,
+        language: observationResult.language,
+        userId: observationResult.userId,
+        patterns: observationResult.patterns,
+        segments: observationResult.segments || [], // ✅ Add missing segments
+        constellations: observationResult.constellations || [],
+        createdAt: new Date(),
         metadata: {
-          userId: observationResult.userId,
-          title: lyricsResult.songMetadata?.title || 'Unknown Song',
-          description: `Musical observation of ${lyricsResult.songMetadata?.artistName || 'Unknown Artist'}`,
-          tags: ['music', 'lyrics', ...(lyricsResult.songMetadata?.genre || [])],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          language: observationResult.language
+          rhymeScheme: observationResult.metadata?.rhymeScheme || null,
+          meter: observationResult.metadata?.meter || null,
+          modelUsed: observationResult.metadata?.modelUsed || 'default',
+          language: observationResult.metadata?.language || 'en',
+          analysisOptions: observationResult.metadata?.analysisOptions
         },
+        textWasCleaned: observationResult.textWasCleaned,
+        originalTextLength: observationResult.originalTextLength,
+        cleanedTextLength: observationResult.cleanedTextLength,
         musicMetadata: {
           songDetails: lyricsResult.songMetadata || this.extractBasicSongInfo(userInput),
           lyricsSource: lyricsResult.source,
@@ -169,9 +171,9 @@ export class MusicAnalysisService {
 
       return {
         ...savedObservation,
-        modelUsed: observationResult.modelUsed || 'enhanced-pattern-recognition',
-        cost: observationResult.cost || 0,
-        tokensUsed: observationResult.tokensUsed || 0
+        modelUsed: observationResult.metadata?.modelUsed || 'unknown',
+        cost: 0,
+        tokensUsed: 0
       };
 
     } catch (error) {

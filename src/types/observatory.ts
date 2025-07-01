@@ -174,82 +174,93 @@ export type PortuguesePatternType =
 
 // Combined pattern type
 export type PatternType = 
-  | BasePatternType
-  | JapanesePatternType
-  | ChinesePatternType
-  | KoreanPatternType
-  | ArabicPatternType
-  | HindiPatternType
-  | RussianPatternType
-  | TurkishPatternType
-  | FilipinoPatternType
-  | SpanishPatternType
-  | FrenchPatternType
-  | GermanPatternType
-  | ItalianPatternType
-  | PortuguesePatternType;
+  | 'rhyme'
+  | 'assonance'
+  | 'consonance'
+  | 'alliteration'
+  | 'rhythm'
+  | 'sibilance'
+  | 'internal_rhyme'
+  | 'slant_rhyme'
+  | 'repetition'
+  | 'parallelism'
+  | 'sound_parallelism'
+  | 'meter'
+  | 'caesura'
+  | 'code_switching'
+  | 'cultural_resonance'
+  | 'emotional_emphasis';
 
 export type PatternStrength = 'strong' | 'medium' | 'weak';
 
-export interface Pattern {
-  id: string;
-  segments: Segment[];
-  type: PatternType;
-  originalText: string;
-  acousticFeatures?: {
-    primaryFeature: string;
-    secondaryFeatures: string[];
-  };
-  languageSpecific?: {
-    language: string;
-    culturalContext?: string;
-    traditionalForm?: string;
-    scriptFeatures?: {
-      direction: 'ltr' | 'rtl';
-      script: string;
-      specialCharacters?: string[];
-    };
-    phonologicalFeatures?: {
-      tonal?: boolean;
-      lengthContrast?: boolean;
-      morphemeType?: string;
-    };
-  };
-  description?: string;
-  examples?: string[];
-  frequency?: number;
-  position?: number;
-  length?: number;
-  strength?: PatternStrength;
-  confidence?: number;
-  relatedPatterns?: string[];
-}
-
 export interface Segment {
+  id: string;
   text: string;
   startIndex: number;
   endIndex: number;
   globalStartIndex: number;
   globalEndIndex: number;
-  phoneticContext?: string;
+  phonetic?: PhoneticSegment;
+}
+
+export interface PhoneticSegment {
+  ipa: string;
+  vowels: string[];
+  consonants: string[];
+  syllableCount: number;
+  stressPattern: string[];
+}
+
+export interface Pattern {
+  id: string;
+  type: PatternType;
+  segments: string[]; // Array of segment IDs
+  originalText: string;
+  significance?: number; // From backend
+  description?: string;
+  acousticFeatures?: {
+    primaryFeature: string;
+    secondaryFeatures: string[];
+  };
+  phonetic?: PhoneticPattern;
+  languageSpecific?: {
+    language: string;
+    culturalContext?: string;
+    traditionalForm?: string;
+  };
+}
+
+export interface PhoneticPattern {
+  type: string;
+  segments: PhoneticSegment[];
+  commonSounds: {
+    vowels: string[];
+    consonants: string[];
+  };
+  difficultyLevel: 'beginner' | 'intermediate' | 'advanced';
 }
 
 export interface ObservationData {
+  id?: string;
+  text: string;
   patterns: Pattern[];
-  originalText: string;
-  timestamp: string;
-  constellations?: {
-    id: string;
-    name: string;
-    patterns: string[];
-    description: string;
-  }[];
-  metadata?: {
-    userId?: string;
+  segments: Segment[];
+  language: string;
+  metadata: {
+    userId: string;
     language: string;
     createdAt: string;
-    updatedAt: string;
+    updatedAt?: string;
   };
+  textWasCleaned?: boolean;
+  originalTextLength?: number;
+  cleanedTextLength?: number;
+}
+
+export interface ObservationResult extends ObservationData {
+  id: string;
+  createdAt: Date;
+  allPatterns?: Pattern[]; // From backend
 }
 
 export interface CachedObservation {
@@ -332,4 +343,22 @@ export const PATTERN_TAGS: Record<string, PatternTag[]> = {
     description: 'Words that sound similar',
     category: 'sound'
   }]
-}; 
+};
+
+export interface PatternGroup {
+  type: PatternType;
+  patterns: Pattern[];
+  centerX: number;
+  centerY: number;
+  color: string;
+}
+
+export interface PatternNode {
+  id: string;
+  pattern: Pattern;
+  x: number;
+  y: number;
+  radius: number;
+  color: string;
+  connections: string[];
+} 

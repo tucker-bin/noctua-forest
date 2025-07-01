@@ -6,13 +6,16 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import TelescopeIcon from '@mui/icons-material/Visibility';
 import GroupsIcon from '@mui/icons-material/Groups';
-
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import AudiotrackIcon from '@mui/icons-material/Audiotrack';
-import { useNavigate } from 'react-router-dom';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import ExtensionIcon from '@mui/icons-material/Extension';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { log } from '../utils/logger';
 import { Scriptorium } from '../components/Scriptorium/Scriptorium';
+import { FlowFinderHub } from '../components/features/FlowFinderHub';
+import { useExperience } from '../contexts/ExperienceContext';
 
 // Mock data - in real app this would come from API
 const mockAnalyses = [
@@ -154,8 +157,18 @@ export const ForestPage: React.FC = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { currentUser } = useAuth();
-  const [activeArea, setActiveArea] = useState<'overview' | 'observatory' | 'community' | 'pathways' | 'scriptorium'>('overview');
+  const { achievements } = useExperience();
+  const [activeArea, setActiveArea] = useState<'overview' | 'observatory' | 'community' | 'pathways' | 'scriptorium' | 'games' | 'achievements'>('overview');
+
+  // Handle URL parameters for deep linking
+  React.useEffect(() => {
+    const area = searchParams.get('area');
+    if (area && ['observatory', 'community', 'pathways', 'scriptorium', 'games', 'achievements'].includes(area)) {
+      setActiveArea(area as any);
+    }
+  }, [searchParams]);
 
   const handleLike = (analysisId: string) => {
     log.info('Liked analysis:', { data: analysisId });
@@ -201,11 +214,34 @@ export const ForestPage: React.FC = () => {
       title: t('forest.areas.scriptorium', 'Song Scriptorium'),
       description: t('forest.areas.scriptorium_desc', 'Discover patterns in music and lyrics'),
       icon: <AudiotrackIcon fontSize="inherit" />
+    },
+    {
+      id: 'games',
+      title: t('forest.areas.games', 'Game Grove'),
+      description: t('forest.areas.games_desc', 'Challenge your mind with word puzzles and pattern games'),
+      icon: <ExtensionIcon fontSize="inherit" />
+    },
+    {
+      id: 'achievements',
+      title: t('forest.areas.achievements', 'Achievement Hall'),
+      description: t('forest.areas.achievements_desc', 'Celebrate your journey and unlock new milestones'),
+      icon: <EmojiEventsIcon fontSize="inherit" />
     }
   ];
 
   return (
-
+    <Box 
+      sx={{ 
+        minHeight: '100vh',
+        bgcolor: theme.palette.forest.background,
+        pt: { xs: 2, sm: 4 },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '100%'
+      }}
+    >
       <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
         {/* Forest Overview */}
         {activeArea === 'overview' && (
@@ -327,7 +363,7 @@ export const ForestPage: React.FC = () => {
               {t('forest.explore_features', 'Explore the Forest')}
             </Typography>
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr', lg: 'repeat(4, 1fr)' }, gap: 4, mb: 6 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(3, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 4, mb: 6 }}>
               {forestAreas.map((area, index) => (
                 <motion.div
                   key={area.id}
@@ -470,7 +506,126 @@ export const ForestPage: React.FC = () => {
             <Scriptorium />
           </>
         )}
-      </Container>
 
+        {/* Game Grove Area */}
+        {activeArea === 'games' && (
+          <>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+              <Button
+                onClick={() => setActiveArea('overview')}
+                sx={{ mr: 2, color: theme.palette.forest.accent }}
+              >
+                ← {t('forest.back_to_forest', 'Back to Forest')}
+              </Button>
+              <Typography
+                variant="h4"
+                sx={{
+                  color: theme.palette.forest.primary,
+                  fontFamily: '"Noto Sans", sans-serif',
+                  fontWeight: 600
+                }}
+              >
+                🧩 {t('forest.areas.games', 'Game Grove')}
+              </Typography>
+            </Box>
+            <FlowFinderHub />
+          </>
+        )}
+
+        {/* Achievement Hall Area */}
+        {activeArea === 'achievements' && (
+          <>
+            <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
+              <Button
+                onClick={() => setActiveArea('overview')}
+                sx={{ mr: 2, color: theme.palette.forest.accent }}
+              >
+                ← {t('forest.back_to_forest', 'Back to Forest')}
+              </Button>
+              <Typography
+                variant="h4"
+                sx={{
+                  color: theme.palette.forest.primary,
+                  fontFamily: '"Noto Sans", sans-serif',
+                  fontWeight: 600
+                }}
+              >
+                🏆 {t('forest.areas.achievements', 'Achievement Hall')}
+              </Typography>
+            </Box>
+            
+            {/* Achievement Display */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }, gap: 3 }}>
+              {achievements.map((achievement) => (
+                <motion.div
+                  key={achievement.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Card
+                    sx={{
+                      background: achievement.unlocked
+                        ? `linear-gradient(135deg, ${theme.palette.forest.secondary}40 0%, ${theme.palette.forest.card}F0 100%)`
+                        : `${theme.palette.forest.card}66`,
+                      border: achievement.unlocked
+                        ? `2px solid ${theme.palette.forest.secondary}`
+                        : `1px solid ${theme.palette.forest.border}40`,
+                      opacity: achievement.unlocked ? 1 : 0.6,
+                      position: 'relative',
+                      overflow: 'visible'
+                    }}
+                  >
+                    <CardContent sx={{ textAlign: 'center', p: 3 }}>
+                      <Typography variant="h3" sx={{ mb: 2 }}>
+                        {achievement.icon}
+                      </Typography>
+                      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                        {achievement.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        {achievement.description}
+                      </Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+                        <EmojiEventsIcon sx={{ color: theme.palette.forest.secondary, fontSize: 16 }} />
+                        <Typography variant="caption" color={theme.palette.forest.secondary}>
+                          {achievement.xpReward} XP
+                        </Typography>
+                      </Box>
+                      {achievement.unlocked && achievement.unlockedAt && (
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                          Unlocked {new Date(achievement.unlockedAt).toLocaleDateString()}
+                        </Typography>
+                      )}
+                    </CardContent>
+                    {achievement.unlocked && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: -8,
+                          right: -8,
+                          width: 24,
+                          height: 24,
+                          borderRadius: '50%',
+                          background: theme.palette.forest.secondary,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: 'black',
+                          fontSize: 14,
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        ✓
+                      </Box>
+                    )}
+                  </Card>
+                </motion.div>
+              ))}
+            </Box>
+          </>
+        )}
+      </Container>
+    </Box>
   );
 }; 

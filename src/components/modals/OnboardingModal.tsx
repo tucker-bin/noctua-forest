@@ -17,9 +17,12 @@ import {
   Paper,
   Fade,
   Modal,
+  Chip,
+  Stack,
 } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import CloseIcon from '@mui/icons-material/Close';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import NoctuaMascot from '../celestial/NoctuaMascot';
 import { useTranslation } from 'react-i18next';
 
@@ -40,30 +43,34 @@ const modalStyle = {
 
 const ONBOARDING_STEPS = [
   {
-    titleKey: 'welcome_title',
-    messageKey: 'welcome_message',
-    owlMessageKey: 'welcome_owl_message',
+    titleKey: 'onboarding.welcome_title',
+    messageKey: 'onboarding.welcome_message',
+    owlMessageKey: 'onboarding.welcome_owl_message',
   },
   {
-    titleKey: 'toolkit_title',
-    messageKey: 'toolkit_message',
-    owlMessageKey: 'toolkit_owl_message',
+    titleKey: 'onboarding.toolkit_title',
+    messageKey: 'onboarding.toolkit_message',
+    owlMessageKey: 'onboarding.toolkit_owl_message',
+    exampleText: 'The rain in Spain stays mainly in the plain',
   },
   {
-    titleKey: 'path_title',
-    messageKey: 'path_message',
-    owlMessageKey: 'path_owl_message',
+    titleKey: 'onboarding.path_title',
+    messageKey: 'onboarding.path_message',
+    owlMessageKey: 'onboarding.path_owl_message',
+    exampleText: 'I see trees of green, red roses too',
   },
   {
-    titleKey: 'journey_title',
-    messageKey: 'journey_message',
-    owlMessageKey: 'journey_owl_message',
+    titleKey: 'onboarding.journey_title',
+    messageKey: 'onboarding.journey_message',
+    owlMessageKey: 'onboarding.journey_owl_message',
+    exampleText: 'Peter Piper picked a peck of pickled peppers',
   },
 ];
 
 interface OnboardingModalProps {
   open: boolean;
   onClose: () => void;
+  onTryExample?: (text: string) => void;
 }
 
 const FloatingStar: React.FC<{ delay: number; size: number; x: number; y: number }> = ({ delay, size, x, y }) => (
@@ -117,7 +124,7 @@ const CosmicDust: React.FC = () => (
   </Box>
 );
 
-const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
+const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose, onTryExample }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [consents, setConsents] = useState({
     terms: false,
@@ -137,7 +144,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
     } else {
       // Final step - check consents and close
       if (consents.terms && consents.privacy && consents.dataProcessing) {
-      onClose();
+        onClose();
       }
     }
   };
@@ -150,6 +157,13 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
 
   const handleConsentChange = (type: keyof typeof consents) => {
     setConsents(prev => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  const handleTryExample = (text: string) => {
+    if (onTryExample) {
+      onTryExample(text);
+      onClose(); // Close onboarding and let user try the example
+    }
   };
 
   const allConsentsGiven = consents.terms && consents.privacy && consents.dataProcessing;
@@ -178,7 +192,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
                 <NoctuaMascot />
               </Box>
               <Typography variant="h5" component="h2" sx={{ mb: 2, fontWeight: 'bold', textAlign: 'center' }}>
-                {isConsentStep ? t('consent_title', 'Privacy & Terms') : t(currentStepData!.titleKey)}
+                {isConsentStep ? t('onboarding.consent_title', 'Privacy & Terms') : t(currentStepData!.titleKey)}
               </Typography>
               <Typography 
                 variant="body1" 
@@ -189,7 +203,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
                   mx: 'auto',
                 }}
               >
-                {isConsentStep ? t('consent_message', 'Please review and accept our terms') : t(currentStepData!.messageKey)}
+                {isConsentStep ? t('onboarding.consent_message', 'Please review and accept our terms') : t(currentStepData!.messageKey)}
               </Typography>
 
               {/* Owl's message bubble - only show for non-consent steps */}
@@ -222,11 +236,81 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
                     sx={{ 
                       fontStyle: 'italic',
                       color: 'rgba(255, 255, 255, 0.9)',
+                      mb: 2,
                     }}
                   >
                     "{t(currentStepData!.owlMessageKey)}"
                   </Typography>
+                  
+                  {/* Try Example Button - show for steps that have example text */}
+                  {currentStepData!.exampleText && onTryExample && (
+                    <Box sx={{ textAlign: 'center', mt: 2 }}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        startIcon={<PlayArrowIcon />}
+                        onClick={() => handleTryExample(currentStepData!.exampleText!)}
+                        sx={{
+                          borderColor: 'rgba(255, 215, 0, 0.5)',
+                          color: 'rgba(255, 215, 0, 0.9)',
+                          '&:hover': {
+                            borderColor: 'rgba(255, 215, 0, 0.8)',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                          },
+                        }}
+                      >
+                        Try This Example
+                      </Button>
+                    </Box>
+                  )}
                 </Paper>
+              )}
+
+              {/* Quick examples for the first step */}
+              {!isConsentStep && currentStep === 0 && (
+                <Box sx={{ mt: 3, textAlign: 'center' }}>
+                  <Typography variant="body2" sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)' }}>
+                    {t('quick_start.or_try', 'Or try one of these examples:')}
+                  </Typography>
+                  <Stack direction="row" spacing={1} justifyContent="center" flexWrap="wrap" useFlexGap>
+                    <Chip
+                      label="Rain in Spain"
+                      onClick={() => handleTryExample('The rain in Spain stays mainly in the plain')}
+                      sx={{
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        color: 'rgba(255, 215, 0, 0.9)',
+                        border: '1px solid rgba(255, 215, 0, 0.3)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                        },
+                      }}
+                    />
+                    <Chip
+                      label="Peter Piper"
+                      onClick={() => handleTryExample('Peter Piper picked a peck of pickled peppers')}
+                      sx={{
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        color: 'rgba(255, 215, 0, 0.9)',
+                        border: '1px solid rgba(255, 215, 0, 0.3)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                        },
+                      }}
+                    />
+                    <Chip
+                      label="Green Trees"
+                      onClick={() => handleTryExample('I see trees of green, red roses too')}
+                      sx={{
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        color: 'rgba(255, 215, 0, 0.9)',
+                        border: '1px solid rgba(255, 215, 0, 0.3)',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                        },
+                      }}
+                    />
+                  </Stack>
+                </Box>
               )}
 
               {/* Consent checkboxes - only show for consent step */}
@@ -240,7 +324,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
                         sx={{ color: 'secondary.main' }}
                       />
                     }
-                    label={t('consent_terms', 'I accept the Terms of Service')}
+                    label={t('onboarding.consent_terms', 'I accept the Terms of Service')}
                   />
                   <FormControlLabel
                     control={
@@ -250,7 +334,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
                         sx={{ color: 'secondary.main' }}
                       />
                     }
-                    label={t('consent_privacy', 'I accept the Privacy Policy')}
+                    label={t('onboarding.consent_privacy', 'I accept the Privacy Policy')}
                   />
                   <FormControlLabel
                     control={
@@ -260,7 +344,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ open, onClose }) => {
                         sx={{ color: 'secondary.main' }}
                       />
                     }
-                    label={t('consent_data', 'I consent to data processing')}
+                    label={t('onboarding.consent_data', 'I consent to data processing')}
                   />
                 </FormGroup>
               )}

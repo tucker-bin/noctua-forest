@@ -5,6 +5,7 @@ import { requireAuth } from '../middleware/auth';
 import { lessonService } from '../services/lessonService';
 import { LearningPath } from '../types/lesson.types';
 import { logger } from '../utils/logger';
+import { ValidationError } from '../utils/errors';
 
 const router = express.Router();
 
@@ -12,7 +13,7 @@ const router = express.Router();
 router.get('/:path', requireAuth, async (req: any, res: any) => {
   try {
     const path = req.params.path as LearningPath;
-    if (!['explorer', 'navigator'].includes(path)) {
+    if (!['celestial-observer', 'pattern-navigator', 'cultural-astronomer'].includes(path)) {
       res.status(400).json({
         success: false,
         error: 'Invalid path'
@@ -31,7 +32,8 @@ router.get('/:path', requireAuth, async (req: any, res: any) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch lessons'
-    }); return;
+    });
+ return;
   }
 });
 
@@ -39,7 +41,7 @@ router.get('/:path', requireAuth, async (req: any, res: any) => {
 router.get('/:path/:slug', requireAuth, async (req: any, res: any) => {
   try {
     const { path, slug } = req.params;
-    if (!['explorer', 'navigator'].includes(path)) {
+    if (!['celestial-observer', 'pattern-navigator', 'cultural-astronomer'].includes(path)) {
       res.status(400).json({
         success: false,
         error: 'Invalid path'
@@ -71,7 +73,8 @@ router.get('/:path/:slug', requireAuth, async (req: any, res: any) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch lesson'
-    }); return;
+    });
+ return;
   }
 });
 
@@ -79,7 +82,9 @@ router.get('/:path/:slug', requireAuth, async (req: any, res: any) => {
 router.post('/:path/:slug/start', requireAuth, async (req: any, res: any) => {
   try {
     const { path, slug } = req.params;
-    if (!['explorer', 'navigator'].includes(path)) {
+    const { language = 'en' } = req.body;
+    
+    if (!['celestial-observer', 'pattern-navigator', 'cultural-astronomer'].includes(path)) {
       res.status(400).json({
         success: false,
         error: 'Invalid path'
@@ -96,7 +101,7 @@ router.post('/:path/:slug/start', requireAuth, async (req: any, res: any) => {
       return;
     }
 
-    const progress = await lessonService.startLesson((req as any).user.uid, lesson);
+    const progress = await lessonService.startLesson((req as any).user.uid, lesson, language);
     res.json({
       success: true,
       data: progress
@@ -106,7 +111,8 @@ router.post('/:path/:slug/start', requireAuth, async (req: any, res: any) => {
     res.status(500).json({
       success: false,
       error: 'Failed to start lesson'
-    }); return;
+    });
+ return;
   }
 });
 
@@ -155,7 +161,8 @@ router.post('/:path/:slug/exercise/:exerciseId', requireAuth, async (req: any, r
     res.status(500).json({
       success: false,
       error: 'Failed to submit exercise'
-    }); return;
+    });
+ return;
   }
 });
 
@@ -184,7 +191,83 @@ router.put('/:path/:slug/time', requireAuth, async (req: any, res: any) => {
     res.status(500).json({
       success: false,
       error: 'Failed to update lesson time'
-    }); return;
+    });
+ return;
+  }
+});
+
+// Scriptorium Lessons
+router.post('/scriptorium', requireAuth, async (req, res, next) => {
+  try {
+    const { lesson } = req.body;
+    const userId = req.user!.uid;
+
+    if (!lesson) {
+      throw new ValidationError('Lesson data is required');
+    }
+
+    const savedLesson = await lessonService.saveScriptoriumLesson(userId, lesson);
+    res.json(savedLesson);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get('/scriptorium', requireAuth, async (req, res, next) => {
+  try {
+    const userId = req.user!.uid;
+    const lessons = await lessonService.getScriptoriumLessons(userId);
+    res.json(lessons);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Community Lessons
+router.get('/community', async (req, res, next) => {
+  try {
+    const { 
+      limit, 
+      offset, 
+      sortBy, 
+      difficulty 
+    } = req.query;
+
+    const options = {
+      limit: limit ? parseInt(limit as string) : undefined,
+      offset: offset ? parseInt(offset as string) : undefined,
+      sortBy: sortBy as 'recent' | 'popular',
+      difficulty: difficulty as 'beginner' | 'intermediate' | 'advanced'
+    };
+
+    const lessons = await lessonService.getCommunityLessons(options);
+    res.json(lessons);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/scriptorium/:lessonId/publish', requireAuth, async (req, res, next) => {
+  try {
+    const { lessonId } = req.params;
+    const userId = req.user!.uid;
+
+    const lesson = await lessonService.getLesson('celestial-observer', lessonId);
+    if (!lesson) {
+      res.status(404).json({
+        success: false,
+        error: 'Lesson not found'
+      });
+      return;
+    }
+
+    await lessonService.updateLessonTime(userId, lessonId, 0); // Mark as published
+    res.json({
+      success: true,
+      data: lesson
+    });
+  } catch (error) {
+    next(error);
   }
 });
 

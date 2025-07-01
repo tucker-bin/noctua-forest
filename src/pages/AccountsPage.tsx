@@ -22,6 +22,7 @@ import {
   FormControlLabel,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../contexts/AuthContext';
 import { useUsage } from '../contexts/UsageContext';
 import { useNavigate } from 'react-router-dom';
@@ -67,6 +68,7 @@ const AccountsPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
+  const theme = useTheme();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setActiveTab(newValue);
@@ -80,337 +82,354 @@ const AccountsPage: React.FC = () => {
   const monthlyUsagePercentage = usageInfo ? (usageInfo.observationsThisMonth / 100) * 100 : 0;
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography
-        variant="h4"
-        sx={{
-          mb: 4,
-          fontWeight: 700,
-          color: 'secondary.main',
-          fontFamily: '"Space Grotesk", sans-serif',
-        }}
-      >
-        {t('accounts.title', 'My Account')}
-      </Typography>
-
-      <Paper
-        sx={{
-          borderRadius: 2,
-          overflow: 'hidden',
-          background: 'rgba(26, 27, 46, 0.6)',
-          border: '1px solid rgba(255, 215, 0, 0.2)',
-        }}
-      >
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
+    <Box 
+      sx={{ 
+        minHeight: '100vh',
+        bgcolor: theme.palette.forest.background,
+        pt: { xs: 2, sm: 4 },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '100%'
+      }}
+    >
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Typography
+          variant="h4"
           sx={{
-            borderBottom: 1,
-            borderColor: 'divider',
-            bgcolor: 'rgba(26, 27, 46, 0.8)',
-            '& .MuiTab-root': {
-              color: 'text.secondary',
-              '&.Mui-selected': {
-                color: 'secondary.main',
-              },
-            },
+            mb: 4,
+            fontWeight: 700,
+            background: `linear-gradient(45deg, ${theme.palette.forest.primary}, ${theme.palette.forest.secondary})`,
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontFamily: '"Noto Sans", sans-serif',
           }}
         >
-          <Tab icon={<BarChartIcon />} label={t('accounts.usage', 'Usage')} />
-          <Tab icon={<PersonIcon />} label={t('accounts.profile', 'Profile')} />
-          <Tab icon={<PaymentIcon />} label={t('accounts.billing', 'Billing')} />
-          <Tab icon={<PsychologyIcon />} label={t('accounts.ai_models', 'AI Models')} />
-          <Tab icon={<SettingsIcon />} label={t('accounts.settings', 'Settings')} />
-        </Tabs>
+          {t('accounts.title', 'My Account')}
+        </Typography>
 
-        {/* Usage Tab */}
-        <TabPanel value={activeTab} index={0}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-            {/* Token Balance Card */}
-            <Card
-              sx={{
-                background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(26, 27, 46, 0.9) 100%)',
-                border: '1px solid rgba(255, 215, 0, 0.3)',
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <TokenIcon sx={{ color: 'secondary.main', mr: 1 }} />
-                  <Typography variant="h6">
-                    {t('accounts.token_balance', 'Token Balance')}
-                  </Typography>
-                </Box>
-                <Typography variant="h3" sx={{ color: 'secondary.main', mb: 1 }}>
-                  {usageInfo?.tokenBalance || 0}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {t('accounts.tokens_remaining', 'tokens remaining')}
-                </Typography>
-                <Button
-                  variant="outlined"
-                  size="small"
-                  sx={{ mt: 2, borderColor: 'secondary.main', color: 'secondary.main' }}
-                  onClick={() => navigate('/pricing')}
-                >
-                  {t('accounts.buy_tokens', 'Buy More Tokens')}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Monthly Usage Card */}
-            <Card
-              sx={{
-                background: 'rgba(26, 27, 46, 0.6)',
-                border: '1px solid rgba(255, 215, 0, 0.2)',
-              }}
-            >
-              <CardContent>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <CalendarMonthIcon sx={{ color: 'text.secondary', mr: 1 }} />
-                  <Typography variant="h6">
-                    {t('accounts.monthly_usage', 'Monthly Usage')}
-                  </Typography>
-                </Box>
-                <Typography variant="h3" sx={{ mb: 1 }}>
-                  {usageInfo?.observationsThisMonth || 0}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                  {t('accounts.observations_this_month', 'observations this month')}
-                </Typography>
-                <LinearProgress
-                  variant="determinate"
-                  value={monthlyUsagePercentage}
-                  sx={{
-                    height: 8,
-                    borderRadius: 4,
-                    bgcolor: 'rgba(255, 215, 0, 0.1)',
-                    '& .MuiLinearProgress-bar': {
-                      bgcolor: 'secondary.main',
-                    },
-                  }}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Usage Statistics - spans full width */}
-            <Card
-              sx={{
-                gridColumn: '1 / -1',
-                background: 'rgba(26, 27, 46, 0.6)',
-                border: '1px solid rgba(255, 215, 0, 0.2)',
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 3 }}>
-                  {t('accounts.usage_breakdown', 'Usage Breakdown')}
-                </Typography>
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
-                  <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Typography variant="h4" color="secondary.main">
-                      {tokenConfig.baseCost}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('accounts.base_cost', 'Base cost per observation')}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Typography variant="h4" color="secondary.main">
-                      {tokenConfig.batchSize}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('accounts.characters_per_batch', 'Characters per batch')}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Typography variant="h4" color="secondary.main">
-                      {(tokenConfig.bulkDiscount * 100).toFixed(0)}%
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('accounts.bulk_discount', 'Bulk discount (5+ batches)')}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Typography variant="h4" color="secondary.main">
-                      {usageInfo?.userRegion || 'US'}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('accounts.your_region', 'Your region')}
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
-          </Box>
-        </TabPanel>
-
-        {/* Profile Tab */}
-        <TabPanel value={activeTab} index={1}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
-            <Card
-              sx={{
-                background: 'rgba(26, 27, 46, 0.6)',
-                border: '1px solid rgba(255, 215, 0, 0.2)',
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 3 }}>
-                  {t('accounts.profile_info', 'Profile Information')}
-                </Typography>
-                
-                <TextField
-                  fullWidth
-                  label={t('accounts.display_name', 'Display Name')}
-                  defaultValue={currentUser?.displayName || ''}
-                  sx={{ mb: 2 }}
-                />
-                
-                <TextField
-                  fullWidth
-                  label={t('accounts.email', 'Email')}
-                  value={currentUser?.email || ''}
-                  disabled
-                  sx={{ mb: 2 }}
-                />
-                
-                <Button
-                  variant="contained"
-                  sx={{
-                    background: 'linear-gradient(45deg, #FFD700, #FFA500)',
-                    color: 'primary.main',
-                  }}
-                >
-                  {t('accounts.update_profile', 'Update Profile')}
-                </Button>
-              </CardContent>
-            </Card>
-            
-            <Card
-              sx={{
-                background: 'rgba(26, 27, 46, 0.6)',
-                border: '1px solid rgba(255, 215, 0, 0.2)',
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 3 }}>
-                  {t('accounts.account_status', 'Account Status')}
-                </Typography>
-                
-                <List>
-                  <ListItem>
-                    <ListItemText
-                      primary={t('accounts.member_since', 'Member Since')}
-                      secondary={currentUser?.metadata?.creationTime || 'N/A'}
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primary={t('accounts.email_verified', 'Email Verified')}
-                      secondary={
-                        <Chip
-                          label={currentUser?.emailVerified ? t('common.yes', 'Yes') : t('common.no', 'No')}
-                          color={currentUser?.emailVerified ? 'success' : 'warning'}
-                          size="small"
-                        />
-                      }
-                    />
-                  </ListItem>
-                </List>
-              </CardContent>
-            </Card>
-          </Box>
-        </TabPanel>
-
-        {/* Billing Tab */}
-        <TabPanel value={activeTab} index={2}>
-          <Alert severity="info" sx={{ mb: 3 }}>
-            {t('accounts.billing_info', 'Billing features coming soon. For now, all features are free during beta.')}
-          </Alert>
-          
-          <Button
-            variant="contained"
+        <Paper
+          sx={{
+            borderRadius: 2,
+            overflow: 'hidden',
+            background: `linear-gradient(135deg, ${theme.palette.forest.card}CC 0%, ${theme.palette.forest.card}99 100%)`,
+            backdropFilter: 'blur(10px)',
+            border: `1px solid ${theme.palette.forest.border}40`,
+          }}
+        >
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
             sx={{
-              background: 'linear-gradient(45deg, #FFD700, #FFA500)',
-              color: 'primary.main',
+              borderBottom: 1,
+              borderColor: 'divider',
+              bgcolor: `${theme.palette.forest.card}80`,
+              '& .MuiTab-root': {
+                color: 'text.secondary',
+                '&.Mui-selected': {
+                  color: theme.palette.forest.primary,
+                },
+              },
             }}
-            onClick={() => navigate('/pricing')}
           >
-            {t('accounts.view_plans', 'View Available Plans')}
-          </Button>
-        </TabPanel>
+            <Tab icon={<BarChartIcon />} label={t('accounts.usage', 'Usage')} />
+            <Tab icon={<PersonIcon />} label={t('accounts.profile', 'Profile')} />
+            <Tab icon={<PaymentIcon />} label={t('accounts.billing', 'Billing')} />
+            <Tab icon={<PsychologyIcon />} label={t('accounts.ai_models', 'AI Models')} />
+            <Tab icon={<SettingsIcon />} label={t('accounts.settings', 'Settings')} />
+          </Tabs>
 
-        {/* AI Models Tab */}
-        <TabPanel value={activeTab} index={3}>
-          <ModelPreferences />
-        </TabPanel>
+          {/* Usage Tab */}
+          <TabPanel value={activeTab} index={0}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+              {/* Token Balance Card */}
+              <Card
+                sx={{
+                  background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(26, 27, 46, 0.9) 100%)',
+                  border: '1px solid rgba(255, 215, 0, 0.3)',
+                }}
+              >
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <TokenIcon sx={{ color: 'secondary.main', mr: 1 }} />
+                    <Typography variant="h6">
+                      {t('accounts.token_balance', 'Token Balance')}
+                    </Typography>
+                  </Box>
+                  <Typography variant="h3" sx={{ color: 'secondary.main', mb: 1 }}>
+                    {usageInfo?.tokenBalance || 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {t('accounts.tokens_remaining', 'tokens remaining')}
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    sx={{ mt: 2, borderColor: 'secondary.main', color: 'secondary.main' }}
+                    onClick={() => navigate('/pricing')}
+                  >
+                    {t('accounts.buy_tokens', 'Buy More Tokens')}
+                  </Button>
+                </CardContent>
+              </Card>
 
-        {/* Settings Tab */}
-        <TabPanel value={activeTab} index={4}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 3 }}>
-            <Card
+              {/* Monthly Usage Card */}
+              <Card
+                sx={{
+                  background: 'rgba(26, 27, 46, 0.6)',
+                  border: '1px solid rgba(255, 215, 0, 0.2)',
+                }}
+              >
+                <CardContent>
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                    <CalendarMonthIcon sx={{ color: 'text.secondary', mr: 1 }} />
+                    <Typography variant="h6">
+                      {t('accounts.monthly_usage', 'Monthly Usage')}
+                    </Typography>
+                  </Box>
+                  <Typography variant="h3" sx={{ mb: 1 }}>
+                    {usageInfo?.observationsThisMonth || 0}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    {t('accounts.observations_this_month', 'observations this month')}
+                  </Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={monthlyUsagePercentage}
+                    sx={{
+                      height: 8,
+                      borderRadius: 4,
+                      bgcolor: 'rgba(255, 215, 0, 0.1)',
+                      '& .MuiLinearProgress-bar': {
+                        bgcolor: 'secondary.main',
+                      },
+                    }}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Usage Statistics - spans full width */}
+              <Card
+                sx={{
+                  gridColumn: '1 / -1',
+                  background: 'rgba(26, 27, 46, 0.6)',
+                  border: '1px solid rgba(255, 215, 0, 0.2)',
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 3 }}>
+                    {t('accounts.usage_breakdown', 'Usage Breakdown')}
+                  </Typography>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
+                    <Box sx={{ textAlign: 'center', p: 2 }}>
+                      <Typography variant="h4" color="secondary.main">
+                        {tokenConfig.baseCost}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {t('accounts.base_cost', 'Base cost per observation')}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'center', p: 2 }}>
+                      <Typography variant="h4" color="secondary.main">
+                        {tokenConfig.batchSize}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {t('accounts.characters_per_batch', 'Characters per batch')}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'center', p: 2 }}>
+                      <Typography variant="h4" color="secondary.main">
+                        {(tokenConfig.bulkDiscount * 100).toFixed(0)}%
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {t('accounts.bulk_discount', 'Bulk discount (5+ batches)')}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ textAlign: 'center', p: 2 }}>
+                      <Typography variant="h4" color="secondary.main">
+                        {usageInfo?.userRegion || 'US'}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {t('accounts.your_region', 'Your region')}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Box>
+          </TabPanel>
+
+          {/* Profile Tab */}
+          <TabPanel value={activeTab} index={1}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+              <Card
+                sx={{
+                  background: 'rgba(26, 27, 46, 0.6)',
+                  border: '1px solid rgba(255, 215, 0, 0.2)',
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 3 }}>
+                    {t('accounts.profile_info', 'Profile Information')}
+                  </Typography>
+                  
+                  <TextField
+                    fullWidth
+                    label={t('accounts.display_name', 'Display Name')}
+                    defaultValue={currentUser?.displayName || ''}
+                    sx={{ mb: 2 }}
+                  />
+                  
+                  <TextField
+                    fullWidth
+                    label={t('accounts.email', 'Email')}
+                    value={currentUser?.email || ''}
+                    disabled
+                    sx={{ mb: 2 }}
+                  />
+                  
+                  <Button
+                    variant="contained"
+                    sx={{
+                      background: 'linear-gradient(45deg, #FFD700, #FFA500)',
+                      color: 'primary.main',
+                    }}
+                  >
+                    {t('accounts.update_profile', 'Update Profile')}
+                  </Button>
+                </CardContent>
+              </Card>
+              
+              <Card
+                sx={{
+                  background: 'rgba(26, 27, 46, 0.6)',
+                  border: '1px solid rgba(255, 215, 0, 0.2)',
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 3 }}>
+                    {t('accounts.account_status', 'Account Status')}
+                  </Typography>
+                  
+                  <List>
+                    <ListItem>
+                      <ListItemText
+                        primary={t('accounts.member_since', 'Member Since')}
+                        secondary={currentUser?.metadata?.creationTime || 'N/A'}
+                      />
+                    </ListItem>
+                    <ListItem>
+                      <ListItemText
+                        primary={t('accounts.email_verified', 'Email Verified')}
+                        secondary={
+                          <Chip
+                            label={currentUser?.emailVerified ? t('common.yes', 'Yes') : t('common.no', 'No')}
+                            color={currentUser?.emailVerified ? 'success' : 'warning'}
+                            size="small"
+                          />
+                        }
+                      />
+                    </ListItem>
+                  </List>
+                </CardContent>
+              </Card>
+            </Box>
+          </TabPanel>
+
+          {/* Billing Tab */}
+          <TabPanel value={activeTab} index={2}>
+            <Alert severity="info" sx={{ mb: 3 }}>
+              {t('accounts.billing_info', 'Billing features coming soon. For now, all features are free during beta.')}
+            </Alert>
+            
+            <Button
+              variant="contained"
               sx={{
-                background: 'rgba(26, 27, 46, 0.6)',
-                border: '1px solid rgba(255, 215, 0, 0.2)',
+                background: 'linear-gradient(45deg, #FFD700, #FFA500)',
+                color: 'primary.main',
               }}
+              onClick={() => navigate('/pricing')}
             >
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 3 }}>
-                  {t('accounts.preferences', 'Preferences')}
-                </Typography>
-                
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={emailNotifications}
-                      onChange={(e) => setEmailNotifications(e.target.checked)}
-                    />
-                  }
-                  label={t('accounts.email_notifications', 'Email Notifications')}
-                  sx={{ mb: 2 }}
-                />
-                
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={darkMode}
-                      onChange={(e) => setDarkMode(e.target.checked)}
-                    />
-                  }
-                  label={t('accounts.dark_mode', 'Dark Mode')}
-                  sx={{ mb: 2 }}
-                />
-              </CardContent>
-            </Card>
+              {t('accounts.view_plans', 'View Available Plans')}
+            </Button>
+          </TabPanel>
 
-            <Card
-              sx={{
-                background: 'rgba(26, 27, 46, 0.6)',
-                border: '1px solid rgba(255, 215, 0, 0.2)',
-              }}
-            >
-              <CardContent>
-                <Typography variant="h6" sx={{ mb: 3 }}>
-                  {t('accounts.developer_options', 'Developer Options')}
-                </Typography>
-                
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleResetOnboarding}
-                >
-                  {t('accounts.reset_onboarding', 'Reset Onboarding')}
-                </Button>
-                
-                {message && (
-                  <Alert severity="success" sx={{ mt: 2 }}>
-                    {message}
-                  </Alert>
-                )}
-              </CardContent>
-            </Card>
-          </Box>
-        </TabPanel>
-      </Paper>
-    </Container>
+          {/* AI Models Tab */}
+          <TabPanel value={activeTab} index={3}>
+            <ModelPreferences />
+          </TabPanel>
+
+          {/* Settings Tab */}
+          <TabPanel value={activeTab} index={4}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr', gap: 3 }}>
+              <Card
+                sx={{
+                  background: 'rgba(26, 27, 46, 0.6)',
+                  border: '1px solid rgba(255, 215, 0, 0.2)',
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 3 }}>
+                    {t('accounts.preferences', 'Preferences')}
+                  </Typography>
+                  
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={emailNotifications}
+                        onChange={(e) => setEmailNotifications(e.target.checked)}
+                      />
+                    }
+                    label={t('accounts.email_notifications', 'Email Notifications')}
+                    sx={{ mb: 2 }}
+                  />
+                  
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={darkMode}
+                        onChange={(e) => setDarkMode(e.target.checked)}
+                      />
+                    }
+                    label={t('accounts.dark_mode', 'Dark Mode')}
+                    sx={{ mb: 2 }}
+                  />
+                </CardContent>
+              </Card>
+
+              <Card
+                sx={{
+                  background: 'rgba(26, 27, 46, 0.6)',
+                  border: '1px solid rgba(255, 215, 0, 0.2)',
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ mb: 3 }}>
+                    {t('accounts.developer_options', 'Developer Options')}
+                  </Typography>
+                  
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={handleResetOnboarding}
+                  >
+                    {t('accounts.reset_onboarding', 'Reset Onboarding')}
+                  </Button>
+                  
+                  {message && (
+                    <Alert severity="success" sx={{ mt: 2 }}>
+                      {message}
+                    </Alert>
+                  )}
+                </CardContent>
+              </Card>
+            </Box>
+          </TabPanel>
+        </Paper>
+      </Container>
+    </Box>
   );
 };
 

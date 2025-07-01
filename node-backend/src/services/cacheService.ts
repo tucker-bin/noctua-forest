@@ -5,17 +5,31 @@ import { settings } from '../config/settings';
 import NodeCache from 'node-cache';
 
 class CacheService {
-  private redis: Redis;
+  private redis: Redis | null = null;
 
   constructor() {
-    this.redis = new Redis(settings.redis.url);
-    
-    this.redis.on('error', (err) => {
-      logger.error('Redis cache error:', err);
-    });
+    try {
+      this.redis = new Redis(settings.redis.url, {
+        maxRetriesPerRequest: 0,
+        lazyConnect: true
+      });
+      
+      this.redis.on('error', (err) => {
+        logger.warn('Redis not available, caching disabled');
+        this.redis?.disconnect();
+        this.redis = null;
+      });
+    } catch (error) {
+      logger.warn('Redis not available, caching disabled:', error);
+      this.redis = null;
+    }
   }
 
   async get<T>(key: string): Promise<T | null> {
+    if (!this.redis) {
+      return null;
+    }
+
     try {
       const data = await this.redis.get(key);
       return data ? JSON.parse(data) : null;
@@ -26,6 +40,10 @@ class CacheService {
   }
 
   async set(key: string, value: any, ttl: number = settings.cache.ttl): Promise<void> {
+    if (!this.redis) {
+      return;
+    }
+
     try {
       await this.redis.setex(key, ttl, JSON.stringify(value));
     } catch (error) {
@@ -34,6 +52,10 @@ class CacheService {
   }
 
   async delete(key: string): Promise<void> {
+    if (!this.redis) {
+      return;
+    }
+
     try {
       await this.redis.del(key);
     } catch (error) {

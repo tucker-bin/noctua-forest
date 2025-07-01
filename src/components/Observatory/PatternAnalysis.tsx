@@ -18,12 +18,13 @@ import AutoGraphIcon from '@mui/icons-material/AutoGraph';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import CompareIcon from '@mui/icons-material/Compare';
 import InfoIcon from '@mui/icons-material/Info';
-import { Pattern } from '../../types/observatory';
+import { Pattern as ObservatoryPattern } from '../../types/observatory';
+import { Pattern as ObservationPattern, Segment } from '../../types/observation';
 import { PatternConstellation } from '../celestial/PatternConstellation';
 
 interface PatternAnalysisProps {
-  pattern: Pattern;
-  relatedPatterns: Pattern[];
+  pattern: ObservatoryPattern;
+  relatedPatterns: ObservatoryPattern[];
   onPatternSelect: (patternId: string) => void;
 }
 
@@ -34,26 +35,33 @@ export const PatternAnalysis: React.FC<PatternAnalysisProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const getPatternRelationship = (p1: Pattern, p2: Pattern): string => {
-    // Calculate pattern relationships based on:
-    // - Phonetic similarity
-    // - Position in text
-    // - Acoustic features
-    // - Cultural context
-    const relationships = [];
+  const comparePatternPositions = (p1: ObservatoryPattern, p2: ObservatoryPattern): number => {
+    const p1Segments = p1.segments as unknown as Segment[];
+    const p2Segments = p2.segments as unknown as Segment[];
+    const p1Start = p1Segments[0]?.globalStartIndex || 0;
+    const p2Start = p2Segments[0]?.globalStartIndex || 0;
+    return p1Start - p2Start;
+  };
 
-    if (p1.acousticFeatures?.primaryFeature === p2.acousticFeatures?.primaryFeature) {
+  const getPatternRelationship = (pattern: ObservatoryPattern, relatedPattern: ObservatoryPattern): string => {
+    const relationships: string[] = [];
+
+    // Language-specific relationship
+    if (pattern.languageSpecific?.language === relatedPattern.languageSpecific?.language) {
+      relationships.push('same language');
+    }
+
+    if (pattern.acousticFeatures?.primaryFeature === relatedPattern.acousticFeatures?.primaryFeature) {
       relationships.push('acoustic_similarity');
     }
 
-    if (p1.languageSpecific?.culturalContext === p2.languageSpecific?.culturalContext) {
+    if (pattern.languageSpecific?.culturalContext === relatedPattern.languageSpecific?.culturalContext) {
       relationships.push('cultural_context');
     }
 
     // Position-based relationship
-    const p1Start = p1.segments[0].globalStartIndex;
-    const p2Start = p2.segments[0].globalStartIndex;
-    if (Math.abs(p1Start - p2Start) < 50) {
+    const positionDifference = comparePatternPositions(pattern, relatedPattern);
+    if (Math.abs(positionDifference) < 50) {
       relationships.push('proximity');
     }
 
@@ -174,7 +182,7 @@ export const PatternAnalysis: React.FC<PatternAnalysisProps> = ({
                   }}
                 >
                   <ListItemText
-                    primary={relatedPattern.segments.map(s => s.text).join(' ')}
+                    primary={relatedPattern.segments.map((s: unknown) => (s as Segment).text).join(' ')}
                     secondary={getPatternRelationship(pattern, relatedPattern)}
                   />
                   <Tooltip title={t('analysis.view_pattern')}>
@@ -203,11 +211,13 @@ export const PatternAnalysis: React.FC<PatternAnalysisProps> = ({
             </Typography>
             <Box sx={{ height: 200, position: 'relative' }}>
               <PatternConstellation
-                pattern={pattern}
-                width={800}
-                height={200}
-                animated={true}
-                glowIntensity={0.8}
+                patterns={[pattern, ...relatedPatterns].map(p => ({
+                  ...p,
+                  segments: (p.segments as unknown as Segment[])
+                }))}
+                onHoverPattern={(id) => id && onPatternSelect(id)}
+                activeFilters={new Set()}
+                colorPalette="vibrant"
               />
             </Box>
           </Paper>

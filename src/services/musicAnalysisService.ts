@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { getAuth } from 'firebase/auth';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
@@ -111,23 +110,25 @@ class MusicAnalysisService {
       throw new Error('Authentication required');
     }
 
-    const config = {
+    const config: RequestInit = {
       method,
-      url: `${API_BASE_URL}${endpoint}`,
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      ...(data && { data })
+      ...(data && { body: JSON.stringify(data) })
     };
 
     try {
-      const response = await axios(config);
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.message || error.message);
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      return await response.json();
+    } catch (error) {
       throw error instanceof Error ? error : new Error('Unknown error');
     }
   }
@@ -137,22 +138,24 @@ class MusicAnalysisService {
     endpoint: string,
     data?: any
   ): Promise<T> {
-    const config = {
+    const config: RequestInit = {
       method,
-      url: `${API_BASE_URL}${endpoint}`,
       headers: {
         'Content-Type': 'application/json',
       },
-      ...(data && { data })
+      ...(data && { body: JSON.stringify(data) })
     };
 
     try {
-      const response = await axios(config);
-      return response.data;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.message || error.message);
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: response.statusText }));
+        throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
       }
+      
+      return await response.json();
+    } catch (error) {
       throw error instanceof Error ? error : new Error('Unknown error');
     }
   }
@@ -201,7 +204,7 @@ class MusicAnalysisService {
   }
 
   /**
-   * Get user's music observations history
+   * Get user's music observations with pagination
    */
   async getUserObservations(limit: number = 10, offset: number = 0): Promise<{
     observations: MusicObservationData[];
@@ -218,6 +221,10 @@ class MusicAnalysisService {
       message: string;
     }>('GET', `/music/observations?limit=${limit}&offset=${offset}`);
 
+    if (!response.success) {
+      throw new Error(response.message || 'Failed to fetch observations');
+    }
+
     return response.data;
   }
 
@@ -230,6 +237,10 @@ class MusicAnalysisService {
       data: MusicObservationData;
       message: string;
     }>('GET', `/music/observations/${id}`);
+
+        if (!response.success) {
+      throw new Error(response.message || 'Failed to fetch observation');
+    }
 
     return response.data;
   }

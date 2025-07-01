@@ -1,39 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useExperience } from '../../contexts/ExperienceContext';
 import {
   Box,
-  Container,
-  Paper,
-  Typography,
-  Button,
-  Grid,
   Card,
   CardContent,
-  CardActions,
-  Chip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Typography,
+  Button,
   Tabs,
   Tab,
+  Grid,
+  Chip,
   LinearProgress,
-  IconButton,
-  Tooltip,
-  useTheme,
-  alpha
+  useTheme
 } from '@mui/material';
-import {
-  PlayArrow as PlayIcon,
-  Lock as LockIcon,
-  Star as StarIcon,
-  CalendarToday as CalendarIcon,
-  Grid3x3 as Grid4Icon,
-  Grid4x4 as Grid8Icon,
-  Info as InfoIcon
-} from '@mui/icons-material';
+import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import { useExperience } from '../../contexts/ExperienceContext';
+import FlowFinder from './FlowFinder';
+import StarIcon from '@mui/icons-material/Star';
+import TrophyIcon from '@mui/icons-material/EmojiEvents';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import ExtensionIcon from '@mui/icons-material/Extension';
+import LockIcon from '@mui/icons-material/Lock';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -52,370 +40,293 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`flow-finder-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
 
-const FlowFinderHub: React.FC = () => {
+export const FlowFinderHub: React.FC = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const theme = useTheme();
+  const [searchParams] = useSearchParams();
   const { 
     flowFinderChallenge, 
-    weeklyPacks, 
-    isPremium, 
-    loadWeeklyPacks,
-    tokens 
+    level, 
+    xp,
+    weeklyPacks,
+    isPremium
   } = useExperience();
+  
+  const [activeTab, setActiveTab] = useState(0);
+  const availablePacks = weeklyPacks;
 
-  const [tabValue, setTabValue] = useState(0);
-  const [selectedChallenge, setSelectedChallenge] = useState<any>(null);
-  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
-
+  // Handle URL tab parameter
   useEffect(() => {
-    loadWeeklyPacks();
-  }, [loadWeeklyPacks]);
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'challenges') {
+      setActiveTab(1);
+    } else if (tabParam === 'packs') {
+      setActiveTab(2);
+    } else if (tabParam === 'play') {
+      setActiveTab(0);
+    }
+  }, [searchParams]);
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-    setTabValue(newValue);
+    setActiveTab(newValue);
   };
 
-  const handleChallengeClick = (challenge: any, requiresPremium: boolean = false) => {
-    if (requiresPremium && !isPremium) {
-      setShowUpgradeDialog(true);
-      return;
+  const challengeTypes = [
+    {
+      id: 'daily',
+      title: t('flowFinder.dailyChallenge', 'Daily Challenge'),
+      description: t('flowFinder.dailyDescription', 'Fresh puzzles every day'),
+      icon: <CalendarTodayIcon />,
+      available: true,
+      difficulty: 'Medium',
+      rewards: { tokens: 10, xp: 50 }
+    },
+    {
+      id: 'weekly',
+      title: t('flowFinder.weeklyChallenge', 'Weekly Challenge'),
+      description: t('flowFinder.weeklyDescription', 'Harder puzzles with bigger rewards'),
+      icon: <TrophyIcon />,
+      available: level >= 5,
+      difficulty: 'Hard',
+      rewards: { tokens: 25, xp: 150 }
+    },
+    {
+      id: 'premium',
+      title: t('flowFinder.premiumPuzzles', 'Premium Puzzles'),
+      description: t('flowFinder.premiumDescription', 'Unlimited custom puzzles'),
+      icon: <StarIcon />,
+      available: isPremium,
+      difficulty: 'Variable',
+      rewards: { tokens: 15, xp: 75 }
     }
-    
-    setSelectedChallenge(challenge);
-  };
-
-  const handlePlayChallenge = (gridSize: '4x4' | '8x8') => {
-    // Navigate to FlowFinder with the selected grid size
-    navigate(`/flow-finder?size=${gridSize}&challenge=${selectedChallenge?.id || 'daily'}`);
-  };
-
-  const getDifficultyColor = (gridSize: '4x4' | '8x8') => {
-    return gridSize === '4x4' ? theme.palette.success.main : theme.palette.warning.main;
-  };
-
-  const getDifficultyIcon = (gridSize: '4x4' | '8x8') => {
-    return gridSize === '4x4' ? <Grid4Icon /> : <Grid8Icon />;
-  };
+  ];
 
   return (
-    <Box sx={{ 
-      minHeight: '100vh',
-      bgcolor: theme.palette.forest.background,
-      py: 4
-    }}>
-      <Container maxWidth="lg">
-        {/* Header */}
-        <Paper sx={{ 
-          p: 4, 
-          mb: 4,
-          background: `linear-gradient(135deg, ${alpha(theme.palette.forest.card, 0.9)}, ${alpha(theme.palette.forest.card, 0.7)})`,
-          backdropFilter: 'blur(10px)',
-          border: `1px solid ${alpha(theme.palette.forest.border, 0.3)}`,
-          borderRadius: 2
-        }}>
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-            <Typography variant="h3" color="text.primary" sx={{ 
-              fontSize: { xs: '2rem', md: '2.5rem' },
-              fontWeight: 600
-            }}>
-              🎯 Flow Finder Hub
-            </Typography>
-            <Box display="flex" gap={1} alignItems="center">
-              <Chip 
-                icon={<StarIcon />}
-                label={isPremium ? 'Premium' : 'Free'}
-                color={isPremium ? 'secondary' : 'default'}
-                variant="outlined"
-              />
-              <Typography variant="body2" color="text.secondary">
-                {tokens} 🪙
+    <Box>
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Typography variant="h4" gutterBottom align="center">
+            🧩 {t('flowFinder.hub.title', 'Flow Finder Hub')}
+          </Typography>
+          <Typography variant="body1" color="text.secondary" align="center" paragraph>
+            {t('flowFinder.hub.subtitle', 'Connect letters, find words, and challenge your mind!')}
+          </Typography>
+          
+          {/* Player Stats */}
+          <Box display="flex" justifyContent="center" gap={3} mb={3}>
+            <Box textAlign="center">
+              <Typography variant="h6" color="primary">
+                {level}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('common.level', 'Level')}
+              </Typography>
+            </Box>
+                         <Box textAlign="center">
+               <Typography variant="h6" color="primary">
+                 {xp}
+               </Typography>
+               <Typography variant="caption" color="text.secondary">
+                 {t('common.xp', 'XP')}
+               </Typography>
+             </Box>
+            <Box textAlign="center">
+              <Typography variant="h6" color="primary">
+                {/* This would come from a stats service */}
+                {Math.floor(Math.random() * 50) + 10}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('flowFinder.puzzlesSolved', 'Puzzles Solved')}
               </Typography>
             </Box>
           </Box>
-          <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Master rhyme patterns with strategic gameplay. Choose your grid size and difficulty!
-          </Typography>
-          
-          {/* Daily Challenges Quick Access */}
-          {flowFinderChallenge && !flowFinderChallenge.completed && (
-            <Card sx={{ 
-              mb: 3,
-              background: `linear-gradient(45deg, ${theme.palette.forest.primary}, ${theme.palette.forest.secondary})`,
-              color: 'white'
-            }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  🌟 Today's Challenge
-                </Typography>
-                <Typography variant="body2" sx={{ mb: 2 }}>
-                  {flowFinderChallenge.text}
-                </Typography>
-                <Box display="flex" gap={1} alignItems="center">
-                  <Chip 
-                    icon={getDifficultyIcon(flowFinderChallenge.gridSize)}
-                    label={flowFinderChallenge.gridSize}
-                    size="small"
-                    sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
-                  />
-                  <Typography variant="caption">
-                    +{flowFinderChallenge.tokensReward} 🪙 +{flowFinderChallenge.xpReward} XP
-                  </Typography>
-                </Box>
-              </CardContent>
-              <CardActions>
-                <Button 
-                  variant="contained"
-                  startIcon={<PlayIcon />}
-                  onClick={() => navigate('/flow-finder')}
+        </CardContent>
+      </Card>
+
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+        <Tabs value={activeTab} onChange={handleTabChange} centered>
+          <Tab 
+            label={t('flowFinder.tabs.play', 'Play')} 
+            icon={<ExtensionIcon />}
+            iconPosition="start"
+          />
+          <Tab 
+            label={t('flowFinder.tabs.challenges', 'Challenges')} 
+            icon={<TrophyIcon />}
+            iconPosition="start"
+          />
+          <Tab 
+            label={t('flowFinder.tabs.packs', 'Puzzle Packs')} 
+            icon={<StarIcon />}
+            iconPosition="start"
+          />
+        </Tabs>
+      </Box>
+
+      <TabPanel value={activeTab} index={0}>
+        {/* Main Game */}
+        <FlowFinder />
+      </TabPanel>
+
+      <TabPanel value={activeTab} index={1}>
+        {/* Challenge Selection */}
+        <Grid container spacing={3}>
+          {challengeTypes.map((challenge) => (
+            <Grid item xs={12} md={4} key={challenge.id}>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Card 
                   sx={{ 
-                    bgcolor: 'rgba(255,255,255,0.2)',
-                    color: 'white',
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' }
+                    height: '100%',
+                    opacity: challenge.available ? 1 : 0.6,
+                    cursor: challenge.available ? 'pointer' : 'default',
+                    border: challenge.available ? `1px solid ${theme.palette.primary.main}40` : '1px solid transparent',
+                    '&:hover': {
+                      border: challenge.available ? `1px solid ${theme.palette.primary.main}` : '1px solid transparent',
+                    }
                   }}
                 >
-                  Play Now
-                </Button>
-              </CardActions>
-            </Card>
-          )}
-        </Paper>
-
-        {/* Tabs for different content */}
-        <Paper sx={{ 
-          background: `linear-gradient(135deg, ${alpha(theme.palette.forest.card, 0.9)}, ${alpha(theme.palette.forest.card, 0.7)})`,
-          backdropFilter: 'blur(10px)',
-          border: `1px solid ${alpha(theme.palette.forest.border, 0.3)}`,
-          borderRadius: 2
-        }}>
-          <Tabs 
-            value={tabValue} 
-            onChange={handleTabChange}
-            sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}
-          >
-            <Tab label="Daily Challenges" />
-            <Tab label="Weekly Packs" />
-            <Tab label="Archive" />
-          </Tabs>
-
-          {/* Daily Challenges Tab */}
-          <TabPanel value={tabValue} index={0}>
-            <Typography variant="h5" gutterBottom>
-              Daily Challenges
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Fresh challenges every day! Choose your preferred grid size.
-            </Typography>
-
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <Card sx={{ 
-                  height: '100%',
-                  border: `2px solid ${getDifficultyColor('4x4')}`,
-                  '&:hover': { transform: 'translateY(-4px)', transition: 'transform 0.3s' }
-                }}>
                   <CardContent>
-                    <Box display="flex" alignItems="center" gap={1} mb={2}>
-                      {getDifficultyIcon('4x4')}
-                      <Typography variant="h6">4x4 Grid</Typography>
-                      <Chip label="Easy" size="small" color="success" />
-                    </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Perfect for beginners. 16 words, 3-5 words per rhyme group.
-                    </Typography>
-                    <Box display="flex" gap={1} mb={2}>
-                      <Chip label="+3 🪙" size="small" />
-                      <Chip label="+25 XP" size="small" />
-                    </Box>
-                  </CardContent>
-                  <CardActions>
-                    <Button 
-                      variant="contained"
-                      startIcon={<PlayIcon />}
-                      onClick={() => handlePlayChallenge('4x4')}
-                      sx={{ bgcolor: getDifficultyColor('4x4') }}
-                    >
-                      Play 4x4
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Card sx={{ 
-                  height: '100%',
-                  border: `2px solid ${getDifficultyColor('8x8')}`,
-                  '&:hover': { transform: 'translateY(-4px)', transition: 'transform 0.3s' }
-                }}>
-                  <CardContent>
-                    <Box display="flex" alignItems="center" gap={1} mb={2}>
-                      {getDifficultyIcon('8x8')}
-                      <Typography variant="h6">8x8 Grid</Typography>
-                      <Chip label="Hard" size="small" color="warning" />
-                    </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      For experts. 64 words, 2-4 words per rhyme group.
-                    </Typography>
-                    <Box display="flex" gap={1} mb={2}>
-                      <Chip label="+5 🪙" size="small" />
-                      <Chip label="+50 XP" size="small" />
-                    </Box>
-                  </CardContent>
-                  <CardActions>
-                    <Button 
-                      variant="contained"
-                      startIcon={<PlayIcon />}
-                      onClick={() => handlePlayChallenge('8x8')}
-                      sx={{ bgcolor: getDifficultyColor('8x8') }}
-                    >
-                      Play 8x8
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            </Grid>
-          </TabPanel>
-
-          {/* Weekly Packs Tab */}
-          <TabPanel value={tabValue} index={1}>
-            <Typography variant="h5" gutterBottom>
-              Weekly Packs
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Collections of 14 challenges (7 days × 2 sizes). Free users get the last month's packs.
-            </Typography>
-
-            <Grid container spacing={3}>
-              {weeklyPacks.slice(0, 8).map((pack) => (
-                <Grid item xs={12} md={6} lg={4} key={pack.id}>
-                  <Card sx={{ 
-                    height: '100%',
-                    opacity: pack.unlocked || isPremium ? 1 : 0.6,
-                    border: pack.isPremium && !isPremium ? `2px solid ${theme.palette.warning.main}` : 'none'
-                  }}>
-                    <CardContent>
-                      <Box display="flex" alignItems="center" gap={1} mb={2}>
-                        <CalendarIcon />
-                        <Typography variant="h6">{pack.name}</Typography>
-                        {pack.isPremium && !isPremium && (
-                          <LockIcon fontSize="small" color="warning" />
-                        )}
+                    <Box display="flex" alignItems="center" mb={2}>
+                      <Box sx={{ color: theme.palette.primary.main, mr: 1 }}>
+                        {challenge.icon}
                       </Box>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        {pack.description}
+                      <Typography variant="h6">
+                        {challenge.title}
                       </Typography>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={0} // TODO: Calculate completion percentage
+                      {!challenge.available && (
+                        <LockIcon sx={{ ml: 'auto', color: 'text.disabled' }} />
+                      )}
+                    </Box>
+                    
+                    <Typography variant="body2" color="text.secondary" paragraph>
+                      {challenge.description}
+                    </Typography>
+
+                    <Box mb={2}>
+                      <Chip 
+                        label={challenge.difficulty} 
+                        size="small" 
+                        color={
+                          challenge.difficulty === 'Easy' ? 'success' :
+                          challenge.difficulty === 'Medium' ? 'warning' :
+                          challenge.difficulty === 'Hard' ? 'error' : 'primary'
+                        }
                         sx={{ mb: 1 }}
                       />
+                    </Box>
+
+                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
                       <Typography variant="caption" color="text.secondary">
-                        0/14 challenges completed
+                        {t('common.rewards', 'Rewards')}:
                       </Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button 
-                        variant={pack.unlocked || isPremium ? "contained" : "outlined"}
-                        startIcon={pack.isPremium && !isPremium ? <LockIcon /> : <PlayIcon />}
-                        onClick={() => handleChallengeClick(pack, pack.isPremium)}
-                        disabled={!pack.unlocked && !isPremium}
-                      >
-                        {pack.isPremium && !isPremium ? 'Premium' : 'Play Pack'}
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))}
+                      <Box display="flex" gap={1}>
+                        <Chip 
+                          label={`${challenge.rewards.tokens} tokens`} 
+                          size="small" 
+                          variant="outlined"
+                        />
+                        <Chip 
+                          label={`${challenge.rewards.xp} XP`} 
+                          size="small" 
+                          variant="outlined"
+                        />
+                      </Box>
+                    </Box>
+
+                    <Button
+                      variant={challenge.available ? 'contained' : 'outlined'}
+                      fullWidth
+                      disabled={!challenge.available}
+                      onClick={() => setActiveTab(0)} // Switch to play tab
+                    >
+                      {challenge.available 
+                        ? t('flowFinder.startChallenge', 'Start Challenge')
+                        : challenge.id === 'weekly' 
+                          ? t('flowFinder.unlockAtLevel', 'Unlock at Level {{level}}', { level: 5 })
+                          : t('flowFinder.premiumRequired', 'Premium Required')
+                      }
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </Grid>
-          </TabPanel>
+          ))}
+        </Grid>
+      </TabPanel>
 
-          {/* Archive Tab */}
-          <TabPanel value={tabValue} index={2}>
-            <Typography variant="h5" gutterBottom>
-              Archive
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Older weekly packs available for premium members.
-            </Typography>
-
-            {!isPremium ? (
-              <Card sx={{ textAlign: 'center', p: 4 }}>
-                <Typography variant="h6" gutterBottom>
-                  Premium Feature
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                  Access to all archived weekly packs with unlimited gameplay.
-                </Typography>
-                <Button 
-                  variant="contained"
-                  color="warning"
-                  onClick={() => setShowUpgradeDialog(true)}
-                >
-                  Upgrade to Premium
-                </Button>
+      <TabPanel value={activeTab} index={2}>
+        {/* Puzzle Packs */}
+        <Grid container spacing={3}>
+          {availablePacks.map((pack) => (
+            <Grid item xs={12} md={6} key={pack.id}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    {pack.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    {pack.description}
+                  </Typography>
+                  
+                                     <Box mb={2}>
+                     <Typography variant="caption" color="text.secondary">
+                       {t('flowFinder.progress', 'Progress')}
+                     </Typography>
+                     <LinearProgress 
+                       variant="determinate" 
+                       value={(pack.challenges.filter(c => c.completed).length / pack.challenges.length) * 100} 
+                       sx={{ mt: 0.5 }}
+                     />
+                     <Typography variant="caption" color="text.secondary">
+                       {pack.challenges.filter(c => c.completed).length}/{pack.challenges.length} {t('flowFinder.completed', 'completed')}
+                     </Typography>
+                   </Box>
+ 
+                   <Box display="flex" justifyContent="space-between" alignItems="center">
+                     <Chip 
+                       label={pack.isPremium ? 'Premium' : 'Free'} 
+                       size="small" 
+                       color={pack.isPremium ? 'warning' : 'success'}
+                     />
+                    <Button 
+                      variant="outlined" 
+                      size="small"
+                      disabled={!pack.unlocked}
+                    >
+                      {pack.unlocked 
+                        ? t('flowFinder.playPack', 'Play Pack')
+                        : t('flowFinder.locked', 'Locked')
+                      }
+                    </Button>
+                  </Box>
+                </CardContent>
               </Card>
-            ) : (
-              <Grid container spacing={3}>
-                {weeklyPacks.slice(8).map((pack) => (
-                  <Grid item xs={12} md={6} lg={4} key={pack.id}>
-                    <Card>
-                      <CardContent>
-                        <Typography variant="h6">{pack.name}</Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {pack.description}
-                        </Typography>
-                      </CardContent>
-                      <CardActions>
-                        <Button 
-                          variant="contained"
-                          startIcon={<PlayIcon />}
-                          onClick={() => handleChallengeClick(pack)}
-                        >
-                          Play Pack
-                        </Button>
-                      </CardActions>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </TabPanel>
-        </Paper>
+            </Grid>
+          ))}
+        </Grid>
 
-        {/* Upgrade Dialog */}
-        <Dialog open={showUpgradeDialog} onClose={() => setShowUpgradeDialog(false)}>
-          <DialogTitle>Upgrade to Premium</DialogTitle>
-          <DialogContent>
-            <Typography variant="body1" sx={{ mb: 2 }}>
-              Unlock unlimited access to Flow Finder with Premium:
+        {availablePacks.length === 0 && (
+          <Box textAlign="center" py={4}>
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              {t('flowFinder.noPacks', 'No puzzle packs available')}
             </Typography>
-            <ul>
-              <li>Access to all archived weekly packs</li>
-              <li>Unlimited daily challenges</li>
-              <li>No token costs for gameplay</li>
-              <li>Exclusive premium-only challenge types</li>
-              <li>Priority access to new features</li>
-            </ul>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setShowUpgradeDialog(false)}>
-              Maybe Later
+            <Typography variant="body2" color="text.secondary">
+              {t('flowFinder.upgradeForPacks', 'Upgrade to Premium to unlock exclusive puzzle packs!')}
+            </Typography>
+            <Button variant="contained" sx={{ mt: 2 }}>
+              {t('common.upgradeToPremium', 'Upgrade to Premium')}
             </Button>
-            <Button variant="contained" color="warning">
-              Upgrade Now
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Container>
+          </Box>
+        )}
+      </TabPanel>
     </Box>
   );
 };

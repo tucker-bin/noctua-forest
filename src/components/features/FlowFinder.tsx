@@ -1,298 +1,300 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useExperience } from '../../contexts/ExperienceContext';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
-  Container,
-  Paper,
+  Card,
+  CardContent,
   Typography,
   Button,
   Grid,
-  Card,
-  CardContent,
+  Chip,
+  LinearProgress,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  LinearProgress,
-  Chip,
+  useTheme,
   IconButton,
   Tooltip,
-  Alert,
-  useTheme,
-  alpha,
-  DialogContentText,
-  List,
-  ListItem,
-  ListItemText
+  Badge,
+  Stack,
+  useMediaQuery,
+  Fade,
+  Zoom,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Avatar,
+  Paper
 } from '@mui/material';
-import {
-  Timer as TimerIcon,
-  CheckCircle as SuccessIcon,
-  Cancel as FailIcon,
-  Help as HelpIcon,
-  Home as HomeIcon,
-  Refresh as RefreshIcon,
-  Visibility as VisibilityIcon
-} from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+import { useExperience } from '../../contexts/ExperienceContext';
+import { useAuth } from '../../contexts/AuthContext';
+import FlowFinderService, { DynamicChallenge, RhymeGroup } from '../../services/flowFinderService';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import StarIcon from '@mui/icons-material/Star';
+import TimerIcon from '@mui/icons-material/Timer';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import LockIcon from '@mui/icons-material/Lock';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import WhatshotIcon from '@mui/icons-material/Whatshot';
+import FlashOnIcon from '@mui/icons-material/FlashOn';
+import CelebrationIcon from '@mui/icons-material/Celebration';
 
-// CSS animations for enhanced visual effects
-const animationStyles = `
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% {
-      transform: translateY(0);
-    }
-    40% {
-      transform: translateY(-10px);
-    }
-    60% {
-      transform: translateY(-5px);
-    }
-  }
-
-  @keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    50% { transform: translateX(3px); }
-    75% { transform: translateX(-3px); }
-    100% { transform: translateX(0); }
-  }
-
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-      opacity: 0.7;
-    }
-    50% {
-      transform: scale(1.1);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 0.7;
-    }
-  }
-
-  @keyframes explode {
-    0% {
-      transform: translate(-50%, -50%) scale(1) rotate(0deg);
-      opacity: 1;
-    }
-    50% {
-      transform: translate(-50%, -50%) scale(1.3) rotate(180deg);
-      opacity: 0.8;
-    }
-    100% {
-      transform: translate(-50%, -50%) scale(1) rotate(360deg);
-      opacity: 1;
-    }
-  }
-`;
-
-// Add these types at the top after the imports
-interface DifficultyConfig {
-  gridSize: number; // 4x4, 8x8
-  minGroupSize: number;
-  maxGroupSize: number;
+interface GameCard {
+  id: string;
+  word: string;
+  groupId: string;
+  isRevealed: boolean;
+  isMatched: boolean;
+  position: { row: number; col: number };
 }
 
-const DIFFICULTY_CONFIGS: Record<string, DifficultyConfig> = {
-  '4x4': {
-    gridSize: 4, // 16 cards
-    minGroupSize: 3,
-    maxGroupSize: 5
-  },
-  '8x8': {
-    gridSize: 8, // 64 cards
-    minGroupSize: 2,
-    maxGroupSize: 4
-  }
+interface GameState {
+  cards: GameCard[];
+  revealedCards: GameCard[];
+  completedGroups: Set<string>;
+  strikes: number;
+  maxStrikes: number;
+  isGameOver: boolean;
+  isWon: boolean;
+  currentGroupInProgress: string | null;
+  combo: number;
+  perfectStreak: number;
+  totalScore: number;
+  lastMatchTime: number | null;
+}
+
+interface GameMode {
+  id: string;
+  patternType: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockLevel: number;
+}
+
+interface ParticleEffect {
+  id: string;
+  x: number;
+  y: number;
+  type: 'success' | 'combo' | 'perfect';
+  emoji: string;
+}
+
+// Cultural themes for CultureTime mode
+const CULTURAL_THEMES = {
+  hiphop: { name: 'Hip-Hop Flow', icon: '🎤', description: 'Master the art of rap wordplay' },
+  classical: { name: 'Classical Poetry', icon: '📜', description: 'Explore timeless poetic forms' },
+  japanese: { name: 'Haiku Harmony', icon: '🌸', description: 'Discover Japanese aesthetic principles' },
+  spanish: { name: 'Romance Rhythm', icon: '💃', description: 'Experience Spanish lyrical beauty' },
+  arabic: { name: 'Arabic Elegance', icon: '🕌', description: 'Honor classical Arabic traditions' }
 };
 
-// Example rhyme groups with explanations
-const RHYME_PATTERNS = [
-  { ending: 'at', explanation: 'Words ending in -AT', examples: ['cat', 'sat', 'hat', 'mat', 'bat', 'rat'] },
-  { ending: 'ight', explanation: 'Words ending in -IGHT', examples: ['bright', 'night', 'light', 'sight', 'fight', 'right'] },
-  { ending: 'own', explanation: 'Words ending in -OWN', examples: ['brown', 'town', 'down', 'crown', 'frown', 'gown'] },
-  { ending: 'ear', explanation: 'Words ending in -EAR', examples: ['bear', 'near', 'clear', 'dear', 'fear', 'hear'] },
-  { ending: 'ake', explanation: 'Words ending in -AKE', examples: ['make', 'take', 'lake', 'bake', 'wake', 'fake'] },
-  { ending: 'ing', explanation: 'Words ending in -ING', examples: ['sing', 'ring', 'king', 'wing', 'bring', 'spring'] },
-  { ending: 'ore', explanation: 'Words ending in -ORE', examples: ['more', 'core', 'store', 'shore', 'bore', 'wore'] },
-  { ending: 'ay', explanation: 'Words ending in -AY', examples: ['day', 'way', 'say', 'play', 'may', 'stay'] },
-  { ending: 'ock', explanation: 'Words ending in -OCK', examples: ['rock', 'lock', 'clock', 'block', 'shock', 'dock'] },
-  { ending: 'ell', explanation: 'Words ending in -ELL', examples: ['bell', 'tell', 'well', 'sell', 'fell', 'smell'] },
-  { ending: 'ice', explanation: 'Words ending in -ICE', examples: ['nice', 'mice', 'rice', 'dice', 'price', 'twice'] },
-  { ending: 'ound', explanation: 'Words ending in -OUND', examples: ['round', 'sound', 'found', 'ground', 'pound', 'bound'] }
+const RHYME_GROUP_COLORS = [
+  '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+  '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9',
+  '#FFB74D', '#81C784', '#F48FB1', '#A1C4FD'
 ];
 
-// Decoy words that look normal but are actually mines
-const MINE_WORDS = [
-  'the', 'and', 'but', 'for', 'with', 'from', 'about', 'through',
-  'under', 'over', 'after', 'before', 'during', 'between', 'among',
-  'quick', 'slow', 'big', 'small', 'new', 'old', 'good', 'bad',
-  'first', 'last', 'next', 'other', 'many', 'few', 'all', 'some'
-];
+// Enhanced game visual effects
+const PARTICLE_EMOJIS = {
+  success: ['✨', '💫', '⭐', '🌟'],
+  combo: ['🔥', '💥', '⚡', '🚀'],
+  perfect: ['🏆', '👑', '💎', '🎉']
+};
 
-interface ChallengeWord {
-  word: string;
-  type: string;
-  position: number;
-  revealed: boolean;
-  clicked: boolean;
-  isMine: boolean;
-  rhymeGroup?: number; // Group ID
-  rhymeExplanation?: string; // Explanation shown after group completion
-  flipped?: boolean; // For card flip animation
-}
-
-const FlowFinder: React.FC = () => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const theme = useTheme();
-  const { flowFinderChallenge, completeFlowFinderChallenge } = useExperience();
+// Dynamic font size based on word length (like NYT Connections)
+const getDynamicFontSize = (word: string, isMobile: boolean = false) => {
+  const baseSize = isMobile ? 14 : 16;
+  const longWordThreshold = 8;
+  const veryLongWordThreshold = 12;
   
-  // Get grid size from URL params
-  const urlGridSize = searchParams.get('size') as '4x4' | '8x8' | null;
-  const challengeId = searchParams.get('challenge');
+  if (word.length >= veryLongWordThreshold) {
+    return `${baseSize - 4}px`;
+  } else if (word.length >= longWordThreshold) {
+    return `${baseSize - 2}px`;
+  }
+  return `${baseSize}px`;
+};
 
-  // Computed challenge object (either real or mock)
-  const currentChallenge = flowFinderChallenge || {
-    id: 'mock-daily-challenge',
-    text: 'The cat sat on the mat, looking fat and ready to chat.',
-    patterns: [
-      { word: 'cat', type: 'rhyme', position: 1 },
-      { word: 'sat', type: 'rhyme', position: 2 },
-      { word: 'mat', type: 'rhyme', position: 6 },
-      { word: 'fat', type: 'rhyme', position: 8 },
-      { word: 'chat', type: 'rhyme', position: 12 }
-    ],
-    type: 'rhyme_hunter',
-    difficulty: 'medium',
-    tokensReward: 0,
-    xpReward: 25,
-    completed: false,
-    createdAt: new Date()
-  };
+// Calculate score based on performance
+const calculateScore = (groupDifficulty: number, timeBonus: number, combo: number, perfect: boolean): number => {
+  const baseScore = groupDifficulty * 100;
+  const comboMultiplier = 1 + (combo * 0.1);
+  const perfectBonus = perfect ? 1.5 : 1;
+  const timeBonusPoints = Math.floor(timeBonus * 50);
+  
+  return Math.floor((baseScore + timeBonusPoints) * comboMultiplier * perfectBonus);
+};
 
-  // Inject animation styles
-  useEffect(() => {
-    const styleSheet = document.createElement('style');
-    styleSheet.type = 'text/css';
-    styleSheet.innerText = animationStyles;
-    document.head.appendChild(styleSheet);
+export const FlowFinder: React.FC = () => {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const { currentUser } = useAuth();
+  const { level, xp, addXp, addTokens, flowFinderChallenge, completeFlowFinderChallenge, isPremium } = useExperience();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
+  // Game mode selection states
+  const [showModeSelection, setShowModeSelection] = useState(true);
+  const [selectedMode, setSelectedMode] = useState<string | null>(null);
+  const [selectedCulturalTheme, setSelectedCulturalTheme] = useState<string>('hiphop');
+  const [availableModes, setAvailableModes] = useState<GameMode[]>([]);
+  
+  // Enhanced game states
+  const [challenge, setChallenge] = useState<DynamicChallenge | null>(null);
+  const [gameState, setGameState] = useState<GameState>({
+    cards: [],
+    revealedCards: [],
+    completedGroups: new Set(),
+    strikes: 0,
+    maxStrikes: 3,
+    isGameOver: false,
+    isWon: false,
+    currentGroupInProgress: null,
+    combo: 0,
+    perfectStreak: 0,
+    totalScore: 0,
+    lastMatchTime: null
+  });
+  
+  // UI enhancement states
+  const [timeLeft, setTimeLeft] = useState<number>(0);
+  const [showHelp, setShowHelp] = useState(false);
+  const [showELOUpdate, setShowELOUpdate] = useState<{show: boolean, change: number}>({show: false, change: 0});
+  const [gameStartTime, setGameStartTime] = useState<Date>(new Date());
+  const [particles, setParticles] = useState<ParticleEffect[]>([]);
+  const [showComboPopup, setShowComboPopup] = useState<{ show: boolean; combo: number; score: number }>({ show: false, combo: 0, score: 0 });
+  const [cardShakeIds, setCardShakeIds] = useState<Set<string>>(new Set());
+
+  // Particle effect system
+  const createParticles = useCallback((x: number, y: number, type: ParticleEffect['type'], count: number = 3) => {
+    const newParticles: ParticleEffect[] = [];
+    const emojis = PARTICLE_EMOJIS[type];
     
-    return () => {
-      document.head.removeChild(styleSheet);
-    };
+    for (let i = 0; i < count; i++) {
+      newParticles.push({
+        id: `particle_${Date.now()}_${i}`,
+        x: x + (Math.random() - 0.5) * 100,
+        y: y + (Math.random() - 0.5) * 50,
+        type,
+        emoji: emojis[Math.floor(Math.random() * emojis.length)]
+      });
+    }
+    
+    setParticles(prev => [...prev, ...newParticles]);
+    
+    // Auto-remove particles after animation
+    setTimeout(() => {
+      setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
+    }, 2000);
   }, []);
 
-  const [gameState, setGameState] = useState<'playing' | 'won' | 'lost'>('playing');
-  const [words, setWords] = useState<ChallengeWord[]>([]);
-  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes
-  const [foundPatterns, setFoundPatterns] = useState(0);
-  const [totalPatterns, setTotalPatterns] = useState(0);
-  const [showInstructions, setShowInstructions] = useState(false);
-  const [explosionWord, setExplosionWord] = useState<string | null>(null);
-  const [activePatternType, setActivePatternType] = useState<string | null>(null);
-  const [completedPatternTypes, setCompletedPatternTypes] = useState<Set<string>>(new Set());
-  const [completedRhymeGroups, setCompletedRhymeGroups] = useState<Set<number>>(new Set());
-  const [difficulty, setDifficulty] = useState<'4x4' | '8x8'>(urlGridSize || '4x4');
-  const [strikes, setStrikes] = useState(0);
+  // Enhanced haptic feedback simulation
+  const triggerHaptic = useCallback((type: 'light' | 'medium' | 'heavy') => {
+    // In a real app, this would use navigator.vibrate() or Haptics API
+    // For now, we'll add visual feedback to simulate haptic response
+    if (type === 'heavy') {
+      // Create a subtle screen flash for major events
+      document.body.style.transition = 'filter 0.1s ease';
+      document.body.style.filter = 'brightness(1.1)';
+      setTimeout(() => {
+        document.body.style.filter = 'brightness(1)';
+        setTimeout(() => {
+          document.body.style.transition = '';
+        }, 100);
+      }, 50);
+    }
+  }, []);
 
-  // Generate a grid based on difficulty
-  const generateGrid = (difficulty: '4x4' | '8x8'): ChallengeWord[] => {
-    const config = DIFFICULTY_CONFIGS[difficulty];
-    const totalCards = config.gridSize * config.gridSize;
+  // Initialize available game modes
+  useEffect(() => {
+    const service = FlowFinderService.getInstance();
+    const modes = service.getAvailableGameModes(level);
+    setAvailableModes(modes);
+  }, [level]);
+
+  // Start game with selected mode
+  const startGame = (modeId: string, culturalTheme?: string) => {
+    const userId = currentUser?.uid || 'anonymous';
+    const service = FlowFinderService.getInstance();
     
-    // Determine rhyme groups distribution
-    const groups: { pattern: typeof RHYME_PATTERNS[0], size: number }[] = [];
-    let remainingCards = totalCards;
-    let groupId = 0;
+    let dynamicChallenge: DynamicChallenge;
     
-    // Shuffle patterns for variety
-    const shuffledPatterns = [...RHYME_PATTERNS].sort(() => Math.random() - 0.5);
-    
-    while (remainingCards > 0 && groupId < shuffledPatterns.length) {
-      const groupSize = Math.min(
-        remainingCards,
-        Math.floor(Math.random() * (config.maxGroupSize - config.minGroupSize + 1)) + config.minGroupSize
-      );
-      
-      if (remainingCards - groupSize < config.minGroupSize && remainingCards !== groupSize) {
-        // Adjust last group to avoid leaving too few cards
-        groups.push({ pattern: shuffledPatterns[groupId], size: remainingCards });
-        remainingCards = 0;
-      } else {
-        groups.push({ pattern: shuffledPatterns[groupId], size: groupSize });
-        remainingCards -= groupSize;
-      }
-      groupId++;
+    if (modeId === 'cultural_crossover' && culturalTheme) {
+      dynamicChallenge = service.generateCulturalChallenge(userId, level, modeId, culturalTheme, isPremium);
+    } else {
+      dynamicChallenge = service.generateCulturalChallenge(userId, level, modeId, undefined, isPremium);
     }
     
-    // Create word array
-    const words: ChallengeWord[] = [];
-    let wordIndex = 0;
+    setChallenge(dynamicChallenge);
+    setSelectedMode(modeId);
+    setShowModeSelection(false);
     
-    // Add rhyme groups
-    groups.forEach((group, gId) => {
-      const availableWords = [...group.pattern.examples];
-      for (let i = 0; i < group.size && i < availableWords.length; i++) {
-        words.push({
-          word: availableWords[i],
-          type: `rhyme-${group.pattern.ending}`,
-          position: wordIndex++,
-          revealed: false,
-          clicked: false,
-          isMine: false,
-          rhymeGroup: gId,
-          rhymeExplanation: group.pattern.explanation
+    // Create cards from pattern groups
+    const cards: GameCard[] = [];
+    const size = dynamicChallenge.gridSize === '4x4' ? 4 : 8;
+    let cardIndex = 0;
+    
+    dynamicChallenge.rhymeGroups.forEach((group, groupIndex) => {
+      group.words.forEach((word) => {
+        const row = Math.floor(cardIndex / size);
+        const col = cardIndex % size;
+        
+        cards.push({
+          id: `card_${cardIndex}`,
+          word,
+          groupId: group.id,
+          isRevealed: false,
+          isMatched: false,
+          position: { row, col }
         });
-      }
+        cardIndex++;
+      });
     });
     
-    // Shuffle the grid
-    return words.sort(() => Math.random() - 0.5).map((word, index) => ({
-      ...word,
-      position: index
-    }));
+    // Shuffle cards
+    const shuffledCards = cards.sort(() => Math.random() - 0.5);
+    
+    setGameState({
+      cards: shuffledCards,
+      revealedCards: [],
+      completedGroups: new Set(),
+      strikes: 0,
+      maxStrikes: dynamicChallenge.maxStrikes,
+      isGameOver: false,
+      isWon: false,
+      currentGroupInProgress: null,
+      combo: 0,
+      perfectStreak: 0,
+      totalScore: 0,
+      lastMatchTime: null
+    });
+    
+    setTimeLeft(dynamicChallenge.timeLimit);
+    setGameStartTime(new Date());
   };
 
-  // Initialize challenge
+  // Return to mode selection
+  const returnToModeSelection = () => {
+    setShowModeSelection(true);
+    setChallenge(null);
+    setSelectedMode(null);
+  };
+
+  // Timer effect
   useEffect(() => {
-    if (!currentChallenge) {
-      navigate('/');
-      return;
-    }
-
-    if (currentChallenge.completed && flowFinderChallenge) {
-      setGameState('won');
-      return;
-    }
-
-    // Generate grid based on difficulty
-    const challengeWords = generateGrid(difficulty);
-    setWords(challengeWords);
-    
-    // Count total non-mine words for progress tracking
-    const totalNonMineWords = challengeWords.filter(word => !word.isMine).length;
-    setTotalPatterns(totalNonMineWords);
-    
-    // Only show instructions on first visit (when we have a real daily challenge)
-    if (flowFinderChallenge && !currentChallenge.completed) {
-      setShowInstructions(true);
-    }
-  }, [currentChallenge, flowFinderChallenge, navigate, difficulty]);
-
-  // Timer countdown
-  useEffect(() => {
-    if (gameState !== 'playing' || timeLeft <= 0) return;
+    if (gameState.isGameOver || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
       setTimeLeft(prev => {
         if (prev <= 1) {
-          setGameState('lost');
+          setGameState(prevState => ({ ...prevState, isGameOver: true, isWon: false }));
           return 0;
         }
         return prev - 1;
@@ -300,177 +302,187 @@ const FlowFinder: React.FC = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [gameState, timeLeft]);
+  }, [gameState.isGameOver, timeLeft]);
 
-  const handleWordClick = useCallback((index: number) => {
-    if (gameState !== 'playing') return;
+  // Enhanced card click handler with combo system and effects
+  const handleCardClick = useCallback((card: GameCard) => {
+    if (gameState.isGameOver || card.isMatched) return;
+
+    // Haptic feedback for card selection
+    triggerHaptic('light');
+
+    const newRevealedCards = [...gameState.revealedCards];
     
-    const word = words[index];
-    if (word.clicked) return;
-    
-    // Check if this click breaks the chain
-    if (activePatternType && word.type !== activePatternType && word.type.startsWith('rhyme-')) {
-      // Breaking the chain - increment strikes
-      const newStrikes = strikes + 1;
-      setStrikes(newStrikes);
-      
-      // Mark this word as a mine (wrong guess)
-      setWords(prev => prev.map((w, i) => 
-        i === index ? { ...w, clicked: true, revealed: true, isMine: true } : w
-      ));
-      
-      if (newStrikes >= 3) {
-        // Game over on 3rd strike
-        setExplosionWord(`Strike 3! You clicked "${word.word}" while completing ${activePatternType.replace('rhyme-', '-').toUpperCase()} rhymes`);
-        setGameState('lost');
-      } else {
-        // Show strike warning but continue playing
-        setExplosionWord(`Strike ${newStrikes}! Wrong pattern - ${3 - newStrikes} ${newStrikes === 2 ? 'strike' : 'strikes'} left`);
-      }
+    // If card is already revealed, remove it (deselect)
+    const alreadyRevealedIndex = newRevealedCards.findIndex(c => c.id === card.id);
+    if (alreadyRevealedIndex !== -1) {
+      newRevealedCards.splice(alreadyRevealedIndex, 1);
+      setGameState(prev => ({ ...prev, revealedCards: newRevealedCards }));
       return;
     }
-    
-    setWords(prev => {
-      const newWordState = prev.map((w, i) => {
-        if (i === index) {
-          const updatedWord = { ...w, clicked: true, revealed: true };
-          
-          // Handle different word types
-          if (w.type.startsWith('rhyme-')) {
-            // Set active pattern type if this is the first click of this type
-            if (!activePatternType || completedPatternTypes.has(activePatternType)) {
-              setActivePatternType(w.type);
-            }
-            
-            return updatedWord;
-          }
-          
-          return updatedWord;
-        }
-        return w;
-      });
+
+    // Add card to revealed cards
+    newRevealedCards.push(card);
+
+    // Check if we have a complete group
+    if (newRevealedCards.length > 0) {
+      const firstGroupId = newRevealedCards[0].groupId;
+      const allSameGroup = newRevealedCards.every(c => c.groupId === firstGroupId);
       
-      return newWordState;
-    });
-    
-    // Check for rhyme group completion
-    setTimeout(() => {
-      setWords(prev => {
-        let updatedWords = [...prev];
-        const clickedWord = updatedWords[index];
+      if (allSameGroup && challenge) {
+        const rhymeGroup = challenge.rhymeGroups.find(g => g.id === firstGroupId);
         
-        if (clickedWord.rhymeGroup !== undefined) {
-          const revealedInGroup = updatedWords.filter(w => 
-            w.rhymeGroup === clickedWord.rhymeGroup && w.revealed
-          ).length;
+        if (rhymeGroup && newRevealedCards.length === rhymeGroup.groupSize) {
+          // Complete group found! Enhanced success handling
+          const currentTime = Date.now();
+          const timeSinceLastMatch = gameState.lastMatchTime ? (currentTime - gameState.lastMatchTime) / 1000 : Infinity;
           
-          const totalInGroup = updatedWords.filter(w => w.rhymeGroup === clickedWord.rhymeGroup).length;
+          // Calculate performance metrics
+          const isQuickMatch = timeSinceLastMatch < 5; // Quick succession bonus
+          const isPerfectStreak = gameState.strikes === 0;
+          const newCombo = isQuickMatch ? gameState.combo + 1 : 1;
+          const perfectStreak = isPerfectStreak ? gameState.perfectStreak + 1 : 0;
           
-          if (revealedInGroup === totalInGroup) {
-            setCompletedPatternTypes(current => new Set([...current, clickedWord.type]));
-            if (clickedWord.rhymeGroup !== undefined) {
-              setCompletedRhymeGroups(current => new Set([...current, clickedWord.rhymeGroup!]));
-            }
-            setActivePatternType(null);
-            
-            // Mark all words in this group to show their rhyme explanation with staggered flip
+          // Calculate score
+          const timeBonus = Math.max(0, (120 - (Date.now() - gameStartTime.getTime()) / 1000) / 120);
+          const score = calculateScore(rhymeGroup.difficulty || 1, timeBonus, newCombo, isPerfectStreak);
+          
+          // Enhanced haptic feedback for success
+          triggerHaptic(newCombo > 3 ? 'heavy' : 'medium');
+          
+          // Create particles at card positions
+          newRevealedCards.forEach((_, index) => {
             setTimeout(() => {
-              setWords(current => current.map(w => {
-                if (w.rhymeGroup === clickedWord.rhymeGroup) {
-                  return { ...w, revealed: true, flipped: true };
-                }
-                return w;
-              }));
-            }, 300); // Delay the flip animation slightly
+              const particleType = newCombo > 5 ? 'perfect' : newCombo > 2 ? 'combo' : 'success';
+              createParticles(
+                300 + (index * 80), // Approximate card positions
+                400,
+                particleType,
+                newCombo > 3 ? 5 : 3
+              );
+            }, index * 100);
+          });
+          
+          // Show combo popup for impressive achievements
+          if (newCombo > 2) {
+            setShowComboPopup({ show: true, combo: newCombo, score });
+            setTimeout(() => setShowComboPopup({ show: false, combo: 0, score: 0 }), 2000);
           }
+          
+          // Update game state with enhanced metrics
+          const updatedCards = gameState.cards.map(c => 
+            newRevealedCards.some(rc => rc.id === c.id) 
+              ? { ...c, isMatched: true, isRevealed: true }
+              : c
+          );
+          
+          setGameState(prev => ({
+            ...prev,
+            cards: updatedCards,
+            revealedCards: [],
+            completedGroups: new Set([...prev.completedGroups, firstGroupId]),
+            currentGroupInProgress: null,
+            combo: newCombo,
+            perfectStreak: perfectStreak,
+            totalScore: prev.totalScore + score,
+            lastMatchTime: currentTime
+          }));
+          
+          return;
         }
+      }
+      
+      // Check for mistakes (mixed groups or wrong group size)
+      if (newRevealedCards.length >= 2) {
+        const groupIds = [...new Set(newRevealedCards.map(c => c.groupId))];
         
-        // Update found patterns count
-        const revealedCount = updatedWords.filter(w => w.revealed && !w.isMine).length;
-        setFoundPatterns(revealedCount);
-        
-        // Check win condition
-        if (revealedCount === totalPatterns) {
-          setGameState('won');
-          if (flowFinderChallenge) {
-            completeFlowFinderChallenge(true, revealedCount / totalPatterns);
-          }
+        if (groupIds.length > 1 || (challenge && newRevealedCards.length > Math.max(...challenge.rhymeGroups.map(g => g.groupSize)))) {
+          // Mixed groups or too many cards - strike!
+          
+          // Enhanced error feedback
+          triggerHaptic('heavy');
+          
+          // Shake animation for incorrect cards
+          const wrongCardIds = new Set(newRevealedCards.map(c => c.id));
+          setCardShakeIds(wrongCardIds);
+          setTimeout(() => setCardShakeIds(new Set()), 600);
+          
+          setGameState(prev => {
+            const newStrikes = prev.strikes + 1;
+            const isGameOver = newStrikes >= prev.maxStrikes;
+            
+            return {
+              ...prev,
+              revealedCards: [],
+              strikes: newStrikes,
+              isGameOver,
+              isWon: false,
+              currentGroupInProgress: null,
+              combo: 0, // Reset combo on mistake
+              perfectStreak: 0 // Reset perfect streak
+            };
+          });
+          
+          return;
         }
-        
-        return updatedWords;
-      });
-    }, 0);
-  }, [gameState, words, activePatternType, completedPatternTypes, totalPatterns, flowFinderChallenge, completeFlowFinderChallenge, strikes]);
-
-  const handleGameEnd = useCallback(() => {
-    if (!currentChallenge) return;
-
-    const success = gameState === 'won';
-    const accuracy = foundPatterns / totalPatterns;
-    
-    // Only call completeFlowFinderChallenge if we have a real daily challenge
-    if (flowFinderChallenge) {
-      completeFlowFinderChallenge(success, accuracy);
+      }
     }
-  }, [currentChallenge, flowFinderChallenge, gameState, foundPatterns, totalPatterns, completeFlowFinderChallenge]);
 
-  // Handle game restart
-  const handleRestart = useCallback(() => {
-    if (!currentChallenge) return;
+    setGameState(prev => ({
+      ...prev,
+      revealedCards: newRevealedCards,
+      currentGroupInProgress: newRevealedCards.length > 0 ? newRevealedCards[0].groupId : null
+    }));
+  }, [gameState, challenge, triggerHaptic, createParticles, gameStartTime]);
 
-    // Reset all game state
-    setGameState('playing');
-    setTimeLeft(180);
-    setFoundPatterns(0);
-    setExplosionWord(null);
-    setShowInstructions(false);
-    setActivePatternType(null);
-    setCompletedPatternTypes(new Set());
-    setCompletedRhymeGroups(new Set());
-    setStrikes(0);
-
-    // Generate new grid based on difficulty
-    const challengeWords = generateGrid(difficulty);
-    setWords(challengeWords);
-    
-    // Count total non-mine words for progress tracking
-    const totalNonMineWords = challengeWords.filter(word => !word.isMine).length;
-    setTotalPatterns(totalNonMineWords);
-  }, [currentChallenge, difficulty]);
-
-  // Handle revealing the solution
-  const handleRevealSolution = useCallback(() => {
-    setWords(current => {
-      const revealed = current.map(word => {
-        if (!word.isMine) {
-          return { ...word, revealed: true, clicked: true };
-        }
-        return word;
-      });
-      
-      // Get all unique rhyme groups
-      const allRhymeGroups = new Set(revealed.filter(w => w.rhymeGroup !== undefined).map(w => w.rhymeGroup!));
-      setCompletedRhymeGroups(allRhymeGroups);
-      
-      // Flip cards after a short delay to show the rhyme patterns
-      setTimeout(() => {
-        setWords(revealed.map(word => {
-          if (!word.isMine && word.rhymeGroup !== undefined) {
-            return { ...word, flipped: true };
-          }
-          return word;
-        }));
-      }, 500);
-      
-      return revealed;
-    });
-  }, []);
-
+  // Enhanced game completion with celebrations
   useEffect(() => {
-    if (gameState !== 'playing') {
-      handleGameEnd();
+    if (challenge && gameState.completedGroups.size === challenge.rhymeGroups.length && !gameState.isGameOver) {
+      // Game won! Big celebration
+      triggerHaptic('heavy');
+      
+      // Victory particles
+      setTimeout(() => {
+        for (let i = 0; i < 10; i++) {
+          setTimeout(() => {
+            createParticles(
+              Math.random() * window.innerWidth,
+              Math.random() * 200 + 100,
+              'perfect',
+              1
+            );
+          }, i * 100);
+        }
+      }, 300);
+      
+      setGameState(prev => ({ ...prev, isGameOver: true, isWon: true }));
+      
+      // Calculate final rewards
+      const timeBonus = Math.max(0, (120 - (Date.now() - gameStartTime.getTime()) / 1000) / 120);
+      const finalScore = gameState.totalScore + (timeBonus * 500);
+      const xpGain = Math.floor(finalScore / 10);
+      const tokensGain = Math.floor(finalScore / 100);
+      
+      // Award experience and tokens
+      addXp(xpGain);
+      addTokens(tokensGain);
+      
+      if (completeFlowFinderChallenge) {
+        const accuracy = Math.max(0, 1 - (gameState.strikes / gameState.maxStrikes)) * 100;
+        completeFlowFinderChallenge(true, accuracy);
+      }
     }
-  }, [gameState, handleGameEnd]);
+  }, [gameState.completedGroups.size, challenge, gameState.isGameOver, gameState.totalScore, gameStartTime, addXp, addTokens, completeFlowFinderChallenge, triggerHaptic, createParticles]);
+
+  // Show ELO update animation
+  useEffect(() => {
+    if (showELOUpdate.show) {
+      const timer = setTimeout(() => {
+        setShowELOUpdate({ show: false, change: 0 });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showELOUpdate.show]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -478,778 +490,713 @@ const FlowFinder: React.FC = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getWordColor = (word: ChallengeWord) => {
-    if (!word.revealed) return 'transparent';
-    if (word.isMine) return theme.palette.error.main;
-    
-    // Use rhyme group ID to determine color
-    if (word.rhymeGroup !== undefined) {
-      const colors = [
-        theme.palette.forest.primary,
-        theme.palette.forest.blue,
-        theme.palette.forest.secondary,
-        theme.palette.forest.accent,
-        theme.palette.info.main,
-        theme.palette.warning.main,
-        theme.palette.success.main
-      ];
-      return colors[word.rhymeGroup % colors.length];
+  const getCardBackgroundColor = (card: GameCard) => {
+    if (card.isMatched) {
+      const groupIndex = challenge?.rhymeGroups.findIndex(g => g.id === card.groupId) || 0;
+      return RHYME_GROUP_COLORS[groupIndex % RHYME_GROUP_COLORS.length];
     }
-    
-    return alpha(theme.palette.text.primary, 0.1);
+    if (gameState.revealedCards.some(c => c.id === card.id)) {
+      return theme.palette.primary.main;
+    }
+    return theme.palette.background.paper;
   };
 
-  const getGridCardColor = (word: ChallengeWord) => {
-    // Hide mines until clicked
-    if (word.isMine && !word.clicked) {
-      return alpha(theme.palette.background.paper, 0.8);
-    }
-    
-    if (!word.revealed) return alpha(theme.palette.background.paper, 0.8);
-    if (word.isMine) return theme.palette.error.main;
-    
-    // Use rhyme group ID to determine color
-    if (word.rhymeGroup !== undefined) {
-      const colors = [
-        theme.palette.forest.primary,
-        theme.palette.forest.blue,
-        theme.palette.forest.secondary,
-        theme.palette.forest.accent,
-        theme.palette.info.main,
-        theme.palette.warning.main,
-        theme.palette.success.main
-      ];
-      return colors[word.rhymeGroup % colors.length];
-    }
-    
-    return alpha(theme.palette.background.paper, 0.9);
-  };
-
-  const getGridCardBorderColor = (word: ChallengeWord) => {
-    // Hide mines until clicked
-    if (word.isMine && !word.clicked) {
-      return alpha(theme.palette.forest.border, 0.3);
-    }
-    
-    if (!word.revealed) return alpha(theme.palette.forest.border, 0.3);
-    if (word.isMine) return theme.palette.error.main;
-    
-    // Use rhyme group ID to determine color
-    if (word.rhymeGroup !== undefined) {
-      const colors = [
-        theme.palette.forest.primary,
-        theme.palette.forest.blue,
-        theme.palette.forest.secondary,
-        theme.palette.forest.accent,
-        theme.palette.info.main,
-        theme.palette.warning.main,
-        theme.palette.success.main
-      ];
-      return colors[word.rhymeGroup % colors.length];
-    }
-    
-    return alpha(theme.palette.forest.border, 0.3);
-  };
-
-  const getGridTextColor = (word: ChallengeWord) => {
-    // Hide mines until clicked
-    if (word.isMine && !word.clicked) {
-      return theme.palette.text.primary;
-    }
-    
-    if (!word.revealed) return theme.palette.text.primary;
-    if (word.isMine) return '#FFFFFF';
-    
-    // Determine text color based on background
-    if (word.rhymeGroup !== undefined) {
-      const lightBgGroups = [0, 2]; // Primary and secondary are light
-      return lightBgGroups.includes(word.rhymeGroup % 7) ? '#000000' : '#FFFFFF';
-    }
-    
-    return theme.palette.text.primary;
-  };
-
-  const progress = totalPatterns > 0 ? (foundPatterns / totalPatterns) * 100 : 0;
-
-  if (!currentChallenge) {
-    return (
-      <Box 
-        sx={{ 
-          minHeight: '100vh',
-          bgcolor: theme.palette.forest.background,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: 3
-        }}
-      >
-        <Container maxWidth="md" sx={{ textAlign: 'center' }}>
-          <Typography variant="h6" color="text.primary" mb={3}>
-            Daily Challenge not found
-          </Typography>
-          <Button 
-            variant="contained" 
-            onClick={() => navigate('/')}
-            sx={{ 
-              bgcolor: theme.palette.forest.primary,
-              color: 'black',
-              '&:hover': { bgcolor: theme.palette.forest.primary }
-            }}
-          >
-            Back to Forest
-          </Button>
-        </Container>
-      </Box>
-    );
-  }
+  const progress = challenge ? (gameState.completedGroups.size / challenge.rhymeGroups.length) * 100 : 0;
 
   return (
-    <Box 
-      sx={{ 
-        minHeight: '100vh',
-        bgcolor: theme.palette.forest.background,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '100%'
-      }}
-    >
-      <Container 
-        maxWidth="lg" 
-        sx={{ 
-          py: 4, 
-          px: { xs: 2, sm: 3, md: 4 },
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          width: '100%',
-          maxWidth: '1200px !important'
-        }}
-      >
-        {/* Header */}
-        <Paper 
-          sx={{ 
-            p: 4, 
-            mb: 4, 
-            width: '100%',
-            background: `linear-gradient(135deg, ${alpha(theme.palette.forest.card, 0.9)}, ${alpha(theme.palette.forest.card, 0.7)})`,
-            backdropFilter: 'blur(10px)',
-            border: `1px solid ${alpha(theme.palette.forest.border, 0.3)}`,
-            borderRadius: 2
-          }}
-        >
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-            <Typography variant="h4" color="text.primary" sx={{ fontSize: { xs: '1.5rem', md: '2rem' } }}>
-              🎯 Flow Finder
-            </Typography>
-            <Box display="flex" gap={1} alignItems="center">
-              {/* Difficulty Selector */}
-              {gameState !== 'playing' && (
-                <Box display="flex" gap={0.5} mr={2}>
-                  <Button
-                    size="small"
-                    variant={difficulty === '4x4' ? 'contained' : 'outlined'}
-                    onClick={() => setDifficulty('4x4')}
-                    sx={{ 
-                      bgcolor: difficulty === '4x4' ? theme.palette.forest.primary : 'transparent',
-                      color: difficulty === '4x4' ? 'black' : theme.palette.forest.primary,
-                      borderColor: theme.palette.forest.primary,
-                      '&:hover': { 
-                        bgcolor: difficulty === '4x4' ? theme.palette.forest.primary : alpha(theme.palette.forest.primary, 0.1)
-                      }
-                    }}
-                  >
-                    4x4
-                  </Button>
-                  <Button
-                    size="small"
-                    variant={difficulty === '8x8' ? 'contained' : 'outlined'}
-                    onClick={() => setDifficulty('8x8')}
-                    sx={{ 
-                      bgcolor: difficulty === '8x8' ? theme.palette.forest.accent : 'transparent',
-                      color: difficulty === '8x8' ? 'white' : theme.palette.forest.accent,
-                      borderColor: theme.palette.forest.accent,
-                      '&:hover': { 
-                        bgcolor: difficulty === '8x8' ? theme.palette.forest.accent : alpha(theme.palette.forest.accent, 0.1)
-                      }
-                    }}
-                  >
-                    8x8
-                  </Button>
-                </Box>
-              )}
-              <Tooltip title="Instructions">
-                <IconButton 
-                  onClick={() => setShowInstructions(true)}
-                  sx={{ color: theme.palette.forest.secondary }}
-                >
-                  <HelpIcon />
-                </IconButton>
-              </Tooltip>
-              <IconButton 
-                onClick={() => navigate('/')}
-                sx={{ color: theme.palette.forest.primary }}
-              >
-                <HomeIcon />
-              </IconButton>
-            </Box>
-          </Box>
+    <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+      {/* Particle Effects Overlay */}
+      <AnimatePresence>
+        {particles.map((particle) => (
+          <motion.div
+            key={particle.id}
+            initial={{ x: particle.x, y: particle.y, scale: 0, opacity: 1 }}
+            animate={{ 
+              x: particle.x + (Math.random() - 0.5) * 200,
+              y: particle.y - 150,
+              scale: [0, 1.2, 0.8],
+              opacity: [1, 1, 0]
+            }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 2, ease: "easeOut" }}
+            style={{
+              position: 'fixed',
+              fontSize: '24px',
+              pointerEvents: 'none',
+              zIndex: 1000
+            }}
+          >
+            {particle.emoji}
+          </motion.div>
+        ))}
+      </AnimatePresence>
 
-          <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} sm={6} md={3}>
-              <Box display="flex" alignItems="center" gap={1} justifyContent={{ xs: 'center', md: 'flex-start' }}>
-                <TimerIcon 
-                  sx={{ color: timeLeft < 30 ? theme.palette.error.main : theme.palette.forest.blue }} 
-                />
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
-                    color: timeLeft < 30 ? theme.palette.error.main : theme.palette.text.primary,
-                    fontSize: { xs: '1.125rem', md: '1.25rem' }
-                  }}
-                >
-                  {formatTime(timeLeft)}
+      {/* Combo Popup */}
+      <AnimatePresence>
+        {showComboPopup.show && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            style={{
+              position: 'fixed',
+              top: '30%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1001,
+              pointerEvents: 'none'
+            }}
+          >
+            <Paper
+              elevation={8}
+              sx={{
+                p: 3,
+                background: `linear-gradient(135deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
+                color: 'white',
+                borderRadius: 3,
+                textAlign: 'center',
+                border: '2px solid #FFD700'
+              }}
+            >
+              <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mb: 1 }}>
+                {showComboPopup.combo}x COMBO! 🔥
+              </Typography>
+              <Typography variant="h6">
+                +{showComboPopup.score} points
+              </Typography>
+            </Paper>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Show game mode selection screen */}
+      {showModeSelection ? (
+        <Box>
+          <Card sx={{ mb: 2 }}>
+            <CardContent>
+              <Typography variant="h4" component="h1" gutterBottom align="center">
+                🎮 RhymeTime Games
+              </Typography>
+              <Typography variant="h6" color="text.secondary" align="center" gutterBottom>
+                {t('flowFinder.selectMode', 'Choose Your Word Pattern Challenge')}
+              </Typography>
+            </CardContent>
+          </Card>
+
+          <Grid container spacing={3}>
+            {availableModes.map((mode) => {
+              const isLocked = level < mode.unlockLevel;
+              return (
+                <Grid item xs={12} sm={6} md={3} key={mode.id}>
+                  <motion.div
+                    whileHover={!isLocked ? { scale: 1.02, y: -5 } : {}}
+                    whileTap={!isLocked ? { scale: 0.98 } : {}}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  >
+                    <Card 
+                      sx={{ 
+                        height: '100%',
+                        cursor: isLocked ? 'not-allowed' : 'pointer',
+                        opacity: isLocked ? 0.6 : 1,
+                        position: 'relative',
+                        background: isLocked ? 
+                          'linear-gradient(135deg, #f5f5f5, #e0e0e0)' :
+                          `linear-gradient(135deg, ${theme.palette.background.paper}, ${theme.palette.background.default})`,
+                        border: !isLocked ? `2px solid ${theme.palette.primary.main}20` : '2px solid transparent',
+                        '&:hover': {
+                          boxShadow: isLocked ? 'none' : theme.shadows[8],
+                          borderColor: !isLocked ? theme.palette.primary.main : 'transparent'
+                        }
+                      }}
+                      onClick={() => !isLocked && (mode.id === 'cultural_crossover' ? null : startGame(mode.id))}
+                    >
+                      <CardContent sx={{ textAlign: 'center', p: 3 }}>
+                        {isLocked && (
+                          <Box sx={{ position: 'absolute', top: 8, right: 8 }}>
+                            <LockIcon color="disabled" />
+                          </Box>
+                        )}
+                        
+                        <Typography variant="h2" sx={{ mb: 1, filter: isLocked ? 'grayscale(1)' : 'none' }}>
+                          {mode.icon}
+                        </Typography>
+                        
+                        <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                          {mode.name}
+                        </Typography>
+                        
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+                          {mode.description}
+                        </Typography>
+                        
+                        {isLocked ? (
+                          <Chip 
+                            icon={<LockIcon />}
+                            label={`Unlock at Level ${mode.unlockLevel}`}
+                            size="small"
+                            color="default"
+                            sx={{ mb: 1 }}
+                          />
+                        ) : mode.id === 'cultural_crossover' ? (
+                          <Box>
+                            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                              <InputLabel>Cultural Theme</InputLabel>
+                              <Select
+                                value={selectedCulturalTheme}
+                                onChange={(e) => setSelectedCulturalTheme(e.target.value)}
+                                label="Cultural Theme"
+                              >
+                                {Object.entries(CULTURAL_THEMES).map(([key, theme]) => (
+                                  <MenuItem key={key} value={key}>
+                                    {theme.icon} {theme.name}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                            <Button
+                              variant="contained"
+                              startIcon={<PlayArrowIcon />}
+                              onClick={() => startGame(mode.id, selectedCulturalTheme)}
+                              fullWidth
+                              size="large"
+                              sx={{ fontWeight: 'bold' }}
+                            >
+                              Start Game
+                            </Button>
+                          </Box>
+                        ) : (
+                          <Button
+                            variant="contained"
+                            startIcon={<PlayArrowIcon />}
+                            onClick={() => startGame(mode.id)}
+                            fullWidth
+                            size="large"
+                            sx={{ fontWeight: 'bold' }}
+                          >
+                            Start Game
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </Grid>
+              );
+            })}
+          </Grid>
+
+          {/* Enhanced Player Progress */}
+          <Card sx={{ mt: 3, background: `linear-gradient(135deg, ${theme.palette.primary.main}10, ${theme.palette.secondary.main}10)` }}>
+            <CardContent>
+              <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  📊 Your Progress
+                </Typography>
+                <Badge badgeContent={level} color="primary">
+                  <Avatar sx={{ bgcolor: theme.palette.primary.main, width: 32, height: 32 }}>
+                    🎯
+                  </Avatar>
+                </Badge>
+              </Box>
+              
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                  Level {level} Player
+                </Typography>
+                <Typography color="text.secondary">
+                  {availableModes.length} of 4 modes unlocked
                 </Typography>
               </Box>
-            </Grid>
+              
+              <LinearProgress 
+                variant="determinate" 
+                value={(availableModes.length / 4) * 100} 
+                sx={{ 
+                  height: 8, 
+                  borderRadius: 4,
+                  mb: 2,
+                  backgroundColor: theme.palette.grey[200],
+                  '& .MuiLinearProgress-bar': {
+                    borderRadius: 4,
+                    background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
+                  }
+                }}
+              />
+              
+              <Typography variant="body2" color="text.secondary" align="center">
+                🎯 Level up through gameplay to unlock new pattern challenges!
+              </Typography>
+            </CardContent>
+          </Card>
+        </Box>
+      ) : !challenge ? (
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              {t('flowFinder.title', 'Flow Finder')}
+            </Typography>
+            <Typography color="text.secondary">
+              {t('flowFinder.noChallenge', 'No challenge available. Check back later!')}
+            </Typography>
+          </CardContent>
+        </Card>
+      ) : (
+        // Enhanced Game Interface
+        <Box>
+          {/* Game Header with Enhanced Info */}
+          <Card sx={{ 
+            mb: 2, 
+            background: `linear-gradient(135deg, ${theme.palette.primary.main}05, ${theme.palette.secondary.main}05)`,
+            border: `1px solid ${theme.palette.primary.main}20`
+          }}>
+            <CardContent sx={{ pb: 2 }}>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <IconButton 
+                    onClick={returnToModeSelection} 
+                    size="small"
+                    sx={{ 
+                      bgcolor: theme.palette.background.paper,
+                      '&:hover': { bgcolor: theme.palette.grey[100] }
+                    }}
+                  >
+                    <ArrowBack />
+                  </IconButton>
+                  <Typography variant={isMobile ? "h6" : "h5"} component="h2" sx={{ fontWeight: 'bold' }}>
+                    {availableModes.find(m => m.id === selectedMode)?.name || 'Flow Finder'}
+                  </Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Tooltip title={t('flowFinder.help', 'How to play')}>
+                    <IconButton onClick={() => setShowHelp(true)} size="small">
+                      <HelpOutlineIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Chip
+                    icon={<TimerIcon />}
+                    label={formatTime(timeLeft)}
+                    color={timeLeft < 30 ? 'error' : timeLeft < 60 ? 'warning' : 'primary'}
+                    variant="outlined"
+                    sx={{ fontWeight: 'bold', minWidth: '70px' }}
+                  />
+                </Box>
+              </Box>
 
-            <Grid item xs={12} sm={6} md={4}>
-              <Box textAlign={{ xs: 'center', md: 'left' }}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Progress: {foundPatterns}/{totalPatterns}
-                </Typography>
+              {/* Enhanced Progress Display */}
+              <Box mb={2}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                    Progress: {gameState.completedGroups.size}/{challenge.rhymeGroups.length} Groups
+                  </Typography>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                      Strikes: {gameState.strikes}/{gameState.maxStrikes}
+                    </Typography>
+                    {Array.from({ length: gameState.maxStrikes }).map((_, i) => (
+                      <ErrorIcon 
+                        key={i} 
+                        fontSize="small" 
+                        color={i < gameState.strikes ? 'error' : 'disabled'} 
+                        sx={{ 
+                          animation: i === gameState.strikes - 1 && gameState.strikes > 0 ? 
+                            'shake 0.5s ease-in-out' : 'none',
+                          '@keyframes shake': {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '25%': { transform: 'translateX(-3px)' },
+                            '75%': { transform: 'translateX(3px)' }
+                          }
+                        }}
+                      />
+                    ))}
+                  </Box>
+                </Box>
                 <LinearProgress 
                   variant="determinate" 
                   value={progress} 
                   sx={{ 
-                    height: 10, 
-                    borderRadius: 5,
-                    bgcolor: alpha(theme.palette.forest.primary, 0.2),
+                    height: 8, 
+                    borderRadius: 4,
+                    backgroundColor: theme.palette.grey[200],
                     '& .MuiLinearProgress-bar': {
-                      bgcolor: theme.palette.forest.primary
+                      borderRadius: 4,
+                      background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
                     }
                   }}
                 />
               </Box>
-            </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <Box display="flex" gap={1} justifyContent={{ xs: 'center', md: 'flex-start' }} flexWrap="wrap">
-                <Chip 
-                  label={`+${currentChallenge.tokensReward} 🪙`} 
-                  sx={{ 
-                    bgcolor: theme.palette.forest.blue,
-                    color: 'white',
-                    fontWeight: 600
-                  }}
-                  size="small"
-                />
-                <Chip 
-                  label={`+${currentChallenge.xpReward} XP`} 
-                  sx={{ 
-                    bgcolor: theme.palette.forest.secondary,
-                    color: 'black',
-                    fontWeight: 600
-                  }}
-                  size="small"
-                />
-              </Box>
-            </Grid>
+              {/* Game Stats Row */}
+              <Grid container spacing={2} sx={{ mb: 2 }}>
+                <Grid item xs={4}>
+                  <Box textAlign="center" sx={{ p: 1, bgcolor: theme.palette.background.paper, borderRadius: 2 }}>
+                    <Typography variant="body2" color="text.secondary">Score</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+                      {gameState.totalScore.toLocaleString()}
+                    </Typography>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box textAlign="center" sx={{ p: 1, bgcolor: theme.palette.secondary.main + '10', borderRadius: 2 }}>
+                    <Typography variant="body2" color="text.secondary">Combo</Typography>
+                    <Box display="flex" alignItems="center" justifyContent="center" gap={0.5}>
+                      <WhatshotIcon color={gameState.combo > 2 ? 'secondary' : 'disabled'} fontSize="small" />
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.secondary.main }}>
+                        {gameState.combo}x
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Grid>
+                <Grid item xs={4}>
+                  <Box textAlign="center" sx={{ p: 1, bgcolor: theme.palette.warning.main + '10', borderRadius: 2 }}>
+                    <Typography variant="body2" color="text.secondary">Perfect</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.warning.main }}>
+                      {gameState.perfectStreak}
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
 
-            <Grid item xs={12} sm={6} md={2}>
-              <Typography variant="body2" color="text.secondary" textAlign={{ xs: 'center', md: 'left' }}>
-                Type: {currentChallenge.type.replace('_', ' ')}
-              </Typography>
-            </Grid>
-
-            {/* Strikes Indicator */}
-            {gameState === 'playing' && strikes > 0 && (
-              <Box sx={{ mt: 2, textAlign: 'center' }}>
-                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center', alignItems: 'center' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Strikes:
+              {/* Pattern Groups Display */}
+              <Box mb={2}>
+                <Typography variant="body2" color="text.secondary" gutterBottom sx={{ fontWeight: 'bold' }}>
+                  {challenge.text}
+                </Typography>
+                <Box display="flex" gap={1} flexWrap="wrap">
+                  <Typography variant="body2" color="text.secondary" sx={{ alignSelf: 'center', mr: 1 }}>
+                    Find groups:
                   </Typography>
-                  {[...Array(3)].map((_, i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: '50%',
-                        bgcolor: i < strikes ? theme.palette.error.main : alpha(theme.palette.error.main, 0.2),
-                        border: `2px solid ${i < strikes ? theme.palette.error.dark : alpha(theme.palette.error.main, 0.3)}`,
-                        transition: 'all 0.3s ease'
-                      }}
-                    />
+                  {challenge.rhymeGroups.map((group, index) => (
+                    <motion.div
+                      key={group.id}
+                      animate={gameState.completedGroups.has(group.id) ? { scale: [1, 1.1, 1] } : {}}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Chip
+                        label={`${group.pattern} (${group.groupSize})`}
+                        size="small"
+                        color={gameState.completedGroups.has(group.id) ? 'success' : 'default'}
+                        icon={gameState.completedGroups.has(group.id) ? <CheckCircleIcon /> : undefined}
+                        sx={{
+                          backgroundColor: gameState.completedGroups.has(group.id) 
+                            ? RHYME_GROUP_COLORS[index % RHYME_GROUP_COLORS.length] 
+                            : undefined,
+                          color: gameState.completedGroups.has(group.id) ? 'white' : undefined,
+                          fontWeight: 'bold',
+                          border: gameState.completedGroups.has(group.id) ? '2px solid #FFD700' : 'none'
+                        }}
+                      />
+                    </motion.div>
                   ))}
-                  <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                    {3 - strikes} {strikes === 2 ? 'strike' : 'strikes'} left
-                  </Typography>
                 </Box>
               </Box>
-            )}
-          </Grid>
-        </Paper>
+            </CardContent>
+          </Card>
 
-        {/* Game Area */}
-        <Paper 
-          sx={{ 
-            p: 4, 
-            width: '100%',
-            background: `linear-gradient(135deg, ${alpha(theme.palette.forest.card, 0.9)}, ${alpha(theme.palette.forest.card, 0.7)})`,
-            backdropFilter: 'blur(10px)',
-            border: `1px solid ${alpha(theme.palette.forest.border, 0.3)}`,
-            borderRadius: 2
-          }}
-        >
-          {gameState === 'playing' && (
-            <Alert 
-              severity="info" 
-              sx={{ 
-                mb: 3,
-                bgcolor: alpha(theme.palette.info.main, 0.1),
-                color: theme.palette.info.main,
-                '& .MuiAlert-icon': { color: theme.palette.info.main }
-              }}
-            >
-              Clear the entire board by completing pattern groups strategically!
-            </Alert>
-          )}
-
-          {gameState === 'won' && (
-            <Alert 
-              severity="success" 
-              sx={{ 
-                mb: 3,
-                bgcolor: alpha(theme.palette.forest.primary, 0.1),
-                color: theme.palette.forest.primary,
-                '& .MuiAlert-icon': { color: theme.palette.forest.primary }
-              }}
-            >
-              🎉 Challenge completed successfully! +{currentChallenge.tokensReward} 🪙 +{currentChallenge.xpReward} XP
-            </Alert>
-          )}
-
-          {gameState === 'lost' && (
-            <Alert 
-              severity="error" 
-              sx={{ 
-                mb: 3,
-                bgcolor: alpha(theme.palette.error.main, 0.1),
-                color: theme.palette.error.main
-              }}
-            >
-              💥 Challenge failed! {explosionWord && `${explosionWord}`}
-            </Alert>
-          )}
-
-          {/* Strike Warning */}
-          {gameState === 'playing' && strikes > 0 && strikes < 3 && explosionWord && (
-            <Alert 
-              severity="warning" 
-              sx={{ 
-                mb: 3,
-                bgcolor: alpha(theme.palette.warning.main, 0.1),
-                color: theme.palette.warning.main
-              }}
-            >
-              ⚠️ {explosionWord}
-            </Alert>
-          )}
-
-          {/* Game Grid - Minesweeper Style */}
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" color="text.primary" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
-              Strategic Pattern Hunt
-            </Typography>
-            
-            {/* Dynamic Grid */}
-            <Box 
-              sx={{ 
-                display: 'grid',
-                gridTemplateColumns: `repeat(${DIFFICULTY_CONFIGS[difficulty].gridSize}, 1fr)`,
-                gap: difficulty === '8x8' ? 1 : 2,
-                maxWidth: difficulty === '8x8' ? '800px' : '600px',
-                margin: '0 auto',
-                p: 3,
-                bgcolor: alpha(theme.palette.background.paper, 0.1),
-                borderRadius: 3,
-                border: `2px solid ${alpha(theme.palette.forest.border, 0.3)}`
-              }}
-            >
-              {words.map((word, index) => (
-                <Card
-                  key={index}
-                  onClick={() => handleWordClick(index)}
-                  sx={{
-                    minHeight: difficulty === '8x8' ? '60px' : '80px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: gameState === 'playing' && !word.clicked ? 'pointer' : 'default',
-                    transition: 'transform 0.6s',
-                    bgcolor: getGridCardColor(word),
-                    border: `2px solid ${getGridCardBorderColor(word)}`,
-                    position: 'relative',
-                    transformStyle: 'preserve-3d',
-                    transform: word.flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                    '&:hover': gameState === 'playing' && !word.clicked && !word.flipped ? {
-                      transform: 'translateY(-4px) rotateY(0deg)',
-                      boxShadow: `0 8px 25px ${alpha(theme.palette.forest.primary, 0.3)}`,
-                      bgcolor: alpha(theme.palette.forest.primary, 0.1)
-                    } : {},
-                    // Completed rhyme group styling
-                    ...(word.rhymeGroup !== undefined && completedRhymeGroups.has(word.rhymeGroup) && !word.flipped && {
-                      background: `linear-gradient(135deg, ${getGridCardColor(word)}, ${alpha(getGridCardColor(word), 0.8)})`,
-                      boxShadow: `inset 0 0 10px ${alpha(theme.palette.common.white, 0.3)}`
-                    })
-                  }}
-                >
-                  {/* Front of card */}
-                  <CardContent sx={{ 
-                    textAlign: 'center',
-                    p: difficulty === '8x8' ? 1 : 2,
-                    '&:last-child': { pb: difficulty === '8x8' ? 1 : 2 },
-                    position: 'absolute',
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backfaceVisibility: 'hidden',
-                    transform: 'rotateY(0deg)'
-                  }}>
-                    <Typography 
-                      variant={difficulty === '8x8' ? 'body2' : 'h6'}
-                      sx={{ 
-                        fontWeight: word.revealed ? 700 : 600,
-                        color: getGridTextColor(word),
-                        fontSize: difficulty === '8x8' ? '0.9rem' : { xs: '1rem', md: '1.1rem' },
-                        textTransform: word.revealed && word.type !== 'normal' ? 'uppercase' : 'none'
+          {/* Enhanced Game Grid */}
+          <Box display="flex" justifyContent="center" mb={3}>
+            <Grid container spacing={1.5} sx={{ maxWidth: isMobile ? 350 : 500 }}>
+              {gameState.cards.map((card) => {
+                const isRevealed = gameState.revealedCards.some(c => c.id === card.id);
+                const backgroundColor = getCardBackgroundColor(card);
+                const fontSize = getDynamicFontSize(card.word, isMobile);
+                const isShaking = cardShakeIds.has(card.id);
+                
+                return (
+                  <Grid 
+                    item 
+                    xs={12 / (challenge.gridSize === '4x4' ? 4 : 8)} 
+                    key={card.id}
+                  >
+                    <motion.div
+                      whileHover={card.isMatched ? {} : { scale: 1.05, y: -3 }}
+                      whileTap={card.isMatched ? {} : { scale: 0.95 }}
+                      animate={card.isMatched ? 
+                        { scale: [1, 1.15, 1], rotateY: [0, 10, 0] } : 
+                        isShaking ? { x: [-3, 3, -3, 3, 0] } : {}
+                      }
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 400, 
+                        damping: 25,
+                        duration: isShaking ? 0.6 : 0.3
                       }}
                     >
-                      {word.word}
-                    </Typography>
-                    
-                    {/* Mine indicator - only show after clicked */}
-                    {word.clicked && word.isMine && (
-                      <Typography 
-                        variant="caption" 
-                        sx={{ 
-                          display: 'block',
-                          mt: 0.5,
-                          fontSize: difficulty === '8x8' ? '1rem' : '1.2rem'
+                      <Card
+                        onClick={() => handleCardClick(card)}
+                        sx={{
+                          minHeight: isMobile ? 70 : 85,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: card.isMatched ? 'default' : 'pointer',
+                          backgroundColor,
+                          border: isRevealed && !card.isMatched ? 
+                            `3px solid ${theme.palette.primary.main}` : 
+                            card.isMatched ? `3px solid #FFD700` : 
+                            `2px solid ${theme.palette.divider}`,
+                          borderRadius: 3,
+                          position: 'relative',
+                          overflow: 'hidden',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          background: card.isMatched ? 
+                            `linear-gradient(135deg, ${backgroundColor}, ${backgroundColor}dd)` :
+                            isRevealed ? 
+                            `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})` :
+                            `linear-gradient(135deg, ${theme.palette.background.paper}, ${theme.palette.grey[50]})`,
+                          boxShadow: card.isMatched ? 
+                            `0 8px 16px ${backgroundColor}40, 0 0 20px ${backgroundColor}30` :
+                            isRevealed ? 
+                            `0 4px 12px ${theme.palette.primary.main}40` :
+                            theme.shadows[2],
+                          '&:hover': {
+                            boxShadow: card.isMatched ? 
+                              `0 8px 16px ${backgroundColor}40, 0 0 20px ${backgroundColor}30` :
+                              theme.shadows[8],
+                            borderColor: card.isMatched ? '#FFD700' : theme.palette.primary.main
+                          }
                         }}
                       >
-                        💥
-                      </Typography>
-                    )}
-                  </CardContent>
-                  
-                  {/* Back of card - shows rhyme pattern */}
-                  {word.flipped && word.rhymeExplanation && (
-                    <CardContent sx={{ 
-                      textAlign: 'center',
-                      p: difficulty === '8x8' ? 1 : 2,
-                      '&:last-child': { pb: difficulty === '8x8' ? 1 : 2 },
-                      position: 'absolute',
-                      width: '100%',
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backfaceVisibility: 'hidden',
-                      transform: 'rotateY(180deg)',
-                      bgcolor: alpha(getGridCardColor(word), 0.9)
-                    }}>
-                      <Typography 
-                        variant={difficulty === '8x8' ? 'body2' : 'h6'}
-                        sx={{ 
-                          fontWeight: 700,
-                          color: getGridTextColor(word),
-                          fontSize: difficulty === '8x8' ? '0.8rem' : { xs: '0.9rem', md: '1rem' }
-                        }}
-                      >
-                        {word.word}
-                      </Typography>
-                      <Typography 
-                        variant="caption" 
-                        sx={{ 
-                          display: 'block',
-                          mt: 0.5,
-                          color: 'inherit',
-                          opacity: 0.9,
-                          fontSize: difficulty === '8x8' ? '0.6rem' : '0.7rem',
-                          fontWeight: 600,
-                          fontStyle: 'italic'
-                        }}
-                      >
-                        {word.type.replace('rhyme-', '-').toUpperCase()}
-                      </Typography>
-                    </CardContent>
-                  )}
-                </Card>
-              ))}
-            </Box>
-          </Box>
-
-          {/* Completed Words Legend */}
-          {completedRhymeGroups.size > 0 && (
-            <Box sx={{ mb: 4 }}>
-              <Typography variant="h6" gutterBottom color="text.primary" sx={{ textAlign: 'center' }}>
-                Discovered Rhyme Patterns
-              </Typography>
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  flexWrap: 'wrap', 
-                  gap: 2, 
-                  justifyContent: 'center',
-                  p: 2,
-                  bgcolor: alpha(theme.palette.background.paper, 0.1),
-                  borderRadius: 2,
-                  border: `1px solid ${alpha(theme.palette.forest.border, 0.3)}`
-                }}
-              >
-                {[...completedRhymeGroups].sort().map(groupId => {
-                  const groupWords = words.filter(w => w.rhymeGroup === groupId && w.revealed);
-                  if (groupWords.length === 0) return null;
-                  
-                  const rhymeEnding = groupWords[0].type.replace('rhyme-', '-').toUpperCase();
-                  const color = getGridCardColor(groupWords[0]);
-                  const textColor = getGridTextColor(groupWords[0]);
-                  
-                  return (
-                    <Box 
-                      key={groupId}
-                      sx={{ 
-                        p: 1.5,
-                        bgcolor: color,
-                        borderRadius: 2,
-                        minWidth: '120px'
-                      }}
-                    >
-                      <Typography 
-                        variant="subtitle2" 
-                        sx={{ 
-                          color: textColor,
-                          fontWeight: 700,
-                          textAlign: 'center',
-                          mb: 1,
-                          borderBottom: `2px solid ${alpha(textColor, 0.3)}`,
-                          pb: 0.5
-                        }}
-                      >
-                        {rhymeEnding} rhymes
-                      </Typography>
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, justifyContent: 'center' }}>
-                        {groupWords.map((word, idx) => (
+                        {/* Success glow effect */}
+                        {card.isMatched && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background: 'linear-gradient(45deg, rgba(255,215,0,0.2), rgba(255,255,255,0.1))',
+                              pointerEvents: 'none'
+                            }}
+                          />
+                        )}
+                        
+                        <CardContent sx={{ p: 1, textAlign: 'center', '&:last-child': { pb: 1 } }}>
                           <Typography 
-                            key={idx}
-                            variant="body2" 
+                            variant="body1"
                             sx={{ 
-                              color: textColor,
-                              fontWeight: 500
+                              fontSize,
+                              fontWeight: 'bold',
+                              color: card.isMatched || isRevealed ? 'white' : theme.palette.text.primary,
+                              textTransform: 'uppercase',
+                              lineHeight: 1.2,
+                              letterSpacing: '0.5px',
+                              textShadow: card.isMatched || isRevealed ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
+                              transition: 'all 0.3s ease'
                             }}
                           >
-                            {word.word}
-                            {idx < groupWords.length - 1 && ','}
+                            {card.word}
                           </Typography>
-                        ))}
-                      </Box>
-                    </Box>
-                  );
-                })}
-              </Box>
-            </Box>
-          )}
-
-          {/* Action Buttons */}
-          <Box sx={{ textAlign: 'center' }}>
-            <Button 
-              variant="contained" 
-              onClick={() => navigate('/')}
-              sx={{ 
-                mr: 2,
-                bgcolor: theme.palette.forest.primary,
-                color: 'black',
-                fontWeight: 600,
-                px: 4,
-                py: 1.5,
-                '&:hover': { 
-                  bgcolor: theme.palette.forest.primary,
-                  transform: 'translateY(-2px)'
-                }
-              }}
-            >
-              {gameState === 'playing' ? 'Quit' : 'Back to Forest'}
-            </Button>
-            
-            {gameState !== 'playing' && (
-              <Button 
-                variant="outlined" 
-                onClick={() => handleRestart()}
-                startIcon={<RefreshIcon />}
-                sx={{
-                  borderColor: theme.palette.forest.secondary,
-                  color: theme.palette.forest.secondary,
-                  fontWeight: 600,
-                  px: 4,
-                  py: 1.5,
-                  '&:hover': {
-                    borderColor: theme.palette.forest.secondary,
-                    bgcolor: alpha(theme.palette.forest.secondary, 0.1),
-                    transform: 'translateY(-2px)'
-                  }
-                }}
-              >
-                Try Again
-              </Button>
-            )}
-            
-            {gameState === 'lost' && (
-              <Button 
-                variant="outlined" 
-                onClick={handleRevealSolution}
-                startIcon={<VisibilityIcon />}
-                sx={{
-                  ml: 2,
-                  borderColor: theme.palette.info.main,
-                  color: theme.palette.info.main,
-                  fontWeight: 600,
-                  px: 4,
-                  py: 1.5,
-                  '&:hover': {
-                    borderColor: theme.palette.info.main,
-                    bgcolor: alpha(theme.palette.info.main, 0.1),
-                    transform: 'translateY(-2px)'
-                  }
-                }}
-              >
-                Reveal Solution
-              </Button>
-            )}
+                        </CardContent>
+                        
+                        {/* Match celebration icon */}
+                        <AnimatePresence>
+                          {card.isMatched && (
+                            <motion.div
+                              initial={{ scale: 0, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              exit={{ scale: 0, opacity: 0 }}
+                              style={{
+                                position: 'absolute',
+                                top: '4px',
+                                right: '4px',
+                                fontSize: '16px'
+                              }}
+                            >
+                              ✨
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </Card>
+                    </motion.div>
+                  </Grid>
+                );
+              })}
+            </Grid>
           </Box>
-        </Paper>
 
-        {/* Instructions Dialog */}
-        <Dialog 
-          open={showInstructions} 
-          onClose={() => setShowInstructions(false)} 
-          maxWidth="lg" 
-          fullWidth
-          PaperProps={{
-            sx: {
-              bgcolor: theme.palette.forest.card,
-              border: `1px solid ${alpha(theme.palette.forest.border, 0.3)}`,
-              maxHeight: '90vh'
-            }
-          }}
-        >
-          <DialogTitle sx={{ color: theme.palette.text.primary, textAlign: 'center', pb: 1 }}>
-            🎯 How to Play Flow Finder
-          </DialogTitle>
-          <DialogContent sx={{ px: 3 }}>
-            <DialogContentText sx={{ mb: 3 }}>
-              <Typography variant="h6" color="primary" gutterBottom>
-                🎯 Flow Finder
-              </Typography>
-              
-              <Typography paragraph>
-                Find and complete rhyme groups while avoiding mines!
-              </Typography>
+          {/* Game Controls */}
+          <Box display="flex" justifyContent="center" gap={2} mb={2}>
+            <Button
+              variant="outlined"
+              startIcon={<ArrowBack />}
+              onClick={returnToModeSelection}
+              sx={{ minWidth: '120px' }}
+            >
+              New Game
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={<HelpOutlineIcon />}
+              onClick={() => setShowHelp(true)}
+              sx={{ minWidth: '120px' }}
+            >
+              Help
+            </Button>
+          </Box>
 
-              <Typography variant="subtitle1" color="primary" gutterBottom sx={{ mt: 2 }}>
-                How to Play:
-              </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemText primary="🔍 Click any word to reveal if it's part of a rhyme group" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="🎵 Once you click a rhyming word, you must complete ALL words in that rhyme group" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="⚡ You get 3 strikes - breaking the chain (clicking a different rhyme group) gives you a strike" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="💥 3 strikes and you're out! Failed attempts turn into mines" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="📚 When you complete a rhyme group, the rhyme pattern is revealed (e.g., -AT, -IGHT)" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="✨ Clear all rhyme groups to win!" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="⏰ Complete the challenge before time runs out!" />
-                </ListItem>
-              </List>
-
-              <Typography variant="subtitle1" color="primary" gutterBottom sx={{ mt: 2 }}>
-                Difficulty Levels:
-              </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemText 
-                    primary="4x4 Grid" 
-                    secondary={`${3}-${5} words per rhyme group`}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText 
-                    primary="8x8 Grid" 
-                    secondary={`${2}-${4} words per rhyme group`}
-                  />
-                </ListItem>
-              </List>
-
-              <Box sx={{ mt: 3, p: 2, bgcolor: alpha(theme.palette.warning.main, 0.1), borderRadius: 2 }}>
-                <Typography variant="subtitle2" color="warning.main" gutterBottom>
-                  💡 Pro Tips:
+          {/* Game Over Modal */}
+          <Dialog 
+            open={gameState.isGameOver} 
+            maxWidth="sm" 
+            fullWidth
+            PaperProps={{
+              sx: {
+                borderRadius: 3,
+                background: gameState.isWon ? 
+                  `linear-gradient(135deg, ${theme.palette.success.main}10, ${theme.palette.primary.main}05)` :
+                  `linear-gradient(135deg, ${theme.palette.error.main}10, ${theme.palette.grey[100]})`
+              }
+            }}
+          >
+            <DialogContent sx={{ textAlign: 'center', p: 4 }}>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              >
+                <Typography variant="h3" sx={{ mb: 2 }}>
+                  {gameState.isWon ? '🎉' : '😔'}
                 </Typography>
-                <Typography variant="body2">
-                  • Once you start a rhyme group, commit to finding all words in it
-                  <br />
-                  • You get 3 strikes before game over - use them wisely!
-                  <br />
-                  • Each wrong pattern guess creates a mine on that word
-                  <br />
-                  • Look for common endings like -AT, -ING, -OWN
-                  <br />
-                  • Higher difficulties have more groups but fewer words per group
-                  <br />
-                  • After completing a group, you'll see what makes them rhyme!
+                <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
+                  {gameState.isWon ? 'Congratulations!' : 'Game Over'}
+                </Typography>
+                <Typography variant="h6" color="text.secondary" sx={{ mb: 3 }}>
+                  {gameState.isWon ? 
+                    'You successfully found all pattern groups!' : 
+                    'Better luck next time!'}
+                </Typography>
+              </motion.div>
+              
+              {gameState.isWon && (
+                <Grid container spacing={2} sx={{ mb: 3 }}>
+                  <Grid item xs={6}>
+                    <Box sx={{ p: 2, bgcolor: theme.palette.primary.main + '10', borderRadius: 2 }}>
+                      <Typography variant="body2" color="text.secondary">Final Score</Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 'bold', color: theme.palette.primary.main }}>
+                        {gameState.totalScore.toLocaleString()}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{ p: 2, bgcolor: theme.palette.success.main + '10', borderRadius: 2 }}>
+                      <Typography variant="body2" color="text.secondary">Max Combo</Typography>
+                      <Typography variant="h5" sx={{ fontWeight: 'bold', color: theme.palette.success.main }}>
+                        {gameState.combo}x
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+              )}
+              
+              <Box display="flex" gap={2} justifyContent="center">
+                <Button
+                  variant="contained"
+                  startIcon={<PlayArrowIcon />}
+                  onClick={() => startGame(selectedMode!, selectedCulturalTheme)}
+                  size="large"
+                  sx={{ minWidth: '140px', fontWeight: 'bold' }}
+                >
+                  Play Again
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={returnToModeSelection}
+                  size="large"
+                  sx={{ minWidth: '140px' }}
+                >
+                  New Mode
+                </Button>
+              </Box>
+            </DialogContent>
+          </Dialog>
+
+          {/* Enhanced Help Dialog */}
+          <Dialog open={showHelp} onClose={() => setShowHelp(false)} maxWidth="md" fullWidth>
+            <DialogTitle sx={{ 
+              background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              color: 'white',
+              textAlign: 'center',
+              fontWeight: 'bold'
+            }}>
+              🎮 How to Play RhymeTime Games
+            </DialogTitle>
+            <DialogContent sx={{ p: 3 }}>
+              <Grid container spacing={3}>
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      🎯 <strong>Objective</strong>
+                    </Typography>
+                    <Typography paragraph>
+                      Find groups of words that follow the same pattern (rhymes, alliteration, etc.). Each group has a specific size - match exactly that many words!
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      🎮 <strong>How to Play</strong>
+                    </Typography>
+                    <Typography paragraph>
+                      • Click cards to select words
+                      <br />• Complete one group at a time
+                      <br />• Avoid mixing different patterns
+                      <br />• Use the pattern hints as your guide
+                    </Typography>
+                  </Box>
+                </Grid>
+                
+                <Grid item xs={12} md={6}>
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      🔥 <strong>Scoring System</strong>
+                    </Typography>
+                    <Typography paragraph>
+                      • Build combos for higher scores
+                      <br />• Maintain perfect streaks for bonuses
+                      <br />• Complete quickly for time bonuses
+                      <br />• Zero mistakes = maximum points
+                    </Typography>
+                  </Box>
+                  
+                  <Box sx={{ mb: 3 }}>
+                    <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      ⚠️ <strong>Strikes & Strategy</strong>
+                    </Typography>
+                    <Typography paragraph>
+                      • 3 strikes maximum per game
+                      <br />• Mixed patterns = 1 strike
+                      <br />• Study group sizes carefully
+                      <br />• Think before you click!
+                    </Typography>
+                  </Box>
+                </Grid>
+              </Grid>
+              
+              <Box sx={{ 
+                mt: 3, 
+                p: 2, 
+                bgcolor: theme.palette.info.main + '10', 
+                borderRadius: 2,
+                border: `1px solid ${theme.palette.info.main}30`
+              }}>
+                <Typography variant="body2" align="center" sx={{ fontWeight: 'bold' }}>
+                  💡 <strong>Pro Tip:</strong> Master the patterns to unlock higher-level modes and compete on the global leaderboard!
                 </Typography>
               </Box>
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions sx={{ px: 3, pb: 3 }}>
-            <Button 
-              onClick={() => setShowInstructions(false)} 
-              variant="contained"
-              size="large"
-              sx={{
-                bgcolor: theme.palette.forest.primary,
-                color: 'black',
-                fontWeight: 600,
-                px: 4,
-                py: 1.5,
-                '&:hover': { 
-                  bgcolor: theme.palette.forest.primary,
-                  transform: 'translateY(-2px)',
-                  boxShadow: 3
-                }
-              }}
-            >
-              🎮 Start Playing!
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Container>
+            </DialogContent>
+            <DialogActions sx={{ p: 2 }}>
+              <Button 
+                onClick={() => setShowHelp(false)} 
+                variant="contained" 
+                size="large"
+                sx={{ minWidth: '120px', fontWeight: 'bold' }}
+              >
+                Got It!
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
+      )}
     </Box>
   );
 };

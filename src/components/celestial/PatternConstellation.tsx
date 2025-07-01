@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pattern } from '../../types/observatory';
+import { Pattern, Segment } from '../../types/observation';
 import { Box, Typography, Paper } from '@mui/material';
 
 interface PatternConstellationProps {
@@ -112,17 +112,15 @@ export const PatternConstellation: React.FC<PatternConstellationProps> = ({
   // Find if patterns share text segments
   const findSharedSegments = (pattern1: Pattern, pattern2: Pattern): string[] => {
     const shared: string[] = [];
-    
-    pattern1.segments.forEach(seg1 => {
-      pattern2.segments.forEach(seg2 => {
+    for (const seg1 of pattern1.segments as Segment[]) {
+      for (const seg2 of pattern2.segments as Segment[]) {
         if (seg1.text.toLowerCase() === seg2.text.toLowerCase() ||
             Math.abs(seg1.globalStartIndex - seg2.globalStartIndex) < 10) {
           shared.push(seg1.text);
         }
-      });
-    });
-    
-    return [...new Set(shared)]; // Remove duplicates
+      }
+    }
+    return [...new Set(shared)];
   };
 
   const handleMouseEnter = (event: React.MouseEvent, patternId: string) => {
@@ -345,7 +343,7 @@ export const PatternConstellation: React.FC<PatternConstellationProps> = ({
                 </Typography>
                 
                 <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
-                  <strong>Segments:</strong> {pattern.segments.map(s => s.text).join(', ')}
+                  <strong>Segments:</strong> {pattern.segments.map((s: Segment) => s.text).join(', ')}
                 </Typography>
                 
                 {pattern.acousticFeatures?.primaryFeature && (

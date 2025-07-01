@@ -3,17 +3,32 @@ import { logger } from '../utils/logger';
 import { settings } from '../config/settings';
 
 class RateLimiter {
-  private redis: Redis;
+  private redis: Redis | null = null;
 
   constructor() {
-    this.redis = new Redis(settings.redis.url);
-    
-    this.redis.on('error', (err) => {
-      logger.error('Redis connection error:', err);
-    });
+    try {
+      this.redis = new Redis(settings.redis.url, {
+        maxRetriesPerRequest: 0,
+        lazyConnect: true
+      });
+      
+      this.redis.on('error', (err) => {
+        logger.warn('Redis not available, rate limiting disabled');
+        this.redis?.disconnect();
+        this.redis = null;
+      });
+    } catch (error) {
+      logger.warn('Redis not available, rate limiting disabled:', error);
+      this.redis = null;
+    }
   }
 
   async checkLimit(key: string): Promise<boolean> {
+    // If Redis is not available, allow all requests
+    if (!this.redis) {
+      return true;
+    }
+
     const currentTime = Date.now();
     const windowStart = currentTime - settings.rateLimit.windowMs;
 
@@ -39,6 +54,11 @@ class RateLimiter {
   }
 
   async getRemainingRequests(key: string): Promise<number> {
+    // If Redis is not available, return max requests
+    if (!this.redis) {
+      return settings.rateLimit.maxRequests;
+    }
+
     try {
       const windowStart = Date.now() - settings.rateLimit.windowMs;
       await this.redis.zremrangebyscore(key, '-inf', windowStart.toString());

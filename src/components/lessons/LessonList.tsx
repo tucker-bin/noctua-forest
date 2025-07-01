@@ -36,26 +36,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { OrionOwl } from '../mascot/OrionOwl';
-
-interface LessonInfo {
-  id: string;
-  title: string;
-  description: string;
-  duration: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  completed: boolean;
-  locked: boolean;
-  progress?: number;
-}
-
-interface LearningPath {
-  id: string;
-  name: string;
-  description: string;
-  icon: React.ReactNode;
-  lessons: LessonInfo[];
-  totalProgress: number;
-}
+import { lessonService, LearningPath, LessonInfo } from '../../services/lessonService';
 
 const LessonList: React.FC = () => {
   const { t } = useTranslation();
@@ -64,80 +45,111 @@ const LessonList: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(false);
   const [showGuide, setShowGuide] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [learningPaths, setLearningPaths] = useState<LearningPath[]>([]);
 
-  // Mock data - in production this would come from the backend
-  const learningPaths: LearningPath[] = [
-    {
-      id: 'celestial_observer',
-      name: t('paths.celestial_observer', 'Celestial Observer'),
-      description: t('paths.celestial_observer.description', 'Begin your journey by learning to observe patterns like stars in the night sky'),
-      icon: <Explore />,
-      totalProgress: 33,
-      lessons: [
-        {
-          id: 'first_light',
-          title: t('lessons.celestial_observer.first_light.title'),
-          description: 'Introduction to sound observation and basic pattern recognition',
-          duration: '20 min',
-          difficulty: 'beginner',
-          completed: true,
-          locked: false,
-          progress: 100
-        },
-        {
-          id: 'star_patterns',
-          title: t('lessons.celestial_observer.star_patterns.title'),
-          description: 'Explore universal patterns that appear across languages',
-          duration: '25 min',
-          difficulty: 'beginner',
-          completed: false,
-          locked: false,
-          progress: 60
-        },
-        {
-          id: 'constellation_mapping',
-          title: t('lessons.celestial_observer.constellation_mapping.title'),
-          description: 'Learn to connect related sounds and create pattern networks',
-          duration: '30 min',
-          difficulty: 'intermediate',
-          completed: false,
-          locked: false,
-          progress: 0
-        },
-        {
-          id: 'night_vision',
-          title: 'Night Vision: Advanced Pattern Recognition',
-          description: 'Develop skills to recognize subtle and complex patterns',
-          duration: '35 min',
-          difficulty: 'intermediate',
-          completed: false,
-          locked: true,
-          progress: 0
-        }
-      ]
-    },
-    {
-      id: 'pattern_navigator',
-      name: t('paths.pattern_navigator', 'Pattern Navigator'),
-      description: t('paths.pattern_navigator.description', 'Advanced techniques for navigating and creating complex pattern systems'),
-      icon: <TrendingUp />,
-      totalProgress: 0,
-      lessons: [
-        {
-          id: 'advanced_mapping',
-          title: 'Advanced Pattern Mapping',
-          description: 'Master complex pattern relationships and networks',
-          duration: '40 min',
-          difficulty: 'advanced',
-          completed: false,
-          locked: true,
-          progress: 0
-        }
-      ]
-    }
-  ];
+  // Load learning paths from backend
+  useEffect(() => {
+    const loadLearningPaths = async () => {
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Load learning paths from service (with fallback to mock data)
+        const pathsData = await lessonService.getLearningPaths(currentUser?.uid);
+        
+        // Add icons to the paths since they come from the frontend
+        const pathsWithIcons: LearningPath[] = pathsData.map(path => ({
+          ...path,
+          icon: path.id === 'celestial_observer' ? <Explore /> : 
+                path.id === 'pattern_navigator' ? <TrendingUp /> : <School />
+        }));
+        
+        setLearningPaths(pathsWithIcons);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load learning paths');
+        
+        // Fallback to local mock data with icons
+        const fallbackPaths: LearningPath[] = [
+          {
+            id: 'celestial_observer',
+            name: t('paths.celestial_observer', 'Celestial Observer'),
+            description: t('paths.celestial_observer.description', 'Begin your journey by learning to observe patterns like stars in the night sky'),
+            icon: <Explore />,
+            totalProgress: 33,
+            lessons: [
+              {
+                id: 'first_light',
+                title: t('lessons.celestial_observer.first_light.title'),
+                description: 'Introduction to sound observation and basic pattern recognition',
+                duration: '20 min',
+                difficulty: 'beginner',
+                completed: true,
+                locked: false,
+                progress: 100
+              },
+              {
+                id: 'star_patterns',
+                title: t('lessons.celestial_observer.star_patterns.title'),
+                description: 'Explore universal patterns that appear across languages',
+                duration: '25 min',
+                difficulty: 'beginner',
+                completed: false,
+                locked: false,
+                progress: 60
+              },
+              {
+                id: 'constellation_mapping',
+                title: t('lessons.celestial_observer.constellation_mapping.title'),
+                description: 'Learn to connect related sounds and create pattern networks',
+                duration: '30 min',
+                difficulty: 'intermediate',
+                completed: false,
+                locked: false,
+                progress: 0
+              },
+              {
+                id: 'night_vision',
+                title: 'Night Vision: Advanced Pattern Recognition',
+                description: 'Develop skills to recognize subtle and complex patterns',
+                duration: '35 min',
+                difficulty: 'intermediate',
+                completed: false,
+                locked: true,
+                progress: 0
+              }
+            ]
+          },
+          {
+            id: 'pattern_navigator',
+            name: t('paths.pattern_navigator', 'Pattern Navigator'),
+            description: t('paths.pattern_navigator.description', 'Advanced techniques for navigating and creating complex pattern systems'),
+            icon: <TrendingUp />,
+            totalProgress: 0,
+            lessons: [
+              {
+                id: 'advanced_mapping',
+                title: 'Advanced Pattern Mapping',
+                description: 'Master complex pattern relationships and networks',
+                duration: '40 min',
+                difficulty: 'advanced',
+                completed: false,
+                locked: true,
+                progress: 0
+              }
+            ]
+          }
+        ];
+        
+        setLearningPaths(fallbackPaths);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadLearningPaths();
+  }, [t]);
 
   const handleLessonClick = (pathId: string, lessonId: string, locked: boolean) => {
     if (!locked) {
@@ -158,7 +170,7 @@ const LessonList: React.FC = () => {
     }
   };
 
-  const currentPath = learningPaths[activeTab];
+  const currentPath = learningPaths[activeTab] || learningPaths[0];
 
   return (
     <Box 
@@ -193,6 +205,86 @@ const LessonList: React.FC = () => {
             {t('lessons.subtitle', 'Choose your path and begin your journey of discovery')}
           </Typography>
         </Box>
+
+        {/* Loading State */}
+        {isLoading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+            <Box sx={{ textAlign: 'center' }}>
+              <CircularProgress size={60} sx={{ mb: 2 }} />
+              <Typography variant="h6" color="text.secondary">
+                {t('lessons.loading', 'Loading your learning paths...')}
+              </Typography>
+            </Box>
+          </Box>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <Alert severity="error" sx={{ mb: 4, p: 3, borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              {t('lessons.error_title', 'Unable to Load Lessons')}
+            </Typography>
+            <Typography variant="body1">
+              {error}
+            </Typography>
+            <Button 
+              variant="outlined" 
+              onClick={() => window.location.reload()} 
+              sx={{ mt: 2 }}
+            >
+              {t('common.retry', 'Try Again')}
+            </Button>
+          </Alert>
+        )}
+
+        {/* Main Content - Only show when not loading and no error */}
+        {!isLoading && !error && learningPaths.length > 0 && currentPath && (
+          <>
+
+        {/* Signup Prompt for Anonymous Users */}
+        {!currentUser && (
+          <Alert 
+            severity="info" 
+            sx={{ 
+              mb: 4, 
+              p: 3, 
+              borderRadius: 2, 
+              width: '100%', 
+              maxWidth: '800px',
+              backgroundColor: 'rgba(25, 118, 210, 0.1)',
+              border: '1px solid rgba(25, 118, 210, 0.3)'
+            }}
+            action={
+              <Box sx={{ display: 'flex', gap: 1, flexDirection: { xs: 'column', sm: 'row' } }}>
+                <Button 
+                  color="primary" 
+                  variant="contained"
+                  size="small"
+                  onClick={() => navigate('/signup')}
+                  sx={{ minWidth: 100 }}
+                >
+                  {t('auth.signup', 'Sign Up Free')}
+                </Button>
+                <Button 
+                  color="primary" 
+                  variant="outlined"
+                  size="small"
+                  onClick={() => navigate('/signin')}
+                  sx={{ minWidth: 100 }}
+                >
+                  {t('auth.signin', 'Sign In')}
+                </Button>
+              </Box>
+            }
+          >
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+              🎓 {t('lessons.signup_prompt_title', 'Unlock Your Learning Journey!')}
+            </Typography>
+            <Typography variant="body1">
+              {t('lessons.signup_prompt_message', 'Sign up for free to access all lessons, track your progress, and earn more Observatory observations. Join thousands of language explorers discovering the hidden patterns in text!')}
+            </Typography>
+          </Alert>
+        )}
 
         <Box sx={{ width: '100%', maxWidth: '1000px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Paper sx={{ mb: 4, borderRadius: 2, width: '100%' }}>
@@ -312,49 +404,44 @@ const LessonList: React.FC = () => {
                           <RadioButtonUnchecked color="primary" sx={{ fontSize: 32 }} />
                         )}
                       </ListItemIcon>
-                      <ListItemText
-                        sx={{ ml: 2 }}
-                        primary={
-                          <Box sx={{ mb: 2 }}>
-                            <Typography variant="h6" sx={{ mb: 1, fontSize: { xs: '1.125rem', md: '1.25rem' }, fontWeight: 600 }}>
-                              Lesson {index + 1}: {lesson.title}
-                            </Typography>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                              <Chip 
-                                label={lesson.difficulty} 
-                                size="small"
-                                color={getDifficultyColor(lesson.difficulty)}
-                                sx={{ fontWeight: 500 }}
+                      <Box sx={{ ml: 2, flex: 1 }}>
+                        <Box sx={{ mb: 2 }}>
+                          <Typography variant="h6" sx={{ mb: 1, fontSize: { xs: '1.125rem', md: '1.25rem' }, fontWeight: 600 }}>
+                            Lesson {index + 1}: {lesson.title}
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                            <Chip 
+                              label={lesson.difficulty} 
+                              size="small"
+                              color={getDifficultyColor(lesson.difficulty)}
+                              sx={{ fontWeight: 500 }}
+                            />
+                            <Chip 
+                              label={lesson.duration} 
+                              size="small"
+                              variant="outlined"
+                              sx={{ fontWeight: 500 }}
+                            />
+                          </Box>
+                        </Box>
+                        <Box>
+                          <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6, mb: 2 }}>
+                            {lesson.description}
+                          </Typography>
+                          {lesson.progress !== undefined && lesson.progress > 0 && !lesson.completed && (
+                            <Box sx={{ mt: 2 }}>
+                              <LinearProgress 
+                                variant="determinate" 
+                                value={lesson.progress} 
+                                sx={{ height: 6, borderRadius: 3, mb: 1 }}
                               />
-                              <Chip 
-                                label={lesson.duration} 
-                                size="small"
-                                variant="outlined"
-                                sx={{ fontWeight: 500 }}
-                              />
+                              <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
+                                {lesson.progress}% Complete
+                              </Typography>
                             </Box>
-                          </Box>
-                        }
-                        secondary={
-                          <Box>
-                            <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6, mb: 2 }}>
-                              {lesson.description}
-                            </Typography>
-                            {lesson.progress !== undefined && lesson.progress > 0 && !lesson.completed && (
-                              <Box sx={{ mt: 2 }}>
-                                <LinearProgress 
-                                  variant="determinate" 
-                                  value={lesson.progress} 
-                                  sx={{ height: 6, borderRadius: 3, mb: 1 }}
-                                />
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-                                  {lesson.progress}% Complete
-                                </Typography>
-                              </Box>
-                            )}
-                          </Box>
-                        }
-                      />
+                          )}
+                        </Box>
+                      </Box>
                       {!lesson.locked && (
                         <NavigateNext color="action" sx={{ fontSize: 28 }} />
                       )}
@@ -374,6 +461,8 @@ const LessonList: React.FC = () => {
             </Box>
           </Box>
         </Box>
+        </>
+        )}
       </Container>
     </Box>
   );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '@mui/material/styles';
 import { log } from '../../utils/logger';
 import {
   Container,
@@ -51,6 +52,7 @@ interface LessonSection {
 const LessonView: React.FC = () => {
   const { path, lessonSlug } = useParams<{ path: string; lessonSlug: string }>();
   const { t, i18n } = useTranslation();
+  const theme = useTheme();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   
@@ -293,21 +295,47 @@ const LessonView: React.FC = () => {
 
   if (loading) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-          <CircularProgress />
-        </Box>
-      </Container>
+      <Box 
+        sx={{ 
+          minHeight: '100vh',
+          bgcolor: theme.palette.forest.background,
+          pt: { xs: 2, sm: 4 },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          width: '100%'
+        }}
+      >
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+            <CircularProgress />
+          </Box>
+        </Container>
+      </Box>
     );
   }
 
   if (!lesson) {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error">
-          Lesson not found
-        </Alert>
-      </Container>
+      <Box 
+        sx={{ 
+          minHeight: '100vh',
+          bgcolor: theme.palette.forest.background,
+          pt: { xs: 2, sm: 4 },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          width: '100%'
+        }}
+      >
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <Alert severity="error">
+            Lesson not found
+          </Alert>
+        </Container>
+      </Box>
     );
   }
 
@@ -318,88 +346,101 @@ const LessonView: React.FC = () => {
   const progress = Object.keys(sectionProgress).length / sections.length * 100;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
-        <Box sx={{ flex: '0 0 300px' }}>
-          <Paper sx={{ p: 3, position: 'sticky', top: 80 }}>
-            <Typography variant="h6" gutterBottom>
-              {lesson.title}
-            </Typography>
-            
-            <LinearProgress 
-              variant="determinate" 
-              value={progress} 
-              sx={{ mb: 2 }}
-            />
-            
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {Math.round(progress)}% Complete
-            </Typography>
-
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="body2" color="text.secondary">
-              Time spent: {Math.floor(timeSpent / 60)}:{(timeSpent % 60).toString().padStart(2, '0')}
-            </Typography>
-
-            <Box sx={{ mt: 3 }}>
-              <OrionOwl 
-                bubbleText={progress === 100 ? "Great job completing this lesson!" : "Keep going, you're doing great!"}
-                mood={progress === 100 ? "celebrating" : "wise"}
-                showBubble={true}
-                size={80}
-                glowIntensity={progress === 100 ? "bright" : "medium"}
-                interactive={true}
-              />
-            </Box>
-          </Paper>
-        </Box>
-
-        <Box sx={{ flex: 1 }}>
-          <Paper sx={{ p: 4 }}>
-            {lesson.welcome && (
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h4" gutterBottom>
-                  {lesson.welcome.title}
-                </Typography>
-                <Typography variant="body1" paragraph>
-                  {lesson.welcome.description}
-                </Typography>
-              </Box>
-            )}
-
-            {sections.map(([sectionKey, section], index) => 
-              renderSection(section, sectionKey, index)
-            )}
-
-            {lesson.note && (
-              <Alert severity="info" sx={{ mt: 4 }}>
-                {lesson.note}
-              </Alert>
-            )}
-
-            <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-              <Button
-                startIcon={<NavigateBefore />}
-                onClick={() => navigate(-1)}
-              >
-                Previous Lesson
-              </Button>
+    <Box 
+      sx={{ 
+        minHeight: '100vh',
+        bgcolor: theme.palette.forest.background,
+        pt: { xs: 2, sm: 4 },
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '100%'
+      }}
+    >
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', md: 'row' } }}>
+          <Box sx={{ flex: '0 0 300px' }}>
+            <Paper sx={{ p: 3, position: 'sticky', top: 80 }}>
+              <Typography variant="h6" gutterBottom>
+                {lesson.title}
+              </Typography>
               
-              {progress === 100 && (
-                <Button
-                  variant="contained"
-                  endIcon={<NavigateNext />}
-                  onClick={() => navigate(`/${path}/lessons/next`)}
-                >
-                  Next Lesson
-                </Button>
+              <LinearProgress 
+                variant="determinate" 
+                value={progress} 
+                sx={{ mb: 2 }}
+              />
+              
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                {Math.round(progress)}% Complete
+              </Typography>
+
+              <Divider sx={{ my: 2 }} />
+
+              <Typography variant="body2" color="text.secondary">
+                Time spent: {Math.floor(timeSpent / 60)}:{(timeSpent % 60).toString().padStart(2, '0')}
+              </Typography>
+
+              <Box sx={{ mt: 3 }}>
+                <OrionOwl 
+                  bubbleText={progress === 100 ? "Great job completing this lesson!" : "Keep going, you're doing great!"}
+                  mood={progress === 100 ? "celebrating" : "wise"}
+                  showBubble={true}
+                  size={80}
+                  glowIntensity={progress === 100 ? "bright" : "medium"}
+                  interactive={true}
+                />
+              </Box>
+            </Paper>
+          </Box>
+
+          <Box sx={{ flex: 1 }}>
+            <Paper sx={{ p: 4 }}>
+              {lesson.welcome && (
+                <Box sx={{ mb: 4 }}>
+                  <Typography variant="h4" gutterBottom>
+                    {lesson.welcome.title}
+                  </Typography>
+                  <Typography variant="body1" paragraph>
+                    {lesson.welcome.description}
+                  </Typography>
+                </Box>
               )}
-            </Box>
-          </Paper>
+
+              {sections.map(([sectionKey, section], index) => 
+                renderSection(section, sectionKey, index)
+              )}
+
+              {lesson.note && (
+                <Alert severity="info" sx={{ mt: 4 }}>
+                  {lesson.note}
+                </Alert>
+              )}
+
+              <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+                <Button
+                  startIcon={<NavigateBefore />}
+                  onClick={() => navigate(-1)}
+                >
+                  Previous Lesson
+                </Button>
+                
+                {progress === 100 && (
+                  <Button
+                    variant="contained"
+                    endIcon={<NavigateNext />}
+                    onClick={() => navigate(`/${path}/lessons/next`)}
+                  >
+                    Next Lesson
+                  </Button>
+                )}
+              </Box>
+            </Paper>
+          </Box>
         </Box>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 };
 

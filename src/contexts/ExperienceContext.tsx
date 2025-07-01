@@ -136,10 +136,8 @@ export const ExperienceProvider: React.FC<{ children: ReactNode }> = ({ children
         setDailyTokens(0);
         localStorage.setItem(`noctua_token_reset_${currentUser.uid}`, today);
       }
-      
-      // Generate daily challenge
-      generateFlowFinderChallenge();
     }
+    
     setIsLoading(false);
   }, [currentUser]);
 
@@ -266,15 +264,20 @@ export const ExperienceProvider: React.FC<{ children: ReactNode }> = ({ children
     
     if (!savedChallenge) {
       // Generate today's challenges using the service
-      const dailyChallenges = flowFinderService.getDailyChallenges();
+      const challenge4x4 = flowFinderService.getDailyChallenge('default', 1, '4x4');
       // Default to 4x4 for the main challenge
-      const challenge = dailyChallenges.challenge4x4;
+      const challenge = challenge4x4;
       setFlowFinderChallenge(challenge);
       localStorage.setItem(`noctua_flow_finder_${today}`, JSON.stringify(challenge));
     } else {
       setFlowFinderChallenge(JSON.parse(savedChallenge));
     }
   }, [flowFinderService]);
+
+  // Generate FlowFinder challenge for both authenticated and anonymous users
+  useEffect(() => {
+    generateFlowFinderChallenge();
+  }, [generateFlowFinderChallenge]);
 
   const completeFlowFinderChallenge = useCallback((success: boolean, accuracy: number) => {
     if (!flowFinderChallenge || flowFinderChallenge.completed) return;

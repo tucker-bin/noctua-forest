@@ -33,6 +33,7 @@ import {
   FullscreenExit as FullscreenExitIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import html2canvas from 'html2canvas';
 
 export interface ObservatoryTheme {
   // Background options
@@ -179,27 +180,44 @@ export const ObservatoryCustomizer: React.FC<ObservatoryCustomizerProps> = ({
   };
 
   const handleExportPNG = async () => {
-    // Get the text display element from Observatory
     const textElement = document.getElementById('observatory-text-display');
-    const previewElement = document.getElementById('observatory-preview');
-    const exportElement = textElement || previewElement;
     
-    if (!exportElement) {
+    if (!textElement) {
       alert('No content to export. Please run an observation first.');
       return;
     }
 
     try {
-      // Use modern browser APIs for the best native experience
-      if ('showSaveFilePicker' in window) {
-        await exportWithFileSystemAPI(exportElement);
-      } else {
-        // Fallback to optimized export window
-        exportWithOptimizedWindow(exportElement);
-      }
+      // Use HTML2Canvas for perfect rendering
+      const canvas = await html2canvas(textElement, {
+        useCORS: true,
+        background: theme.backgroundType === 'solid' ? theme.backgroundColor : '#ffffff',
+        logging: false,
+        width: textElement.offsetWidth,
+        height: textElement.offsetHeight
+      });
+
+      // Convert to blob and download
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const link = document.createElement('a');
+          link.download = `observatory-analysis-${new Date().toISOString().slice(0, 10)}.png`;
+          link.href = URL.createObjectURL(blob);
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(link.href);
+          
+          if (onSave) {
+            onSave(theme);
+          }
+        }
+      }, 'image/png', 1.0);
+
     } catch (error) {
       console.error('Export failed:', error);
-      exportWithOptimizedWindow(exportElement);
+      // Fallback to existing export method
+      exportWithOptimizedWindow(textElement);
     }
   };
 
