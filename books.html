@@ -10,66 +10,79 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   </head>
   <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a href="books.html" class="brand">Tucker B. Robinson</a>
-        <nav class="nav">
-          <a href="books.html" class="nav-link active">Books</a>
-          <a href="about.html" class="nav-link">About</a>
-        </nav>
+    <a href="#nav" class="skip-link">Skip to primary navigation</a>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <a href="#footer" class="skip-link">Skip to footer</a>
+
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <a href="books.html" class="logo-link">Noctua's Forest</a>
+          <div class="tagline">Where Wisdom Guides Growth</div>
+        </div>
       </div>
     </header>
+    <nav id="nav" class="navigation">
+      <div class="container">
+        <ul class="nav-menu">
+          <li class="nav-item"><a href="books.html" class="nav-link">Books</a></li>
+          <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+        </ul>
+        <div class="nav-auth">
+          <a href="newsletter.html" class="nav-link">Newsletter</a>
+          <a href="account.html" class="nav-link signup-btn">Account</a>
+        </div>
+      </div>
+    </nav>
 
     <main>
       <section class="hero">
         <div class="container">
-          <h1>Books by Tucker B. Robinson</h1>
-          <p class="subtitle">Simple, elegant, and ready to buy.</p>
+          <h1>City Survival Guides</h1>
         </div>
       </section>
 
-      <section class="books container">
-        <div class="book-grid">
+      <section class="container books-section">
+        <h2>City Survival Guides</h2>
+        <p class="section-description">Learn English naturally through real city experiences while mastering essential urban survival skills.</p>
+        <p class="availability">(Beginner-Friendly with Progressive Learning Paths)</p>
+        <div class="books-grid">
           <article class="book-card">
-            <div class="book-cover" aria-hidden="true" style="background-size: cover; background-position: center; background-image: url('la_survival_guide.jpg');"></div>
-            <div class="book-content">
-              <h2 class="book-title">Los Angeles Survival Guide</h2>
-              <p class="book-desc">Learn English through authentic experiences in LA's diverse neighborhoods while mastering essential survival skills for city life.</p>
-              <div class="book-cta">
-                <a class="btn primary" href="#" target="_blank" rel="noopener">Buy</a>
-                <a class="btn" href="#" target="_blank" rel="noopener">Preview</a>
-              </div>
+            <div class="book-preview">
+              <img src="la_survival_guide.jpg" alt="Los Angeles Survival Guide Cover" class="book-cover" />
             </div>
+            <h3>Los Angeles Survival Guide</h3>
+            <p class="book-description">Learn English through authentic experiences in LA's diverse neighborhoods while mastering essential survival skills for city life.</p>
+            <button class="buy-button">buy book</button>
           </article>
           <article class="book-card">
-            <div class="book-cover" aria-hidden="true"></div>
-            <div class="book-content">
-              <h2 class="book-title">New York City Survival Guide</h2>
-              <p class="book-desc">Master practical English and essential city skills while exploring New York's iconic neighborhoods and hidden gems.</p>
-              <div class="book-cta">
-                <a class="btn primary" href="#" target="_blank" rel="noopener">Pre‑order</a>
-                <a class="btn" href="#" target="_blank" rel="noopener">Notify me</a>
-              </div>
-            </div>
+            <h3>New York City Survival Guide</h3>
+            <p class="book-description">Master practical English and essential city skills while exploring New York's iconic neighborhoods and hidden gems.</p>
+            <button class="buy-button">pre-order</button>
           </article>
           <article class="book-card">
-            <div class="book-cover" aria-hidden="true"></div>
-            <div class="book-content">
-              <h2 class="book-title">San Francisco Bay Area Survival Guide</h2>
-              <p class="book-desc">Learn English through the Bay Area's blend of tech culture and historic neighborhoods while navigating urban life.</p>
-              <div class="book-cta">
-                <a class="btn primary" href="#" target="_blank" rel="noopener">Pre‑order</a>
-                <a class="btn" href="#" target="_blank" rel="noopener">Notify me</a>
-              </div>
-            </div>
+            <h3>San Francisco Bay Area Survival Guide</h3>
+            <p class="book-description">Learn English through the Bay Area's blend of tech culture and historic neighborhoods while navigating urban life.</p>
+            <button class="buy-button">pre-order</button>
           </article>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer">
+    <footer id="footer" class="footer">
       <div class="container">
-        <p>© <span id="year"></span> Tucker B. Robinson. All rights reserved.</p>
+        <div class="footer-content">
+          <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+              <li><a href="books.html">Books</a></li>
+              <li><a href="about.html">About</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p><a href="#">Terms of Service</a> & <a href="#">Privacy Policy</a></p>
+        </div>
       </div>
     </footer>
 

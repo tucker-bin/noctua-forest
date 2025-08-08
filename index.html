@@ -1,132 +1,160 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>My Books</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a href="books.html" class="brand">Tucker B. Robinson</a>
-        <nav class="nav">
-          <a href="books.html" class="nav-link active">Books</a>
-          <a href="about.html" class="nav-link">About</a>
-        </nav>
-      </div>
-    </header>
-
-    <main>
-      <section class="hero">
-        <div class="container">
-          <h1>Books by Tucker B. Robinson</h1>
-          <p class="subtitle">Simple, elegant, and ready to buy.</p>
-        </div>
-      </section>
-
-      <section class="books container">
-        <div class="book-grid">
-          <article class="book-card">
-            <div class="book-cover" aria-hidden="true" style="background-size: cover; background-position: center; background-image: url('la_survival_guide.jpg');"></div>
-            <div class="book-content">
-              <h2 class="book-title">Los Angeles Survival Guide</h2>
-              <p class="book-desc">Learn English through authentic experiences in LA's diverse neighborhoods while mastering essential survival skills for city life.</p>
-              <div class="book-cta">
-                <a class="btn primary" href="#" target="_blank" rel="noopener">Buy</a>
-                <a class="btn" href="#" target="_blank" rel="noopener">Preview</a>
-              </div>
-            </div>
-          </article>
-          <article class="book-card">
-            <div class="book-cover" aria-hidden="true"></div>
-            <div class="book-content">
-              <h2 class="book-title">New York City Survival Guide</h2>
-              <p class="book-desc">Master practical English and essential city skills while exploring New York's iconic neighborhoods and hidden gems.</p>
-              <div class="book-cta">
-                <a class="btn primary" href="#" target="_blank" rel="noopener">Pre‑order</a>
-                <a class="btn" href="#" target="_blank" rel="noopener">Notify me</a>
-              </div>
-            </div>
-          </article>
-          <article class="book-card">
-            <div class="book-cover" aria-hidden="true"></div>
-            <div class="book-content">
-              <h2 class="book-title">San Francisco Bay Area Survival Guide</h2>
-              <p class="book-desc">Learn English through the Bay Area's blend of tech culture and historic neighborhoods while navigating urban life.</p>
-              <div class="book-cta">
-                <a class="btn primary" href="#" target="_blank" rel="noopener">Pre‑order</a>
-                <a class="btn" href="#" target="_blank" rel="noopener">Notify me</a>
-              </div>
-            </div>
-          </article>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer">
-      <div class="container">
-        <p>© <span id="year"></span> Tucker B. Robinson. All rights reserved.</p>
-      </div>
-    </footer>
-
-    <script>
-      document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
-  </body>
-  </html>
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- Primary Meta Tags -->
-    <title>RhymeTime Games - AI-Powered Word Puzzle Games</title>
-    <meta name="title" content="RhymeTime Games - AI-Powered Word Puzzle Games">
-    <meta name="description" content="Play addictive word puzzle games that make you a better writer. Daily rhyming challenges, competitive leaderboards, and vocabulary building through fun gameplay.">
-    <meta name="keywords" content="word games, rhyme puzzles, vocabulary games, word matching, brain training, educational games, writing skills, puzzle games">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://rhymetime.games/">
-    <meta property="og:title" content="RhymeTime Games - AI-Powered Word Puzzle Games">
-    <meta property="og:description" content="Play addictive word puzzle games that make you a better writer. Daily rhyming challenges, competitive leaderboards, and vocabulary building through fun gameplay.">
-    <meta property="og:image" content="/pwa-512x512.png">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://rhymetime.games/">
-    <meta property="twitter:title" content="RhymeTime Games - AI-Powered Word Puzzle Games">
-    <meta property="twitter:description" content="Play addictive word puzzle games that make you a better writer. Daily rhyming challenges, competitive leaderboards, and vocabulary building through fun gameplay.">
-    <meta property="twitter:image" content="/pwa-512x512.png">
-    
-    <!-- PWA -->
-    <meta name="theme-color" content="#3182ce">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="RhymeTime">
-    
-    <!-- Game-specific meta tags -->
-    <meta name="application-name" content="RhymeTime Games">
-    <meta name="category" content="games">
-    <meta name="rating" content="general">
-    
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- App icons -->
-    <link rel="apple-touch-icon" href="/pwa-192x192.png">
-    <link rel="manifest" href="/manifest.json">
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Survival Guides - Noctua's Forest</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="public/pwa-64x64.png">
+    <link rel="apple-touch-icon" href="public/pwa-192x192.png">
+    <link rel="manifest" href="public/manifest.json">
+    <meta name="theme-color" content="#2c5aa0">
+</head>
+<body>
+    <!-- Skip Links -->
+    <a href="#nav" class="skip-link">Skip to primary navigation</a>
+    <a href="#main" class="skip-link">Skip to main content</a>
+    <a href="#sidebar" class="skip-link">Skip to primary sidebar</a>
+    <a href="#footer" class="skip-link">Skip to footer</a>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="#" class="logo-link">Noctua's Forest</a>
+                </div>
+                <div class="tagline">Where Wisdom Guides Growth</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav id="nav" class="navigation">
+        <div class="container">
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Courses</a></li>
+                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+            </ul>
+            <div class="nav-auth">
+                <a href="#" class="nav-link">Login</a>
+                <a href="#" class="nav-link signup-btn">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main" class="main">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h1>Learn English Through American City Life</h1>
+                <p>Master English naturally while exploring America's most dynamic cities - perfect for newcomers and international visitors.</p>
+            </section>
+
+            <!-- English Books Section -->
+            <section class="books-section">
+                <h2>City Survival Guides</h2>
+                <p class="section-description">Learn English naturally through real city experiences while mastering essential urban survival skills.</p>
+                <p class="availability">(Beginner-Friendly with Progressive Learning Paths)</p>
+
+                <div class="books-grid">
+                    <div class="book-card featured">
+                        <div class="book-preview">
+                            <img src="la_survival_guide.jpg" alt="Los Angeles Survival Guide Cover" class="book-cover">
+                        </div>
+                        <h3>Los Angeles Survival Guide</h3>
+                        <p class="book-description">Learn English through authentic experiences in LA's diverse neighborhoods while mastering essential survival skills for city life.</p>
+                        <button class="buy-button">buy book</button>
+                    </div>
+
+                    <div class="book-card">
+                        <h3>New York City Survival Guide</h3>
+                        <p class="book-description">Master practical English and essential city skills while exploring New York's iconic neighborhoods and hidden gems.</p>
+                        <button class="buy-button">pre-order</button>
+                    </div>
+
+                    <div class="book-card">
+                        <h3>San Francisco Bay Area Survival Guide</h3>
+                        <p class="book-description">Learn English through San Francisco's unique blend of tech culture and historic neighborhoods while navigating urban life.</p>
+                        <button class="buy-button">pre-order</button>
+                    </div>
+
+                    <div class="book-card">
+                        <h3>Miami Survival Guide</h3>
+                        <p class="book-description">Discover English through Miami's vibrant culture and coastal lifestyle while learning to thrive in this dynamic city.</p>
+                        <button class="buy-button">pre-order</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Language Selection -->
+            <section class="newsletter-section">
+                <h2>Join Our Language Learning Community</h2>
+                <p>Get exclusive language tips and city insights for your chosen destination</p>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Enter your email address">
+                    <button class="cta-button">Subscribe</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+        <!-- This can be used for additional content if needed -->
+    </aside>
+
+    <!-- Footer -->
+    <footer class="mini-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Tucker B. Robinson</p>
+      </div>
+    </footer>
+
+    <!-- Popups and Modals -->
+    <div id="language-popup" class="popup hidden">
+        <div class="popup-content">
+            <button class="popup-close">&times;</button>
+            <h3>Which language are you learning?</h3>
+            <select id="language-select">
+                <option value="">Select a language</option>
+                <option value="arabic">I'm learning Arabic</option>
+                <option value="chinese">I'm learning Chinese</option>
+                <option value="danish">I'm learning Danish</option>
+                <option value="french">I'm learning French</option>
+                <option value="english">I'm learning English</option>
+                <option value="german">I'm learning German</option>
+                <option value="italian">I'm learning Italian</option>
+                <option value="japanese">I'm learning Japanese</option>
+                <option value="korean">I'm learning Korean</option>
+                <option value="latin">I'm learning Latin</option>
+                <option value="norwegian">I'm learning Norwegian</option>
+                <option value="portuguese">I'm learning Portuguese</option>
+                <option value="russian">I'm learning Russian</option>
+                <option value="spanish">I'm learning Spanish</option>
+                <option value="swedish">I'm learning Swedish</option>
+                <option value="turkish">I'm learning Turkish</option>
+                <option value="other">I'm learning a different language</option>
+            </select>
+
+            <h4>What is your current level in [language]?</h4>
+            <div class="level-buttons">
+                <button class="level-btn">Beginner</button>
+                <button class="level-btn">Intermediate</button>
+                <button class="level-btn">Advanced</button>
+            </div>
+
+            <h4>Perfect! Where shall I send your Train Like a Cryptolinguist PDF?</h4>
+            <div class="email-form">
+                <input type="email" placeholder="Enter your email address">
+                <button class="submit-btn">Send me the PDF!</button>
+            </div>
+            <p class="privacy-note">We will protect your data in accordance with our data policy.</p>
+        </div>
+    </div>
+
+    <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  
   </body>
 </html>
