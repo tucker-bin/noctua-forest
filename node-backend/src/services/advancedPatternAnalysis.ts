@@ -175,7 +175,7 @@ export class AdvancedPatternAnalysis {
       }
     });
     
-    let alliterationIndex = 0;
+    const alliterationIndex = 0;
     initialGroups.forEach((segmentGroup, letter) => {
       if (segmentGroup.length >= 2) {
         const significance = 0.4 + (Math.min(segmentGroup.length, 5) * 0.1); // Score 0.5 to 0.9

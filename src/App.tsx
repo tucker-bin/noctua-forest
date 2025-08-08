@@ -1,302 +1,454 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, CssBaseline, Box, CircularProgress, useMediaQuery } from '@mui/material';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, CssBaseline, Box, CircularProgress, useMediaQuery, Typography, Container, Card, Button, Grid, Chip, CardMedia, CardContent, CardActions, Badge, Avatar } from '@mui/material';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ExperienceProvider } from './contexts/ExperienceContext';
 import { UsageProvider } from './contexts/UsageContext';
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
 import { noctuaTheme } from './theme/noctuaTheme';
-import { Layout } from './components/layout/Layout';
-
-// Core components - loaded immediately for better initial experience
-import ProfilePage from './components/ProfilePage';
-import OnboardingModal from './components/modals/OnboardingModal';
-
-// Production features - loaded immediately for better UX
 import CookieConsentBanner from './components/features/CookieConsentBanner';
-import PWAInstallPrompt from './components/features/PWAInstallPrompt';
 import OfflineIndicator from './components/features/OfflineIndicator';
 import { WebVitalsMonitor } from './components/features/WebVitalsMonitor';
-import PerformanceMonitor from './components/features/PerformanceMonitor';
-import PushNotifications from './components/features/PushNotifications';
+import { CustomPuzzleGenerator } from './components/features/CustomPuzzleGenerator';
+import { motion } from 'framer-motion';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StarIcon from '@mui/icons-material/Star';
+import PeopleIcon from '@mui/icons-material/People';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import NewReleasesIcon from '@mui/icons-material/NewReleases';
+import CreateIcon from '@mui/icons-material/Create';
 
-// Lazy loaded components for optimal bundle splitting
-const LandingPage = lazy(() => import('./components/pages/LandingPage'));
-const SignUp = lazy(() => import('./components/auth/SignUp'));
-const SignIn = lazy(() => import('./components/auth/SignIn'));
-const TermsOfService = lazy(() => import('./components/layout/TermsOfService'));
-const PrivacyPolicy = lazy(() => import('./components/layout/PrivacyPolicy'));
-const AccountsPage = lazy(() => import('./pages/AccountsPage'));
-const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
+// Main game experiences
+const RhymeMahjongWrapper = lazy(() => import('./components/features/RhymeMahjongWrapper'));
+const FlowFinderGameWrapper = lazy(() => import('./components/features/FlowFinderGameWrapper').then(module => ({ default: module.FlowFinderGameWrapper })));
 
-// Main game experience
-const FlowFinderHub = lazy(() => import('./components/features/FlowFinderHub'));
-const FlowFinder = lazy(() => import('./components/features/FlowFinder'));
-
-// Social features
-const Leaderboard = lazy(() => import('./components/social/Leaderboard').then(module => ({ default: module.Leaderboard })));
-
-// Legacy components - kept for backward compatibility but not in main nav
-const Observatory = lazy(() => import('./components/Observatory/Observatory'));
-const Scriptorium = lazy(() => import('./components/Scriptorium/Scriptorium').then(module => ({ default: module.Scriptorium })));
-const LessonList = lazy(() => import('./components/lessons/LessonList'));
-const LessonView = lazy(() => import('./components/lessons/LessonView'));
-
-// Enhanced loading component with better UX
 const LoadingFallback: React.FC<{ message?: string }> = ({ message = "Loading..." }) => (
     <Box 
         display="flex" 
         flexDirection="column"
         justifyContent="center" 
         alignItems="center" 
-        minHeight="60vh"
-        gap={2}
+        minHeight="100vh"
+        sx={{ backgroundColor: '#0f1419' }}
     >
-        <CircularProgress size={40} />
-        <Box sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
-            {message}
-        </Box>
+        <CircularProgress sx={{ color: '#1976d2' }} />
+        <Typography sx={{ mt: 2, color: '#8892b0' }}>{message}</Typography>
     </Box>
 );
 
-const MobileOptimizedApp: React.FC = () => {
+// Game data structure
+interface GameData {
+    id: string;
+    title: string;
+    subtitle: string;
+    description: string;
+    thumbnail: string;
+    gradient: string;
+    category: 'puzzle' | 'word' | 'strategy';
+    difficulty: 'Easy' | 'Medium' | 'Hard';
+    players: string;
+    status: 'available' | 'coming-soon' | 'new';
+    features: string[];
+    playtime: string;
+    rating: number;
+}
+
+const gameLibrary: GameData[] = [
+    {
+        id: 'rhyme-mahjong',
+        title: 'Rhyme Mahjong',
+        subtitle: '3D Pyramid Puzzles',
+        description: 'Match rhyming words in beautiful 3D pyramid layouts using traditional Mahjong exposure mechanics.',
+        thumbnail: '🏯',
+        gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        category: 'puzzle',
+        difficulty: 'Medium',
+        players: 'Single Player',
+        status: 'available',
+        features: ['3D Graphics', 'Rhyme Engine', 'Star Progression'],
+        playtime: '10-20 min',
+        rating: 4.8
+    },
+    {
+        id: 'connections',
+        title: 'Noctua Connections',
+        subtitle: 'Linguistic Patterns',
+        description: 'Find groups of four words connected by phonetic patterns, rhymes, and linguistic structures.',
+        thumbnail: '🔤',
+        gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        category: 'word',
+        difficulty: 'Easy',
+        players: 'Single Player',
+        status: 'available',
+        features: ['NYT Style', 'Star Scoring', 'Hint System'],
+        playtime: '5-15 min',
+        rating: 4.6
+    },
+    {
+        id: 'word-cascade',
+        title: 'Word Cascade',
+        subtitle: 'Falling Letters',
+        description: 'Build rhyming chains as letters cascade down in this fast-paced word puzzle adventure.',
+        thumbnail: '🌊',
+        gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        category: 'word',
+        difficulty: 'Medium',
+        players: 'Single Player',
+        status: 'coming-soon',
+        features: ['Real-time', 'Combos', 'Leaderboards'],
+        playtime: '3-10 min',
+        rating: 0
+    },
+    {
+        id: 'rhyme-battle',
+        title: 'Rhyme Battle',
+        subtitle: 'Multiplayer Duels',
+        description: 'Challenge friends in real-time rhyming battles with power-ups and special abilities.',
+        thumbnail: '⚔️',
+        gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        category: 'strategy',
+        difficulty: 'Hard',
+        players: 'Multiplayer',
+        status: 'coming-soon',
+        features: ['Real-time PvP', 'Power-ups', 'Tournaments'],
+        playtime: '5-15 min',
+        rating: 0
+    }
+];
+
+// Game Card Component
+const GameCard: React.FC<{ game: GameData; onPlay: (gameId: string) => void }> = ({ game, onPlay }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    
+    return (
+        <motion.div
+            whileHover={{ y: -8, scale: 1.02 }}
+            transition={{ duration: 0.2 }}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
+        >
+            <Card sx={{
+                height: 320,
+                background: game.gradient,
+                color: 'white',
+                position: 'relative',
+                overflow: 'hidden',
+                cursor: game.status === 'available' ? 'pointer' : 'default',
+                opacity: game.status === 'coming-soon' ? 0.7 : 1,
+                '&:hover': {
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                }
+            }}>
+                {/* Status Badge */}
+                {game.status === 'new' && (
+                    <Chip 
+                        icon={<NewReleasesIcon />}
+                        label="NEW" 
+                        size="small" 
+                        sx={{ 
+                            position: 'absolute', 
+                            top: 12, 
+                            right: 12, 
+                            bgcolor: '#ff4444',
+                            color: 'white',
+                            zIndex: 2
+                        }} 
+                    />
+                )}
+                {game.status === 'coming-soon' && (
+                    <Chip 
+                        label="COMING SOON" 
+                        size="small" 
+                        sx={{ 
+                            position: 'absolute', 
+                            top: 12, 
+                            right: 12, 
+                            bgcolor: 'rgba(255,255,255,0.2)',
+                            color: 'white',
+                            zIndex: 2
+                        }} 
+                    />
+                )}
+
+                {/* Game Thumbnail */}
+                <Box sx={{ 
+                    height: 140, 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    background: 'rgba(255,255,255,0.1)',
+                    backdropFilter: 'blur(10px)'
+                }}>
+                    <Typography variant="h1" sx={{ fontSize: '4rem' }}>
+                        {game.thumbnail}
+                    </Typography>
+                </Box>
+
+                <CardContent sx={{ p: 2 }}>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom>
+                        {game.title}
+                    </Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9, mb: 1 }}>
+                        {game.subtitle}
+                    </Typography>
+                    <Typography variant="body2" sx={{ 
+                        opacity: 0.8, 
+                        height: '40px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                    }}>
+                        {game.description}
+                    </Typography>
+
+                    {/* Game Stats */}
+                    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <StarIcon sx={{ fontSize: '1rem', color: '#ffd700' }} />
+                            <Typography variant="body2">{game.rating || 'New'}</Typography>
+                        </Box>
+                        <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                            {game.playtime}
+                        </Typography>
+                    </Box>
+                </CardContent>
+
+                {/* Play Button Overlay */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isHovered && game.status === 'available' ? 1 : 0 }}
+                    transition={{ duration: 0.2 }}
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'rgba(0,0,0,0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        backdropFilter: 'blur(2px)'
+                    }}
+                >
+                    <Button
+                        variant="contained"
+                        size="large"
+                        startIcon={<PlayArrowIcon />}
+                        onClick={() => onPlay(game.id)}
+                        sx={{
+                            bgcolor: 'white',
+                            color: 'black',
+                            '&:hover': { bgcolor: '#f0f0f0' },
+                            fontWeight: 'bold',
+                            px: 4
+                        }}
+                    >
+                        PLAY
+                    </Button>
+                </motion.div>
+            </Card>
+        </motion.div>
+    );
+};
+
+const GameApp: React.FC = () => {
     const { currentUser } = useAuth();
-    const [showPWAPrompt, setShowPWAPrompt] = useState(false);
-    const [showPushNotifications, setShowPushNotifications] = useState(false);
+    const [viewMode, setViewMode] = useState<'hub' | 'rhyme-mahjong' | 'connections' | 'create'>('hub');
+    const [customPuzzle, setCustomPuzzle] = useState<any | null>(null);
+    const [gameKey, setGameKey] = useState<string>('initial');
 
-    // Track user interactions for PWA prompt timing
-    useEffect(() => {
-        let interactionCount = 0;
-        const trackInteraction = () => {
-            interactionCount++;
-            localStorage.setItem('user-interactions', interactionCount.toString());
-        };
+    const handlePuzzleGenerated = (puzzle: any) => {
+        setCustomPuzzle(puzzle);
+        setGameKey(`custom-${Date.now()}`);
+        setViewMode('rhyme-mahjong');
+    };
 
-        const events = ['click', 'touch', 'keydown'];
-        events.forEach(event => {
-            document.addEventListener(event, trackInteraction);
-        });
-
-        return () => {
-            events.forEach(event => {
-                document.removeEventListener(event, trackInteraction);
-            });
-        };
-    }, []);
-
-    // Track games played for PWA prompt
-    useEffect(() => {
-        const gamesPlayed = localStorage.getItem('games-played') || '0';
-        const count = parseInt(gamesPlayed);
-        
-        // Show PWA prompt after 2 games
-        if (count >= 2 && !showPWAPrompt) {
-            setTimeout(() => setShowPWAPrompt(true), 5000);
+    const handlePlayGame = (gameId: string) => {
+        setGameKey(`${gameId}-${Date.now()}`);
+        if (gameId === 'rhyme-mahjong') {
+            setViewMode('rhyme-mahjong');
+        } else if (gameId === 'connections') {
+            setViewMode('connections');
         }
-    }, [showPWAPrompt]);
+        // Add other games as they become available
+    };
+
+    const handleReturnToHub = () => {
+        setViewMode('hub');
+    };
+
+    const availableGames = gameLibrary.filter(game => game.status === 'available');
+    const comingSoonGames = gameLibrary.filter(game => game.status === 'coming-soon');
+
+    const renderContent = () => {
+        switch (viewMode) {
+            case 'create':
+                return <CustomPuzzleGenerator onPuzzleGenerated={handlePuzzleGenerated} onCancel={handleReturnToHub} />;
+            case 'rhyme-mahjong':
+                return (
+                    <Box sx={{ bgcolor: '#0f1419', minHeight: '100vh' }}>
+                        <Button onClick={handleReturnToHub} sx={{ m: 2, color: '#8892b0' }}>← Back to Library</Button>
+                        <RhymeMahjongWrapper key={gameKey} />
+                    </Box>
+                );
+            case 'connections':
+                return (
+                    <Box sx={{ bgcolor: '#0f1419', minHeight: '100vh' }}>
+                        <Button onClick={handleReturnToHub} sx={{ m: 2, color: '#8892b0' }}>← Back to Library</Button>
+                        <FlowFinderGameWrapper />
+                    </Box>
+                );
+            case 'hub':
+            default:
+                return (
+                    <Box sx={{ 
+                        background: 'linear-gradient(180deg, #0f1419 0%, #1a1f36 100%)',
+                        minHeight: '100vh',
+                        color: '#e6f1ff'
+                    }}>
+                        {/* Header */}
+                        <Box sx={{ p: 4, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                            <Container maxWidth="lg">
+                                <Typography variant="h3" fontWeight="bold" gutterBottom sx={{ 
+                                    background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                                    backgroundClip: 'text',
+                                    WebkitBackgroundClip: 'text',
+                                    color: 'transparent'
+                                }}>
+                                    🌙 Noctua Forest
+                                </Typography>
+                                <Typography variant="h6" sx={{ color: '#8892b0', mb: 3 }}>
+                                    Your Linguistic Puzzle Game Library
+                                </Typography>
+                                
+                                {/* Stats Bar */}
+                                <Box sx={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Avatar sx={{ bgcolor: '#667eea', width: 32, height: 32 }}>
+                                            <PeopleIcon fontSize="small" />
+                                        </Avatar>
+                                        <Box>
+                                            <Typography variant="body2" sx={{ color: '#8892b0' }}>Games Available</Typography>
+                                            <Typography variant="h6" fontWeight="bold">{availableGames.length}</Typography>
+                                        </Box>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Avatar sx={{ bgcolor: '#f5576c', width: 32, height: 32 }}>
+                                            <TrendingUpIcon fontSize="small" />
+                                        </Avatar>
+                                        <Box>
+                                            <Typography variant="body2" sx={{ color: '#8892b0' }}>Coming Soon</Typography>
+                                            <Typography variant="h6" fontWeight="bold">{comingSoonGames.length}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </Container>
+                        </Box>
+
+                        <Container maxWidth="lg" sx={{ py: 4 }}>
+                            {/* Available Games Section */}
+                            <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
+                                🎮 Play Now
+                            </Typography>
+                            <Grid container spacing={3} sx={{ mb: 6 }}>
+                                {availableGames.map((game) => (
+                                    <Grid item xs={12} sm={6} md={4} key={game.id}>
+                                        <GameCard game={game} onPlay={handlePlayGame} />
+                                    </Grid>
+                                ))}
+                                
+                                {/* Custom Puzzle Creator Card */}
+                                <Grid item xs={12} sm={6} md={4}>
+                                    <motion.div whileHover={{ y: -8, scale: 1.02 }} transition={{ duration: 0.2 }}>
+                                        <Card sx={{
+                                            height: 320,
+                                            background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
+                                            color: 'white',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            cursor: 'pointer',
+                                            border: '2px dashed rgba(255,255,255,0.3)',
+                                            '&:hover': {
+                                                boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                                                borderColor: 'rgba(255,255,255,0.5)'
+                                            }
+                                        }} onClick={() => setViewMode('create')}>
+                                            <Box sx={{ 
+                                                height: '100%',
+                                                display: 'flex', 
+                                                flexDirection: 'column',
+                                                alignItems: 'center', 
+                                                justifyContent: 'center',
+                                                textAlign: 'center',
+                                                p: 3
+                                            }}>
+                                                <CreateIcon sx={{ fontSize: '4rem', mb: 2, opacity: 0.7 }} />
+                                                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                                                    Create Custom Puzzle
+                                                </Typography>
+                                                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                                                    Build your own rhyme puzzles from any text
+                                                </Typography>
+                                            </Box>
+                                        </Card>
+                                    </motion.div>
+                                </Grid>
+                            </Grid>
+
+                            {/* Coming Soon Section */}
+                            {comingSoonGames.length > 0 && (
+                                <>
+                                    <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
+                                        🚀 Coming Soon
+                                    </Typography>
+                                    <Grid container spacing={3}>
+                                        {comingSoonGames.map((game) => (
+                                            <Grid item xs={12} sm={6} md={4} key={game.id}>
+                                                <GameCard game={game} onPlay={handlePlayGame} />
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </>
+                            )}
+                        </Container>
+                    </Box>
+                );
+        }
+    };
 
     return (
-        <>
-            <Routes>
-                <Route path="/" element={<LandingPage />} />
-                
-                {/* Main Games Experience */}
-                <Route 
-                    path="/games" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading Games..." />}>
-                            <FlowFinderHub />
-                        </Suspense>
-                    } 
-                />
-                <Route 
-                    path="/games/play" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading puzzle..." />}>
-                            <FlowFinder />
-                        </Suspense>
-                    } 
-                />
-                
-                {/* Social features */}
-                <Route 
-                    path="/leaderboard" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading rankings..." />}>
-                            <Leaderboard />
-                        </Suspense>
-                    } 
-                />
-                
-                {/* Core user pages */}
-                <Route 
-                    path="/profile" 
-                    element={
-                        currentUser ? <ProfilePage /> : <Navigate to="/" replace />
-                    } 
-                />
-                <Route 
-                    path="/subscribe" 
-                    element={
-                        currentUser ? <SubscriptionPage /> : <Navigate to="/" replace />
-                    } 
-                />
-                
-                {/* Auth routes */}
-                <Route 
-                    path="/signup" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading sign up..." />}>
-                            <SignUp />
-                        </Suspense>
-                    } 
-                />
-                <Route 
-                    path="/signin" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading sign in..." />}>
-                            <SignIn />
-                        </Suspense>
-                    } 
-                />
-                
-                {/* Legal and account pages */}
-                <Route 
-                    path="/terms" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading terms..." />}>
-                            <TermsOfService />
-                        </Suspense>
-                    } 
-                />
-                <Route 
-                    path="/privacy" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading privacy policy..." />}>
-                            <PrivacyPolicy />
-                        </Suspense>
-                    } 
-                />
-                <Route 
-                    path="/accounts" 
-                    element={
-                        currentUser ? <AccountsPage /> : <Navigate to="/" replace />
-                    } 
-                />
-                
-                {/* Legacy routes - redirects to main games experience */}
-                <Route path="/forest" element={<Navigate to="/games" replace />} />
-                <Route path="/flow-finder" element={<Navigate to="/games" replace />} />
-                <Route path="/flow-finder/play" element={<Navigate to="/games/play" replace />} />
-                <Route path="/daily-challenge" element={<Navigate to="/games" replace />} />
-                <Route path="/game-grove" element={<Navigate to="/games" replace />} />
-                <Route path="/achievements" element={<Navigate to="/profile" replace />} />
-                
-                {/* Hidden legacy routes - accessible by direct URL but not in navigation */}
-                <Route 
-                    path="/legacy/observatory" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading Observatory..." />}>
-                            <Observatory />
-                        </Suspense>
-                    } 
-                />
-                <Route 
-                    path="/legacy/scriptorium" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading Scriptorium..." />}>
-                            <Scriptorium />
-                        </Suspense>
-                    } 
-                />
-                <Route 
-                    path="/legacy/lessons" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading lessons..." />}>
-                            <LessonList />
-                        </Suspense>
-                    } 
-                />
-                <Route 
-                    path="/legacy/lessons/:path/:lessonSlug" 
-                    element={
-                        <Suspense fallback={<LoadingFallback message="Loading lesson content..." />}>
-                            <LessonView />
-                        </Suspense>
-                    } 
-                />
-                
-                {/* Redirect old paths to games */}
-                <Route path="/observatory" element={<Navigate to="/games" replace />} />
-                <Route path="/scriptorium" element={<Navigate to="/games" replace />} />
-                <Route path="/lessons" element={<Navigate to="/games" replace />} />
-                <Route path="/studio" element={<Navigate to="/games" replace />} />
-            </Routes>
-
-            {/* Mobile Optimization Components */}
-            <PWAInstallPrompt 
-                onInstall={() => {
-                    setShowPWAPrompt(false);
-                    console.log('PWA installed successfully');
-                }}
-                onDismiss={() => setShowPWAPrompt(false)}
-            />
+        <Box sx={{ backgroundColor: '#fafafa', minHeight: '100vh' }}>
+            <Suspense fallback={<LoadingFallback />}>
+                {renderContent()}
+            </Suspense>
             
-            {/* Show push notifications setup for authenticated users */}
-            {currentUser && (
-                <Box sx={{ 
-                    position: 'fixed', 
-                    bottom: 80, 
-                    right: 16, 
-                    zIndex: 1200,
-                    display: showPushNotifications ? 'block' : 'none'
-                }}>
-                    <PushNotifications 
-                        onPermissionChange={(granted) => {
-                            if (granted) {
-                                setShowPushNotifications(false);
-                            }
-                        }}
-                    />
-                </Box>
-            )}
-
-            {/* Offline gaming indicator */}
-            <Box sx={{ 
-                position: 'fixed', 
-                top: 16, 
-                right: 16, 
-                zIndex: 1100,
-                maxWidth: '90vw'
-            }}>
-                <OfflineIndicator />
-            </Box>
-        </>
+            {/* Modals and overlays will go here */}
+            <CookieConsentBanner />
+            <OfflineIndicator />
+            {currentUser && <WebVitalsMonitor />}
+        </Box>
     );
 };
 
 const App: React.FC = () => {
-  return (
-    <I18nextProvider i18n={i18n}>
-      <ThemeProvider theme={noctuaTheme}>
-        <CssBaseline />
-        <AuthProvider>
-          <ExperienceProvider>
-            <UsageProvider>
-              <Router>
-                <Layout>
-                  <Suspense fallback={<LoadingFallback />}>
-                    <MobileOptimizedApp />
-                  </Suspense>
-                </Layout>
-              </Router>
-            </UsageProvider>
-          </ExperienceProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </I18nextProvider>
-  );
+    return (
+        <I18nextProvider i18n={i18n}>
+            <ThemeProvider theme={noctuaTheme}>
+                <CssBaseline />
+                <AuthProvider>
+                    <ExperienceProvider>
+                        <UsageProvider>
+                            <Routes>
+                                <Route path="/" element={<GameApp />} />
+                                <Route path="*" element={<Navigate to="/" replace />} />
+                            </Routes>
+                        </UsageProvider>
+                    </ExperienceProvider>
+                </AuthProvider>
+            </ThemeProvider>
+        </I18nextProvider>
+    );
 };
 
 export default App; 

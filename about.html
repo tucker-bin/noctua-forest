@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About the Author</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="books.html" class="brand">Tucker B. Robinson</a>
+        <nav class="nav">
+          <a href="books.html" class="nav-link">Books</a>
+          <a href="about.html" class="nav-link active">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container">
+          <h1>About Me</h1>
+          <p class="subtitle">Short bio and contact.</p>
+        </div>
+      </section>
+
+      <section class="container about">
+        <div class="about-grid">
+          <div class="about-image" aria-hidden="true"></div>
+          <div class="about-content">
+            <p>
+              Replace this with a concise bio. Share your background, what you write, and
+              what readers can expect from your books. Keep it friendly and human.
+            </p>
+            <p>
+              Email: <a href="mailto:you@example.com">you@example.com</a>
+            </p>
+            <p class="socials">
+              <a href="#" target="_blank" rel="noopener">Twitter</a>
+              <span aria-hidden="true">·</span>
+              <a href="#" target="_blank" rel="noopener">Instagram</a>
+              <span aria-hidden="true">·</span>
+              <a href="#" target="_blank" rel="noopener">Newsletter</a>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>© <span id="year"></span> Tucker B. Robinson. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+  </body>
+  </html>
+

@@ -258,21 +258,35 @@ export const ExperienceProvider: React.FC<{ children: ReactNode }> = ({ children
     return () => window.removeEventListener('firstObservation', handleFirstObservation);
   }, [unlockAchievement]);
 
-  const generateFlowFinderChallenge = useCallback(() => {
+  const generateFlowFinderChallenge = useCallback(async () => {
     const today = new Date().toDateString();
     const savedChallenge = localStorage.getItem(`noctua_flow_finder_${today}`);
     
     if (!savedChallenge) {
-      // Generate today's challenges using the service
-      const challenge4x4 = flowFinderService.getDailyChallenge('default', 1, '4x4');
-      // Default to 4x4 for the main challenge
-      const challenge = challenge4x4;
-      setFlowFinderChallenge(challenge);
-      localStorage.setItem(`noctua_flow_finder_${today}`, JSON.stringify(challenge));
+      try {
+        // Generate sophisticated daily challenge based on user's actual level and progression
+        const userId = currentUser?.uid || 'anonymous';
+        const challenge = await flowFinderService.generateDynamicChallenge(userId, level, isPremium, true); // true = isDaily
+        
+        console.log(`📅 Generated daily challenge for level ${level}:`, {
+          gridSize: challenge.gridSize,
+          eloRating: challenge.eloRating,
+          adaptiveFeatures: challenge.adaptiveFeatures,
+          groups: challenge.rhymeGroups?.length || 0,
+          timeLimit: challenge.timeLimit
+        });
+        
+        setFlowFinderChallenge(challenge);
+        localStorage.setItem(`noctua_flow_finder_${today}`, JSON.stringify(challenge));
+      } catch (error) {
+        console.error('Error generating FlowFinder challenge:', error);
+        // Fallback to a basic challenge or show error state
+        setFlowFinderChallenge(null);
+      }
     } else {
       setFlowFinderChallenge(JSON.parse(savedChallenge));
     }
-  }, [flowFinderService]);
+  }, [flowFinderService, currentUser, level, isPremium]);
 
   // Generate FlowFinder challenge for both authenticated and anonymous users
   useEffect(() => {
@@ -299,9 +313,14 @@ export const ExperienceProvider: React.FC<{ children: ReactNode }> = ({ children
     localStorage.setItem(`noctua_flow_finder_${today}`, JSON.stringify(updatedChallenge));
   }, [flowFinderChallenge, addTokens, addXp, updateStreak, flowFinderService]);
 
-  const loadWeeklyPacks = useCallback(() => {
-    const packs = flowFinderService.getAvailablePacks(isPremium);
-    setWeeklyPacks(packs);
+  const loadWeeklyPacks = useCallback(async () => {
+    try {
+      const packs = await flowFinderService.getAvailablePacks(isPremium);
+      setWeeklyPacks(packs);
+    } catch (error) {
+      console.error('Error loading weekly packs:', error);
+      setWeeklyPacks([]);
+    }
   }, [flowFinderService, isPremium]);
 
   const xpForNextLevel = level * XP_PER_LEVEL;

@@ -1,3 +1,9 @@
+.git/
+node_modules/
+.github/
+**/*.log
+**/.DS_Store
+archives/
 # Python
 __pycache__/
 *.py[cod]

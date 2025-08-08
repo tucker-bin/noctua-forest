@@ -49,7 +49,7 @@ import {
   Psychology as SkillIcon,
   LocalFireDepartment as FireIcon,
   Diamond as DiamondIcon,
-  Military as MilitaryIcon
+  Commute as MilitaryIcon
 } from '@mui/icons-material';
 
 interface LeaderboardPlayer {

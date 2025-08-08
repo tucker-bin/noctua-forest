@@ -1,7 +1,7 @@
 {
-  "name": "RhymeTime Games",
-  "short_name": "RhymeTime",
-  "description": "AI-powered word puzzle games that make you a better writer. Play daily rhyming challenges and compete on leaderboards.",
+  "name": "Noctua Observatory",
+  "short_name": "Observatory",
+  "description": "Advanced linguistic pattern analysis and corpus research platform",
   "theme_color": "#3182ce",
   "background_color": "#1a202c",
   "display": "standalone",
@@ -48,30 +48,20 @@
   ],
   "shortcuts": [
     {
-      "name": "Play Daily Challenge",
-      "short_name": "Daily",
-      "description": "Jump straight into today's rhyme puzzle",
-      "url": "/games",
+      "name": "Observatory Analysis",
+      "short_name": "Analyze",
+      "description": "Analyze text for linguistic patterns",
+      "url": "/observatory",
       "icons": [{"src": "pwa-192x192.png", "sizes": "192x192"}]
     },
     {
-      "name": "View Leaderboards",
-      "short_name": "Rankings",
-      "description": "Check your ranking and compete with friends",
-      "url": "/profile",
+      "name": "Corpus Licensing",
+      "short_name": "License",
+      "description": "Access linguistic data licensing",
+      "url": "/corpus-licensing",
       "icons": [{"src": "pwa-192x192.png", "sizes": "192x192"}]
     }
   ],
-  "share_target": {
-    "action": "/share",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
   "protocol_handlers": [
     {
       "protocol": "web+noctua",

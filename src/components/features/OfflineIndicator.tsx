@@ -180,7 +180,7 @@ const OfflineIndicator: React.FC = () => {
 
     try {
       // Download different game modes and difficulties
-      const gameModes = ['rhyme_time', 'alli_time', 'flow_time'];
+      const gameModes = ['rhyme_hunter', 'alliteration_alert', 'consonance_challenge'];
       const difficulties = [1, 2, 3];
       const totalGames = gameModes.length * difficulties.length * 3; // 3 games per combination
       let downloadedCount = 0;
@@ -312,212 +312,33 @@ const OfflineIndicator: React.FC = () => {
   const lastSyncFormatted = offlineData.lastSync ? 
     new Date(offlineData.lastSync).toLocaleDateString() : 'Never';
 
+  // Only show if offline or slow connection
+  if (networkStatus.isOnline && connectionQuality.label !== 'Slow') {
+    return null;
+  }
+
   return (
     <Box>
-      {/* Connection Status Bar */}
+      {/* Subtle Connection Status */}
       <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
       >
-        <Alert
-          severity={networkStatus.isOnline ? 'success' : 'warning'}
+        <Chip
           icon={connectionQuality.icon}
+          label={networkStatus.isOnline ? 'Slow Connection' : 'Offline'}
+          size="small"
+          color={networkStatus.isOnline ? 'warning' : 'error'}
           sx={{
-            mb: 2,
-            border: '1px solid',
-            borderColor: `${theme.palette[connectionQuality.color as 'success' | 'warning' | 'error'].main}30`,
-            bgcolor: `${theme.palette[connectionQuality.color as 'success' | 'warning' | 'error'].main}08`
+            fontSize: '0.75rem',
+            bgcolor: `${theme.palette[connectionQuality.color as 'success' | 'warning' | 'error'].main}15`,
+            border: `1px solid ${theme.palette[connectionQuality.color as 'success' | 'warning' | 'error'].main}30`
           }}
-          action={
-            <Stack direction="row" spacing={1} alignItems="center">
-              {pendingSync > 0 && (
-                <Badge badgeContent={pendingSync} color="error">
-                  <CloudOffIcon fontSize="small" />
-                </Badge>
-              )}
-              {networkStatus.isOnline && pendingSync > 0 && (
-                <IconButton size="small" onClick={syncPendingData} disabled={syncing}>
-                  <SyncIcon sx={{ animation: syncing ? 'spin 1s linear infinite' : 'none' }} />
-                </IconButton>
-              )}
-            </Stack>
-          }
-        >
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-            {networkStatus.isOnline ? 
-              `Connected • ${connectionQuality.label} Connection` : 
-              'Offline Mode Active'
-            }
-          </Typography>
-          {!networkStatus.isOnline && hasOfflineGames && (
-            <Typography variant="body2">
-              {offlineData.games.length} games available offline
-            </Typography>
-          )}
-        </Alert>
+        />
       </motion.div>
 
-      {/* Offline Gaming Panel */}
-      <Card>
-        <CardContent>
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-            <Box display="flex" alignItems="center" gap={2}>
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  background: hasOfflineGames ? 
-                    `linear-gradient(135deg, ${theme.palette.success.main}, ${theme.palette.primary.main})` :
-                    `linear-gradient(135deg, ${theme.palette.grey[400]}, ${theme.palette.grey[600]})`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white'
-                }}
-              >
-                <StorageIcon />
-              </Box>
-              <Box>
-                <Typography variant="h6" gutterBottom>
-                  Offline Gaming
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {hasOfflineGames ? 
-                    `${offlineData.games.length} games cached • Last sync: ${lastSyncFormatted}` :
-                    'Download games to play offline'
-                  }
-                </Typography>
-              </Box>
-            </Box>
-            <Chip
-              label={hasOfflineGames ? 'Ready' : 'Setup Required'}
-              color={hasOfflineGames ? 'success' : 'default'}
-              variant={hasOfflineGames ? 'filled' : 'outlined'}
-            />
-          </Box>
-
-          {/* Download Progress */}
-          <AnimatePresence>
-            {downloading && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-              >
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="body2" gutterBottom>
-                    Downloading games for offline play...
-                  </Typography>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={downloadProgress}
-                    sx={{ 
-                      height: 8, 
-                      borderRadius: 4,
-                      bgcolor: theme.palette.grey[200],
-                      '& .MuiLinearProgress-bar': {
-                        borderRadius: 4,
-                        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`
-                      }
-                    }}
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    {Math.round(downloadProgress)}% complete
-                  </Typography>
-                </Box>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Action Buttons */}
-          <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-            {!hasOfflineGames ? (
-              <Button
-                variant="contained"
-                startIcon={<DownloadIcon />}
-                onClick={downloadGamesForOffline}
-                disabled={!networkStatus.isOnline || downloading}
-                sx={{ flex: 1 }}
-              >
-                {downloading ? 'Downloading...' : 'Download Games'}
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="contained"
-                  startIcon={<PlayArrowIcon />}
-                  href="/games"
-                  sx={{ flex: 1 }}
-                >
-                  Play Offline
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<DownloadIcon />}
-                  onClick={downloadGamesForOffline}
-                  disabled={!networkStatus.isOnline || downloading}
-                >
-                  Refresh
-                </Button>
-              </>
-            )}
-          </Stack>
-
-          {/* Advanced Details */}
-          <Box>
-            <Button
-              onClick={() => setShowDetails(!showDetails)}
-              startIcon={showDetails ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              size="small"
-              sx={{ mb: 1 }}
-            >
-              Details
-            </Button>
-
-            <Collapse in={showDetails}>
-              <Stack spacing={2}>
-                <Box>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Cache Information
-                  </Typography>
-                  <Typography variant="body2">
-                    • Storage used: {cacheSize} KB
-                    <br />
-                    • Games cached: {offlineData.games.length}
-                    <br />
-                    • Pending sync: {pendingSync} items
-                    <br />
-                    • Connection: {networkStatus.effectiveType?.toUpperCase()} 
-                    {networkStatus.downlink > 0 && ` (${networkStatus.downlink} Mbps)`}
-                  </Typography>
-                </Box>
-
-                <Box display="flex" gap={1}>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={syncPendingData}
-                    disabled={!networkStatus.isOnline || syncing || pendingSync === 0}
-                    startIcon={<SyncIcon />}
-                  >
-                    Sync Now
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    onClick={clearOfflineData}
-                    color="error"
-                  >
-                    Clear Cache
-                  </Button>
-                </Box>
-              </Stack>
-            </Collapse>
-          </Box>
-        </CardContent>
-      </Card>
+      {/* Full offline panel available at /settings if needed */}
 
       {/* CSS for spinning animation */}
       <style>

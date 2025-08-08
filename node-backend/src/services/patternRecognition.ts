@@ -52,22 +52,192 @@ interface RhymeGroup {
 }
 
 export function findEnhancedPatterns(text: string, language: string = 'en'): Pattern[] {
-  if (text.length < 2000) {
-    return processChunk(text, 0, language);
-  }
+  const chunks = splitTextIntoChunks(text, 100, 20);
+  const chunkPatterns = chunks.map((chunk, index) => 
+    processChunk(chunk, index * 80, language)
+  );
   
-  const chunks = splitTextIntoChunks(text, CHUNK_SIZE, OVERLAP_SIZE);
-  const maxChunks = 3;
-  const limitedChunks = chunks.slice(0, maxChunks);
+  // Merge sophisticated patterns
+  const sophisticatedPatterns = mergeChunkPatterns(chunkPatterns);
   
-  const chunkPatterns = limitedChunks.map((chunk, index) => {
-    const chunkStart = index * (CHUNK_SIZE - OVERLAP_SIZE);
-    return processChunk(chunk, chunkStart, language);
-  });
-
-  const mergedPatterns = mergeChunkPatterns(chunkPatterns);
-  return rankAndSelectPatterns(mergedPatterns, MAX_ENHANCED_PATTERNS);
+  // Add simple patterns that anyone can see
+  const simplePatterns = findSimplePatterns(text);
+  
+  // Combine both layers, removing duplicates but keeping both simple and sophisticated versions
+  const allPatterns = [...sophisticatedPatterns, ...simplePatterns];
+  
+  return rankAndSelectPatterns(allPatterns, 50);
 }
+
+/**
+ * Simple pattern detection for casual players
+ * Detects obvious patterns that anyone would notice
+ */
+function findSimplePatterns(text: string): Pattern[] {
+  const patterns: Pattern[] = [];
+  const words = text.toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(word => word.length > 2 && !STOP_WORDS.has(word));
+  
+  // 1. SIMPLE ALLITERATION - Same first letter
+  const firstLetterGroups = new Map<string, string[]>();
+  words.forEach(word => {
+    const firstLetter = word.charAt(0);
+    if (/[a-z]/.test(firstLetter)) {
+      if (!firstLetterGroups.has(firstLetter)) {
+        firstLetterGroups.set(firstLetter, []);
+      }
+      firstLetterGroups.get(firstLetter)!.push(word);
+    }
+  });
+  
+  firstLetterGroups.forEach((group, letter) => {
+    if (group.length >= 4) {
+      patterns.push({
+        id: `simple_alliteration_${letter}`,
+        type: 'alliteration',
+        segments: group.map((word, i) => `seg_${letter}_${i}`),
+        originalText: group.slice(0, 4).join(' '),
+        significance: 0.9, // High significance for perfect groups of 4
+        acousticFeatures: {
+          primaryFeature: `Words starting with "${letter.toUpperCase()}"`,
+          secondaryFeatures: [
+            'Same first letter',
+            'Easy to spot',
+            `${Math.min(group.length, 4)} words`
+          ]
+        },
+        description: `Words that all start with the letter "${letter.toUpperCase()}"`
+      });
+    } else if (group.length === 3) {
+      patterns.push({
+        id: `simple_alliteration_${letter}_3`,
+        type: 'alliteration',
+        segments: group.map((word, i) => `seg_${letter}_${i}`),
+        originalText: group.join(' '),
+        significance: 0.7,
+        acousticFeatures: {
+          primaryFeature: `Words starting with "${letter.toUpperCase()}"`,
+          secondaryFeatures: [
+            'Same first letter',
+            '3 words'
+          ]
+        },
+        description: `Three words starting with "${letter.toUpperCase()}"`
+      });
+    }
+  });
+  
+  // 2. SIMPLE RHYMES - Same ending sounds (2-3 letters)
+  const endingGroups = new Map<string, string[]>();
+  words.forEach(word => {
+    if (word.length >= 3) {
+      // Try different ending lengths
+      const ending2 = word.slice(-2);
+      const ending3 = word.slice(-3);
+      
+      [ending2, ending3].forEach(ending => {
+        if (ending.length >= 2) {
+          if (!endingGroups.has(ending)) {
+            endingGroups.set(ending, []);
+          }
+          endingGroups.get(ending)!.push(word);
+        }
+      });
+    }
+  });
+  
+  endingGroups.forEach((group, ending) => {
+    if (group.length >= 4) {
+      patterns.push({
+        id: `simple_rhyme_${ending}`,
+        type: 'rhyme',
+        segments: group.map((word, i) => `seg_rhyme_${ending}_${i}`),
+        originalText: group.slice(0, 4).join(' '),
+        significance: 0.8,
+        acousticFeatures: {
+          primaryFeature: `Words ending in "-${ending}"`,
+          secondaryFeatures: [
+            'Same ending sound',
+            'Rhyming pattern',
+            `${Math.min(group.length, 4)} words`
+          ]
+        },
+        description: `Words that rhyme with "-${ending}" sound`
+      });
+    } else if (group.length === 3) {
+      patterns.push({
+        id: `simple_rhyme_${ending}_3`,
+        type: 'rhyme',
+        segments: group.map((word, i) => `seg_rhyme_${ending}_${i}`),
+        originalText: group.join(' '),
+        significance: 0.6,
+        acousticFeatures: {
+          primaryFeature: `Words ending in "-${ending}"`,
+          secondaryFeatures: [
+            'Same ending sound',
+            '3 words'
+          ]
+        },
+        description: `Three words ending in "-${ending}"`
+      });
+    }
+  });
+  
+  // 3. WORD FAMILIES - Similar letter patterns
+  const patternGroups = new Map<string, string[]>();
+  words.forEach(word => {
+    // Look for common patterns like -ing, -ed, -ly, etc.
+    const commonEndings = ['ing', 'ed', 'er', 'ly', 'tion', 'sion', 'ness', 'ment', 'able', 'ible'];
+    commonEndings.forEach(ending => {
+      if (word.endsWith(ending) && word.length > ending.length + 2) {
+        const key = `pattern_${ending}`;
+        if (!patternGroups.has(key)) {
+          patternGroups.set(key, []);
+        }
+        patternGroups.get(key)!.push(word);
+      }
+    });
+  });
+  
+  patternGroups.forEach((group, pattern) => {
+    if (group.length >= 3) {
+      const suffix = pattern.replace('pattern_', '');
+      patterns.push({
+        id: `word_family_${suffix}`,
+        type: 'consonance', // Close enough category
+        segments: group.map((word, i) => `seg_family_${suffix}_${i}`),
+        originalText: group.slice(0, 4).join(' '),
+        significance: 0.5,
+        acousticFeatures: {
+          primaryFeature: `Words ending in "-${suffix}"`,
+          secondaryFeatures: [
+            'Word family pattern',
+            'Same suffix',
+            `${Math.min(group.length, 4)} words`
+          ]
+        },
+        description: `Words from the same family ending in "-${suffix}"`
+      });
+    }
+  });
+  
+  return patterns;
+}
+
+// Add STOP_WORDS definition at the top level
+const STOP_WORDS = new Set([
+  'a', 'an', 'the', 'and', 'but', 'or', 'for', 'nor', 'on', 'at', 'to', 'from', 'by', 'with',
+  'i', 'you', 'he', 'she', 'it', 'we', 'they', 'me', 'him', 'her', 'us', 'them',
+  'my', 'your', 'his', 'its', 'our', 'their', 'mine', 'yours', 'hers', 'ours', 'theirs',
+  'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+  'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'shall', 'should', 'can', 'could',
+  'may', 'might', 'must', 'what', 'who', 'whom', 'which', 'where', 'when', 'why', 'how',
+  'in', 'out', 'of', 'off', 'up', 'down', 'over', 'under', 'again', 'further', 'then', 'once',
+  'here', 'there', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some',
+  'such', 'no', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'just', 'now'
+]);
 
 function splitTextIntoChunks(text: string, chunkSize: number, overlapSize: number): string[] {
   const chunks: string[] = [];
@@ -352,10 +522,42 @@ function findAlliterationPatterns(segments: PhoneticSegment[]): Pattern[] {
   const patterns: Pattern[] = [];
   const initialSoundGroups = new Map<string, PhoneticSegment[]>();
   
-  // Group segments by initial sound
+  // Group segments by initial sound - use multiple methods for better detection
   segments.forEach(segment => {
-    const initialSound = segment.soundQuality.consonants[0];
+    // Method 1: First consonant from phonetic analysis
+    let initialSound = segment.soundQuality.consonants[0];
+    
+    // Method 2: If no consonant found, try first character of text (for words like "see")
+    if (!initialSound) {
+      const firstChar = segment.text.charAt(0).toLowerCase();
+      if (/[bcdfghjklmnpqrstvwxyz]/.test(firstChar)) {
+        initialSound = firstChar;
+      }
+    }
+    
+    // Method 3: Handle special cases and improve detection
+    if (!initialSound) {
+      // Extract from phoneticForm directly for edge cases
+      const phoneticFirst = segment.phoneticForm.match(/^[bcdfghjklmnpqrstvwxyzʃʒθðŋ]/i);
+      if (phoneticFirst) {
+        initialSound = phoneticFirst[0].toLowerCase();
+      }
+    }
+    
+    // Method 4: Fallback to text analysis for common patterns
+    if (!initialSound) {
+      const textFirst = segment.text.charAt(0).toLowerCase();
+      if (/[bcdfghjklmnpqrstvwxyz]/.test(textFirst)) {
+        initialSound = textFirst;
+      }
+    }
+    
     if (initialSound) {
+      // Normalize some common phonetic variations
+      if (initialSound === 'ʃ') initialSound = 's'; // "sh" sound maps to "s"
+      if (initialSound === 'θ') initialSound = 'th'; // "th" sound
+      if (initialSound === 'ð') initialSound = 'th'; // voiced "th" sound
+      
       if (!initialSoundGroups.has(initialSound)) {
         initialSoundGroups.set(initialSound, []);
       }
@@ -363,19 +565,24 @@ function findAlliterationPatterns(segments: PhoneticSegment[]): Pattern[] {
     }
   });
   
-  // Create patterns for each initial sound group
+  // Create patterns for each initial sound group (require at least 3 for stronger patterns)
   initialSoundGroups.forEach((group, sound) => {
     if (group.length >= 3) {
+      // Higher significance score for groups of exactly 4 (perfect for puzzles)
+      const significance = group.length === 4 ? 1.0 : Math.min(0.8, group.length / 4);
+      
       patterns.push({
         id: `alliteration_${sound}`,
         type: 'alliteration',
         segments: group.map(s => s.id),
         originalText: group.map(s => s.text).join(' '),
+        significance: significance,
         acousticFeatures: {
           primaryFeature: `Alliteration pattern: ${sound}`,
           secondaryFeatures: [
             `Initial sound: ${sound}`,
-            `${group.length} segments`
+            `${group.length} segments`,
+            `Strength: ${(significance * 100).toFixed(0)}%`
           ]
         },
         description: `Alliteration pattern with initial sound: ${sound}`

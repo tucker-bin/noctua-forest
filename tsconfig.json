@@ -28,15 +28,12 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src/**/*",
-    "src/**/*.tsx",
-    "src/**/*.ts",
-    "vite.config.ts"
+  "files": [
+    "src/theme/mui.d.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "node-backend"
+  "include": [
+    "src",
+    "scripts",
+    "src/theme/mui.d.ts"
   ]
 } 

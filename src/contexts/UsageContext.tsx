@@ -57,10 +57,20 @@ export const UsageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [tokenConfig] = useState<TokenConfig>(DEFAULT_TOKEN_CONFIG);
 
   const fetchUsageInfo = useCallback(async () => {
-    if (!currentUser) return;
+    setIsLoading(true);
+    
+    // For anonymous users, provide default usage info
+    if (!currentUser) {
+      setUsageInfo({
+        observationsThisMonth: 0,
+        tokenBalance: 3, // Default tokens for anonymous users
+        userRegion: 'US'
+      });
+      setIsLoading(false);
+      return;
+    }
     
     try {
-      setIsLoading(true);
       const token = await currentUser.getIdToken();
       
       log.info('Fetching usage information', { userId: currentUser.uid });
@@ -86,6 +96,13 @@ export const UsageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         userId: currentUser?.uid,
         error: error instanceof Error ? error.message : String(error) 
       }, error instanceof Error ? error : undefined);
+      
+      // Fallback to anonymous user defaults on error
+      setUsageInfo({
+        observationsThisMonth: 0,
+        tokenBalance: 3,
+        userRegion: 'US'
+      });
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +134,11 @@ export const UsageProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   const recordObservation = useCallback(async (tokenCost: number) => {
-    if (!currentUser) return;
+    // For anonymous users, just log locally without API calls
+    if (!currentUser) {
+      log.info('Observation recorded (anonymous user)', { tokenCost });
+      return;
+    }
     
     try {
       const token = await currentUser.getIdToken();

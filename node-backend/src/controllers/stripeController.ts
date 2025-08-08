@@ -61,11 +61,17 @@ export async function handleStripeWebhook(req: Request, res: Response): Promise<
 
   // Handle the event
   switch (event.type) {
-    case 'checkout.session.completed':
+    case 'checkout.session.completed': {
       const session = event.data.object;
       logger.info('Payment was successful for session:', session.id);
       // Fulfill the purchase...
       break;
+    }
+    case 'invoice.payment_succeeded': {
+      const invoice = event.data.object;
+      // Update subscription status...
+      break;
+    }
     default:
       logger.warn(`Unhandled event type ${event.type}`);
   }

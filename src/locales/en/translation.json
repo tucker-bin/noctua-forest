@@ -858,58 +858,30 @@
       "open": "Open App"
     }
   },
-  "share": {
-    "button": "Share",
-    "copy_link": "Copy Link",
-    "twitter": "Twitter",
-    "facebook": "Facebook",
-    "whatsapp": "WhatsApp",
-    "email": "Email",
-    "copy_success": "Link copied to clipboard!"
-  },
-  "offline": {
-    "title": "You're offline",
-    "description": "Some features may be limited. Your progress is saved locally.",
-    "indicator": "Offline"
-  },
-  "online": {
-    "message": "Back online! Syncing your progress..."
-  },
-  "scriptorium": {
-    "title": "Song Scriptorium",
-    "subtitle": "Observe the hidden patterns in music - from structural elements to emotional landscapes",
-    "search_placeholder": "Search by song title, artist, or lyrics...",
-    "observe": "Observe",
-    "signin_prompt": "Sign in to save your musical observations",
-    "try_demo": "Try Demo with Sample Song",
-    "search_error": "Failed to search for song. Please try again.",
-    "refresh": "Refresh Analysis",
-    "save": "Save Observation",
-    "share": "Share"
-  },
-  "accessibility": {
-    "title": "Accessibility",
-    "open_settings": "Open accessibility settings",
-    "settings_title": "Accessibility Settings",
-    "settings_updated": "Accessibility settings updated",
-    "visual_title": "Visual Settings",
-    "high_contrast": "High Contrast Mode",
-    "large_text": "Large Text",
-    "reduced_motion": "Reduce Motion",
-    "font_size": "Font Size",
-    "screen_reader_title": "Screen Reader Settings",
-    "screen_reader_optimized": "Screen Reader Optimized",
-    "speech_rate": "Speech Rate",
-    "reset": "Reset to Defaults",
-    "save": "Save Settings"
+  "corpus": {
+    "licensing": {
+      "title": "Corpus Licensing",
+      "subtitle": "Access our comprehensive linguistic pattern database",
+      "research": "Academic Research",
+      "commercial": "Commercial License", 
+      "education": "Educational Use",
+      "api": "API Access"
+    },
+    "economics": {
+      "title": "Corpus Economics",
+      "contribute": "Contribute to Corpus",
+      "earn": "Earn from Contributions",
+      "license": "License Data",
+      "api_access": "API Access"
+    }
   },
   "community": {
-    "forest_title": "Community Forest",
-    "forest_subtitle": "Share discoveries and connect with fellow observers",
-    "feed": "Discovery Feed",
-    "stargazers": "Star Gazers",
-    "patterns_found": "Patterns Found:",
-    "view_details": "View Details",
+    "forest_title": "Research Community",
+    "forest_subtitle": "Collaborate on linguistic research and corpus development",
+    "feed": "Research Feed",
+    "contributors": "Top Contributors",
+    "patterns_found": "Patterns Contributed:",
+    "view_details": "View Research",
     "share": "Share"
   },
   "landing": {

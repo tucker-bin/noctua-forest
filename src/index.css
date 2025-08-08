@@ -168,3 +168,24 @@ button:focus-visible {
   width: 100%;
   min-height: 100vh;
 }
+
+/* Game animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Smooth transitions for RTL/LTR switching */
+.rtl-transition {
+  transition: all 0.3s ease;
+}
+
+/* Poetry-style text layout */
+.verse-line {
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}

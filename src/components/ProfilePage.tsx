@@ -5,6 +5,7 @@ import { LearningProgress } from './profile/LearningProgress';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import DataManager from './profile/DataManager';
+import StarIcon from '@mui/icons-material/Star';
 
 const ProfilePage: React.FC = () => {
   const { t } = useTranslation();
@@ -12,8 +13,18 @@ const ProfilePage: React.FC = () => {
   
   // Placeholder data
   const user = { name: 'Your Name', email: 'your@email.com' };
-  const xp = 120;
   const streak = 3;
+  
+  // Mock star data - in real app, this would come from user context/API
+  const userStats = {
+    totalStars: 27,
+    level: 3,
+    title: 'Linguist',
+    starsToNext: 5,
+    progress: 0.6, // 60% to next level
+    puzzlesSolved: 12,
+    perfectSolutions: 4
+  };
 
   const handleStartLesson = () => {
     navigate('/lessons/celestial_observer/first_light');
@@ -39,13 +50,34 @@ const ProfilePage: React.FC = () => {
                 <Typography variant="h5" sx={{ mt: 2 }}>{user.name}</Typography>
                 <Typography variant="body2" color="text.secondary">{user.email}</Typography>
                 <Box sx={{ mt: 2, mb: 1 }}>
-                  <Typography variant="subtitle2">XP</Typography>
-                  <LinearProgress variant="determinate" value={xp % 100} sx={{ height: 8, borderRadius: 4 }} />
-                  <Typography variant="caption">Level {Math.floor(xp / 100) + 1} • {xp} XP</Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 1 }}>
+                    <StarIcon sx={{ color: '#FFD700', fontSize: '1.2rem' }} />
+                    <Typography variant="subtitle2">{userStats.totalStars} Stars</Typography>
+                  </Box>
+                  <LinearProgress variant="determinate" value={userStats.progress * 100} sx={{ height: 8, borderRadius: 4 }} />
+                  <Typography variant="caption">Level {userStats.level} {userStats.title} • {userStats.starsToNext} to next</Typography>
                 </Box>
                 <Chip label={`🔥 ${streak}-day streak`} color="warning" size="small" sx={{ mb: 2 }} />
               </Box>
             </CardContent>
+          </Card>
+
+          {/* Minimal Game Stats */}
+          <Card sx={{ p: 2 }}>
+            <Grid container spacing={2} sx={{ textAlign: 'center' }}>
+              <Grid item xs={4}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{userStats.puzzlesSolved}</Typography>
+                <Typography variant="caption" color="text.secondary">Solved</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{userStats.perfectSolutions}</Typography>
+                <Typography variant="caption" color="text.secondary">Perfect</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{userStats.totalStars}</Typography>
+                <Typography variant="caption" color="text.secondary">Stars</Typography>
+              </Grid>
+            </Grid>
           </Card>
         </Box>
 

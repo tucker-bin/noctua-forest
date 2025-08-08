@@ -24,6 +24,16 @@ export interface UserUsage {
   favoriteModels: string[];
 }
 
+export interface UserGameStats {
+  totalStars: number;
+  puzzlesSolved: number;
+  perfectSolutions: number; // 3-star solutions
+  currentLevel: number;
+  starsToNextLevel: number;
+  achievements: string[];
+  lastPlayedDate?: Date;
+}
+
 export interface ModelUsageStats {
   modelId: string;
   tokensUsed: number;

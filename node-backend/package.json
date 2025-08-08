@@ -24,7 +24,6 @@
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
     "express": "^4.19.2",
     "express-rate-limit": "^7.3.1",
     "firebase-admin": "^12.1.1",

@@ -1,21 +1,3 @@
-import dotenv from 'dotenv';
-import path from 'path';
-
-// Load environment variables - try multiple possible locations
-const envPaths = [
-  path.resolve(__dirname, '../../.env'), // project root
-  path.resolve(__dirname, '../.env'),    // node-backend parent
-  path.resolve(__dirname, '.env'),       // node-backend/src
-];
-
-for (const envPath of envPaths) {
-  const result = dotenv.config({ path: envPath });
-  if (!result.error) {
-    console.log(`Environment loaded from: ${envPath}`);
-    break;
-  }
-}
-
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import compression from 'compression';
@@ -23,21 +5,19 @@ import cookieParser from 'cookie-parser';
 import { logger } from './utils/logger';
 import apiRouter from './routes/api';
 import userRouter from './routes/userRoutes';
-import adminRouter from './routes/adminRoutes';
-import stripeRouter from './routes/stripeRoutes';
-import metricsRouter from './routes/metricsRoutes';
 import lessonRouter from './routes/lessonRoutes';
 import analysisRouter from './routes/analysisRoutes';
-import paymentRouter from './routes/paymentRoutes';
-import batchRouter from './routes/batchRoutes';
-import privacyRouter from './routes/privacyRoutes';
+import puzzleRouter from './routes/puzzleRoutes';
 import { errorHandler } from './middleware/errorHandler';
 import './config/i18n';
 import { i18nMiddleware } from './config/i18n';
 
+// The application now assumes environment variables are set externally,
+// both for local development and in production. There is no more .env file loading.
+
 const app = express();
-app.set('trust proxy', 1); // Trust Docker/Nginx proxy for correct IP handling
 const port = process.env.PORT || 3001;
+app.set('trust proxy', 1); // Trust Docker/Nginx proxy for correct IP handling
 
 // --- Core Middleware ---
 const allowedOrigins = [
@@ -78,14 +58,15 @@ app.use(express.json());
 // --- Route Definitions ---
 app.use('/api', apiRouter);
 app.use('/api', userRouter);
-app.use('/api/admin', adminRouter);
-app.use('/api/stripe', stripeRouter);
-app.use('/api/metrics', metricsRouter);
-app.use('/api/lessons', lessonRouter);
-app.use('/api/analysis', analysisRouter);
-app.use('/api/payment', paymentRouter);
-app.use('/api/batch', batchRouter);
-app.use('/api/privacy', privacyRouter);
+// app.use('/api/admin', adminRouter);
+// app.use('/api/stripe', stripeRouter);
+// app.use('/api/metrics', metricsRouter);
+app.use('/api/lessons', lessonRouter); // Keep for now, may contain engine logic
+app.use('/api/analysis', analysisRouter); // Keep for now, may contain engine logic
+// app.use('/api/payment', paymentRouter);
+// app.use('/api/batch', batchRouter);
+// app.use('/api/privacy', privacyRouter);
+app.use('/api/puzzles', puzzleRouter); // Use the new puzzle router
 
 // Health check endpoint
 app.get('/health', (req, res) => {

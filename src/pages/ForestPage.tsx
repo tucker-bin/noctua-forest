@@ -1,21 +1,17 @@
 import React, { useState } from 'react';
 import { Box, Container, Tabs, Tab, Typography, Card, CardContent, Grid, Button, useTheme } from '@mui/material';
 import { CommunityForest } from '../components/social/CommunityForest';
-import Observatory from '../components/Observatory/Observatory';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import TelescopeIcon from '@mui/icons-material/Visibility';
 import GroupsIcon from '@mui/icons-material/Groups';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
-import AudiotrackIcon from '@mui/icons-material/Audiotrack';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { log } from '../utils/logger';
-import { Scriptorium } from '../components/Scriptorium/Scriptorium';
-import { FlowFinderHub } from '../components/features/FlowFinderHub';
 import { useExperience } from '../contexts/ExperienceContext';
+import RhymeMahjong from '../components/features/RhymeMahjong';
 
 // Mock data - in real app this would come from API
 const mockAnalyses = [
@@ -106,35 +102,35 @@ const ForestAreaCard = ({ title, description, icon, isActive, onClick, theme }: 
       sx={{
         cursor: 'pointer',
         background: isActive 
-          ? `linear-gradient(135deg, ${theme.palette.forest.primary}50 0%, ${theme.palette.forest.card}F0 100%)`
-          : `linear-gradient(135deg, ${theme.palette.forest.card}CC 0%, ${theme.palette.forest.card}99 100%)`,
+          ? `linear-gradient(135deg, ${theme.palette.primary.dark}50 0%, ${theme.palette.background.paper}F0 100%)`
+          : `linear-gradient(135deg, ${theme.palette.background.paper}CC 0%, ${theme.palette.background.paper}99 100%)`,
         backdropFilter: 'blur(10px)',
         border: isActive 
-          ? `2px solid ${theme.palette.forest.primary}`
-          : `1px solid ${theme.palette.forest.border}40`,
+          ? `2px solid ${theme.palette.primary.main}`
+          : `1px solid ${theme.palette.divider}40`,
         transition: 'all 0.3s ease',
         height: '100%',
         boxShadow: isActive
-          ? `0 0 20px ${theme.palette.forest.primary}40`
+          ? `0 0 20px ${theme.palette.primary.light}40`
           : '0 4px 12px rgba(0, 0, 0, 0.1)',
         '&:hover': {
-          border: `1px solid ${theme.palette.forest.primary}99`,
+          border: `1px solid ${theme.palette.primary.light}99`,
           transform: 'translateY(-2px)',
-          boxShadow: `0 6px 16px ${theme.palette.forest.primary}30`,
-          background: `linear-gradient(135deg, ${theme.palette.forest.primary}30 0%, ${theme.palette.forest.card}E6 100%)`,
+          boxShadow: `0 6px 16px ${theme.palette.primary.light}30`,
+          background: `linear-gradient(135deg, ${theme.palette.primary.dark}30 0%, ${theme.palette.background.paper}E6 100%)`,
         },
       }}
       onClick={onClick}
     >
       <CardContent sx={{ textAlign: 'center', p: 3 }}>
-        <Box sx={{ mb: 2, color: theme.palette.forest.secondary, fontSize: '3rem' }}>
+        <Box sx={{ mb: 2, color: theme.palette.secondary.main, fontSize: '3rem' }}>
           {icon}
         </Box>
         <Typography 
           variant="h6" 
           gutterBottom 
           sx={{ 
-            color: isActive ? theme.palette.forest.primary : 'text.primary',
+            color: isActive ? theme.palette.primary.main : 'text.primary',
             fontFamily: '"Noto Sans", sans-serif',
             fontWeight: 600
           }}
@@ -160,12 +156,12 @@ export const ForestPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { currentUser } = useAuth();
   const { achievements } = useExperience();
-  const [activeArea, setActiveArea] = useState<'overview' | 'observatory' | 'community' | 'pathways' | 'scriptorium' | 'games' | 'achievements'>('overview');
+  const [activeArea, setActiveArea] = useState<'overview' | 'community' | 'pathways' | 'games' | 'achievements'>('overview');
 
   // Handle URL parameters for deep linking
   React.useEffect(() => {
     const area = searchParams.get('area');
-    if (area && ['observatory', 'community', 'pathways', 'scriptorium', 'games', 'achievements'].includes(area)) {
+    if (area && ['community', 'pathways', 'games', 'achievements'].includes(area)) {
       setActiveArea(area as any);
     }
   }, [searchParams]);
@@ -192,12 +188,6 @@ export const ForestPage: React.FC = () => {
 
   const forestAreas = [
     {
-      id: 'observatory',
-      title: t('forest.areas.observatory', 'Observatory'),
-      description: t('forest.areas.observatory_desc', 'Discover patterns hidden in text under the starlit canopy'),
-      icon: <TelescopeIcon fontSize="inherit" />
-    },
-    {
       id: 'community',
       title: t('forest.areas.community', 'Community Forest'),
       description: t('forest.areas.community_desc', 'Share discoveries and connect with fellow observers'),
@@ -208,12 +198,6 @@ export const ForestPage: React.FC = () => {
       title: t('forest.areas.pathways', 'Learning Pathways'),
       description: t('forest.areas.pathways_desc', 'Follow guided trails to deepen your observation skills'),
       icon: <AutoStoriesIcon fontSize="inherit" />
-    },
-    {
-      id: 'scriptorium',
-      title: t('forest.areas.scriptorium', 'Song Scriptorium'),
-      description: t('forest.areas.scriptorium_desc', 'Discover patterns in music and lyrics'),
-      icon: <AudiotrackIcon fontSize="inherit" />
     },
     {
       id: 'games',
@@ -233,7 +217,7 @@ export const ForestPage: React.FC = () => {
     <Box 
       sx={{ 
         minHeight: '100vh',
-        bgcolor: theme.palette.forest.background,
+        bgcolor: theme.palette.background.default,
         pt: { xs: 2, sm: 4 },
         display: 'flex',
         flexDirection: 'column',
@@ -256,10 +240,10 @@ export const ForestPage: React.FC = () => {
                   variant="h1"
                   sx={{
                     fontWeight: 700,
-                    color: theme.palette.forest.primary,
+                    color: theme.palette.primary.main,
                     fontFamily: '"Noto Sans", sans-serif',
                     mb: 2,
-                    background: `linear-gradient(45deg, ${theme.palette.forest.primary}, ${theme.palette.forest.secondary})`,
+                    background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
@@ -287,21 +271,21 @@ export const ForestPage: React.FC = () => {
                   <Button
                     variant="contained"
                     size="large"
-                    onClick={() => setActiveArea('observatory')}
-                    startIcon={<TelescopeIcon />}
+                    onClick={() => setActiveArea('games')}
+                    startIcon={<ExtensionIcon />}
                     sx={{
-                      background: `linear-gradient(45deg, ${theme.palette.forest.primary}, ${theme.palette.forest.secondary})`,
-                      color: 'black',
+                      background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                      color: 'white',
                       fontWeight: 600,
                       px: 4,
                       py: 1.5,
                       fontSize: '1.1rem',
                       '&:hover': {
-                        background: `linear-gradient(45deg, ${theme.palette.forest.secondary}, ${theme.palette.forest.primary})`,
+                        background: `linear-gradient(45deg, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
                       },
                     }}
                   >
-                    {t('forest.start_observing', 'Begin Observing')}
+                    {t('forest.start_playing', 'Play Now')}
                   </Button>
                   {!currentUser && (
                     <Button
@@ -309,15 +293,15 @@ export const ForestPage: React.FC = () => {
                       size="large"
                       onClick={() => navigate('/signup')}
                       sx={{
-                        borderColor: theme.palette.forest.blue,
-                        color: theme.palette.forest.blue,
+                        borderColor: theme.palette.info.main,
+                        color: theme.palette.info.main,
                         fontWeight: 600,
                         px: 4,
                         py: 1.5,
                         fontSize: '1.1rem',
                         '&:hover': {
-                          borderColor: theme.palette.forest.blue,
-                          backgroundColor: `${theme.palette.forest.blue}20`,
+                          borderColor: theme.palette.info.main,
+                          backgroundColor: `${theme.palette.info.light}20`,
                         },
                       }}
                     >
@@ -331,15 +315,15 @@ export const ForestPage: React.FC = () => {
                       onClick={() => navigate('/lessons')}
                       startIcon={<AutoStoriesIcon />}
                       sx={{
-                        borderColor: theme.palette.forest.blue,
-                        color: theme.palette.forest.blue,
+                        borderColor: theme.palette.info.main,
+                        color: theme.palette.info.main,
                         fontWeight: 600,
                         px: 4,
                         py: 1.5,
                         fontSize: '1.1rem',
                         '&:hover': {
-                          borderColor: theme.palette.forest.blue,
-                          backgroundColor: `${theme.palette.forest.blue}20`,
+                          borderColor: theme.palette.info.main,
+                          backgroundColor: `${theme.palette.info.light}20`,
                         },
                       }}
                     >
@@ -395,9 +379,9 @@ export const ForestPage: React.FC = () => {
               textAlign: 'center', 
               mt: 8,
               p: 4,
-              background: `${theme.palette.forest.card}66`,
+              background: `${theme.palette.background.paper}66`,
               borderRadius: 2,
-              border: `1px solid ${theme.palette.forest.border}40`
+              border: `1px solid ${theme.palette.divider}40`
             }}>
               <Typography
                 variant="h6"
@@ -408,44 +392,19 @@ export const ForestPage: React.FC = () => {
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
                 <Box>
-                  <Typography variant="h4" color={theme.palette.forest.secondary} fontWeight="bold">14</Typography>
+                  <Typography variant="h4" color={theme.palette.secondary.main} fontWeight="bold">14</Typography>
                   <Typography variant="body2" color="text.secondary">{t('forest.languages_supported', 'Languages')}</Typography>
                 </Box>
                 <Box>
-                  <Typography variant="h4" color={theme.palette.forest.secondary} fontWeight="bold">20+</Typography>
+                  <Typography variant="h4" color={theme.palette.secondary.main} fontWeight="bold">20+</Typography>
                   <Typography variant="body2" color="text.secondary">{t('forest.pattern_types', 'Pattern Types')}</Typography>
                 </Box>
                 <Box>
-                  <Typography variant="h4" color={theme.palette.forest.secondary} fontWeight="bold">∞</Typography>
+                  <Typography variant="h4" color={theme.palette.secondary.main} fontWeight="bold">∞</Typography>
                   <Typography variant="body2" color="text.secondary">{t('forest.discoveries_await', 'Discoveries')}</Typography>
                 </Box>
               </Box>
             </Box>
-          </>
-        )}
-
-        {/* Observatory Area */}
-        {activeArea === 'observatory' && (
-          <>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-              <Button
-                onClick={() => setActiveArea('overview')}
-                sx={{ mr: 2, color: theme.palette.forest.accent }}
-              >
-                ← {t('forest.back_to_forest', 'Back to Forest')}
-              </Button>
-              <Typography
-                variant="h4"
-                sx={{
-                  color: theme.palette.forest.primary,
-                  fontFamily: '"Noto Sans", sans-serif',
-                  fontWeight: 600
-                }}
-              >
-                🔭 {t('forest.areas.observatory', 'Observatory')}
-              </Typography>
-            </Box>
-            <Observatory />
           </>
         )}
 
@@ -455,14 +414,14 @@ export const ForestPage: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
               <Button
                 onClick={() => setActiveArea('overview')}
-                sx={{ mr: 2, color: theme.palette.forest.accent }}
+                sx={{ mr: 2, color: theme.palette.secondary.main }}
               >
                 ← {t('forest.back_to_forest', 'Back to Forest')}
               </Button>
               <Typography
                 variant="h4"
                 sx={{
-                  color: theme.palette.forest.primary,
+                  color: theme.palette.primary.main,
                   fontFamily: '"Noto Sans", sans-serif',
                   fontWeight: 600
                 }}
@@ -482,53 +441,28 @@ export const ForestPage: React.FC = () => {
           </>
         )}
 
-        {/* Scriptorium Area */}
-        {activeArea === 'scriptorium' && (
-          <>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-              <Button
-                onClick={() => setActiveArea('overview')}
-                sx={{ mr: 2, color: theme.palette.forest.accent }}
-              >
-                ← {t('forest.back_to_forest', 'Back to Forest')}
-              </Button>
-              <Typography
-                variant="h4"
-                sx={{
-                  color: theme.palette.forest.primary,
-                  fontFamily: '"Noto Sans", sans-serif',
-                  fontWeight: 600
-                }}
-              >
-                🎵 {t('forest.areas.scriptorium', 'Song Scriptorium')}
-              </Typography>
-            </Box>
-            <Scriptorium />
-          </>
-        )}
-
         {/* Game Grove Area */}
         {activeArea === 'games' && (
           <>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
               <Button
                 onClick={() => setActiveArea('overview')}
-                sx={{ mr: 2, color: theme.palette.forest.accent }}
+                sx={{ mr: 2, color: theme.palette.secondary.main }}
               >
                 ← {t('forest.back_to_forest', 'Back to Forest')}
               </Button>
               <Typography
                 variant="h4"
                 sx={{
-                  color: theme.palette.forest.primary,
+                  color: theme.palette.primary.main,
                   fontFamily: '"Noto Sans", sans-serif',
                   fontWeight: 600
                 }}
               >
-                🧩 {t('forest.areas.games', 'Game Grove')}
+                🧩 {t('forest.areas.games', 'Rhyme Mahjong')}
               </Typography>
             </Box>
-            <FlowFinderHub />
+            <RhymeMahjong />
           </>
         )}
 
@@ -538,14 +472,14 @@ export const ForestPage: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
               <Button
                 onClick={() => setActiveArea('overview')}
-                sx={{ mr: 2, color: theme.palette.forest.accent }}
+                sx={{ mr: 2, color: theme.palette.secondary.main }}
               >
                 ← {t('forest.back_to_forest', 'Back to Forest')}
               </Button>
               <Typography
                 variant="h4"
                 sx={{
-                  color: theme.palette.forest.primary,
+                  color: theme.palette.primary.main,
                   fontFamily: '"Noto Sans", sans-serif',
                   fontWeight: 600
                 }}
@@ -566,11 +500,11 @@ export const ForestPage: React.FC = () => {
                   <Card
                     sx={{
                       background: achievement.unlocked
-                        ? `linear-gradient(135deg, ${theme.palette.forest.secondary}40 0%, ${theme.palette.forest.card}F0 100%)`
-                        : `${theme.palette.forest.card}66`,
+                        ? `linear-gradient(135deg, ${theme.palette.secondary.light}40 0%, ${theme.palette.background.paper}F0 100%)`
+                        : `${theme.palette.background.paper}66`,
                       border: achievement.unlocked
-                        ? `2px solid ${theme.palette.forest.secondary}`
-                        : `1px solid ${theme.palette.forest.border}40`,
+                        ? `2px solid ${theme.palette.secondary.main}`
+                        : `1px solid ${theme.palette.divider}40`,
                       opacity: achievement.unlocked ? 1 : 0.6,
                       position: 'relative',
                       overflow: 'visible'
@@ -587,8 +521,8 @@ export const ForestPage: React.FC = () => {
                         {achievement.description}
                       </Typography>
                       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
-                        <EmojiEventsIcon sx={{ color: theme.palette.forest.secondary, fontSize: 16 }} />
-                        <Typography variant="caption" color={theme.palette.forest.secondary}>
+                        <EmojiEventsIcon sx={{ color: theme.palette.secondary.main, fontSize: 16 }} />
+                        <Typography variant="caption" color={theme.palette.secondary.main}>
                           {achievement.xpReward} XP
                         </Typography>
                       </Box>
@@ -607,7 +541,7 @@ export const ForestPage: React.FC = () => {
                           width: 24,
                           height: 24,
                           borderRadius: '50%',
-                          background: theme.palette.forest.secondary,
+                          background: theme.palette.secondary.main,
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',

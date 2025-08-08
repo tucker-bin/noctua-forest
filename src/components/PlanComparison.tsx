@@ -27,7 +27,13 @@ import {
   School as SchoolIcon,
   Token as TokenIcon,
   EmojiEvents as TrophyIcon,
-  LocalFireDepartment as StreakIcon
+  LocalFireDepartment as StreakIcon,
+  Science as ResearchIcon,
+  Business as BusinessIcon,
+  School as EducationIcon,
+  Api as ApiIcon,
+  Dataset as DataIcon,
+  Analytics as AnalyticsIcon
 } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
@@ -46,67 +52,55 @@ interface PlanFeature {
 
 const PLAN_FEATURES: PlanFeature[] = [
   {
-    name: 'Daily Token Allowance',
-    free: '5 tokens',
-    premium: '20 tokens',
+    name: 'Daily Observatory Analysis',
+    free: '5 analyses',
+    premium: '50 analyses',
     icon: <TokenIcon />,
     highlight: true
   },
   {
-    name: 'Observatory Analysis',
-    free: 'Basic patterns',
-    premium: 'Advanced patterns + AI insights',
+    name: 'Pattern Database Access',
+    free: 'Basic patterns only',
+    premium: 'Full linguistic database',
     icon: <PsychologyIcon />,
     highlight: true
   },
   {
-    name: 'Scriptorium (Music Tool)',
-    free: 'Demo mode only',
-    premium: 'Full access + lyrics lookup',
-    icon: <SpeedIcon />,
+    name: 'Analysis History & Export',
+    free: false,
+    premium: 'Unlimited saves + CSV export',
+    icon: <AnalyticsIcon />,
     highlight: true
   },
   {
-    name: 'Analysis History',
+    name: 'API Access',
     free: false,
-    premium: 'Unlimited saves',
-    icon: <CheckIcon />
+    premium: '1,000 API calls/month',
+    icon: <ApiIcon />
   },
   {
-    name: 'XP & Achievement Bonuses',
-    free: 'Standard rates',
-    premium: '2x XP + exclusive achievements',
+    name: 'Corpus Contribution Rewards',
+    free: 'Basic recognition',
+    premium: 'Revenue sharing program',
     icon: <TrophyIcon />,
     highlight: true
   },
   {
-    name: 'Streak Rewards',
-    free: 'Basic rewards',
-    premium: 'Premium bonuses + token gifts',
-    icon: <StreakIcon />
-  },
-  {
-    name: 'Token Gifting',
+    name: 'Research Tools',
     free: false,
-    premium: 'Gift tokens to other users',
-    icon: <GroupsIcon />
-  },
-  {
-    name: 'Learning Paths',
-    free: 'Basic lessons',
-    premium: 'Advanced courses + personalized',
+    premium: 'Advanced analytics + insights',
     icon: <SchoolIcon />
   },
   {
-    name: 'Community Features',
-    free: 'View public observations',
-    premium: 'Share, comment, collaborate',
-    icon: <GroupsIcon />
+    name: 'Data Licensing Discounts',
+    free: false,
+    premium: '25% off corpus licenses',
+    icon: <DataIcon />
   },
   {
     name: 'Support',
     free: 'Community forums',
-    premium: 'Priority email support',
+    premium: 'Priority research support',
     icon: <CheckIcon />
   }
 ];
