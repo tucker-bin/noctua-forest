@@ -182,6 +182,7 @@ body {
 .books-section h2 { font-size: 32px; color: var(--text); margin-bottom: 15px; border-bottom: 3px solid var(--brand); padding-bottom: 10px; }
 .book-preview { margin-bottom: 20px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 .book-cover { width: 100%; height: auto; display: block; transition: transform 0.3s ease; }
+.book-preview .book-cover { height: 220px; object-fit: cover; }
 .book-card:hover .book-cover { transform: scale(1.05); }
 .book-description { color: #666; font-size: 14px; margin: 10px 0 20px; line-height: 1.4; }
 .book-card.featured { grid-column: span 2; background: linear-gradient(to right bottom, #fff, #f8f9fa); }
@@ -386,6 +387,7 @@ body {
 .book-title { margin: 0; font-size: 18px; }
 .book-desc { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
 .book-cta { display: flex; gap: 10px; margin-top: 4px; }
+.btn.full { display: block; width: 100%; text-align: center; padding: 14px 16px; }
 
 .btn {
   appearance: none;
