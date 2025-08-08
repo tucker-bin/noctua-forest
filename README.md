@@ -2,12 +2,12 @@
 
 A bare-bones, static, two-page website for selling books and an about page.
 
-- index.html: Books list with buy/preview links
+- books.html: Books list with buy/preview links (site entry)
 - about.html: Short bio and contact
 - styles.css: Simple modern styling
 
 How to use
-- Open `index.html` in your browser
+- Open `books.html` in your browser
 - Edit text, links, and author name directly in the HTML
 
 Deploy options

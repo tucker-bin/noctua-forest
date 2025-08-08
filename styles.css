@@ -48,15 +48,20 @@ body {
 }
 
 .logo-link {
-    font-size: 32px;
-    font-weight: bold;
-    color: #4b3b2f; /* deep brown */
     text-decoration: none;
 }
 
 .tagline {
     color: #666;
     font-size: 16px;
+}
+
+/* Site logo image */
+.site-logo {
+  height: 44px;
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* Navigation */
