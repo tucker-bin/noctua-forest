@@ -21,7 +21,7 @@ images:
 substitutions:
   _SERVICE: 'noctua-forest'
   _REGION: 'us-central1'
-  _REPO: 'web'
+  _REPO: 'my-rhyme-app-images'
 
 options:
   logging: CLOUD_LOGGING_ONLY
