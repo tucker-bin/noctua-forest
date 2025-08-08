@@ -9,7 +9,6 @@ COPY . /usr/share/nginx/html
 # Expose port 8080 for Cloud Run
 EXPOSE 8080
 
-# Nginx listens on 80 by default; map 8080 to 80 inside container
-ENV PORT=8080
-CMD ["/bin/sh", "-c", "sed -i 's/listen 80/listen ${PORT}/g' /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+# Start nginx (config already listens on 8080)
+CMD ["nginx", "-g", "daemon off;"]
 
