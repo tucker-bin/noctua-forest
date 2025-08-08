@@ -208,10 +208,12 @@ body {
 /* Compact copyright footer */
 .mini-footer { background: #3a2f24; color: #fff; padding: 18px 0 22px; margin-top: 60px; }
 .mini-footer .container { text-align: center; font-size: 14px; opacity: 0.95; }
-.mini-footer .footer-brand { font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; color: #fff; }
+.mini-footer .footer-brand { font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; color: #fff; }
 .mini-footer .footer-links { display: flex; gap: 12px; justify-content: center; align-items: center; color: #bdc3c7; font-size: 13px; }
-.mini-footer .footer-links a { color: #bdc3c7; text-decoration: none; }
-.mini-footer .footer-links a:hover { color: #ffffff; text-decoration: underline; }
+.mini-footer a { color: #bdc3c7; text-decoration: none; }
+.mini-footer a:visited { color: #bdc3c7; }
+.mini-footer a:hover { color: #ffffff; text-decoration: underline; }
+.mini-footer .footer-links span { color: #8e8070; }
 
 /* Popup Styles (optional) */
 .popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 10000; transition: opacity 0.3s ease; }
