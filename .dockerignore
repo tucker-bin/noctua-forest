@@ -19,6 +19,8 @@
 !firebase-config.js
 !favicon.ico
 !logo.png
+!privacy.html
+!terms.html
 
 !scripts/
 !scripts/serve.bat
