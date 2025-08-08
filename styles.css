@@ -179,7 +179,7 @@ body {
 
 /* Books Section */
 .books-section { margin-bottom: 60px; }
-.books-section h2 { font-size: 32px; color: #4b3b2f; margin-bottom: 15px; border-bottom: 3px solid #8b5e34; padding-bottom: 10px; }
+.books-section h2 { font-size: 32px; color: var(--text); margin-bottom: 15px; border-bottom: 3px solid var(--brand); padding-bottom: 10px; }
 .book-preview { margin-bottom: 20px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 .book-cover { width: 100%; height: auto; display: block; transition: transform 0.3s ease; }
 .book-card:hover .book-cover { transform: scale(1.05); }
@@ -194,8 +194,8 @@ body {
 .book-card:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
 .book-level { background-color: #f8f9fa; color: #666; padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-bottom: 15px; display: inline-block; }
 .book-card h3 { font-size: 18px; color: #333; margin-bottom: 20px; line-height: 1.4; }
-.buy-button { background-color: #8b5e34; color: #fff; padding: 12px 25px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-transform: lowercase; }
-.buy-button:hover { background-color: #704927; transform: translateY(-2px); }
+.buy-button { background-color: var(--brand); color: #fff; padding: 12px 25px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-transform: lowercase; }
+.buy-button:hover { background-color: var(--brand-strong); transform: translateY(-2px); }
 
 /* Footer */
 .footer { background-color: #3a2f24; color: #fff; padding: 50px 0 20px; margin-top: 80px; }
@@ -293,15 +293,16 @@ body {
   .popup-content { padding: 20px 15px; }
 }
 :root {
-  --bg: #f2e9de;
-  --panel: #faf4ec;
-  --text: #2b2b2b;
-  --muted: #6b6b6b;
-  --brand: #8b5e34;
-  --brand-strong: #704927;
-  --accent: #d4a373;
-  --card: #ffffff;
-  --border: #ddd;
+  /* Neutral, educational palette */
+  --bg: #F5F4EF;
+  --panel: #FFFFFF;
+  --text: #1F2937;
+  --muted: #6B7280;
+  --brand: #335C67;
+  --brand-strong: #234853;
+  --accent: #E09F3E;
+  --card: #FFFFFF;
+  --border: #E5E7EB;
 }
 
 * { box-sizing: border-box; }
@@ -349,7 +350,7 @@ body {
   padding: 8px 10px;
   border-radius: 8px;
 }
-.nav-link.active, .nav-link:hover { color: var(--text); background: rgba(79,140,255,0.08); }
+.nav-link.active, .nav-link:hover { color: var(--text); background: rgba(51,92,103,0.08); }
 
 .hero {
   padding: 56px 0 24px;

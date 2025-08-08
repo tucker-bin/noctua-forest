@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Resident Setup — Simple Checklist</title>
+    <meta name="description" content="Clear steps for new immigrants: bank account, driver's license, housing, and essential vocabulary." />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="header-inner container">
+        <a class="brand" href="books.html">Noctua's Forest</a>
+        <nav class="nav">
+          <a href="books.html" class="nav-link">Books</a>
+          <a href="about.html" class="nav-link">About</a>
+        </nav>
+      </div>
+    </header>
+    <main class="about">
+      <div class="container about-content">
+        <h1>New Resident Setup</h1>
+        <p class="lead">David, this is for you. One step at a time. We are with you.</p>
+        <section class="book-card" style="padding:20px;">
+          <ol id="resident-list" class="book-desc" style="line-height:1.8;">
+            <li><label><input type="checkbox"/> Open a bank account (passport, address, job letter). Ask for a debit card.</label></li>
+            <li><label><input type="checkbox"/> DMV: make an appointment for a driver’s license or state ID.</label></li>
+            <li><label><input type="checkbox"/> Housing: learn key words — lease, deposit, utilities included, proof of income.</label></li>
+            <li><label><input type="checkbox"/> Health: find a nearby pharmacy and urgent care. Save the addresses.</label></li>
+            <li><label><input type="checkbox"/> Phones: buy a SIM or plan. Keep your number safe with account PIN.</label></li>
+            <li><label><input type="checkbox"/> Vocabulary: appointment, statement, paycheck, schedule, landlord.</label></li>
+          </ol>
+          <div class="book-cta">
+            <a class="btn primary" href="la.html">Preview LA Guide</a>
+            <a class="btn" href="books.html">Back</a>
+          </div>
+        </section>
+      </div>
+    </main>
+    <footer class="mini-footer">
+      <div class="container">
+        <div class="footer-brand">TUCKER B. ROBINSON</div>
+        <div class="footer-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <span>|</span>
+          <a href="terms.html">Terms of Service</a>
+        </div>
+      </div>
+    </footer>
+    <script>
+      const list = document.getElementById('resident-list');
+      const key = 'resident_checklist_v1';
+      const saved = JSON.parse(localStorage.getItem(key) || '[]');
+      [...list.querySelectorAll('input[type="checkbox"]')].forEach((cb, i) => {
+        cb.checked = !!saved[i];
+        cb.addEventListener('change', () => {
+          const state = [...list.querySelectorAll('input[type="checkbox"]')].map(x => x.checked);
+          localStorage.setItem(key, JSON.stringify(state));
+        });
+      });
+    </script>
+  </body>
+  </html>
+
+
