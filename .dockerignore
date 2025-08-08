@@ -15,6 +15,9 @@
 !account.html
 !styles.css
 !la_survival_guide.jpg
+!auth.js
+!firebase-config.js
+!favicon.ico
 
 !scripts/
 !scripts/serve.bat

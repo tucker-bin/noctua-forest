@@ -24,31 +24,52 @@
       <section class="hero">
         <div class="container">
           <h1>Account</h1>
-          <p class="subtitle">Stub page — connect authentication later.</p>
+          <p class="subtitle">Sign in to manage your purchases.</p>
         </div>
       </section>
 
       <section class="container" style="padding: 8px 0 56px;">
         <div class="book-card" style="padding: 16px;">
           <h2 style="margin-top: 0;">Sign In</h2>
-          <p class="book-desc">Replace with your auth provider (e.g., Firebase Auth, Clerk, Auth0) when ready.</p>
-          <div class="book-cta" style="margin-top: 12px;">
-            <a class="btn primary" href="#" aria-disabled="true" style="pointer-events:none; opacity:.6;">Continue</a>
+          <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
+            <div style="flex:1; min-width:260px;">
+              <label for="email" style="display:block; font-weight:600; color:#4b3b2f;">Email</label>
+              <input id="email" type="email" placeholder="you@example.com" style="width:100%; padding:10px; border:1px solid #d8cdbf; border-radius:6px; background:#faf4ec;" />
+            </div>
+            <div style="flex:1; min-width:220px;">
+              <label for="password" style="display:block; font-weight:600; color:#4b3b2f;">Password</label>
+              <input id="password" type="password" placeholder="••••••••" style="width:100%; padding:10px; border:1px solid #d8cdbf; border-radius:6px; background:#faf4ec;" />
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button id="email-signin" class="btn">Sign In</button>
+              <button id="email-signup" class="btn">Create Account</button>
+            </div>
+          </div>
+
+          <div style="margin-top:16px; display:flex; gap:8px; align-items:center;">
+            <button id="google-signin" class="btn primary">Continue with Google</button>
+            <button id="signout" class="btn" style="display:none;">Sign Out</button>
+          </div>
+
+          <div id="auth-status" style="margin-top:16px; color:#2b2b2b;"></div>
+          <div class="book-cta" style="margin-top: 16px;">
             <a class="btn" href="books.html">Back to Books</a>
           </div>
         </div>
       </section>
     </main>
 
-    <footer class="site-footer">
+    <footer class="mini-footer">
       <div class="container">
-        <p>© <span id="year"></span> Tucker B. Robinson. All rights reserved.</p>
+        <div class="footer-brand">TUCKER B. ROBINSON</div>
+        <div class="footer-links">
+          <a href="#" aria-label="Privacy Policy">Privacy Policy</a>
+          <span>|</span>
+          <a href="#" aria-label="Terms of Service">Terms of Service</a>
+        </div>
       </div>
     </footer>
-
-    <script>
-      document.getElementById('year').textContent = new Date().getFullYear();
-    </script>
+    <script type="module" src="auth.js"></script>
   </body>
   </html>
 
