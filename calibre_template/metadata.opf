@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="3.0">
+  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
+    <dc:identifier id="BookId">urn:uuid:00000000-0000-0000-0000-000000000000</dc:identifier>
+    <dc:title>Survival Guide</dc:title>
+    <dc:creator opf:role="aut">Tucker B. Robinson</dc:creator>
+    <dc:language>en</dc:language>
+    <!-- No cover set on purpose; add a cover image later if desired -->
+  </metadata>
+  <manifest>
+    <item id="html" href="index.html" media-type="application/xhtml+xml"/>
+    <item id="css" href="styles.css" media-type="text/css"/>
+    <item id="extra" href="extra-css.css" media-type="text/css"/>
+  </manifest>
+  <spine>
+    <itemref idref="html"/>
+  </spine>
+</package>
+
+
