@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Submit Your Book — Noctua Forest</title>
+    <meta name="description" content="Submit your manuscript to engaged readers who appreciate quality storytelling across all genres. Join The Forest community." />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbebcc;
+            color: #2D3748;
+        }
+    </style>
+  </head>
+  <body>
+    <a href="#nav" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to navigation</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to main content</a>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Header/Navigation -->
+        <header class="flex justify-between items-center mb-12">
+            <a href="welcome.html" class="flex items-center space-x-3">
+                <!-- Noctua Forest Logo -->
+                <img src="images/logo.png" alt="Noctua Forest Logo" class="w-10 h-10">
+                <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+            </a>
+            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg" style="font-family: 'Inter', sans-serif;">
+                <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">The Forest</a>
+                <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Submit Book</a>
+                <a href="contributor.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Contribute</a>
+                <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">About</a>
+            </nav>
+        </header>
+
+    <main id="main" class="max-w-4xl mx-auto px-4">
+        <article class="space-y-16">
+            <!-- Hero Section -->
+            <div class="text-center">
+                <h1 class="text-4xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Submit Your Book</h1>
+                <p class="text-xl mb-4" style="color: #4A5450;">Share your story with readers who value thoughtful storytelling.</p>
+                <p class="text-lg" style="color: #4A5450;">We prioritize narrative quality, genre craftsmanship, and meaningful reader engagement across all genres.</p>
+            </div>
+
+        <form id="submissionForm" class="bg-[#4A5450] rounded-xl p-8 text-white space-y-6" novalidate>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="email" class="block font-medium">Your Email</label>
+              <input id="email" name="email" type="email" required placeholder="you@example.com" 
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+            </div>
+            <div class="space-y-2">
+              <label for="author" class="block font-medium">Author Name</label>
+              <input id="author" name="author" type="text" required placeholder="Author Name" 
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="title" class="block font-medium">Book Title</label>
+              <input id="title" name="title" type="text" required placeholder="Book Title" 
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+            </div>
+            <div class="space-y-2">
+              <label for="publisher" class="block font-medium">Publisher (or Self-Published)</label>
+              <input id="publisher" name="publisher" type="text" placeholder="Publisher or Self-Published" 
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="blurb" class="block font-medium">Book Blurb</label>
+            <textarea id="blurb" name="blurb" rows="5" required placeholder="Short description of your book"
+              class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent"></textarea>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="wordCount" class="block font-medium">Word Count</label>
+              <input id="wordCount" name="wordCount" type="number" min="0" inputmode="numeric" placeholder="e.g., 65000" 
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+            </div>
+            <div class="space-y-2">
+              <label for="purchaseLink" class="block font-medium">Book Purchase Link</label>
+              <input id="purchaseLink" name="purchaseLink" type="url" placeholder="https://..." 
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+            </div>
+          </div>
+
+          <!-- Cultural Context Section -->
+          <fieldset class="space-y-6">
+            <legend class="text-lg font-bold mb-4">Cultural Context</legend>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label for="primaryLanguage" class="block font-medium">Primary Language</label>
+                <select id="primaryLanguage" name="primaryLanguage" required
+                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  <option value="">Select language</option>
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                  <option value="it">Italian</option>
+                  <option value="pt">Portuguese</option>
+                  <option value="ja">Japanese</option>
+                  <option value="ko">Korean</option>
+                  <option value="zh">Chinese</option>
+                  <option value="ar">Arabic</option>
+                  <option value="hi">Hindi</option>
+                  <option value="ru">Russian</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              
+              <div class="space-y-2">
+                <label for="originalLanguage" class="block font-medium">Original Language (if translated)</label>
+                <select id="originalLanguage" name="originalLanguage"
+                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  <option value="">Not a translation</option>
+                  <option value="en">English</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                  <option value="de">German</option>
+                  <option value="it">Italian</option>
+                  <option value="pt">Portuguese</option>
+                  <option value="ja">Japanese</option>
+                  <option value="ko">Korean</option>
+                  <option value="zh">Chinese</option>
+                  <option value="ar">Arabic</option>
+                  <option value="hi">Hindi</option>
+                  <option value="ru">Russian</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label for="authorRegion" class="block font-medium">Author's Region</label>
+                <select id="authorRegion" name="authorRegion" required
+                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  <option value="">Select region</option>
+                  <option value="north-america">North America</option>
+                  <option value="south-america">South America</option>
+                  <option value="europe">Europe</option>
+                  <option value="africa">Africa</option>
+                  <option value="asia">Asia</option>
+                  <option value="oceania">Oceania</option>
+                  <option value="middle-east">Middle East</option>
+                </select>
+              </div>
+              
+              <div class="space-y-2">
+                <label for="publicationYear" class="block font-medium">Publication Year</label>
+                <input id="publicationYear" name="publicationYear" type="number" min="1800" max="2030" placeholder="2024"
+                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <label for="culturalThemes" class="block font-medium">Cultural Themes (optional)</label>
+              <input id="culturalThemes" name="culturalThemes" type="text" placeholder="e.g., diaspora, identity, tradition, family heritage"
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+              <p class="text-sm text-gray-300">Themes that reflect cultural experiences or perspectives in your work</p>
+            </div>
+          </fieldset>
+
+          <!-- Genre & Classification Section -->
+          <fieldset class="space-y-6">
+            <legend class="text-lg font-bold mb-4">Genre & Classification</legend>
+            
+            <div class="space-y-2">
+              <label for="authorTags" class="block font-medium">Your Genre Tags</label>
+              <input id="authorTags" name="authorTags" type="text" placeholder="Type tags separated by commas"
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+              <p class="text-sm text-gray-300">Create your own genre tags (e.g., "dark academia, philosophical fiction, coming-of-age")</p>
+              <div id="tagPreview" class="flex flex-wrap gap-2 mt-2"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label for="targetAudience" class="block font-medium">Target Audience (optional)</label>
+                <select id="targetAudience" name="targetAudience"
+                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  <option value="">Not specified</option>
+                  <option value="young-adult">Young Adult</option>
+                  <option value="adult">Adult</option>
+                  <option value="children">Children</option>
+                  <option value="middle-grade">Middle Grade</option>
+                  <option value="new-adult">New Adult</option>
+                </select>
+              </div>
+              
+              <div class="space-y-2">
+                <label for="bookLength" class="block font-medium">Book Length</label>
+                <select id="bookLength" name="bookLength"
+                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  <option value="">Not specified</option>
+                  <option value="short">Short (under 50k words)</option>
+                  <option value="medium">Medium (50k-80k words)</option>
+                  <option value="long">Long (80k+ words)</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="coverUrl" class="block font-medium">Book Cover (URL)</label>
+              <input id="coverUrl" name="coverUrl" type="url" placeholder="https://..."
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+            </div>
+            <div class="space-y-2">
+              <label for="pdfUrl" class="block font-medium">Book (PDF) URL</label>
+              <input id="pdfUrl" name="pdfUrl" type="url" placeholder="https://..."
+                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="contentWarnings" class="block font-medium">Content Warnings (optional)</label>
+            <input id="contentWarnings" name="contentWarnings" type="text" placeholder="e.g., violence, grief"
+              class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+          </div>
+
+          <div class="bg-[#5A6560] rounded-lg p-4 border border-[#7A8580]">
+            <label class="flex items-center space-x-3">
+              <input type="checkbox" id="premiumReview" class="w-5 h-5 rounded border-[#7A8580] bg-[#4A5450] checked:bg-[#F58220]" />
+              <span class="font-bold">Premium Review Service (+$14.99)</span>
+            </label>
+            <p class="text-sm text-gray-300 mt-2">Guaranteed detailed review and priority placement in The Forest.</p>
+          </div>
+
+          <div class="mt-8">
+            <button type="submit" 
+              class="w-full md:w-auto px-8 py-3 bg-[#F58220] hover:bg-[#E67615] text-white font-medium rounded-full transition duration-300">
+              Submit to The Forest
+            </button>
+            <p id="submissionSuccess" class="hidden mt-4 text-green-400">Thank you! Your submission was received.</p>
+          </div>
+        </form>
+      </div>
+    </main>
+
+
+
+    <script>
+      window.__STRIPE_PREMIUM_REVIEW_LINK__ = 'https://buy.stripe.com/test_6oU00b0IK6Fh4f600H3wQ00';
+    </script>
+    <script type="module">
+      import { handleFormSubmission } from './js/formHandler.js';
+      import showAlphaPopup from './components/AlphaPopup.js';
+
+      // Show alpha popup on first visit
+      showAlphaPopup();
+
+      // Initialize form handler
+      handleFormSubmission('submissionForm', 'book');
+
+      // Restore form data if returning from signup
+      const savedFormData = sessionStorage.getItem('savedFormData');
+      if (savedFormData) {
+        const { type, data } = JSON.parse(savedFormData);
+        if (type === 'book') {
+          Object.entries(data).forEach(([key, value]) => {
+            const input = document.getElementById(key);
+            if (input) {
+              if (input.type === 'checkbox') {
+                input.checked = value === 'on';
+              } else {
+                input.value = value;
+              }
+            }
+          });
+          // Clear saved data
+          sessionStorage.removeItem('savedFormData');
+        }
+      }
+    </script>
+  </body>
+</html>
+
+

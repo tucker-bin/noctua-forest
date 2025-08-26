@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Book — Noctua Forest</title>
+    <meta name="description" content="Book profile — Noctua Forest" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body { font-family: 'Inter', sans-serif; background-color: #fbebcc; color: #2D3748; }
+    </style>
+  </head>
+  <body>
+    <header class="shadow-sm">
+      <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <img src="images/logo.png" alt="Noctua Forest logo" class="w-10 h-10">
+          <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+        </div>
+        <div class="hidden md:flex items-center space-x-8" style="font-family: 'Inter', sans-serif;">
+          <a href="forest.html" class="font-medium" style="color:#4A5450;">The Forest</a>
+          <a href="submit.html" class="font-medium" style="color:#4A5450;">Submit Book</a>
+          <a href="contributor.html" class="font-medium" style="color:#4A5450;">Contribute</a>
+          <a href="about.html" class="font-medium" style="color:#4A5450;">About</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-10">
+      <div id="bookContainer" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="md:col-span-1">
+          <div class="w-full bg-[#5A6560]/30 flex items-center justify-center rounded-lg" style="aspect-ratio:3/4;">
+            <img id="bookCover" src="https://placehold.co/480x640/4A5450/E0E2DB?text=Book%20Cover" alt="Book cover" class="max-h-[90%] max-w-[90%] object-contain rounded">
+          </div>
+        </div>
+        <div class="md:col-span-2">
+          <h1 id="bookTitle" class="text-3xl md:text-4xl font-bold mb-2" style="font-family:'Poppins',sans-serif;">Loading…</h1>
+          <p id="bookAuthor" class="text-gray-600 mb-4">By …</p>
+          <div class="flex items-center gap-4 text-sm text-gray-600 mb-6">
+            <span id="bookRating">⭐ –</span>
+            <span id="bookYear">—</span>
+            <span id="bookRegion">—</span>
+            <span id="bookLanguage">—</span>
+          </div>
+          <p id="bookBlurb" class="leading-relaxed mb-6">Fetching book details…</p>
+          <div id="bookTags" class="flex flex-wrap gap-2"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="text-white py-12" style="background-color:#4A5450;">
+      <div class="container mx-auto px-6 text-center">
+        <div class="flex justify-center items-center space-x-4 mb-4">
+          <a href="privacy.html" class="text-gray-300 hover:text-white transition">Privacy Policy</a>
+          <span class="text-gray-500">|</span>
+          <a href="terms.html" class="text-gray-300 hover:text-white transition">Terms of Service</a>
+        </div>
+        <p>&copy; 2024 Noctua Forest. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script type="module" src="book.js"></script>
+  </body>
+  </html>
+
+

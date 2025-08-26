@@ -1,37 +1,41 @@
-# Minimal Author Site
+# Noctua Forest — Curated Book Discovery Platform
 
-A bare-bones, static, two-page website for selling books and an about page.
+This repository contains the public website for Noctua Forest, a curated book discovery platform.
 
-- books.html: Books list with buy/preview links (site entry)
-- about.html: Short bio and contact
-- styles.css: Simple modern styling
+Audience: Authors across all genres seeking engaged readers and readers who value thoughtful storytelling. The platform facilitates manuscript submissions, quality curation, and author-reader connections.
 
-How to use
-- Open `books.html` in your browser
-- Edit text, links, and author name directly in the HTML
+Website structure
+- `welcome.html`: landing page with CTAs to The Forest and submission
+- `forest.html`: book discovery community (The Forest)
+- `submit.html`: book submission form with optional premium review
+- `contributor.html`: contributor application form for writers and industry professionals
+- `newsletter.html`: newsletter signup with redirect to forest
+- `about.html`: mission, contact, imprint
+- `styles.css`: typography and layout
+- Assets: images, icons, logo
 
-Deploy options
-- Google Cloud Run (recommended): use Cloud Build trigger on push to `main`
-- Netlify/Vercel: drag-and-drop the folder
-- Any static host: upload the files
+Tooling (production)
+- Hosting: Google Cloud Run (containerized static site)
+- CI/CD: Cloud Build trigger on push to `main` using `cloudbuild.yaml`
+- Web server: Nginx with `nginx.conf` (serves `welcome.html` as index)
+- Container: `Dockerfile`, `.dockerignore`, `.gcloudignore`
 
-Notes
-- No build tools, frameworks, or dependencies
-- Replace placeholder links and copy
+Operational notes
+- Premium review service ($14.99) integrates with Stripe Payment Links for book submissions
+- Newsletter, book submissions, and contributor applications save to Firebase Firestore collections
+- Community features include book discovery, genre filtering, author submissions, and contributor applications
+- Contributors can link Medium profiles and submit articles via document upload
+- Accessibility: semantic headings, high‑contrast palette, responsive images, mobile optimization
 
-Scripts (Windows)
-- `scripts\serve.bat`: start a local server on http://localhost:8080 and open Books
+Local preview
+- Windows: `scripts\serve.bat` starts a local server at http://localhost:8080 and opens Welcome page.
 
-Cloud Run deployment
-- Files added: `Dockerfile`, `nginx.conf`, `cloudbuild.yaml`, `.gcloudignore`.
-- Setup once:
-  - Create an Artifact Registry repo (name matches `_REPO` in `cloudbuild.yaml`, default `web`).
-  - Create a Cloud Build trigger for this repo on pushes to `main`, with substitutions:
-    - `_SERVICE=noctua-forest`, `_REGION=us-central1`, `_REPO=web`
-  - Enable Cloud Run, Cloud Build, Artifact Registry APIs.
-- Deploy: push to `main` to build+deploy automatically.
+Deployment
+1. Ensure Cloud Run, Cloud Build, and Artifact Registry are enabled.
+2. Create an Artifact Registry repo (matches `_REPO` in `cloudbuild.yaml`).
+3. Create a Cloud Build trigger for branch `main` and set substitutions:
+   - `_SERVICE=noctua-forest`, `_REGION=us-central1`, `_REPO=<your-repo>`
+4. Push to `main` → Cloud Build builds and deploys to Cloud Run.
 
-Stub pages
-- `checkout.html`: placeholder for future payment flow; currently shows a disabled button and link back to Books. Replace with your cart/checkout integration.
-- `newsletter.html`: placeholder for mailing list. Swap the stub form with your provider embed (e.g., Mailchimp/ConvertKit).
-- `account.html`: placeholder for authentication. Replace with your auth provider (e.g., Firebase/Auth0/Clerk) when ready.
+Contact
+- For partnerships, manuscript submissions, and platform questions, email support@noctuaforest.com

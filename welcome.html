@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noctua Forest - Redesigned</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'forest': {
+                'deep': '#fbebcc',
+                'card': '#4A5450',
+                'light': '#E0E2DB',
+                'accent': '#F58220',
+                'secondary': '#5A6560'
+              }
+            },
+            fontFamily: {
+              'sans': ['Inter', 'sans-serif'],
+              'heading': ['Poppins', 'serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            /* Switched to Noto Sans for body text */
+            font-family: 'Noto Sans', sans-serif;
+            background-color: #fbebcc;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        main {
+            flex: 1;
+        }
+        .font-heading {
+            /* Switched to Noto Serif for headings */
+            font-family: 'Noto Serif', serif;
+        }
+        .hero-bg {
+            background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <header class="flex justify-between items-center">
+            <a href="welcome.html" class="flex items-center space-x-3">
+                <!-- Noctua Forest Logo -->
+                <img src="images/logo.png" alt="Noctua Forest Logo" class="w-10 h-10">
+                <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+            </a>
+            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg" style="font-family: 'Inter', sans-serif;">
+                <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">The Forest</a>
+                <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Submit Book</a>
+                <a href="contributor.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Contribute</a>
+                <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">About</a>
+            </nav>
+        </header>
+    </div>
+
+    <!-- Hero Section -->
+    <main>
+        <section class="hero-bg w-full">
+            <div class="bg-black/60 text-white">
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold font-heading mb-4">Welcome to <span class="text-[#F9A825]">Noctua Forest</span></h1>
+                    <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">For the writers who burn the midnight oil. Share your manuscript or discover your next great read.</p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="forest.html" class="bg-[#F58220] hover:bg-[#E0751C] text-white font-bold py-3 px-8 rounded-lg transition duration-300 shadow-lg">Explore</a>
+                        <a href="submit.html" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-bold py-3 px-8 rounded-lg transition duration-300 border border-white/50">Submit Your Book</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Join Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="bg-[#4A5450] rounded-xl p-8 text-white max-w-2xl mx-auto">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">Nightly Wisdom</h2>
+                    <p class="text-lg text-gray-300 mb-8">Subscribe for publishing insights, author spotlights, and creative inspiration delivered to your inbox.</p>
+                    <form action="newsletter.html" method="get" class="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-md mx-auto">
+                        <input type="email" placeholder="Enter your email" 
+                            class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                        <button type="submit" 
+                            class="w-full sm:w-auto bg-[#F58220] hover:bg-[#E67615] text-white font-bold py-3 px-8 rounded-full transition duration-300">
+                            Subscribe
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-white py-12" style="background-color: #4A5450;">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex justify-center items-center space-x-4 mb-4">
+                <a href="privacy.html" class="text-gray-300 hover:text-white transition duration-300">Privacy Policy</a>
+                <span class="text-gray-500">|</span>
+                <a href="terms.html" class="text-gray-300 hover:text-white transition duration-300">Terms of Service</a>
+            </div>
+            <p>&copy; 2025 Noctua Forest. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Firebase -->
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+      import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+      import firebaseConfig from './firebase-config.js';
+      import showAlphaPopup from './components/AlphaPopup.js';
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      // Show alpha popup
+      showAlphaPopup();
+    </script>
+</body>
+</html>

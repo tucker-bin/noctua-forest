@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Forest — Noctua Forest</title>
+    <meta name="description" content="The Forest is an international book discovery community. Submit your book and find stories from around the world." />
+    <meta property="og:title" content="The Forest — Noctua Forest" />
+    <meta property="og:description" content="Discover and submit books in our international community." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="theme-color" content="#222725" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbebcc;
+            color: #E0E2DB;
+        }
+        .bg-forest-deep { background-color: #fbebcc; }
+        .bg-forest-card { background-color: #4A5450; }
+        .text-forest-light { color: #E0E2DB; }
+        .text-forest-accent { color: #F58A51; }
+        .border-forest-accent { border-color: #F58A51; }
+        .bg-forest-accent { background-color: #F58A51; }
+        .bg-forest-accent-hover:hover { background-color: #E47941; }
+        .bg-forest-secondary { background-color: #5A6560; }
+        .bg-forest-secondary-hover:hover { background-color: #6A7570; }
+        .form-select, .form-input {
+            background-color: #5A6560;
+            border-color: #7A8580;
+        }
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: #F58A51;
+            box-shadow: 0 0 0 2px rgba(245, 138, 81, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-forest-deep text-forest-light">
+    <a href="#nav" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to navigation</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to main content</a>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Header/Navigation -->
+        <header class="flex justify-between items-center mb-12">
+            <a href="welcome.html" class="flex items-center space-x-3">
+                <!-- Noctua Forest Logo -->
+                <img src="images/logo.png" alt="Noctua Forest Logo" class="w-10 h-10">
+                <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+            </a>
+            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg" style="font-family: 'Inter', sans-serif;">
+                <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Submit Book</a>
+                <a href="contributor.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Contribute</a>
+                <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">About</a>
+            </nav>
+            <button class="md:hidden" onclick="toggleMobileMenu()">
+                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </header>
+
+
+
+        <!-- Search & Filter Section -->
+        <section id="forest" class="bg-forest-card p-6 sm:p-8 rounded-2xl shadow-2xl mb-16">
+            <div class="flex items-center space-x-3 mb-6">
+                <svg class="w-6 h-6 text-forest-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <h2 class="text-xl font-semibold text-white">Find your path through the forest...</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Search Input -->
+                <div class="md:col-span-2">
+                    <input type="text" id="search" placeholder="Search books, authors, or themes..." class="form-input w-full p-3 rounded-lg text-forest-light border-2 border-transparent focus:border-forest-accent focus:ring-0 transition-colors duration-300">
+                </div>
+                <!-- Language Filter -->
+                <div>
+                    <label for="language" class="sr-only">Language</label>
+                    <select id="language" class="form-select w-full p-3 rounded-lg text-forest-light border-2 border-transparent focus:border-forest-accent focus:ring-0 transition-colors duration-300">
+                        <option value="">All Languages</option>
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                        <option value="ja">Japanese</option>
+                        <option value="ko">Korean</option>
+                        <option value="zh">Chinese</option>
+                        <option value="ar">Arabic</option>
+                        <option value="hi">Hindi</option>
+                        <option value="ru">Russian</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <!-- Region Filter -->
+                <div>
+                    <label for="region" class="sr-only">Region</label>
+                    <select id="region" class="form-select w-full p-3 rounded-lg text-forest-light border-2 border-transparent focus:border-forest-accent focus:ring-0 transition-colors duration-300">
+                        <option value="">All Regions</option>
+                        <option value="north-america">North America</option>
+                        <option value="south-america">South America</option>
+                        <option value="europe">Europe</option>
+                        <option value="africa">Africa</option>
+                        <option value="asia">Asia</option>
+                        <option value="oceania">Oceania</option>
+                        <option value="middle-east">Middle East</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Sort and Active Filters Row -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mt-6 space-y-4 md:space-y-0">
+                <div class="w-full md:w-auto">
+                    <select id="sort" class="form-select w-full md:w-auto p-3 rounded-lg text-forest-light border-2 border-transparent focus:border-forest-accent focus:ring-0 transition-colors duration-300">
+                        <option value="recent">Most Recent</option>
+                        <option value="popular">Most Popular</option>
+                        <option value="rating">Highest Rated</option>
+                        <option value="random">Random Discovery</option>
+                    </select>
+                </div>
+                
+                <div id="activeFilters" class="hidden flex-wrap gap-2">
+                    <span class="text-sm text-gray-300">Active filters:</span>
+                    <div class="filter-tags flex flex-wrap gap-2"></div>
+                    <button onclick="clearAllFilters()" class="text-sm text-forest-accent hover:text-white transition-colors duration-300">Clear All</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Book Grid Section -->
+        <main id="forestFeed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Books will be dynamically loaded here -->
+        </main>
+
+        <!-- Loading Indicator -->
+        <div id="loadingIndicator" class="text-center py-16 hidden">
+            <div class="inline-flex items-center space-x-2">
+                <div class="w-4 h-4 bg-forest-accent rounded-full animate-pulse"></div>
+                <div class="w-4 h-4 bg-forest-accent rounded-full animate-pulse" style="animation-delay: 0.3s;"></div>
+                <div class="w-4 h-4 bg-forest-accent rounded-full animate-pulse" style="animation-delay: 0.6s;"></div>
+            </div>
+            <p class="text-gray-300 mt-4">Discovering more books...</p>
+        </div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="text-center py-16 hidden">
+            <div class="text-6xl mb-6 opacity-60">🌲</div>
+            <h3 class="text-2xl font-bold text-white mb-4" style="font-family: 'Poppins', sans-serif;">The forest is quiet here...</h3>
+            <p class="text-gray-300 mb-8 max-w-md mx-auto">No books match your current filters. Try adjusting your search or exploring different regions.</p>
+            <button onclick="clearAllFilters()" class="bg-forest-secondary bg-forest-secondary-hover text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+                Clear Filters
+            </button>
+        </div>
+
+        <!-- End-of-feed message / CTAs -->
+        <div class="container mx-auto px-6 mt-16 mb-24 text-center">
+            <p class="mb-4" style="color:#4A5450;">You've reached a quiet clearing in the Forest. This is the end of the list—for now.</p>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
+                <a href="submit.html" class="bg-forest-accent bg-forest-accent-hover text-white font-bold py-3 px-6 rounded-full transition-all duration-300">Submit a book</a>
+                <a href="about.html" class="font-medium underline hover:text-[#F58220]" style="color:#4A5450;">Learn about Noctua Forest</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="forest-discovery.js"></script>
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            // Add mobile menu functionality if needed
+            console.log('Mobile menu toggle');
+        }
+    </script>
+</body>
+</html>

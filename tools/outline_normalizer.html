@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Outline → Clean EPUB HTML</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Arial,sans-serif;margin:20px;}
+    textarea{width:100%;height:40vh;font-family:ui-monospace,Consolas,monospace}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    .row>*{flex:1 1 320px}
+    button{padding:10px 14px;border:1px solid #ddd;border-radius:8px;background:#335C67;color:#fff;font-weight:600}
+    input[type=file]{padding:8px}
+    .muted{color:#666}
+  </style>
+</head>
+<body>
+  <h1>Normalize Outline HTML (client‑side)</h1>
+  <p class="muted">Load your exported outline HTML (e.g., Google Docs). This tool cleans styles, converts headings, and generates a Calibre‑ready <code>index.html</code>.</p>
+  <div class="row">
+    <div>
+      <label>Outline HTML (file): <input id="file" type="file" accept="text/html,.html,.htm"></label>
+    </div>
+    <div>
+      <button id="normalize">Normalize</button>
+      <button id="download" disabled>Download index.html</button>
+    </div>
+  </div>
+  <h3>Output (editable)</h3>
+  <textarea id="out" spellcheck="false"></textarea>
+
+  <script>
+  function clean(html){
+    // extract body
+    const bodyMatch = html.match(/<body[\s\S]*?>([\s\S]*?)<\/body>/i);
+    let body = bodyMatch ? bodyMatch[1] : html;
+    // remove style/script/comments
+    body = body.replace(/<style[\s\S]*?<\/style>/gi,'')
+               .replace(/<script[\s\S]*?<\/script>/gi,'')
+               .replace(/<!--[\s\s]*?-->/g,'');
+    // unwrap spans
+    body = body.replace(/<span[^>]*>/gi,'').replace(/<\/span>/gi,'');
+    // strong-only paragraphs => h2
+    body = body.replace(/<p[^>]*>\s*(?:<strong>|<b>)([\s\S]*?)(?:<\/strong>|<\/b>)\s*<\/p>/gi,'<h2>$1</h2>');
+    // style=font-weight:bold paragraphs => h2
+    body = body.replace(/<p[^>]*style="[^"]*(font-weight\s*:\s*bold|700)[^"]*"[^>]*>([\s\S]*?)<\/p>/gi,'<h2>$2</h2>');
+    // Chapter N -> h1
+    body = body.replace(/<p[^>]*>\s*(CHAPTER\s+\d+[^<]*?)\s*<\/p>/gi,'<h1>$1</h1>')
+               .replace(/<p[^>]*>\s*(Chapter\s+\d+[^<]*?)\s*<\/p>/gi,'<h1>$1</h1>');
+    // remove heavy attributes
+    body = body.replace(/\s(?:class|style|id|dir|data-[^=]+)="[^"]*"/gi,'');
+    // normalize nbsp / spaces
+    body = body.replace(/&nbsp;/g,' ').replace(/\s{2,}/g,' ');
+    // build skeleton
+    const doc = `<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8"/>\n<meta name="viewport" content="width=device-width, initial-scale=1"/>\n<title>Survival Guide</title>\n<link rel="stylesheet" href="styles.css"/>\n<link rel="stylesheet" href="extra-css.css"/>\n</head>\n<body>\n${body}\n</body>\n</html>`;
+    return doc;
+  }
+
+  document.getElementById('normalize').onclick = async () => {
+    const f = document.getElementById('file').files[0];
+    if(!f){ alert('Choose your outline HTML first.'); return; }
+    const text = await f.text();
+    const out = clean(text);
+    document.getElementById('out').value = out;
+    document.getElementById('download').disabled = false;
+  };
+
+  document.getElementById('download').onclick = () => {
+    const blob = new Blob([document.getElementById('out').value], {type:'text/html;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'index.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+  </script>
+</body>
+</html>
+
+

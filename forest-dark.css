@@ -1,0 +1,572 @@
+/* Forest Dark Theme - Lost in the Forest Experience */
+
+:root {
+  /* Dark Forest Color Palette */
+  --forest-dark: #0f1f0f;
+  --forest-deep: #1a2e1a;
+  --forest-medium: #2d3d2d;
+  --forest-light: #3a4a3a;
+  
+  /* Moonlight Accents */
+  --moonlight: #e8f4f8;
+  --moonlight-dim: #d1e7dd;
+  --moonlight-soft: #b8c9c4;
+  
+  /* Firelight Highlights */
+  --firelight-warm: #f4a261;
+  --firelight-bright: #e76f51;
+  --firelight-glow: rgba(244, 162, 97, 0.2);
+  
+  /* Card Clearings */
+  --card-bg: #2d3748;
+  --card-border: #4a5568;
+  --card-hover: #3a4556;
+}
+
+/* Body Dark Theme Override */
+body {
+  background: linear-gradient(135deg, var(--forest-dark) 0%, var(--forest-deep) 100%);
+  color: var(--moonlight);
+  min-height: 100vh;
+}
+
+/* Header Dark Theme */
+.header {
+  background: rgba(15, 31, 15, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--forest-medium);
+}
+
+.tagline {
+  color: var(--moonlight-dim);
+}
+
+/* Navigation Dark Theme */
+.navigation {
+  background: var(--forest-deep);
+  border-bottom: 1px solid var(--forest-medium);
+}
+
+.nav-link {
+  color: var(--moonlight-dim);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.nav-link:hover {
+  color: var(--firelight-warm);
+  text-shadow: 0 0 8px var(--firelight-glow);
+}
+
+/* Forest Hero Section */
+.forest-hero {
+  background: linear-gradient(rgba(15, 31, 15, 0.7), rgba(26, 46, 26, 0.8)), 
+              url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" fill="%23223322"><polygon points="0,600 50,550 100,580 150,520 200,560 250,500 300,540 350,480 400,520 450,460 500,500 550,440 600,480 650,420 700,460 750,400 800,440 850,380 900,420 950,360 1000,400 1000,600"/></svg>') center/cover;
+  padding: 120px 0;
+  position: relative;
+}
+
+.forest-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(244, 162, 97, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.forest-hero h1 {
+  color: var(--moonlight);
+  text-shadow: 0 2px 20px rgba(15, 31, 15, 0.8);
+  margin-bottom: 24px;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, var(--firelight-warm), var(--firelight-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 10px var(--firelight-glow));
+}
+
+.forest-subtitle {
+  color: var(--moonlight-dim);
+  font-size: 1.25rem;
+  margin-bottom: 32px;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Hero Actions */
+.hero-actions .btn-lg {
+  background: linear-gradient(135deg, var(--firelight-warm), var(--firelight-bright));
+  color: white;
+  border: none;
+  box-shadow: 0 4px 20px var(--firelight-glow);
+  transition: all 0.3s ease;
+}
+
+.hero-actions .btn-lg:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--firelight-glow);
+}
+
+.hero-actions .btn-ghost {
+  background: rgba(232, 244, 248, 0.1);
+  color: var(--moonlight);
+  border: 2px solid var(--moonlight-soft);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.hero-actions .btn-ghost:hover {
+  background: rgba(232, 244, 248, 0.2);
+  border-color: var(--firelight-warm);
+  color: var(--firelight-warm);
+  box-shadow: 0 0 20px var(--firelight-glow);
+}
+
+/* Search and Filter Controls */
+.forest-controls {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.search-section {
+  margin-bottom: 24px;
+}
+
+.search-group label {
+  font-size: 1.1rem;
+  color: var(--firelight-warm);
+  margin-bottom: 12px;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--forest-medium);
+  border: 2px solid var(--card-border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  color: var(--moonlight);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: var(--firelight-warm);
+  box-shadow: 0 0 0 4px var(--firelight-glow);
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--moonlight-soft);
+}
+
+.filters-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.active-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  border-top: 1px solid var(--card-border);
+}
+
+.filter-label {
+  color: var(--moonlight-dim);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.filter-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  background: var(--firelight-warm);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-tag .remove {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 2px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.clear-filters {
+  background: transparent;
+  border: 1px solid var(--moonlight-soft);
+  color: var(--moonlight-soft);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.clear-filters:hover {
+  border-color: var(--firelight-warm);
+  color: var(--firelight-warm);
+}
+
+.forest-controls .select {
+  background: var(--forest-medium);
+  border: 1px solid var(--card-border);
+  color: var(--moonlight);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.forest-controls .select:focus {
+  border-color: var(--firelight-warm);
+  box-shadow: 0 0 0 3px var(--firelight-glow);
+  outline: none;
+}
+
+.forest-controls label {
+  color: var(--moonlight-dim);
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Infinite Scroll Feed */
+.forest-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+/* Loading States */
+.loading-indicator {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--moonlight-dim);
+}
+
+.forest-spinner {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.spinner-leaf {
+  width: 12px;
+  height: 12px;
+  background: var(--firelight-warm);
+  border-radius: 50%;
+  animation: forestPulse 1.5s ease-in-out infinite;
+}
+
+.spinner-leaf:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.spinner-leaf:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes forestPulse {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--moonlight-dim);
+}
+
+.no-results-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  opacity: 0.6;
+}
+
+.no-results h3 {
+  color: var(--moonlight);
+  margin-bottom: 12px;
+  font-family: 'Lora', serif;
+}
+
+.no-results p {
+  margin-bottom: 24px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Book Cards - Enhanced for Feed */
+.forest-book-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.forest-book-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, var(--firelight-glow) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.forest-book-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--firelight-warm);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--firelight-glow);
+}
+
+.forest-book-card:hover::before {
+  opacity: 1;
+}
+
+.forest-book-card .book-title {
+  color: var(--moonlight);
+  margin: 16px 0 8px;
+}
+
+.forest-book-card .meta {
+  color: var(--moonlight-soft);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.forest-book-card .btn {
+  background: linear-gradient(135deg, var(--firelight-warm), var(--firelight-bright));
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.forest-book-card .btn:hover {
+  background: linear-gradient(135deg, var(--firelight-bright), var(--firelight-warm));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px var(--firelight-glow);
+}
+
+/* Enhanced Book Card Content */
+.forest-book-card .book-content {
+  padding: 20px;
+}
+
+.forest-book-card .book-blurb {
+  color: var(--moonlight-dim);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 12px 0 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.forest-book-card .book-meta {
+  margin-bottom: 16px;
+}
+
+.forest-book-card .book-tags {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.forest-book-card .tag {
+  background: var(--forest-medium);
+  color: var(--moonlight-soft);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  border: 1px solid var(--card-border);
+}
+
+.forest-book-card .book-info {
+  display: flex;
+  gap: 12px;
+  font-size: 0.8rem;
+  color: var(--moonlight-soft);
+  align-items: center;
+}
+
+.forest-book-card .rating {
+  color: var(--firelight-warm);
+  font-weight: 600;
+}
+
+.forest-book-card .book-cover {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+/* Series CTA Section */
+.series-cta {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.series-cta h2 {
+  color: var(--moonlight);
+  margin-bottom: 16px;
+}
+
+.series-cta p {
+  color: var(--moonlight-dim);
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+}
+
+.series-cta .btn-ghost {
+  background: rgba(232, 244, 248, 0.1);
+  color: var(--moonlight);
+  border: 2px solid var(--moonlight-soft);
+  transition: all 0.3s ease;
+}
+
+.series-cta .btn-ghost:hover {
+  border-color: var(--firelight-warm);
+  color: var(--firelight-warm);
+  box-shadow: 0 0 20px var(--firelight-glow);
+}
+
+/* Testimonials Section */
+.books-grid .book-card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.books-grid .book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.books-grid .book-card strong {
+  color: var(--moonlight);
+}
+
+.books-grid .book-card .book-description {
+  color: var(--moonlight-dim) !important;
+}
+
+/* Footer Dark Theme */
+.mini-footer {
+  background: var(--forest-dark);
+  border-top: 1px solid var(--forest-medium);
+  color: var(--moonlight-dim);
+}
+
+.footer-brand {
+  color: var(--firelight-warm);
+  font-weight: 800;
+}
+
+.mini-footer a {
+  color: var(--moonlight-soft);
+  transition: color 0.3s ease;
+}
+
+.mini-footer a:hover {
+  color: var(--firelight-warm);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .forest-hero {
+    padding: 80px 0;
+  }
+  
+  .forest-feed {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .filters-section {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .search-input {
+    padding: 12px 16px;
+  }
+  
+  .series-cta {
+    padding: 24px;
+  }
+  
+  .active-filters {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus Indicators */
+.forest-book-card:focus-within {
+  outline: 3px solid var(--firelight-warm);
+  outline-offset: 2px;
+}
+
+.select:focus,
+.btn:focus {
+  outline: 3px solid var(--firelight-warm);
+  outline-offset: 2px;
+}

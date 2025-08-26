@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Newsletter — Noctua Forest</title>
-    <meta name="description" content="Subscribe to Noctua Forest for publishing insights, author spotlights, and craft-focused content for serious writers." />
+    <title>Preorder — Noctua Forest</title>
+    <meta name="description" content="Reserve your copy and get notified when it's ready. Early access to our ESL learning guides." />
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -36,41 +36,60 @@
             </nav>
         </header>
 
-    <main id="main" class="main">
-      <div class="container">
-        <section class="forest-hero">
-          <h1>Join the forest</h1>
-          <p class="forest-subtitle">Get publishing insights, author spotlights, and craft-focused content for serious writers.</p>
-        </section>
+    <main id="main">
+      <section class="hero">
+        <div class="container">
+          <h1>Reserve Your Copy</h1>
+          <p class="subtitle">Get early access and special pricing when our guides launch.</p>
+        </div>
+      </section>
 
-        <section class="newsletter-form-section">
-          <div class="container">
-            <form id="newsletterForm" class="submission-form" style="max-width: 500px; margin: 0 auto;" novalidate>
+      <section class="content-section">
+        <div class="container">
+          <div class="preorder-form-container">
+            <form id="preorderForm" class="preorder-form">
               <div class="form-group">
-                <label for="email">Your Email</label>
-                <input id="email" name="email" type="email" required placeholder="you@example.com" />
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="your.email@example.com">
               </div>
-              <button type="submit" class="btn primary">Subscribe</button>
-              <p id="newsletterSuccess" class="hint" style="display:none; margin-top:12px; color: #16a34a;">
-                Thank you! Redirecting you to The Forest...
-              </p>
+
+              <button type="submit" class="btn-lg" id="submitBtn">
+                Reserve My Copy
+              </button>
+
+              <div class="form-benefits">
+                <h3>What you get:</h3>
+                <ul>
+                  <li>Early access when guides launch</li>
+                  <li>25% off launch price</li>
+                  <li>Free bonus content</li>
+                  <li>No spam, unsubscribe anytime</li>
+                </ul>
+              </div>
             </form>
+
+            <div id="successMessage" class="success-message" style="display: none;">
+              <h2>You're all set! 🎉</h2>
+              <p>We'll email you when your guide is ready with your special discount code.</p>
+              <a href="forest.html" class="btn-lg">Browse More Guides</a>
+            </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </main>
 
     <footer id="footer" class="mini-footer">
       <div class="container">
-        <div class="footer-brand">NOCTUA FOREST</div>
-        <div class="footer-links">
-          <a href="privacy.html">Privacy Policy</a>
-          <span>|</span>
-          <a href="terms.html">Terms of Service</a>
-        </div>
+        <p>&copy; 2025 Noctua Forest. 
+          <a href="privacy.html">Privacy</a> • 
+          <a href="terms.html">Terms</a> • 
+          <a href="mailto:support@noctuaforest.com">Contact</a>
+        </p>
       </div>
     </footer>
 
-    <script type="module" src="newsletter.js" defer></script>
+    <!-- Firebase -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="preorder.js"></script>
   </body>
 </html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://www.gstatic.com; script-src 'self' https://www.gstatic.com https://cdn.tailwindcss.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <title>Admin Login - Noctua Forest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'forest': {
+                'deep': '#fbebcc',
+                'card': '#4A5450',
+                'light': '#E0E2DB',
+                'accent': '#F58220',
+                'secondary': '#5A6560'
+              }
+            },
+            fontFamily: {
+              'sans': ['Inter', 'sans-serif'],
+              'heading': ['Poppins', 'serif'],
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#fbebcc] min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-xl shadow-sm max-w-md w-full">
+        <h1 class="text-2xl font-bold mb-6 text-forest-card">Admin Login</h1>
+        
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" required
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-forest-accent focus:border-transparent">
+            </div>
+            
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                <input type="password" id="password" required
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-forest-accent focus:border-transparent">
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-forest-card hover:bg-forest-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                Login
+            </button>
+        </form>
+
+        <div id="error" class="mt-4 text-center text-red-600 hidden"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import firebaseConfig from '../firebase-config.js';
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorDiv = document.getElementById('error');
+            errorDiv.classList.add('hidden');
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                // Rate limit login attempts
+                const now = Date.now();
+                const lastAttempt = sessionStorage.getItem('lastLoginAttempt');
+                const attempts = parseInt(sessionStorage.getItem('loginAttempts') || '0');
+                
+                if (lastAttempt && now - parseInt(lastAttempt) < 1000) {
+                    throw new Error('Please wait before trying again');
+                }
+                
+                if (attempts >= 5 && now - parseInt(lastAttempt) < 300000) {
+                    throw new Error('Too many attempts. Please try again in 5 minutes');
+                }
+                
+                sessionStorage.setItem('lastLoginAttempt', now.toString());
+                sessionStorage.setItem('loginAttempts', (attempts + 1).toString());
+
+                // Attempt login
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+                
+                if (!userDoc.exists() || !userDoc.data().isAdmin) {
+                    await signOut(auth);
+                    throw new Error('Not authorized');
+                }
+
+                // Clear attempt tracking on success
+                sessionStorage.removeItem('loginAttempts');
+                sessionStorage.removeItem('lastLoginAttempt');
+                
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
