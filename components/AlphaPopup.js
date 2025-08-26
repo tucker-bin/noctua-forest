@@ -98,26 +98,25 @@ const showAlphaPopup = () => {
     window.location.href = '/signup.html';
   });
 
-  document.getElementById('googleSignInBtn').addEventListener('click', () => {
+  document.getElementById('googleSignInBtn').addEventListener('click', async () => {
     localStorage.setItem('alphaPopupSeen', 'true');
-    // Implement Google Sign-in
-    const auth = firebase.auth();
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider)
-      .then((result) => {
-        // Check if there's a saved form to return to
-        const savedFormData = sessionStorage.getItem('savedFormData');
-        if (savedFormData) {
-          const { type } = JSON.parse(savedFormData);
-          window.location.href = type === 'book' ? '/submit.html' : '/contributor.html';
-        } else {
-          window.location.href = '/forest.html';
-        }
-      })
-      .catch((error) => {
-        console.error('Error with Google sign-in:', error);
-        alert('There was an error signing in with Google. Please try again or use email signup.');
-      });
+    try {
+      const { getAuth, GoogleAuthProvider, signInWithPopup } = await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js');
+      const { app } = await import('../firebase-config.js');
+      const auth = getAuth(app);
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      const savedFormData = sessionStorage.getItem('savedFormData');
+      if (savedFormData) {
+        const { type } = JSON.parse(savedFormData);
+        window.location.href = type === 'book' ? '/submit.html' : '/contributor.html';
+      } else {
+        window.location.href = '/forest.html';
+      }
+    } catch (error) {
+      console.error('Error with Google sign-in:', error);
+      alert('There was an error signing in with Google. Please try again or use email signup.');
+    }
   });
 
   // Close on background click
