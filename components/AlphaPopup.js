@@ -4,9 +4,9 @@ const showAlphaPopup = () => {
   if (localStorage.getItem('alphaPopupSeen')) return;
 
   const popup = document.createElement('div');
-  popup.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+  popup.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4';
   popup.innerHTML = `
-    <div class="bg-[#4A5450] text-white p-8 rounded-xl max-w-lg mx-4 relative">
+    <div class="bg-[#4A5450] text-white p-6 md:p-8 rounded-xl w-full max-w-md max-h-[85vh] overflow-y-auto relative">
       <!-- Close button -->
       <button id="closePopupBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -15,11 +15,11 @@ const showAlphaPopup = () => {
       </button>
 
       <!-- Main content -->
-      <h2 class="text-3xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">Shape the Future of Storytelling</h2>
+      <h2 class="text-2xl md:text-3xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">Shape the Future of Storytelling</h2>
       <p class="text-gray-300 mb-6">You're invited to be a founding member of Noctua Forest, a new community for authors and readers. As an early Alpha member, your voice and submissions will directly influence the platform's growth.</p>
       
       <!-- Benefits list -->
-      <div class="bg-[#3A4440] rounded-lg p-6 mb-6">
+      <div class="bg-[#3A4440] rounded-lg p-4 md:p-6 mb-6">
         <p class="font-medium mb-4">Join now to be the first to:</p>
         <ul class="space-y-3">
           <li class="flex items-start">
@@ -53,7 +53,7 @@ const showAlphaPopup = () => {
       <p class="text-sm text-gray-300 mb-6 text-center">Join the first 150+ other night owls shaping our community.</p>
 
       <!-- Email capture form -->
-      <div class="space-y-4">
+      <div class="space-y-3 md:space-y-4">
         <div class="relative">
           <input type="email" placeholder="Enter your email" required
             class="w-full px-4 h-12 rounded bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent text-base">
