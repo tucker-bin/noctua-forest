@@ -3,33 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://www.gstatic.com; script-src 'self' https://www.gstatic.com https://cdn.tailwindcss.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; script-src 'self' https://www.gstatic.com https://www.gstatic.com/firebasejs/ https://apis.google.com https://cdn.tailwindcss.com 'unsafe-inline'; connect-src 'self' https://firestore.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://www.googleapis.com https://www.gstatic.com https://apis.google.com https://www.google.com; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.googleusercontent.com https://*.gstatic.com https://firebasestorage.googleapis.com https://www.google.com; frame-src 'self' https://accounts.google.com https://apis.google.com https://my-rhyme-app.firebaseapp.com;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <title>Admin Dashboard - Noctua Forest</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'forest': {
-                'deep': '#fbebcc',
-                'card': '#4A5450',
-                'light': '#E0E2DB',
-                'accent': '#F58220',
-                'secondary': '#5A6560'
-              }
-            },
-            fontFamily: {
-              'sans': ['Inter', 'sans-serif'],
-              'heading': ['Poppins', 'serif'],
-            }
-          }
-        }
-      }
-    </script>
+    <link rel="stylesheet" href="../assets/tailwind.css">
+    <!-- Tailwind is precompiled into assets/tailwind.css; CDN config not needed -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-[#fbebcc] text-gray-800">
@@ -45,85 +24,137 @@
             </a>
             <nav class="flex items-center space-x-8">
                 <span id="adminEmail" class="text-forest-card"></span>
-                <button id="logoutBtn" class="text-forest-card hover:text-forest-accent">Logout</button>
+                <a href="./email-logs.html" class="text-forest-card hover:text-forest-accent">Email Logs</a>
+                <button id="signout" class="text-forest-card hover:text-forest-accent">Sign Out</button>
             </nav>
         </header>
     </div>
 
     <main id="main" class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-white rounded-xl shadow-sm p-8">
-            <h1 class="text-3xl font-bold mb-8 text-forest-card">Admin Dashboard</h1>
+        <div class="bg-forest-card rounded-xl p-8 mb-12">
+            <h1 class="text-3xl font-bold mb-8 text-white">Admin Dashboard</h1>
             
             <!-- Stats Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div class="bg-forest-card text-white rounded-lg p-6">
-                    <h3 class="text-lg font-semibold mb-2">Pending Submissions</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="flex items-center mb-2">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                        <h3 class="text-lg font-semibold">Pending Submissions</h3>
+                    </div>
                     <p id="pendingCount" class="text-3xl font-bold">0</p>
                 </div>
                 <div class="bg-forest-secondary text-white rounded-lg p-6">
-                    <h3 class="text-lg font-semibold mb-2">Published Books</h3>
-                    <p id="publishedCount" class="text-3xl font-bold">0</p>
+                    <div class="flex items-center mb-2">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                        <h3 class="text-lg font-semibold">Applications</h3>
+                    </div>
+                    <p id="applicationsCount" class="text-3xl font-bold">0</p>
                 </div>
                 <div class="bg-forest-accent text-white rounded-lg p-6">
-                    <h3 class="text-lg font-semibold mb-2">Premium Reviews</h3>
-                    <p id="premiumCount" class="text-3xl font-bold">0</p>
-                </div>
-            </div>
-
-            <!-- Submissions Table -->
-            <div class="mb-12">
-                <h2 class="text-2xl font-bold mb-6 text-forest-card">Recent Submissions</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-forest-card text-white">
-                            <tr>
-                                <th class="px-6 py-3 text-left">Title</th>
-                                <th class="px-6 py-3 text-left">Author</th>
-                                <th class="px-6 py-3 text-left">Submitted</th>
-                                <th class="px-6 py-3 text-left">Premium</th>
-                                <th class="px-6 py-3 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="submissionsTable" class="divide-y divide-gray-200">
-                            <!-- Submissions will be populated here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Published Books -->
-            <div>
-                <h2 class="text-2xl font-bold mb-6 text-forest-card">Published Books</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-forest-card text-white">
-                            <tr>
-                                <th class="px-6 py-3 text-left">Title</th>
-                                <th class="px-6 py-3 text-left">Author</th>
-                                <th class="px-6 py-3 text-left">Published</th>
-                                <th class="px-6 py-3 text-left">Views</th>
-                                <th class="px-6 py-3 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="publishedTable" class="divide-y divide-gray-200">
-                            <!-- Published books will be populated here -->
-                        </tbody>
-                    </table>
+                    <div class="flex items-center mb-2">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <h3 class="text-lg font-semibold">Pending Reviews</h3>
+                    </div>
+                    <p id="pendingReviewsCount" class="text-3xl font-bold">0</p>
                 </div>
             </div>
         </div>
+
+        <!-- Review Book Submissions -->
+        <div class="bg-forest-card rounded-xl p-8 mb-8">
+            <div class="flex items-center mb-6">
+                <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <h2 class="text-2xl font-bold text-white">Review Book Submissions</h2>
+            </div>
+            <div id="pendingSubmissions" class="space-y-4"></div>
+        </div>
+
+        <!-- Review Contributor Applications -->
+        <div class="bg-forest-card rounded-xl p-8">
+            <div class="flex items-center mb-6">
+                <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                </svg>
+                <h2 class="text-2xl font-bold text-white">Review Applications</h2>
+            </div>
+            <div id="applicationsList" class="space-y-4"></div>
+        </div>
+        </div>
     </main>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 id="previewTitle" class="text-2xl font-bold text-forest-card mb-2"></h2>
+                        <p id="previewAuthor" class="text-gray-600"></p>
+                    </div>
+                    <button onclick="closePreview()" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="font-bold text-forest-card mb-2">Blurb</h3>
+                        <p id="previewBlurb" class="text-gray-700"></p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="font-bold text-forest-card mb-2">Language</h3>
+                            <p id="previewLanguage" class="text-gray-700"></p>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-forest-card mb-2">Region</h3>
+                            <p id="previewRegion" class="text-gray-700"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-forest-card mb-2">Cultural Themes</h3>
+                        <p id="previewThemes" class="text-gray-700"></p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-forest-card mb-2">Genre Tags</h3>
+                        <div id="previewTags" class="flex flex-wrap gap-2"></div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-forest-card mb-2">Links</h3>
+                        <div class="space-y-2">
+                            <p id="previewCover" class="text-gray-700"></p>
+                            <p id="previewPdf" class="text-gray-700"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 flex justify-end space-x-4">
+                    <button onclick="closePreview()" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                        Close
+                    </button>
+                    <button id="previewApprove" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+                        Approve
+                    </button>
+                    <button id="previewReject" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">
+                        Reject
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Firebase -->
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut, getIdTokenResult } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
         import { 
-            getAuth, 
-            onAuthStateChanged,
-            signOut 
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { 
-            getFirestore,
             collection,
             query,
             where,
@@ -135,113 +166,267 @@
             updateDoc,
             deleteDoc,
             serverTimestamp
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import firebaseConfig from '../firebase-config.js';
+        } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { app as firebaseApp, db as firebaseDb } from '../firebase-config.js';
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // Use initialized Firebase
+        const auth = getAuth(firebaseApp);
+        const db = firebaseDb;
+
+        // Email notification via backend
+        async function sendApplicationEmail(toEmail, status, title, author) {
+            try {
+                const res = await fetch('/api/email/applications', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ to: toEmail, status, title, author })
+                });
+                if (!res.ok) throw new Error('Email failed');
+            } catch (err) {
+                console.warn('[email] failed', err);
+            }
+        }
+
+        // Review management functions
+        window.editReview = async (reviewId) => {
+            // TODO: Implement review editor modal
+            window.location.href = `edit-review.html?id=${reviewId}`;
+        };
+
+        window.toggleReviewStatus = async (reviewId, currentStatus) => {
+            try {
+                const newStatus = currentStatus === 'published' ? 'draft' : 'published';
+                await updateDoc(doc(db, 'reviews', reviewId), {
+                    status: newStatus,
+                    lastUpdated: serverTimestamp()
+                });
+                alert(`Review ${newStatus === 'published' ? 'published' : 'unpublished'} successfully!`);
+            } catch (error) {
+                console.error('Error updating review status:', error);
+                alert('Error updating review status. Please try again.');
+            }
+        };
+
+        window.editBook = async (bookId) => {
+            // TODO: Implement book editor modal
+            window.location.href = `edit-book.html?id=${bookId}`;
+        };
+
+        window.removeBook = async (bookId) => {
+            if (!confirm('Are you sure you want to remove this book? This action cannot be undone.')) return;
+
+            try {
+                await deleteDoc(doc(db, 'books', bookId));
+                alert('Book removed successfully!');
+            } catch (error) {
+                console.error('Error removing book:', error);
+                alert('Error removing book. Please try again.');
+            }
+        };
+
+        // No dropdown; mirror user dashboard sign-out UX
 
         // Auth state observer
         onAuthStateChanged(auth, async (user) => {
+            console.log('[admin-check] onAuthStateChanged fired');
             if (!user) {
-                window.location.href = 'login.html';
+                window.location.href = '../account.html';
                 return;
             }
 
-            // Check if user is admin
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (!userDoc.exists() || !userDoc.data().isAdmin) {
-                signOut(auth);
-                window.location.href = 'login.html';
+            // Parallel admin checks
+            let usersDocResult = undefined;
+            let claimsResult = undefined;
+            await Promise.all([
+                (async () => {
+                    try {
+                        const snap = await getDoc(doc(db, 'users', user.uid));
+                        if (snap.exists()) {
+                            const data = snap.data();
+                            usersDocResult = (data?.isAdmin === true || data?.admin === true);
+                            console.log('[admin-check] users doc isAdmin:', usersDocResult);
+                        } else {
+                            usersDocResult = false;
+                            console.log('[admin-check] users doc missing');
+                        }
+                    } catch (err) {
+                        usersDocResult = undefined;
+                        console.warn('[admin-check] users doc error:', err);
+                    }
+                })(),
+                (async () => {
+                    try {
+                        await user.getIdToken(true);
+                        const token = await getIdTokenResult(user);
+                        claimsResult = (token.claims?.admin === true || token.claims?.isAdmin === true);
+                        console.log('[admin-check] claims isAdmin:', claimsResult, token.claims);
+                    } catch (err) {
+                        claimsResult = undefined;
+                        console.warn('[admin-check] claims error:', err);
+                    }
+                })()
+            ]);
+
+            // Resolve conservatively to avoid flipping legit admins
+            const isAdmin = (usersDocResult === true || claimsResult === true) || (usersDocResult === undefined || claimsResult === undefined);
+            console.log('[admin-check] final decision isAdmin:', isAdmin);
+            if (!isAdmin) {
+                window.location.href = '../dashboard.html';
                 return;
             }
 
-            // Display admin email
-            document.getElementById('adminEmail').textContent = user.email;
+            // Display admin email in both places
+            const adminEmailEl = document.getElementById('adminEmail');
+            const dropdownEmailEl = document.getElementById('dropdownEmail');
+            if (adminEmailEl && dropdownEmailEl) {
+                const email = user.email || 'Admin User';
+                adminEmailEl.textContent = email;
+                dropdownEmailEl.textContent = email;
+            }
 
             // Set up real-time listeners
             setupSubmissionsListener();
-            setupPublishedBooksListener();
+            setupReviewsListener();
         });
 
-        // Logout handler
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            signOut(auth).then(() => {
-                window.location.href = 'login.html';
+        // Signout handler (same pattern as user dashboard)
+        const signoutBtn = document.getElementById('signout');
+        if (signoutBtn) {
+            signoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await signOut(auth);
+                    window.location.href = '../account.html';
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                    alert('Error signing out. Please try again.');
+                }
             });
-        });
+        }
 
-        // Set up submissions listener
-        function setupSubmissionsListener() {
-            const q = query(
-                collection(db, 'submissions'),
-                orderBy('createdAt', 'desc')
-            );
-
+        // Set up reviews listener
+        function setupReviewsListener() {
+            const q = query(collection(db, 'reviews'), orderBy('lastUpdated', 'desc'));
             onSnapshot(q, (snapshot) => {
-                let pendingCount = 0;
-                let premiumCount = 0;
-                const submissionsTable = document.getElementById('submissionsTable');
-                submissionsTable.innerHTML = '';
+                let reviewsWritten = 0;
+                let pendingReviews = 0;
+                const list = document.getElementById('pendingSubmissions');
+                if (list) list.innerHTML = '';
 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    if (!data.approved) pendingCount++;
-                    if (data.premium) premiumCount++;
+                    if (data.status === 'published') reviewsWritten++;
+                    if (data.status === 'draft') pendingReviews++;
 
-                    const row = document.createElement('tr');
-                    
-                    // Create and append cells safely
-                    const cells = [
-                        { text: data.title },
-                        { text: data.author },
-                        { text: new Date(data.createdAt.toDate()).toLocaleDateString() },
-                        { text: data.premium ? '✓' : '' },
-                        {
-                            content: [
-                                { 
-                                    element: 'button',
-                                    text: 'Approve',
-                                    classes: ['text-green-600', 'hover:text-green-800', 'mr-3'],
-                                    click: () => approveSubmission(doc.id)
-                                },
-                                {
-                                    element: 'button',
-                                    text: 'Reject',
-                                    classes: ['text-red-600', 'hover:text-red-800'],
-                                    click: () => rejectSubmission(doc.id)
-                                }
-                            ]
-                        }
-                    ];
-
-                    cells.forEach(cell => {
-                        const td = document.createElement('td');
-                        td.className = 'px-6 py-4';
-                        
-                        if (cell.text !== undefined) {
-                            td.textContent = cell.text;
-                        } else if (cell.content) {
-                            cell.content.forEach(item => {
-                                const el = document.createElement(item.element);
-                                el.textContent = item.text;
-                                el.classList.add(...item.classes);
-                                el.addEventListener('click', item.click);
-                                td.appendChild(el);
-                            });
-                        }
-                        
-                        row.appendChild(td);
-                    });
-                    submissionsTable.appendChild(row);
+                    if (list) {
+                        const card = document.createElement('div');
+                        card.className = 'bg-forest-secondary text-white p-6 rounded-lg flex justify-between items-start';
+                        card.innerHTML = `
+                            <div>
+                                <h3 class="font-bold text-lg">${data.bookTitle || 'Untitled'}</h3>
+                                <p class="text-gray-200">by ${data.bookAuthor || 'Unknown'}</p>
+                                <p class="text-gray-300 mt-2">${(data.reviewText || '').slice(0,120)}${(data.reviewText||'').length>120?'...':''}</p>
+                            </div>
+                            <div class="flex space-x-3">
+                                <button class="text-gray-200 hover:text-white" id="edit-${doc.id}">Edit</button>
+                                <button class="text-green-200 hover:text-white" id="pub-${doc.id}">${data.status==='published'?'Unpublish':'Publish'}</button>
+                            </div>`;
+                        list.appendChild(card);
+                        card.querySelector(`#edit-${doc.id}`)?.addEventListener('click', ()=>editReview(doc.id));
+                        card.querySelector(`#pub-${doc.id}`)?.addEventListener('click', ()=>toggleReviewStatus(doc.id, data.status));
+                    }
                 });
 
-                document.getElementById('pendingCount').textContent = pendingCount;
-                document.getElementById('premiumCount').textContent = premiumCount;
+                const reviewsCountEl = document.getElementById('reviewsCount');
+                if (reviewsCountEl) reviewsCountEl.textContent = reviewsWritten;
+                document.getElementById('pendingReviewsCount').textContent = pendingReviews;
             });
         }
+
+        // Set up submissions listener
+        function setupSubmissionsListener() {
+            const q = query(collection(db, 'submissions'), where('approved','==', false), orderBy('createdAt','desc'));
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('pendingSubmissions');
+                if (container) container.innerHTML = '';
+                document.getElementById('pendingCount').textContent = snapshot.size;
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    if (!container) return;
+                    const card = document.createElement('div');
+                    card.className = 'bg-forest-secondary text-white p-6 rounded-lg';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-lg">${data.title}</h3>
+                                <p class="text-gray-200">by ${data.author}</p>
+                                <p class="text-gray-300 mt-2">${(data.blurb||'').slice(0,140)}${(data.blurb||'').length>140?'...':''}</p>
+                            </div>
+                            <div class="flex space-x-3">
+                                <button class="text-gray-200 hover:text-white" id="view-${doc.id}">View</button>
+                                <button class="text-green-200 hover:text-white" id="approve-${doc.id}">Approve</button>
+                                <button class="text-red-200 hover:text-white" id="reject-${doc.id}">Reject</button>
+                            </div>
+                        </div>`;
+                    container.appendChild(card);
+                    card.querySelector(`#view-${doc.id}`)?.addEventListener('click', ()=>previewSubmission(doc.id));
+                    card.querySelector(`#approve-${doc.id}`)?.addEventListener('click', ()=>approveSubmission(doc.id));
+                    card.querySelector(`#reject-${doc.id}`)?.addEventListener('click', ()=>rejectSubmission(doc.id));
+                });
+            });
+        }
+
+        // Applications listener (Firestore collection: 'applications')
+        (function setupApplicationsListener(){
+            try {
+                const q = query(collection(db, 'applications'), orderBy('createdAt', 'desc'));
+                onSnapshot(q, (snapshot) => {
+                    const container = document.getElementById('applicationsList');
+                    if (container) container.innerHTML = '';
+                    const countEl = document.getElementById('applicationsCount');
+                    if (countEl) countEl.textContent = String(snapshot.size);
+
+                    snapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        if (!container) return;
+                        const card = document.createElement('div');
+                        card.className = 'bg-forest-secondary text-white p-6 rounded-lg';
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg">${data.name || 'Unnamed applicant'}</h3>
+                                    <p class="text-gray-200">Email: ${data.email || 'N/A'}</p>
+                                    ${data.mediumUrl ? `<p class=\"text-gray-300 mt-2\">Medium: <a class=\"underline\" href=\"${data.mediumUrl}\" target=\"_blank\">${data.mediumUrl}</a></p>` : ''}
+                                    ${data.message ? `<p class=\"text-gray-300 mt-2\">${String(data.message).slice(0,160)}${String(data.message||'').length>160?'...':''}</p>` : ''}
+                                </div>
+                                <div class="flex space-x-3">
+                                    <button class="text-green-200 hover:text-white" id="app-approve-${docSnap.id}">Approve</button>
+                                    <button class="text-red-200 hover:text-white" id="app-reject-${docSnap.id}">Reject</button>
+                                </div>
+                            </div>`;
+                        container.appendChild(card);
+                        card.querySelector(`#app-approve-${docSnap.id}`)?.addEventListener('click', async () => {
+                            try {
+                                await updateDoc(doc(db, 'applications', docSnap.id), { status: 'approved', reviewedAt: serverTimestamp() });
+                                await sendApplicationEmail(data.email || '', 'approved', data.title, data.author);
+                                alert('Application approved');
+                            } catch (e) { console.error(e); alert('Failed to update application'); }
+                        });
+                        card.querySelector(`#app-reject-${docSnap.id}`)?.addEventListener('click', async () => {
+                            if (!confirm('Reject this application?')) return;
+                            try {
+                                await updateDoc(doc(db, 'applications', docSnap.id), { status: 'rejected', reviewedAt: serverTimestamp() });
+                                await sendApplicationEmail(data.email || '', 'rejected', data.title, data.author);
+                                alert('Application rejected');
+                            } catch (e) { console.error(e); alert('Failed to update application'); }
+                        });
+                    });
+                });
+            } catch (err) {
+                console.warn('Applications listener failed:', err);
+            }
+        })();
 
         // Set up published books listener
         function setupPublishedBooksListener() {
@@ -298,29 +483,51 @@
             });
         }
 
-        // Approve submission
+        // Approve submission -> publish book pipeline
         window.approveSubmission = async (submissionId) => {
             try {
                 const submissionRef = doc(db, 'submissions', submissionId);
-                const submissionDoc = await getDoc(submissionRef);
-                const submissionData = submissionDoc.data();
+                const subSnap = await getDoc(submissionRef);
+                if (!subSnap.exists()) throw new Error('Submission not found');
+                const s = subSnap.data();
 
-                // Create new book document
-                const bookRef = doc(collection(db, 'books'));
-                await setDoc(bookRef, {
-                    ...submissionData,
+                // Normalize payload for books collection
+                const bookPayload = {
+                    title: s.title || 'Untitled',
+                    author: s.author || 'Unknown',
+                    publisher: s.publisher || '',
+                    blurb: s.blurb || '',
+                    primaryLanguage: s.primaryLanguage || '',
+                    originalLanguage: s.originalLanguage || '',
+                    authorRegion: s.authorRegion || '',
+                    publicationYear: s.publicationYear || null,
+                    culturalThemes: s.culturalThemes || '',
+                    authorTags: s.authorTags || '',
+                    targetAudience: s.targetAudience || '',
+                    bookLength: s.bookLength || '',
+                    coverUrl: s.coverUrl || '',
+                    pdfUrl: s.pdfUrl || '',
+                    purchaseLink: s.purchaseLink || '',
+                    premium: s.premium === true,
+                    userId: s.userId || '',
+                    views: 0,
                     publishedAt: serverTimestamp(),
-                    views: 0
-                });
+                };
 
-                // Update submission status
+                const bookRef = doc(collection(db, 'books'));
+                await setDoc(bookRef, bookPayload);
+
                 await updateDoc(submissionRef, {
                     approved: true,
                     approvedAt: serverTimestamp(),
                     bookId: bookRef.id
                 });
 
-                alert('Submission approved and published successfully!');
+                if (confirm('Published. View book page?')) {
+                    window.open(`../book.html?id=${bookRef.id}`, '_blank');
+                } else {
+                    alert('Submission approved and published successfully!');
+                }
             } catch (error) {
                 console.error('Error approving submission:', error);
                 alert('Error approving submission. Please try again.');
@@ -351,6 +558,86 @@
                 console.error('Error unpublishing book:', error);
                 alert('Error unpublishing book. Please try again.');
             }
+        };
+
+        // Preview submission
+        let currentSubmissionId = null;
+        const previewModal = document.getElementById('previewModal');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewAuthor = document.getElementById('previewAuthor');
+        const previewBlurb = document.getElementById('previewBlurb');
+        const previewLanguage = document.getElementById('previewLanguage');
+        const previewRegion = document.getElementById('previewRegion');
+        const previewThemes = document.getElementById('previewThemes');
+        const previewTags = document.getElementById('previewTags');
+        const previewCover = document.getElementById('previewCover');
+        const previewPdf = document.getElementById('previewPdf');
+        const previewApprove = document.getElementById('previewApprove');
+        const previewReject = document.getElementById('previewReject');
+
+        window.previewSubmission = async (submissionId) => {
+            try {
+                const submissionDoc = await getDoc(doc(db, 'submissions', submissionId));
+                if (!submissionDoc.exists()) {
+                    alert('Submission not found');
+                    return;
+                }
+
+                const data = submissionDoc.data();
+                currentSubmissionId = submissionId;
+
+                // Fill preview data
+                previewTitle.textContent = data.title;
+                previewAuthor.textContent = data.author;
+                previewBlurb.textContent = data.blurb;
+                previewLanguage.textContent = data.primaryLanguage || 'Not specified';
+                previewRegion.textContent = data.authorRegion || 'Not specified';
+                previewThemes.textContent = data.culturalThemes || 'None specified';
+                
+                // Handle tags
+                previewTags.innerHTML = '';
+                if (data.authorTags) {
+                    data.authorTags.split(',').forEach(tag => {
+                        const span = document.createElement('span');
+                        span.className = 'px-2 py-1 bg-forest-card text-white rounded text-sm';
+                        span.textContent = tag.trim();
+                        previewTags.appendChild(span);
+                    });
+                } else {
+                    previewTags.textContent = 'No tags';
+                }
+
+                // Handle links
+                previewCover.innerHTML = data.coverUrl ? 
+                    `Cover: <a href="${data.coverUrl}" target="_blank" class="text-blue-600 hover:text-blue-800">View</a>` :
+                    'No cover image provided';
+                previewPdf.innerHTML = data.pdfUrl ?
+                    `PDF: <a href="${data.pdfUrl}" target="_blank" class="text-blue-600 hover:text-blue-800">View</a>` :
+                    'No PDF provided';
+
+                // Show modal
+                previewModal.classList.remove('hidden');
+                previewModal.classList.add('flex');
+
+                // Set up action buttons
+                previewApprove.onclick = () => {
+                    approveSubmission(currentSubmissionId);
+                    closePreview();
+                };
+                previewReject.onclick = () => {
+                    rejectSubmission(currentSubmissionId);
+                    closePreview();
+                };
+            } catch (error) {
+                console.error('Error loading preview:', error);
+                alert('Error loading preview. Please try again.');
+            }
+        };
+
+        window.closePreview = () => {
+            previewModal.classList.add('hidden');
+            previewModal.classList.remove('flex');
+            currentSubmissionId = null;
         };
     </script>
 </body>

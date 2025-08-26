@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us — Noctua Forest</title>
+  <link rel="stylesheet" href="assets/tailwind.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#fbebcc]">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <header class="flex justify-between items-center mb-8">
+      <a href="welcome.html" class="flex items-center space-x-3">
+        <img src="images/logo.png" alt="Noctua Forest Logo" class="w-10 h-10">
+        <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+      </a>
+      <nav class="flex items-center space-x-6">
+        <a href="forest.html" class="hover:text-forest-accent" style="color:#4A5450">The Forest</a>
+        <a href="submit.html" class="hover:text-forest-accent" style="color:#4A5450">Submit Book</a>
+        <a href="about.html" class="hover:text-forest-accent" style="color:#4A5450">About</a>
+      </nav>
+    </header>
+
+    <main class="max-w-2xl mx-auto bg-white rounded-xl shadow-sm p-6 md:p-10">
+      <h1 class="text-3xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color:#4A5450">Contact Us</h1>
+      <p class="text-gray-700 mb-6">Questions, feedback, or partnership ideas? Send us a message.</p>
+
+      <form id="contactForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Your email</label>
+          <input id="fromEmail" type="email" class="mt-1 block w-full border rounded-md p-2" placeholder="you@example.com">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Subject</label>
+          <input id="subject" type="text" required class="mt-1 block w-full border rounded-md p-2">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Message</label>
+          <textarea id="message" rows="6" required class="mt-1 block w-full border rounded-md p-2"></textarea>
+        </div>
+        <!-- Honeypot field (hidden from users) -->
+        <div style="position:absolute;left:-9999px" aria-hidden="true">
+          <label>Leave this field empty</label>
+          <input id="website" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <button id="sendBtn" type="submit" class="px-6 py-2 bg-forest-accent text-white rounded-md">Send</button>
+        <p id="status" class="mt-3 text-sm"></p>
+      </form>
+    </main>
+  </div>
+
+  <script type="module">
+    import { app } from './firebase-config.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+    const auth = getAuth(app);
+    let currentUserId = null;
+    onAuthStateChanged(auth, (user)=>{ currentUserId = user ? user.uid : null; });
+
+    const form = document.getElementById('contactForm');
+    const statusEl = document.getElementById('status');
+    const startedAt = Date.now();
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      statusEl.textContent = 'Sending...';
+      const payload = {
+        fromEmail: document.getElementById('fromEmail').value || undefined,
+        subject: document.getElementById('subject').value,
+        message: document.getElementById('message').value,
+        userId: currentUserId || undefined,
+        honeypot: document.getElementById('website').value || '',
+        startedAtMs: startedAt
+      };
+      try{
+        const res = await fetch('/api/email/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if(!res.ok) throw new Error('Failed');
+        statusEl.textContent = 'Message sent. Thank you!';
+        form.reset();
+      }catch(err){
+        console.error(err);
+        statusEl.textContent = 'Failed to send. Please try again later.';
+        statusEl.classList.add('text-red-600');
+      }
+    });
+  </script>
+</body>
+</html>
+
+

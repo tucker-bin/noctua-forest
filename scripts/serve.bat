@@ -14,6 +14,13 @@ REM Check for python
 where python >nul 2>nul
 set PYTHON_FOUND=%errorlevel%
 
+REM Build Tailwind (non-blocking) if npm is available
+where npm >nul 2>nul
+if %errorlevel%==0 (
+    echo Building Tailwind CSS...
+    call npm run tailwind:build >nul 2>nul
+)
+
 REM Start local server
 if %PYTHON_FOUND%==0 (
     echo Starting local server on http://localhost:8080

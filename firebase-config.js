@@ -25,3 +25,4 @@ const firebaseConfig = window.__FIREBASE_CONFIG__ || {
 
 export const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+export default firebaseConfig;

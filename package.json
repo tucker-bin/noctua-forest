@@ -1,12 +1,20 @@
 {
   "name": "noctua-forest",
+  "private": true,
   "version": "1.0.0",
-  "description": "A curated book discovery platform",
+  "description": "Noctua Forest — static site with minimal Node server",
   "scripts": {
-    "build:css": "tailwindcss -i ./styles/input.css -o ./styles/output.css --minify",
-    "watch:css": "tailwindcss -i ./styles/input.css -o ./styles/output.css --watch"
+    "tailwind:build": "tailwindcss -c tailwind.config.js -i ./src/styles/input.css -o ./assets/tailwind.css --minify",
+    "tailwind:watch": "tailwindcss -c tailwind.config.js -i ./src/styles/input.css -o ./assets/tailwind.css --watch",
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.13",
+    "tailwindcss": "^3.4.10"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.1"
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.41"
   }
 }

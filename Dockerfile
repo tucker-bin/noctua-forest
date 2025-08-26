@@ -1,14 +1,11 @@
-FROM nginx:1.25-alpine
+FROM node:20-alpine
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
+COPY package.json package-lock.json* ./
+RUN npm ci --only=production || npm i --omit=dev
+COPY . .
 
-# Copy static site
-COPY . /usr/share/nginx/html
-
-# Expose port 8080 for Cloud Run
+ENV PORT=8080
 EXPOSE 8080
-
-# Start nginx (config already listens on 8080)
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["node", "server/server.js"]
 

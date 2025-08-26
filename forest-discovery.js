@@ -249,12 +249,24 @@ class ForestDiscovery {
     const card = document.createElement('div');
     card.className = 'bg-forest-card rounded-2xl overflow-hidden shadow-lg group transform hover:-translate-y-2 transition-transform duration-300';
     
-    // Create generic book cover placeholder
-    const placeholderUrl = `https://placehold.co/480x640/4A5450/E0E2DB?text=Book%20Cover`;
+    // Resolve cover image: use provided URL, else title-mapped file, else sample rotation
+    const titleMap = {
+      'klara and the sun': 'books_cover_sample_templates/klara and the sun.jpg',
+      'the midnight library': 'books_cover_sample_templates/midnight_library.jpg',
+      'circe': 'books_cover_sample_templates/circe.jpg',
+      'project hail mary': 'books_cover_sample_templates/project_hail_mary.jpg',
+      'pachinko': 'books_cover_sample_templates/pachinko.jpg',
+      'educated': 'books_cover_sample_templates/educated.jpg'
+    };
+    const samples = Object.values(titleMap);
+    const norm = (book.title || '').toLowerCase().replace(/\s+/g,' ').trim();
+    const mapped = titleMap[norm];
+    const sampleUrl = samples[(book.id || Math.floor(Math.random()*samples.length)) % samples.length];
+    const coverUrl = book.coverUrl || mapped || sampleUrl;
     
     card.innerHTML = `
         <div class="w-full bg-forest-secondary/30 flex items-center justify-center" style="aspect-ratio:3/4;">
-            <img src="${placeholderUrl}" alt="${book.title} cover" class="max-h-[85%] max-w-[85%] object-contain rounded shadow-sm" loading="lazy">
+            <img src="${coverUrl}" alt="${book.title} cover" class="max-h-[85%] max-w-[85%] object-contain rounded shadow-sm" loading="lazy">
         </div>
         <div class="p-6">
             <h3 class="text-2xl font-bold text-white mb-2" style="font-family: 'Poppins', sans-serif;">${book.title}</h3>

@@ -4,28 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noctua Forest - Redesigned</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              'forest': {
-                'deep': '#fbebcc',
-                'card': '#4A5450',
-                'light': '#E0E2DB',
-                'accent': '#F58220',
-                'secondary': '#5A6560'
-              }
-            },
-            fontFamily: {
-              'sans': ['Inter', 'sans-serif'],
-              'heading': ['Poppins', 'serif'],
-            }
-          }
-        }
-      }
-    </script>
+    <link rel="stylesheet" href="assets/tailwind.css">
+    <!-- Tailwind is precompiled into assets/tailwind.css; remove CDN config to avoid ReferenceError -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -65,6 +45,11 @@
                 <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Submit Book</a>
                 <a href="contributor.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Contribute</a>
                 <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">About</a>
+                <a href="account.html" class="hover:text-forest-accent transition-colors duration-300" style="color: #4A5450;">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </a>
             </nav>
         </header>
     </div>
@@ -84,7 +69,62 @@
             </div>
         </section>
 
-        <!-- Join Section -->
+        <!-- Value Proposition: For Readers / For Writers -->
+        <section class="py-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-forest-card text-white rounded-2xl shadow-sm p-8 md:p-14">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+                        <h2 class="text-3xl md:text-4xl font-bold leading-tight" style="font-family: 'Poppins', sans-serif;">Find your place in the Forest</h2>
+                        <div class="flex items-center gap-4 text-sm md:text-base text-gray-200">
+                            <span>Join <strong>50+ Featured Authors</strong></span>
+                            <span class="hidden md:inline text-gray-400">|</span>
+                            <span><strong>10,000+ Engaged Readers</strong></span>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="flex gap-3 mb-8">
+                        <button id="tab-readers" aria-selected="true" class="px-5 py-2.5 rounded-full bg-[#F58220] text-white shadow">For Readers</button>
+                        <button id="tab-writers" aria-selected="false" class="px-5 py-2.5 rounded-full bg-white/10 text-white/90 hover:bg-white/20 border border-white/20">For Writers</button>
+                    </div>
+
+                    <!-- Panels -->
+                    <div id="panel-readers" class="grid md:grid-cols-2 gap-8 items-stretch">
+                        <div class="bg-[#4A5450] text-white rounded-xl p-8 min-h-[260px]">
+                            <h3 class="text-2xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">Why readers love Noctua</h3>
+                            <ul class="list-disc pl-5 space-y-3 text-gray-100 leading-relaxed">
+                                <li>Discover hand‑picked gems across unique genres</li>
+                                <li>Follow emerging voices and indie favorites</li>
+                                <li>Filter by language, region, and cultural themes</li>
+                            </ul>
+                            <a href="forest.html" class="inline-block mt-6 px-7 py-3 bg-[#F58220] hover:bg-[#E0751C] text-white rounded-full">Start Discovering</a>
+                        </div>
+                        <div class="bg-[#5A6560] text-white rounded-xl p-8 min-h-[260px]">
+                            <h3 class="text-2xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">Curated for quality</h3>
+                            <p class="text-gray-100 leading-relaxed">Our boutique approach emphasizes thoughtful discovery over volume. Every book earns its place among the trees.</p>
+                        </div>
+                    </div>
+
+                    <div id="panel-writers" class="hidden grid md:grid-cols-2 gap-8 items-stretch">
+                        <div class="bg-[#4A5450] text-white rounded-xl p-8 min-h-[260px]">
+                            <h3 class="text-2xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">Why writers choose Noctua</h3>
+                            <ul class="list-disc pl-5 space-y-3 text-gray-100 leading-relaxed">
+                                <li>Submit your manuscript and reach engaged readers</li>
+                                <li>Gain visibility in a curated discovery feed</li>
+                                <li>Opt for Premium Review for detailed, timely feedback</li>
+                            </ul>
+                            <a href="submit.html" class="inline-block mt-6 px-7 py-3 bg-[#F58220] hover:bg-[#E0751C] text-white rounded-full">Submit Your Blurb</a>
+                        </div>
+                        <div class="bg-[#5A6560] text-white rounded-xl p-8 min-h-[260px]">
+                            <h3 class="text-2xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">Support that scales</h3>
+                            <p class="text-gray-100 leading-relaxed">From first submission to featured spotlights, we help your work meet the right readers—without the noise.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nightly Wisdom Newsletter (relocated) -->
         <section class="py-20">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <div class="bg-[#4A5450] rounded-xl p-8 text-white max-w-2xl mx-auto">
@@ -117,18 +157,46 @@
 
     <!-- Firebase -->
     <script type="module">
-      // Import the functions you need from the SDKs you need
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-      import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-      import firebaseConfig from './firebase-config.js';
+      import { app } from './firebase-config.js';
       import showAlphaPopup from './components/AlphaPopup.js';
+      import { initNavigation } from './components/Navigation.js';
 
-      // Initialize Firebase
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
+      // Initialize navigation
+      initNavigation();
 
       // Show alpha popup
       showAlphaPopup();
+
+      // Tabs logic
+      const tabReaders = document.getElementById('tab-readers');
+      const tabWriters = document.getElementById('tab-writers');
+      const panelReaders = document.getElementById('panel-readers');
+      const panelWriters = document.getElementById('panel-writers');
+      function activate(which){
+        if (which === 'readers'){
+          panelReaders.classList.remove('hidden');
+          panelReaders.classList.add('grid');
+          panelWriters.classList.add('hidden');
+          tabReaders.setAttribute('aria-selected','true');
+          tabWriters.setAttribute('aria-selected','false');
+          tabReaders.classList.remove('bg-white/10','text-white/90','border','border-white/20');
+          tabReaders.classList.add('bg-[#F58220]','text-white','shadow');
+          tabWriters.classList.remove('bg-[#F58220]','text-white','shadow');
+          tabWriters.classList.add('bg-white/10','text-white/90','border','border-white/20');
+        } else {
+          panelWriters.classList.remove('hidden');
+          panelWriters.classList.add('grid');
+          panelReaders.classList.add('hidden');
+          tabReaders.setAttribute('aria-selected','false');
+          tabWriters.setAttribute('aria-selected','true');
+          tabWriters.classList.remove('bg-white/10','text-white/90','border','border-white/20');
+          tabWriters.classList.add('bg-[#F58220]','text-white','shadow');
+          tabReaders.classList.remove('bg-[#F58220]','text-white','shadow');
+          tabReaders.classList.add('bg-white/10','text-white/90','border','border-white/20');
+        }
+      }
+      tabReaders?.addEventListener('click', () => activate('readers'));
+      tabWriters?.addEventListener('click', () => activate('writers'));
     </script>
 </body>
 </html>

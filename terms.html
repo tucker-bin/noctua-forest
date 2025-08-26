@@ -1,46 +1,79 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Terms of Service — Noctua Forest</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a href="welcome.html" class="brand">Noctua Forest</a>
-        <nav class="nav">
-          <a href="forest.html" class="nav-link">The Forest</a>
-          <a href="about.html" class="nav-link">About</a>
-        </nav>
-      </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service — Noctua Forest</title>
+  <link rel="stylesheet" href="assets/tailwind.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#fbebcc] text-gray-800 min-h-screen flex flex-col">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <header class="flex justify-between items-center">
+      <a href="welcome.html" class="flex items-center space-x-3">
+        <img src="images/logo.png" alt="Noctua Forest Logo" class="w-10 h-10">
+        <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+      </a>
+      <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg" style="font-family: 'Inter', sans-serif;">
+        <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">The Forest</a>
+        <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Submit Book</a>
+        <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">About</a>
+      </nav>
     </header>
+  </div>
 
-    <main class="about" style="padding-top:24px;">
-      <div class="container about-content">
-        <h1>Terms of Service</h1>
-        <p>By using this site, you agree to follow these simple rules.</p>
-        <h3>Use</h3>
-        <p>Use the site for learning and buying our books. Do not misuse or harm the site.</p>
-        <h3>Purchases</h3>
-        <p>Payments are processed by our payment provider. Issues? Email <a href="mailto:support@notuaforest.com">support@notuaforest.com</a>.</p>
-        <h3>Changes</h3>
-        <p>We may update these terms. We will post changes here.</p>
-      </div>
-    </main>
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex-1">
+    <article class="bg-forest-card text-white rounded-2xl shadow-sm p-6 md:p-10 max-w-4xl mx-auto">
+      <h1 class="text-3xl md:text-4xl font-bold mb-6" style="font-family: 'Poppins', sans-serif;">Terms of Service</h1>
+      <p class="text-gray-100 mb-6">These terms describe how we provide Noctua Forest and the responsibilities you agree to as a user. The tone and expectations are similar to boutique creative studios and small marketing teams—clear, practical, and focused on mutual respect.</p>
 
-    <footer class="mini-footer">
-      <div class="container">
-        <div class="footer-brand">TUCKER B. ROBINSON</div>
-        <div class="footer-links">
-          <a href="privacy.html" aria-label="Privacy Policy">Privacy Policy</a>
-          <span>|</span>
-          <a href="terms.html" aria-label="Terms of Service">Terms of Service</a>
-        </div>
+      <h2 class="text-xl font-semibold mt-8 mb-3">1) Using Noctua Forest</h2>
+      <ul class="list-disc pl-6 text-gray-100 space-y-2">
+        <li>You must be at least 13 and able to form a contract where you live.</li>
+        <li>Keep your account secure and don’t share access. You’re responsible for activity under your account.</li>
+        <li>Don’t misuse the platform (e.g., harassment, illegal content, attempts to break security).</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">2) Content & submissions</h2>
+      <ul class="list-disc pl-6 text-gray-100 space-y-2">
+        <li>You retain ownership of your content. You grant us a non‑exclusive license to host, display, and process it solely to operate features you use (e.g., submissions, reviews).</li>
+        <li>You promise you have the rights to what you upload and that it doesn’t violate any laws or third‑party rights.</li>
+        <li>We may remove content that violates these terms or applicable law.</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">3) Payments & premium services</h2>
+      <ul class="list-disc pl-6 text-gray-100 space-y-2">
+        <li>Payments are handled by Stripe. We don’t store full card details.</li>
+        <li>Premium services (e.g., Premium Review) are described at checkout; refunds are handled consistent with that offer and applicable law.</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">4) Acceptable use</h2>
+      <p class="text-gray-100">No unlawful, defamatory, or harmful activity. No attempts to reverse engineer, scrape at abusive scales, or bypass access controls.</p>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">5) Termination</h2>
+      <p class="text-gray-100">We may suspend or end access for violations. You can close your account at any time; we may retain minimal records as required by law (e.g., payment references).</p>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">6) Disclaimers & liability</h2>
+      <p class="text-gray-100">The service is provided “as is.” To the extent allowed by law, we exclude warranties and limit liability to amounts you paid in the last 12 months for the service giving rise to the claim.</p>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">7) Changes</h2>
+      <p class="text-gray-100">We may update these terms as we evolve. We’ll post changes here and update the date below.</p>
+
+      <p class="text-sm text-gray-500 mt-8">Last updated: 2025-08-26</p>
+    </article>
+  </main>
+
+  <footer class="w-full text-white py-12" style="background-color: #4A5450;">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="flex justify-center items-center space-x-4 mb-4">
+        <a href="privacy.html" class="text-gray-300 hover:text-white transition duration-300">Privacy Policy</a>
+        <span class="text-gray-500">|</span>
+        <a href="terms.html" class="text-gray-300 hover:text-white transition duration-300">Terms of Service</a>
       </div>
-    </footer>
-  </body>
-  </html>
+      <p>&copy; 2025 Noctua Forest. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
 
 

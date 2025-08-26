@@ -1,75 +1,89 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Account — Noctua Forest</title>
-    <link rel="stylesheet" href="styles.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a href="welcome.html" class="brand">Noctua Forest</a>
-        <nav class="nav">
-          <a href="forest.html" class="nav-link">The Forest</a>
-          <a href="about.html" class="nav-link">About</a>
-        </nav>
-      </div>
-    </header>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - Noctua Forest</title>
+    <link rel="stylesheet" href="assets/tailwind.css">
+    <!-- Tailwind is precompiled into assets/tailwind.css; CDN config not needed -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#fbebcc]">
+    <!-- Header -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <header class="flex justify-between items-center">
+            <a href="welcome.html" class="flex items-center space-x-3">
+                <img src="images/logo.png" alt="Noctua Forest Logo" class="w-10 h-10">
+                <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+            </a>
+            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg" style="font-family: 'Inter', sans-serif;">
+                <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">The Forest</a>
+                <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Submit Book</a>
+                <a href="contributor.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Contribute</a>
+                <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">About</a>
+                <a href="account.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Account</a>
+            </nav>
+            <button onclick="toggleMobileMenu()" class="md:hidden" aria-label="Toggle menu">
+                <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </header>
+    </div>
 
-    <main>
-      <section class="hero">
-        <div class="container">
-          <h1>Account</h1>
-          <p class="subtitle">Sign in to manage your purchases.</p>
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="max-w-md mx-auto bg-[#4A5450] rounded-xl p-8 text-white">
+            <h1 class="text-2xl font-bold mb-6">Sign In</h1>
+            <div class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium mb-1">Email</label>
+                    <input type="email" id="email" required
+                        class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium mb-1">Password</label>
+                    <input type="password" id="password" required
+                        class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button id="email-signin" 
+                        class="w-full sm:w-auto bg-[#F58220] hover:bg-[#E67615] text-white font-medium py-3 px-8 rounded-full transition duration-300">
+                        Sign In
+                    </button>
+                    <button id="email-signup"
+                        class="w-full sm:w-auto bg-[#5A6560] hover:bg-[#6A7570] text-white font-medium py-3 px-8 rounded-full transition duration-300">
+                        Create Account
+                    </button>
+                </div>
+                <div>
+                    <button id="google-signin"
+                        class="w-full bg-white text-[#4A5450] font-medium py-3 px-8 rounded-full transition duration-300 hover:bg-gray-100">
+                        Continue with Google
+                    </button>
+                </div>
+                <div id="auth-status" class="text-sm text-gray-300"></div>
+                <button id="signout" class="hidden text-gray-300 hover:text-white">Sign Out</button>
+            </div>
         </div>
-      </section>
-
-      <section class="container" style="padding: 8px 0 56px;">
-        <div class="book-card" style="padding: 16px;">
-          <h2 style="margin-top: 0;">Sign In</h2>
-          <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end;">
-            <div style="flex:1; min-width:260px;">
-              <label for="email" style="display:block; font-weight:600; color:#4b3b2f;">Email</label>
-              <input id="email" type="email" placeholder="you@example.com" style="width:100%; padding:10px; border:1px solid #d8cdbf; border-radius:6px; background:#faf4ec;" />
-            </div>
-            <div style="flex:1; min-width:220px;">
-              <label for="password" style="display:block; font-weight:600; color:#4b3b2f;">Password</label>
-              <input id="password" type="password" placeholder="••••••••" style="width:100%; padding:10px; border:1px solid #d8cdbf; border-radius:6px; background:#faf4ec;" />
-            </div>
-            <div style="display:flex; gap:8px;">
-              <button id="email-signin" class="btn">Sign In</button>
-              <button id="email-signup" class="btn">Create Account</button>
-            </div>
-          </div>
-
-          <div style="margin-top:16px; display:flex; gap:8px; align-items:center;">
-            <button id="google-signin" class="btn primary">Continue with Google</button>
-            <button id="signout" class="btn" style="display:none;">Sign Out</button>
-          </div>
-
-          <div id="auth-status" style="margin-top:16px; color:#2b2b2b;"></div>
-          <div class="book-cta" style="margin-top: 16px;">
-            <a class="btn" href="forest.html">Back to The Forest</a>
-          </div>
-        </div>
-      </section>
     </main>
 
-    <footer class="mini-footer">
-      <div class="container">
-        <div class="footer-brand">NOCTUA FOREST</div>
-        <div class="footer-links">
-          <a href="#" aria-label="Privacy Policy">Privacy Policy</a>
-          <span>|</span>
-          <a href="#" aria-label="Terms of Service">Terms of Service</a>
-        </div>
-      </div>
-    </footer>
+    <script>
+        function toggleMobileMenu() {
+            const nav = document.getElementById('nav');
+            nav.classList.toggle('hidden');
+            nav.classList.toggle('flex');
+            nav.classList.toggle('flex-col');
+            nav.classList.toggle('absolute');
+            nav.classList.toggle('top-20');
+            nav.classList.toggle('right-4');
+            nav.classList.toggle('bg-white');
+            nav.classList.toggle('p-4');
+            nav.classList.toggle('rounded-lg');
+            nav.classList.toggle('shadow-lg');
+            nav.classList.toggle('z-50');
+        }
+    </script>
     <script type="module" src="auth.js"></script>
-  </body>
-  </html>
+</body>
+</html>
 

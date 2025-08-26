@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // Admin flag stored in users/{uid}.isAdmin or .admin
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.admin == true;
+    }
+
+    // Users
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Public books
+    match /books/{bookId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Submissions (unpublished)
+    match /submissions/{submissionId} {
+      allow create: if isSignedIn();
+      // owners can read their own; admins can list/read all
+      allow read: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      // owners can update their own before approval; admins manage
+      allow update: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid && resource.data.approved != true);
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid && resource.data.approved != true);
+    }
+
+    // Reviews
+    match /reviews/{reviewId} {
+      allow read: if isAdmin() || isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // Reading list items
+    match /readingList/{itemId} {
+      allow read, create, update, delete: if isSignedIn() &&
+        (request.resource.data.userId == request.auth.uid || resource.data.userId == request.auth.uid);
+    }
+
+    // Contributor applications
+    match /applications/{appId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Newsletter subscribers (email only)
+    match /subscribers/{subId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
+
+

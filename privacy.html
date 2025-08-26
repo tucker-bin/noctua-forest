@@ -1,46 +1,81 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Privacy Policy — Noctua Forest</title>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <div class="container header-inner">
-        <a href="welcome.html" class="brand">Noctua Forest</a>
-        <nav class="nav">
-          <a href="forest.html" class="nav-link">The Forest</a>
-          <a href="about.html" class="nav-link">About</a>
-        </nav>
-      </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Noctua Forest</title>
+  <link rel="stylesheet" href="assets/tailwind.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#fbebcc] text-gray-800 min-h-screen flex flex-col">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <header class="flex justify-between items-center">
+      <a href="welcome.html" class="flex items-center space-x-3">
+        <img src="images/logo.png" alt="Noctua Forest Logo" class="w-10 h-10">
+        <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+      </a>
+      <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg" style="font-family: 'Inter', sans-serif;">
+        <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">The Forest</a>
+        <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Submit Book</a>
+        <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">About</a>
+      </nav>
     </header>
+  </div>
 
-    <main class="about" style="padding-top:24px;">
-      <div class="container about-content">
-        <h1>Privacy Policy</h1>
-        <p>We respect your privacy. We only collect the information we need to run this site and process your orders.</p>
-        <h3>What we collect</h3>
-        <p>Email for newsletters (optional). Order info from our payment provider when you buy a book.</p>
-        <h3>How we use it</h3>
-        <p>To send updates you asked for and to deliver your purchases. You can stop emails any time using the unsubscribe link.</p>
-        <h3>Contact</h3>
-        <p>Questions? Email <a href="mailto:support@notuaforest.com">support@notuaforest.com</a>.</p>
-      </div>
-    </main>
+  <main class="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex-1">
+    <article class="bg-forest-card text-white rounded-2xl shadow-sm p-6 md:p-10 max-w-4xl mx-auto">
+      <h1 class="text-3xl md:text-4xl font-bold mb-6" style="font-family: 'Poppins', sans-serif;">Privacy Policy</h1>
+      <p class="text-gray-100 mb-6">We operate like a boutique creative studio: we collect only what we need to run the platform, deliver services you request, and keep things secure.</p>
 
-    <footer class="mini-footer">
-      <div class="container">
-        <div class="footer-brand">TUCKER B. ROBINSON</div>
-        <div class="footer-links">
-          <a href="privacy.html" aria-label="Privacy Policy">Privacy Policy</a>
-          <span>|</span>
-          <a href="terms.html" aria-label="Terms of Service">Terms of Service</a>
-        </div>
+      <h2 class="text-xl font-semibold mt-8 mb-3">Information we collect</h2>
+      <ul class="list-disc pl-6 text-gray-100 space-y-2">
+        <li><strong>Account & profile</strong>: email, basic profile, and any optional links you add (e.g., social profiles).</li>
+        <li><strong>Content</strong>: submissions, applications, and reviews you create.</li>
+        <li><strong>Usage</strong>: device/browser details, pages visited, and interactions (via standard analytics).</li>
+        <li><strong>Payments</strong>: processed by Stripe; we receive payment status and references, not full card data.</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">How we use information</h2>
+      <ul class="list-disc pl-6 text-gray-100 space-y-2">
+        <li>Provide and improve the site, personalize your dashboard, and support author services.</li>
+        <li>Send transactional messages (e.g., submission confirmations). Marketing emails are opt‑in and include unsubscribe.</li>
+        <li>Maintain security, prevent fraud, and comply with legal requirements.</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">Sharing</h2>
+      <p class="text-gray-100">We share data with service providers solely to run the platform (e.g., Google/Firebase for auth and data, Stripe for payments, email for notifications). We don’t sell personal data.</p>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">Cookies & analytics</h2>
+      <p class="text-gray-100">We use essential cookies for sign‑in and security, and limited analytics to understand feature usage. You can control cookies at the browser level.</p>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">Data retention</h2>
+      <p class="text-gray-100">We keep your content and account data while your account is active. You can request deletion at any time; some records (e.g., payment references) may be retained as required by law.</p>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">Your choices</h2>
+      <ul class="list-disc pl-6 text-gray-100 space-y-2">
+        <li>Access/update your profile in Dashboard → Settings.</li>
+        <li>Unsubscribe from marketing emails using the link included.</li>
+        <li>Request data deletion or ask privacy questions at <a class="underline" href="mailto:support@noctuaforest.com">support@noctuaforest.com</a>.</li>
+      </ul>
+
+      <h2 class="text-xl font-semibold mt-8 mb-3">Changes</h2>
+      <p class="text-gray-100">We’ll post updates on this page and adjust the “last updated” date. Material changes may also be emailed to active users.</p>
+
+      <p class="text-sm text-gray-500 mt-8">Last updated: 2025-08-26</p>
+    </article>
+  </main>
+
+  <footer class="w-full text-white py-12" style="background-color: #4A5450;">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="flex justify-center items-center space-x-4 mb-4">
+        <a href="privacy.html" class="text-gray-300 hover:text-white transition duration-300">Privacy Policy</a>
+        <span class="text-gray-500">|</span>
+        <a href="terms.html" class="text-gray-300 hover:text-white transition duration-300">Terms of Service</a>
       </div>
-    </footer>
-  </body>
-  </html>
+      <p>&copy; 2025 Noctua Forest. All rights reserved.</p>
+    </div>
+  </footer>
+</body>
+</html>
 
 

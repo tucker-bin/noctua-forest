@@ -10,6 +10,7 @@ import {
   signOut,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  getIdTokenResult,
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
@@ -45,6 +46,9 @@ if (emailSignInBtn) {
 
 if (emailSignUpBtn) {
   emailSignUpBtn.addEventListener('click', async () => {
+    if (auth.currentUser) {
+      return setStatus('You are already signed in. Please sign out before creating a new account.');
+    }
     const email = emailInput?.value?.trim();
     const password = passwordInput?.value ?? '';
     if (!email) return setStatus('Please enter your email.');
@@ -52,7 +56,16 @@ if (emailSignUpBtn) {
       await createUserWithEmailAndPassword(auth, email, password);
       setStatus('Account created and signed in.');
     } catch (err) {
-      setStatus(err?.message || 'Sign up failed.');
+      const code = err?.code || '';
+      if (code === 'auth/operation-not-allowed') {
+        setStatus('Email/Password sign-up is not enabled for this project.');
+      } else if (code === 'auth/email-already-in-use') {
+        setStatus('That email is already in use. Try signing in instead.');
+      } else if (code === 'auth/weak-password') {
+        setStatus('Password should be at least 6 characters.');
+      } else {
+        setStatus(err?.message || 'Sign up failed.');
+      }
     }
   });
 }
@@ -79,13 +92,22 @@ if (signOutBtn) {
   });
 }
 
-// Check if user is admin
+// Check if user is admin (Firestore flag or custom claim)
 async function checkAdminStatus(uid) {
+  // Firestore flag
   try {
     const userDoc = await getDoc(doc(db, 'users', uid));
-    return userDoc.exists() && userDoc.data().isAdmin;
-  } catch (error) {
-    console.error('Error checking admin status:', error);
+    if (userDoc.exists()) {
+      const data = userDoc.data();
+      if (data?.isAdmin === true || data?.admin === true) return true;
+    }
+  } catch (_) {}
+
+  // Custom claim
+  try {
+    const token = await getIdTokenResult(auth.currentUser, true);
+    return token.claims?.admin === true || token.claims?.isAdmin === true;
+  } catch (_) {
     return false;
   }
 }
@@ -95,17 +117,32 @@ onAuthStateChanged(auth, async (user) => {
     const isAdmin = await checkAdminStatus(user.uid);
     signOutBtn && (signOutBtn.style.display = 'inline-block');
     googleBtn && (googleBtn.style.display = 'none');
+    emailSignInBtn && (emailSignInBtn.disabled = true);
+    emailSignUpBtn && (emailSignUpBtn.disabled = true);
     if (emailInput) emailInput.disabled = true;
     if (passwordInput) passwordInput.disabled = true;
     setStatus(`Signed in as ${user.email || 'user'}${isAdmin ? ' (Admin)' : ''}.`);
 
-    // Redirect to admin dashboard if on setup page
-    if (isAdmin && window.location.pathname.includes('/admin/setup.html')) {
-      window.location.href = '/admin/dashboard.html';
+    // Handle redirects based on user type and current page
+    const currentPath = window.location.pathname;
+    if (currentPath.endsWith('account.html')) {
+      if (isAdmin) {
+        window.location.href = 'admin/dashboard.html';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+      return;
+    }
+
+    // Redirect from admin pages if not admin
+    if (!isAdmin && currentPath.includes('/admin/')) {
+      window.location.href = '../dashboard.html';
     }
   } else {
     signOutBtn && (signOutBtn.style.display = 'none');
     googleBtn && (googleBtn.style.display = 'inline-block');
+    emailSignInBtn && (emailSignInBtn.disabled = false);
+    emailSignUpBtn && (emailSignUpBtn.disabled = false);
     if (emailInput) emailInput.disabled = false;
     if (passwordInput) passwordInput.disabled = false;
     setStatus('Not signed in.');

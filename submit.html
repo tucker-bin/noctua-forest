@@ -6,7 +6,7 @@
     <title>Submit Your Book — Noctua Forest</title>
     <meta name="description" content="Submit your manuscript to engaged readers who appreciate quality storytelling across all genres. Join The Forest community." />
     <link rel="stylesheet" href="styles.css" />
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/tailwind.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -35,6 +35,11 @@
                 <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Submit Book</a>
                 <a href="contributor.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Contribute</a>
                 <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">About</a>
+                <a href="account.html" class="hover:text-forest-accent transition-colors duration-300" style="color: #4A5450;">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </a>
             </nav>
         </header>
 
@@ -218,10 +223,20 @@
                 class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
             </div>
             <div class="space-y-2">
-              <label for="pdfUrl" class="block font-medium">Book (PDF) URL</label>
-              <input id="pdfUrl" name="pdfUrl" type="url" placeholder="https://..."
+              <label for="pdfUrl" class="block font-medium">
+                Book (PDF) URL
+                <span aria-label="Help" title="Paste a direct HTTPS link to your book’s PDF. Use a public link (no login). Example: Firebase Storage download URL. Avoid Google Drive preview pages.">🛈</span>
+              </label>
+              <input id="pdfUrl" name="pdfUrl" type="url" placeholder="Direct public link to your PDF (https://…)"
                 class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
             </div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="coverFile" class="block font-medium">Or Upload Cover (PNG/JPG)</label>
+            <input id="coverFile" name="coverFile" type="file" accept="image/*"
+              class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+            <p class="text-sm text-gray-300">If both URL and file are provided, the uploaded file will be used.</p>
           </div>
 
           <div class="space-y-2">
@@ -246,23 +261,77 @@
             <p id="submissionSuccess" class="hidden mt-4 text-green-400">Thank you! Your submission was received.</p>
           </div>
         </form>
+
+        <!-- Submission Modal -->
+        <div id="submissionModal" class="hidden fixed inset-0 bg-black/60 items-center justify-center">
+          <div class="bg-white rounded-xl w-full max-w-md mx-4 p-6">
+            <h3 class="text-xl font-bold mb-2 text-[#4A5450]">Thanks for your submission</h3>
+            <p id="submissionModalDesc" class="text-gray-700 mb-4">We'll review it shortly.</p>
+            <div id="premiumCta" class="hidden bg-amber-50 border border-amber-200 text-amber-800 rounded-md p-3 mb-4">
+              Want a guaranteed detailed review and priority placement? Continue to Premium Review.
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button id="modalSubmitAnother" class="px-4 py-2 bg-[#F58220] hover:bg-[#E67615] text-white rounded-md">Submit Another</button>
+              <a id="modalViewDashboard" href="dashboard.html" class="px-4 py-2 text-center bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-md">Dashboard</a>
+              <button id="modalPremium" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Premium Review</button>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
 
 
 
     <script>
-      window.__STRIPE_PREMIUM_REVIEW_LINK__ = 'https://buy.stripe.com/test_6oU00b0IK6Fh4f600H3wQ00';
+      window.__STRIPE_PREMIUM_REVIEW_LINK__ = 'https://book.stripe.com/14A6oHbgy5mJe6e49waVa00';
     </script>
     <script type="module">
+      import { app } from './firebase-config.js';
+      import { initNavigation } from './components/Navigation.js';
       import { handleFormSubmission } from './js/formHandler.js';
       import showAlphaPopup from './components/AlphaPopup.js';
+
+      // Initialize navigation
+      initNavigation();
 
       // Show alpha popup on first visit
       showAlphaPopup();
 
-      // Initialize form handler
+      // Initialize form handler (uses shared app from firebase-config.js)
       handleFormSubmission('submissionForm', 'book');
+
+      // Modal controller for submission
+      window.showSubmissionModal = ({ premium, stripeLink, title }) => {
+        const modal = document.getElementById('submissionModal');
+        const desc = document.getElementById('submissionModalDesc');
+        const premiumBox = document.getElementById('premiumCta');
+        const premiumBtn = document.getElementById('modalPremium');
+        const submitAnother = document.getElementById('modalSubmitAnother');
+        if (!modal) return;
+        if (title) desc.textContent = `"${title}" was received. We'll review it shortly.`;
+
+        // Configure premium area
+        if (premium && stripeLink) {
+          premiumBox.classList.remove('hidden');
+          premiumBtn.classList.remove('hidden');
+          premiumBtn.onclick = () => window.open(stripeLink, '_blank', 'noopener');
+        } else {
+          premiumBox.classList.add('hidden');
+          premiumBtn.classList.add('hidden');
+          premiumBtn.onclick = null;
+        }
+
+        // Submit another (refresh form)
+        submitAnother.onclick = () => {
+          modal.classList.add('hidden');
+          try { document.getElementById('submissionForm').reset(); } catch (_) {}
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // Show modal
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      };
 
       // Restore form data if returning from signup
       const savedFormData = sessionStorage.getItem('savedFormData');
@@ -283,6 +352,24 @@
           sessionStorage.removeItem('savedFormData');
         }
       }
+    </script>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const nav = document.getElementById('nav');
+            nav.classList.toggle('hidden');
+            nav.classList.toggle('flex');
+            nav.classList.toggle('flex-col');
+            nav.classList.toggle('absolute');
+            nav.classList.toggle('top-20');
+            nav.classList.toggle('right-4');
+            nav.classList.toggle('bg-white');
+            nav.classList.toggle('p-4');
+            nav.classList.toggle('rounded-lg');
+            nav.classList.toggle('shadow-lg');
+            nav.classList.toggle('z-50');
+        }
     </script>
   </body>
 </html>
