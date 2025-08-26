@@ -6,16 +6,32 @@ function getQueryParam(name) {
   return url.searchParams.get(name);
 }
 
+function coverForLocal(book){
+  if (window.coverFor) return window.coverFor(book);
+  return book.coverUrl || '';
+}
+
 async function loadBook() {
-  const id = getQueryParam('id');
-  const fallback = getFallback(parseInt(id || '0', 10));
+  const id = parseInt(getQueryParam('id') || '0', 10);
 
   try {
     if (id) {
       const ref = doc(db, 'books', String(id));
       const snap = await getDoc(ref);
       if (snap.exists()) {
-        renderBook(snap.data());
+        const b = snap.data();
+        renderBook({
+          id,
+          title: b.title,
+          author: b.author,
+          language: b.primaryLanguage || b.language,
+          region: b.authorRegion || b.region,
+          blurb: b.blurb,
+          rating: b.rating,
+          year: b.publicationYear || b.year,
+          tags: b.tags || b.authorTags || [],
+          coverUrl: b.coverUrl
+        });
         return;
       }
     }
@@ -23,7 +39,9 @@ async function loadBook() {
     console.warn('Firestore not available or book missing, using fallback.', e);
   }
 
-  renderBook(fallback);
+  const fallbacks = (window.SAMPLE_BOOKS || []);
+  const fallback = fallbacks.find(b => b.id === id) || fallbacks[0] || { title: 'Book', author: 'Unknown', blurb: 'No details available yet.', tags: [] };
+  renderBook({ ...fallback });
 }
 
 function renderBook(book) {
@@ -37,7 +55,7 @@ function renderBook(book) {
   $('bookBlurb').textContent = book.blurb || '';
 
   const cover = $('bookCover');
-  if (book.coverUrl) cover.src = book.coverUrl;
+  cover.src = coverForLocal(book);
 
   const tags = $('bookTags');
   tags.innerHTML = '';
@@ -47,15 +65,6 @@ function renderBook(book) {
     el.textContent = tag;
     tags.appendChild(el);
   });
-}
-
-function getFallback(id) {
-  const base = {
-    1: { title: 'Klara and the Sun', author: 'Kazuo Ishiguro', language: 'en', region: 'europe', rating: 4.1, year: 2021, blurb: 'An artificial friend observes the world with profound questions about love and humanity.', tags: ['science fiction', 'philosophical'] },
-    2: { title: 'The Midnight Library', author: 'Matt Haig', language: 'en', region: 'europe', rating: 4.2, year: 2020, blurb: 'Between life and death there is a library where every book is a different life you could live.', tags: ['contemporary', 'philosophical'] },
-    3: { title: 'Circe', author: 'Madeline Miller', language: 'en', region: 'north-america', rating: 4.3, year: 2018, blurb: 'A feminist retelling of the Greek goddess who transforms from an awkward nymph into a formidable witch.', tags: ['mythology', 'fantasy'] },
-  };
-  return base[id] || { title: 'Book', author: 'Unknown', blurb: 'No details available yet.', tags: [] };
 }
 
 document.addEventListener('DOMContentLoaded', loadBook);

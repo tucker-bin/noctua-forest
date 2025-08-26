@@ -1,3 +1,10 @@
 ==== PUBLISH Tue 08/26/2025 15:30:16.01 ==== 
 true
 https://github.com/tucker-bin/my-ryhme-app.git
+warning: in the working copy of 'scripts/publish.log', LF will be replaced by CRLF the next time Git touches it
+[main f398c4d] publish: site update
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+Pushing to origin/main with --force-with-lease ... 
+branch 'main' set up to track 'origin/main'.
+To https://github.com/tucker-bin/my-ryhme-app.git
+   33c00f5..f398c4d  main -> main

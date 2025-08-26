@@ -6,11 +6,13 @@
   "scripts": {
     "tailwind:build": "tailwindcss -c tailwind.config.js -i ./src/styles/input.css -o ./assets/tailwind.css --minify",
     "tailwind:watch": "tailwindcss -c tailwind.config.js -i ./src/styles/input.css -o ./assets/tailwind.css --watch",
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "images:thumbs": "node scripts/generate-images.mjs"
   },
   "dependencies": {
     "express": "^4.19.2",
     "express-rate-limit": "^6.11.2",
+    "sharp": "^0.33.4",
     "nodemailer": "^6.9.13",
     "tailwindcss": "^3.4.10"
   },
