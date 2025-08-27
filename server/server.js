@@ -10,8 +10,8 @@ const PORT = process.env.PORT || 8080;
 // Security headers (CSP centralized)
 const csp = [
   "default-src 'self' data:",
-  "script-src 'self' https://www.gstatic.com https://www.gstatic.com/firebasejs/ https://apis.google.com 'unsafe-inline'",
-  "connect-src 'self' https://firestore.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://www.googleapis.com https://www.gstatic.com https://apis.google.com https://www.google.com",
+  "script-src 'self' https://www.gstatic.com https://www.gstatic.com/firebasejs/ https://apis.google.com https://www.googletagmanager.com 'unsafe-inline'",
+  "connect-src 'self' https://firestore.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://www.googleapis.com https://www.gstatic.com https://apis.google.com https://www.google.com https://www.google-analytics.com https://analytics.google.com",
   "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'",
   "font-src 'self' https://fonts.gstatic.com",
   "img-src 'self' data: https://*.googleusercontent.com https://*.gstatic.com https://firebasestorage.googleapis.com https://www.google.com https://images.unsplash.com",
