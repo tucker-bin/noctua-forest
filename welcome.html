@@ -19,6 +19,52 @@
     gtag('config', 'G-NJE78MQ7EX');
   </script>
   
+  <!-- Organization Schema Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Noctua Forest",
+    "url": "https://noctuaforest.com",
+    "logo": "https://noctuaforest.com/images/logo-120.png",
+    "description": "A curated book discovery platform connecting thoughtful readers with quality authors across all genres.",
+    "foundingDate": "2024",
+    "slogan": "For the writers who burn the midnight oil",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+1-555-NOCTUA",
+      "contactType": "customer service",
+      "email": "support@noctuaforest.com"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "US"
+    },
+    "sameAs": [
+      "https://medium.com/@noctuaforest"
+    ],
+    "offers": {
+      "@type": "Offer",
+      "name": "Book Submission Review",
+      "description": "Professional manuscript review service",
+      "price": "14.99",
+      "priceCurrency": "USD"
+    },
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "Authors and Readers",
+      "name": "Writers and Book Enthusiasts"
+    },
+    "knowsAbout": [
+      "Book Publishing",
+      "Literature Discovery", 
+      "Author Promotion",
+      "Book Reviews",
+      "Independent Publishing"
+    ]
+  }
+  </script>
+  
   <style>
         body {
             /* Switched to Noto Sans for body text */
@@ -32,8 +78,8 @@
             flex: 1;
         }
         .font-heading {
-            /* Switched to Noto Serif for headings */
-            font-family: 'Noto Serif', serif;
+            /* Switched to Noto Serif for headings - force override */
+            font-family: 'Noto Serif', serif !important;
         }
         .hero-bg {
             background-image: url('https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2070&auto=format&fit=crop');
@@ -71,7 +117,7 @@
         <section class="hero-bg w-full">
             <div class="bg-black/60 text-white">
                 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
-                    <h1 class="text-4xl md:text-6xl font-bold font-heading mb-4" style="font-family: 'Noto Serif', serif;">Welcome to <span class="text-[#F9A825]">Noctua Forest</span></h1>
+                    <h1 class="text-4xl md:text-6xl font-bold font-heading mb-4">Welcome to <span class="text-[#F9A825]">Noctua Forest</span></h1>
                     <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">For the writers who burn the midnight oil. Share your manuscript or discover your next great read.</p>
                     <div class="flex justify-center gap-3">
                         <a href="forest.html" class="bg-[#F58220] hover:bg-[#E0751C] text-white font-bold py-3 px-8 rounded-full transition duration-300 shadow-lg">Explore</a>

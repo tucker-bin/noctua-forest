@@ -1,3 +1,21 @@
+// Helper function to truncate text with fade effect
+function truncateText(text, maxLength = 200) {
+  if (text.length <= maxLength) {
+    return text;
+  }
+  
+  // Find the last space before maxLength to avoid cutting words
+  let truncateAt = maxLength;
+  for (let i = maxLength; i >= maxLength - 20; i--) {
+    if (text[i] === ' ') {
+      truncateAt = i;
+      break;
+    }
+  }
+  
+  return text.substring(0, truncateAt) + '...';
+}
+
 // Forest Discovery System - Infinite Scroll & Filtering
 class ForestDiscovery {
   constructor() {
@@ -154,37 +172,92 @@ class ForestDiscovery {
       const bookCard = this.createBookCard(book);
       feed.appendChild(bookCard);
     });
+    
+    // Update screen reader status
+    this.updateSearchStatus(books.length);
+  }
+  
+  updateSearchStatus(count) {
+    const searchStatus = document.getElementById('searchStatus');
+    const resultsInfo = document.getElementById('resultsInfo');
+    
+    if (searchStatus) {
+      if (count === 0) {
+        searchStatus.textContent = 'No books found matching your criteria.';
+      } else {
+        searchStatus.textContent = `Found ${count} book${count === 1 ? '' : 's'} matching your search.`;
+      }
+    }
+    
+    if (resultsInfo) {
+      if (count > 0) {
+        resultsInfo.textContent = `Showing ${count} book${count === 1 ? '' : 's'}`;
+        resultsInfo.classList.remove('hidden');
+      } else {
+        resultsInfo.classList.add('hidden');
+      }
+    }
+  }
+  
+  updateLoadingStatus(isLoading) {
+    const loadingStatus = document.getElementById('loadingStatus');
+    if (loadingStatus) {
+      loadingStatus.textContent = isLoading ? 'Loading more books...' : '';
+    }
   }
 
   createBookCard(book) {
     const card = document.createElement('div');
-    card.className = 'bg-forest-card rounded-2xl overflow-hidden shadow-lg group transform hover:-translate-y-2 transition-transform duration-300';
+    card.className = 'bg-forest-card rounded-2xl overflow-hidden shadow-lg group transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:ring-offset-2 focus:ring-offset-[#3A4F3C]';
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', `View details for ${book.title} by ${book.author}. Rating: ${book.rating} stars.`);
     
     const coverUrl = (window.coverFor ? window.coverFor(book) : (book.coverUrl || ''));
+    const truncatedBlurb = truncateText(book.blurb, 200);
     
     card.innerHTML = `
         <div class="w-full bg-forest-secondary/30 flex items-center justify-center" style="aspect-ratio:3/4;">
-            <img src="${coverUrl}" alt="${book.title} cover" class="max-h-[85%] max-w-[85%] object-contain rounded shadow-sm" loading="lazy">
+            <img src="${coverUrl}" alt="Cover image for ${book.title}" class="max-h-[85%] max-w-[85%] object-contain rounded shadow-sm" loading="lazy">
         </div>
         <div class="p-6">
             <h3 class="text-2xl font-bold text-white mb-2" style="font-family: 'Poppins', sans-serif;">${book.title}</h3>
-            <p class="text-md text-gray-300 mb-4">By ${book.author}</p>
-            <p class="text-forest-light leading-relaxed mb-4">${book.blurb}</p>
-            <div class="flex flex-wrap gap-2 mb-4">
+            <p class="text-md text-gray-300 mb-4" aria-label="Author">By ${book.author}</p>
+            <div class="relative mb-4">
+                <p class="text-forest-light leading-relaxed" aria-label="Book description">${truncatedBlurb}</p>
+                ${truncatedBlurb.endsWith('...') ? '<div class="absolute bottom-0 right-0 bg-gradient-to-l from-[#3A4F3C] to-transparent w-8 h-6" aria-hidden="true"></div>' : ''}
+            </div>
+            <div class="flex flex-wrap gap-2 mb-4" role="list" aria-label="Book genres">
                 ${book.tags.slice(0, 2).map(tag => `
-                    <span class="bg-forest-secondary text-forest-light px-2 py-1 rounded-full text-xs">${tag}</span>
+                    <span class="bg-forest-secondary text-forest-light px-2 py-1 rounded-full text-xs" role="listitem">${tag}</span>
                 `).join('')}
             </div>
             <div class="flex items-center justify-between text-sm text-gray-400 mb-4">
-                <span class="text-forest-accent font-semibold">⭐ ${book.rating}</span>
-                <span>${book.year}</span>
-                <span>${this.formatRegion(book.region)}</span>
+                <span class="text-forest-accent font-semibold" aria-label="Rating: ${book.rating} out of 5 stars">⭐ ${book.rating}</span>
+                <span aria-label="Publication year">${book.year}</span>
+                <span aria-label="Author region">${this.formatRegion(book.region)}</span>
             </div>
-            <a href="book.html?id=${book.id}" class="block text-center w-full bg-forest-accent bg-forest-accent-hover text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105">
+            <a href="book.html?id=${book.id}" class="block text-center w-full bg-forest-accent bg-forest-accent-hover text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105" aria-label="View details for ${book.title}">
                 View Details
             </a>
         </div>
     `;
+    
+    // Add keyboard navigation support
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        window.location.href = `book.html?id=${book.id}`;
+      }
+    });
+    
+    // Add click handler for mouse users
+    card.addEventListener('click', (e) => {
+      // Don't trigger if clicking on the View Details link
+      if (e.target.tagName === 'A') return;
+      window.location.href = `book.html?id=${book.id}`;
+    });
+    
     return card;
   }
 

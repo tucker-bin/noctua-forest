@@ -87,9 +87,17 @@
                 <h2 class="text-xl font-semibold text-white">Find your path through the forest...</h2>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Search Input -->
+                <!-- Search Input with Voice -->
                 <div class="md:col-span-2">
-                    <input type="text" id="search" placeholder="Search books, authors, or themes..." class="form-input w-full p-3 rounded-lg text-forest-light border-2 border-transparent focus:border-forest-accent focus:ring-0 transition-colors duration-300">
+                    <div class="relative">
+                        <input type="text" id="search" placeholder="Search books, authors, or themes..." class="form-input w-full p-3 pr-12 rounded-lg text-forest-light border-2 border-transparent focus:border-forest-accent focus:ring-0 transition-colors duration-300">
+                        <button id="voiceSearchBtn" class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-forest-light hover:text-forest-accent transition-colors duration-300" title="Voice Search" aria-label="Voice Search">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="voiceSearchStatus" class="text-xs text-forest-light mt-1 opacity-0 transition-opacity duration-300"></div>
                 </div>
                 <!-- Language Filter -->
                 <div>
@@ -146,13 +154,22 @@
             </div>
         </section>
 
+        <!-- Screen Reader Status Updates -->
+        <div aria-live="polite" aria-atomic="true" class="sr-only" id="searchStatus"></div>
+        <div aria-live="polite" class="sr-only" id="loadingStatus"></div>
+        
+        <!-- Results Summary -->
+        <div id="resultsInfo" class="text-forest-light text-sm mb-4 hidden" role="status" aria-live="polite">
+            <!-- Results count will be inserted here -->
+        </div>
+
         <!-- Book Grid Section -->
-        <main id="forestFeed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <main id="forestFeed" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="main" aria-label="Book collection">
             <!-- Books will be dynamically loaded here -->
         </main>
 
         <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="text-center py-16 hidden">
+        <div id="loadingIndicator" class="text-center py-16 hidden" aria-hidden="true">
             <div class="inline-flex items-center space-x-2">
                 <div class="w-4 h-4 bg-forest-accent rounded-full animate-pulse"></div>
                 <div class="w-4 h-4 bg-forest-accent rounded-full animate-pulse" style="animation-delay: 0.3s;"></div>
@@ -209,6 +226,149 @@
             nav.classList.toggle('shadow-lg');
             nav.classList.toggle('z-50');
         }
+    </script>
+
+    <!-- Voice Search JavaScript -->
+    <script>
+        class VoiceSearch {
+            constructor() {
+                this.recognition = null;
+                this.isListening = false;
+                this.searchInput = document.getElementById('search');
+                this.voiceBtn = document.getElementById('voiceSearchBtn');
+                this.statusDiv = document.getElementById('voiceSearchStatus');
+                
+                this.init();
+            }
+            
+            init() {
+                // Check for Web Speech API support
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    this.voiceBtn.style.display = 'none';
+                    return;
+                }
+                
+                // Initialize speech recognition
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                this.recognition = new SpeechRecognition();
+                
+                this.recognition.continuous = false;
+                this.recognition.interimResults = false;
+                this.recognition.lang = 'en-US';
+                
+                // Event listeners
+                this.recognition.onstart = () => this.onStart();
+                this.recognition.onresult = (event) => this.onResult(event);
+                this.recognition.onerror = (event) => this.onError(event);
+                this.recognition.onend = () => this.onEnd();
+                
+                // Button click handler
+                this.voiceBtn.addEventListener('click', () => this.toggleListening());
+            }
+            
+            toggleListening() {
+                if (this.isListening) {
+                    this.stopListening();
+                } else {
+                    this.startListening();
+                }
+            }
+            
+            startListening() {
+                try {
+                    this.recognition.start();
+                } catch (error) {
+                    console.error('Voice recognition error:', error);
+                    this.showStatus('Voice search not available', 'error');
+                }
+            }
+            
+            stopListening() {
+                this.recognition.stop();
+            }
+            
+            onStart() {
+                this.isListening = true;
+                this.voiceBtn.classList.add('text-red-500');
+                this.voiceBtn.innerHTML = `
+                    <svg class="w-5 h-5 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                `;
+                this.showStatus('Listening... Speak now', 'listening');
+            }
+            
+            onResult(event) {
+                const transcript = event.results[0][0].transcript;
+                this.searchInput.value = transcript;
+                this.showStatus(`Found: "${transcript}"`, 'success');
+                
+                // Trigger the search
+                const searchEvent = new Event('input', { bubbles: true });
+                this.searchInput.dispatchEvent(searchEvent);
+            }
+            
+            onError(event) {
+                console.error('Speech recognition error:', event.error);
+                let message = 'Voice search error';
+                
+                switch (event.error) {
+                    case 'no-speech':
+                        message = 'No speech detected. Try again.';
+                        break;
+                    case 'audio-capture':
+                        message = 'Microphone not available';
+                        break;
+                    case 'not-allowed':
+                        message = 'Microphone permission denied';
+                        break;
+                    case 'network':
+                        message = 'Network error. Check connection.';
+                        break;
+                    default:
+                        message = `Voice search error: ${event.error}`;
+                }
+                
+                this.showStatus(message, 'error');
+            }
+            
+            onEnd() {
+                this.isListening = false;
+                this.voiceBtn.classList.remove('text-red-500');
+                this.voiceBtn.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                    </svg>
+                `;
+                
+                // Hide status after delay if not error
+                setTimeout(() => {
+                    if (!this.statusDiv.textContent.includes('error') && !this.statusDiv.textContent.includes('denied')) {
+                        this.hideStatus();
+                    }
+                }, 3000);
+            }
+            
+            showStatus(message, type = 'info') {
+                this.statusDiv.textContent = message;
+                this.statusDiv.className = `text-xs mt-1 transition-opacity duration-300 opacity-100 ${
+                    type === 'error' ? 'text-red-400' :
+                    type === 'success' ? 'text-green-400' :
+                    type === 'listening' ? 'text-blue-400' :
+                    'text-forest-light'
+                }`;
+            }
+            
+            hideStatus() {
+                this.statusDiv.className = 'text-xs text-forest-light mt-1 opacity-0 transition-opacity duration-300';
+            }
+        }
+        
+        // Initialize voice search when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new VoiceSearch();
+        });
     </script>
 </body>
 </html>

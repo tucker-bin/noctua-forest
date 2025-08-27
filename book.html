@@ -17,6 +17,32 @@
     gtag('js', new Date());
     gtag('config', 'G-NJE78MQ7EX');
   </script>
+  
+  <!-- Book Schema Markup (will be populated by JavaScript) -->
+  <script type="application/ld+json" id="bookSchema">
+  {
+    "@context": "https://schema.org",
+    "@type": "Book",
+    "name": "",
+    "author": {
+      "@type": "Person",
+      "name": ""
+    },
+    "description": "",
+    "datePublished": "",
+    "inLanguage": "",
+    "publisher": {
+      "@type": "Organization", 
+      "name": "Noctua Forest"
+    },
+    "offers": {
+      "@type": "Offer",
+      "availability": "https://schema.org/InStock",
+      "url": ""
+    }
+  }
+  </script>
+  
   <style>
     body { font-family: 'Noto Sans', sans-serif; background-color: #fbebcc; }
   </style>
@@ -37,6 +63,17 @@
         </a>
       </nav>
     </header>
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="max-w-5xl mx-auto mb-4" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-2 text-sm text-gray-600">
+        <li><a href="welcome.html" class="hover:text-[#F58220] transition-colors">Home</a></li>
+        <li><span class="mx-2">/</span></li>
+        <li><a href="forest.html" class="hover:text-[#F58220] transition-colors">The Forest</a></li>
+        <li><span class="mx-2">/</span></li>
+        <li id="breadcrumbBookTitle" class="text-gray-800 font-medium" aria-current="page">Book Details</li>
+      </ol>
+    </nav>
 
     <main id="main" class="max-w-5xl mx-auto">
       <div id="loading" class="text-center text-forest-card">Loading…</div>
@@ -99,6 +136,8 @@
         view.classList.remove('hidden');
         document.getElementById('title').textContent = b.title || 'Untitled';
         document.getElementById('author').textContent = b.author ? `by ${b.author}` : '';
+        // Update breadcrumb
+        document.getElementById('breadcrumbBookTitle').textContent = b.title || 'Book Details';
         document.getElementById('blurb').textContent = b.blurb || '';
         document.getElementById('primaryLanguage').textContent = b.primaryLanguage || '';
         document.getElementById('authorRegion').textContent = b.authorRegion || '';
@@ -108,6 +147,33 @@
         if(b.coverUrl){ cover.src = b.coverUrl; } else { cover.style.display='none'; }
         const link = document.getElementById('purchaseLink');
         if(b.purchaseLink){ link.href = b.purchaseLink; } else { link.style.display='none'; }
+        
+        // Update Book Schema Markup
+        const bookSchema = document.getElementById('bookSchema');
+        if (bookSchema) {
+          const schema = {
+            "@context": "https://schema.org",
+            "@type": "Book",
+            "name": b.title || "Untitled",
+            "author": {
+              "@type": "Person",
+              "name": b.author || "Unknown"
+            },
+            "description": b.blurb || "",
+            "datePublished": b.publicationYear || "",
+            "inLanguage": b.primaryLanguage || "en",
+            "publisher": {
+              "@type": "Organization", 
+              "name": "Noctua Forest"
+            },
+            "offers": {
+              "@type": "Offer",
+              "availability": "https://schema.org/InStock",
+              "url": b.purchaseLink || window.location.href
+            }
+          };
+          bookSchema.textContent = JSON.stringify(schema, null, 2);
+        }
 
         const btn = document.getElementById('addReading');
         btn.addEventListener('click', async ()=>{

@@ -238,7 +238,7 @@
 
         // Auth state observer
         onAuthStateChanged(auth, async (user) => {
-            console.log('[admin-check] onAuthStateChanged fired');
+            // console.log('[admin-check] onAuthStateChanged fired');
             if (!user) {
                 window.location.href = '../account.html';
                 return;
@@ -254,10 +254,10 @@
                         if (snap.exists()) {
                             const data = snap.data();
                             usersDocResult = (data?.isAdmin === true || data?.admin === true);
-                            console.log('[admin-check] users doc isAdmin:', usersDocResult);
+                            // console.log('[admin-check] users doc isAdmin:', usersDocResult);
                         } else {
                             usersDocResult = false;
-                            console.log('[admin-check] users doc missing');
+                            // console.log('[admin-check] users doc missing');
                         }
                     } catch (err) {
                         usersDocResult = undefined;
@@ -269,7 +269,7 @@
                         await user.getIdToken(true);
                         const token = await getIdTokenResult(user);
                         claimsResult = (token.claims?.admin === true || token.claims?.isAdmin === true);
-                        console.log('[admin-check] claims isAdmin:', claimsResult, token.claims);
+                        // console.log('[admin-check] claims isAdmin:', claimsResult, token.claims);
                     } catch (err) {
                         claimsResult = undefined;
                         console.warn('[admin-check] claims error:', err);
@@ -279,7 +279,7 @@
 
             // Resolve conservatively to avoid flipping legit admins
             const isAdmin = (usersDocResult === true || claimsResult === true) || (usersDocResult === undefined || claimsResult === undefined);
-            console.log('[admin-check] final decision isAdmin:', isAdmin);
+            // console.log('[admin-check] final decision isAdmin:', isAdmin);
             if (!isAdmin) {
                 window.location.href = '../dashboard.html';
                 return;

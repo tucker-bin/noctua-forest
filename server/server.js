@@ -4,6 +4,46 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
 
+// Sample books data for API (in production, this would come from Firestore)
+const SAMPLE_BOOKS = [
+  {
+    id: "whispers-in-the-wind",
+    title: "Whispers in the Wind",
+    author: "Elena Rodriguez",
+    blurb: "A haunting tale of love and loss set against the backdrop of the Spanish Civil War. Elena's grandmother's journal reveals secrets that span three generations.",
+    tags: ["Historical Fiction", "Romance", "Spain"],
+    language: "English",
+    region: "Spain",
+    rating: 4.7,
+    publicationYear: 2023,
+    coverUrl: "/images/book-covers/whispers-wind.jpg"
+  },
+  {
+    id: "digital-nomad-chronicles",
+    title: "Digital Nomad Chronicles",
+    author: "Marcus Chen",
+    blurb: "An honest account of building a successful remote business while traveling the world. Practical insights mixed with personal adventures from Silicon Valley to rural Vietnam.",
+    tags: ["Memoir", "Business", "Travel"],
+    language: "English",
+    region: "Global",
+    rating: 4.5,
+    publicationYear: 2023,
+    coverUrl: "/images/book-covers/digital-nomad.jpg"
+  },
+  {
+    id: "midnight-calculations",
+    title: "Midnight Calculations",
+    author: "Dr. Sarah Kim",
+    blurb: "A brilliant mathematician discovers a pattern in prime numbers that could revolutionize cryptography. But someone is willing to kill to keep it secret.",
+    tags: ["Thriller", "Science", "Mystery"],
+    language: "English",
+    region: "South Korea",
+    rating: 4.8,
+    publicationYear: 2024,
+    coverUrl: "/images/book-covers/midnight-calc.jpg"
+  }
+];
+
 const app = express();
 const PORT = process.env.PORT || 8080;
 
@@ -243,6 +283,99 @@ app.get('/api/admin/email-logs', (req, res) => {
     res.json({ ok: true, logs: emailLogs.slice().reverse() });
   } catch (err) {
     res.status(500).json({ error: 'failed' });
+  }
+});
+
+// Public API: Books endpoints
+app.get('/api/books', (req, res) => {
+  try {
+    // Add CORS headers for API access
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    
+    // Support query parameters for filtering
+    const { language, region, author, tag, search, limit = 50 } = req.query;
+    
+    let filteredBooks = [...SAMPLE_BOOKS];
+    
+    // Apply filters
+    if (language) {
+      filteredBooks = filteredBooks.filter(book => 
+        book.language?.toLowerCase().includes(language.toLowerCase())
+      );
+    }
+    if (region) {
+      filteredBooks = filteredBooks.filter(book => 
+        book.region?.toLowerCase().includes(region.toLowerCase())
+      );
+    }
+    if (author) {
+      filteredBooks = filteredBooks.filter(book => 
+        book.author?.toLowerCase().includes(author.toLowerCase())
+      );
+    }
+    if (tag) {
+      filteredBooks = filteredBooks.filter(book => 
+        book.tags?.some(t => t.toLowerCase().includes(tag.toLowerCase()))
+      );
+    }
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredBooks = filteredBooks.filter(book => 
+        book.title?.toLowerCase().includes(searchLower) ||
+        book.author?.toLowerCase().includes(searchLower) ||
+        book.blurb?.toLowerCase().includes(searchLower) ||
+        book.tags?.some(t => t.toLowerCase().includes(searchLower))
+      );
+    }
+    
+    // Apply limit
+    const limitNum = Math.min(parseInt(limit) || 50, 100); // Max 100 books per request
+    filteredBooks = filteredBooks.slice(0, limitNum);
+    
+    res.json({
+      success: true,
+      count: filteredBooks.length,
+      total: SAMPLE_BOOKS.length,
+      books: filteredBooks
+    });
+  } catch (err) {
+    console.error('API /books error:', err);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch books' 
+    });
+  }
+});
+
+app.get('/api/books/:id', (req, res) => {
+  try {
+    // Add CORS headers for API access
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    
+    const { id } = req.params;
+    const book = SAMPLE_BOOKS.find(b => b.id === id);
+    
+    if (!book) {
+      return res.status(404).json({
+        success: false,
+        error: 'Book not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      book: book
+    });
+  } catch (err) {
+    console.error('API /books/:id error:', err);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch book' 
+    });
   }
 });
 

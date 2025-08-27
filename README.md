@@ -1,6 +1,6 @@
 # Noctua Forest — Curated Book Discovery Platform
 
-This repository contains the public website for Noctua Forest, a curated book discovery platform.
+This repository contains the public website for Noctua Forest, a curated book discovery platform with Google Analytics integration.
 
 Audience: Authors across all genres seeking engaged readers and readers who value thoughtful storytelling. The platform facilitates manuscript submissions, quality curation, and author-reader connections.
 

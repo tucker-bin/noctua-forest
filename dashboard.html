@@ -171,8 +171,9 @@
                         <label for="tiktok" class="block text-sm mb-1">TikTok</label>
                         <input id="tiktok" type="url" placeholder="https://www.tiktok.com/@handle" class="w-full px-4 py-3 rounded-lg bg-forest-secondary border border-[#7A8580] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
                     </div>
-                    <div class="flex items-end gap-3">
+                    <div class="flex items-end gap-3 flex-wrap">
                         <button id="saveSettings" type="submit" class="px-6 py-3 bg-forest-accent text-white rounded-full hover:opacity-90">Save Settings</button>
+                        <a href="api-docs.html" class="px-6 py-3 bg-[#4A5450] text-white rounded-full hover:opacity-90">API Docs</a>
                         <a href="contact.html" class="px-6 py-3 bg-[#F58220] text-white rounded-full hover:opacity-90">Contact Us</a>
                     </div>
                 </form>
@@ -206,7 +207,7 @@
 
         // Wait for DOM to be ready
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, setting up Firebase...');
+            // console.log('DOM loaded, setting up Firebase...');
 
             // Use initialized Firebase from firebase-config.js
             const app = firebaseApp;
@@ -215,14 +216,14 @@
 
             // Set up sign out handler (single source of truth)
             const signoutBtn = document.getElementById('signout');
-            console.log('Sign out button found:', signoutBtn);
+            // console.log('Sign out button found:', signoutBtn);
             if (signoutBtn) {
                 signoutBtn.addEventListener('click', async (e) => {
                     e.preventDefault();
-                    console.log('Sign out clicked');
+                    // console.log('Sign out clicked');
                     try {
                         await signOut(auth);
-                        console.log('Firebase sign out successful');
+                        // console.log('Firebase sign out successful');
                         window.location.href = 'account.html';
                     } catch (error) {
                         console.error('Error signing out:', error);
