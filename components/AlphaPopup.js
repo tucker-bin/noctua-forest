@@ -50,7 +50,7 @@ const showAlphaPopup = () => {
       </div>
 
       <!-- Social proof -->
-      <p class="text-xs md:text-sm text-gray-300 mb-5 md:mb-6 text-center">Join the first 150+ other night owls shaping our community.</p>
+      <p class="text-xs md:text-sm text-gray-300 mb-5 md:mb-6 text-center">Join 150+ night owls shaping our community.</p>
 
       <!-- Email capture form -->
       <div class="space-y-3 md:space-y-4">
@@ -66,7 +66,7 @@ const showAlphaPopup = () => {
 
         <!-- Social sign-in -->
         <button id="googleSignInBtn" 
-          class="w-full bg-white hover:bg-gray-50 text-gray-800 font-medium h-11 md:h-12 rounded transition duration-300 flex items-center justify-center gap-2 text-sm md:text-base">
+          class="w-full bg-[#F58220] hover:bg-[#E67615] text-white font-medium h-11 md:h-12 rounded transition duration-300 flex items-center justify-center gap-2 text-sm md:text-base">
           <svg class="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24">
             <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>

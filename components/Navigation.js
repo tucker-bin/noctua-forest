@@ -13,7 +13,7 @@ export function initNavigation() {
         const btn = document.createElement('button');
         btn.setAttribute('data-mobile-toggle', '');
         btn.setAttribute('aria-label', 'Toggle menu');
-        btn.className = 'md:hidden text-[#2D3A36]';
+        btn.className = 'md:hidden text-[#213029]';
         btn.innerHTML = '<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>';
         header?.appendChild(btn);
 
@@ -29,10 +29,10 @@ export function initNavigation() {
             nav.classList.toggle('rounded-lg');
             nav.classList.toggle('shadow-lg');
             nav.classList.toggle('z-50');
-            // Use green card background instead of white
+            // Use green card background and light text instead of white
             if (open) {
-                nav.style.backgroundColor = '#4A5450';
-                nav.style.color = '#E0E2DB';
+                nav.style.backgroundColor = '#3A4440';
+                nav.style.color = '#E8ECE6';
             } else {
                 nav.style.backgroundColor = '';
                 nav.style.color = '';
