@@ -63,6 +63,13 @@ class ForestDiscovery {
   }
 
   setupInfiniteScroll() {
+    // Safari compatibility: Check for IntersectionObserver support
+    if (!('IntersectionObserver' in window)) {
+      console.warn('IntersectionObserver not supported, using scroll fallback');
+      this.setupScrollFallback();
+      return;
+    }
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting && !this.isLoading && this.hasMoreBooks) {
@@ -78,6 +85,21 @@ class ForestDiscovery {
     if (loadingIndicator) {
       observer.observe(loadingIndicator);
     }
+  }
+
+  // Fallback for browsers without IntersectionObserver
+  setupScrollFallback() {
+    window.addEventListener('scroll', () => {
+      if (!this.isLoading && this.hasMoreBooks) {
+        const scrollHeight = document.documentElement.scrollHeight;
+        const scrollTop = document.documentElement.scrollTop;
+        const clientHeight = document.documentElement.clientHeight;
+        
+        if (scrollTop + clientHeight >= scrollHeight - 1000) {
+          this.loadMoreBooks();
+        }
+      }
+    });
   }
 
   async loadInitialBooks() {
