@@ -60,8 +60,46 @@
   }
   </script>
   
+  <!-- Safari Compatibility Script -->
+  <script>
+    // Safari detection
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    
+    if (isSafari || isIOS) {
+      document.documentElement.classList.add('safari');
+      if (isIOS) document.documentElement.classList.add('ios');
+    }
+    
+    // Safari touch event handling
+    document.addEventListener('touchstart', function(){}, {passive: true});
+  </script>
+  
   <style>
     body { font-family: 'Noto Sans', sans-serif; background-color: #fbebcc; }
+    
+    /* Safari-specific loading state */
+    .safari .loading-img {
+      position: relative;
+      min-height: 200px;
+      background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+      background-size: 200% 100%;
+      animation: 1.5s shine linear infinite;
+    }
+    
+    @keyframes shine {
+      to { background-position-x: -200%; }
+    }
+    
+    /* Safari-specific button styles */
+    .safari button {
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* iOS-specific viewport height fix */
+    .ios .full-height {
+      height: -webkit-fill-available;
+    }
   </style>
 </head>
 <body>
@@ -137,45 +175,47 @@
     }
 
     async function loadBook(){
-      const id = getParam('id');
-      if(!id){
-        document.getElementById('loading').textContent = 'Missing book id.';
-        return;
-      }
-      
-      let b = null;
-      
-      try{
-        // First try to get data from Firestore (for authenticated users)
-        const snap = await getDoc(doc(db, 'books', id));
-        if(snap.exists()){
-          b = snap.data();
+      try {
+        const id = getParam('id');
+        if(!id){
+          document.getElementById('loading').textContent = 'Missing book id.';
+          return;
         }
-      } catch(firestoreError) {
-        console.log('Firestore not available or book missing, using fallback.', firestoreError);
-      }
-      
-      // If Firestore failed or book not found, try public API
-      if (!b) {
-        try {
-          const response = await fetch(`/api/books/${id}`);
-          if (response.ok) {
-            const apiData = await response.json();
-            if (apiData.success && apiData.book) {
-              b = apiData.book;
-              console.log('Loaded book from public API');
-            }
+        
+        let b = null;
+        
+        try{
+          // First try to get data from Firestore (for authenticated users)
+          const snap = await getDoc(doc(db, 'books', id));
+          if(snap.exists()){
+            b = snap.data();
           }
-        } catch(apiError) {
-          console.error('Public API also failed:', apiError);
+        } catch(firestoreError) {
+          console.log('Firestore not available or book missing, using fallback.', firestoreError);
         }
-      }
-      
-      // If both methods failed
-      if (!b) {
-        document.getElementById('loading').textContent = 'Book not found.';
-        return;
-      }
+        
+        // If Firestore failed or book not found, try public API
+        if (!b) {
+          try {
+            const response = await fetch(`/api/books/${id}`);
+            if (response.ok) {
+              const apiData = await response.json();
+              if (apiData.success && apiData.book) {
+                b = apiData.book;
+                console.log('Loaded book from public API');
+              }
+            }
+          } catch(apiError) {
+            console.error('Public API also failed:', apiError);
+          }
+        }
+        
+        // If both methods failed
+        if (!b) {
+          document.getElementById('loading').textContent = 'Book not found.';
+          return;
+        }
+        
         document.getElementById('loading').classList.add('hidden');
         const view = document.getElementById('bookView');
         view.classList.remove('hidden');
@@ -194,13 +234,42 @@
         updateElement('authorRegion', b.authorRegion || '');
         updateElement('publicationYear', b.publicationYear || '');
         updateElement('authorTags', b.authorTags || '');
+        
+        // Handle cover image with loading state and error fallback
         const cover = document.getElementById('coverImg');
         if(cover) {
-          if(b.coverUrl){ cover.src = b.coverUrl; } else { cover.style.display='none'; }
+          if(b.coverUrl) {
+            cover.classList.add('loading-img');
+            const img = new Image();
+            img.onload = () => {
+              cover.src = b.coverUrl;
+              cover.classList.remove('loading-img');
+            };
+            img.onerror = () => {
+              cover.style.display = 'none';
+              console.warn('Failed to load cover image:', b.coverUrl);
+            };
+            img.src = b.coverUrl;
+          } else {
+            cover.style.display = 'none';
+          }
         }
+        
+        // Handle purchase link
         const link = document.getElementById('purchaseLink');
         if(link) {
-          if(b.purchaseLink){ link.href = b.purchaseLink; } else { link.style.display='none'; }
+          if(b.purchaseLink) {
+            link.href = b.purchaseLink;
+            // Add touch handling for Safari
+            if (document.documentElement.classList.contains('safari')) {
+              link.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                window.open(b.purchaseLink, '_blank');
+              }, { passive: false });
+            }
+          } else {
+            link.style.display = 'none';
+          }
         }
         
         // Update Book Schema Markup

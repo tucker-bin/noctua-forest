@@ -22,7 +22,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Safari Compatibility Script -->
-    <script src="assets/safari-compat.js"></script>
+    <script>
+        // Safari detection
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        
+        if (isSafari || isIOS) {
+            document.documentElement.classList.add('safari');
+            if (isIOS) document.documentElement.classList.add('ios');
+        }
+        
+        // Safari IntersectionObserver fallback
+        if (!('IntersectionObserver' in window)) {
+            const fallbackScript = document.createElement('script');
+            fallbackScript.src = 'https://polyfill.io/v3/polyfill.min.js?features=IntersectionObserver';
+            document.head.appendChild(fallbackScript);
+        }
+        
+        // Safari touch event handling
+        document.addEventListener('touchstart', function(){}, {passive: true});
+    </script>
     
     <!-- Google tag (gtag.js) with Consent Management -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-NJE78MQ7EX"></script>
@@ -227,9 +246,11 @@
     <script src="sample-books.js"></script>
     <script src="forest-discovery.js"></script>
     <script>
-        // Mobile menu toggle
+        // Mobile menu toggle with Safari support
         function toggleMobileMenu() {
             const nav = document.getElementById('nav');
+            if (!nav) return;
+            
             const isOpen = nav.classList.contains('hidden');
             
             // Toggle visibility and layout
@@ -237,7 +258,7 @@
             nav.classList.toggle('flex');
             nav.classList.toggle('flex-col');
             
-            // Toggle mobile positioning
+            // Toggle mobile positioning with Safari-specific adjustments
             nav.classList.toggle('absolute');
             nav.classList.toggle('top-20');
             nav.classList.toggle('right-4');
@@ -250,14 +271,38 @@
             if (isOpen) {
                 nav.style.backgroundColor = '#3A4440';
                 nav.style.color = '#E8ECE6';
+                
+                // Safari-specific: Add backdrop blur
+                if (document.documentElement.classList.contains('safari')) {
+                    nav.style.backdropFilter = 'blur(10px)';
+                    nav.style.webkitBackdropFilter = 'blur(10px)';
+                }
             } else {
                 nav.style.backgroundColor = '';
                 nav.style.color = '';
+                nav.style.backdropFilter = '';
+                nav.style.webkitBackdropFilter = '';
             }
             
-            // Prevent body scroll when menu is open
-            document.body.style.overflow = isOpen ? 'hidden' : '';
+            // Prevent body scroll when menu is open (Safari-safe)
+            if (document.documentElement.classList.contains('ios')) {
+                document.body.style.position = isOpen ? 'fixed' : '';
+                document.body.style.width = isOpen ? '100%' : '';
+            } else {
+                document.body.style.overflow = isOpen ? 'hidden' : '';
+            }
         }
+        
+        // Add touch event listeners for Safari
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
+            if (menuButton) {
+                menuButton.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                }, { passive: false });
+            }
+        });
     </script>
 
     <!-- Voice Search JavaScript -->
