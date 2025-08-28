@@ -89,8 +89,12 @@
     </style>
 </head>
 <body class="bg-forest-deep text-forest-light">
-    <a href="#nav" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to navigation</a>
-    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to main content</a>
+    <!-- Skip Links -->
+    <div class="skip-links" role="navigation" aria-label="Skip links">
+        <a href="#nav" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent z-50">Skip to navigation</a>
+        <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent z-50">Skip to main content</a>
+        <a href="#search" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent z-50">Skip to search</a>
+    </div>
 
     <!-- Main Container -->
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -120,28 +124,44 @@
 
 
         <!-- Search & Filter Section -->
-        <section id="forest" class="bg-forest-card p-6 sm:p-8 rounded-2xl shadow-2xl mb-16">
+        <section id="forest" class="bg-forest-card p-6 sm:p-8 rounded-2xl shadow-2xl mb-16" role="search" aria-label="Book search and filters">
             <div class="flex items-center space-x-3 mb-6">
-                <svg class="w-6 h-6 text-forest-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <h2 class="text-xl font-semibold text-white">Find your path through the forest...</h2>
+                <svg class="w-6 h-6 text-forest-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <h2 class="text-xl font-semibold text-white" id="searchHeading">Find your path through the forest...</h2>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" role="group" aria-labelledby="searchHeading">
                 <!-- Search Input with Voice -->
                 <div class="md:col-span-2">
                     <div class="relative">
-                        <input type="text" id="search" placeholder="Search books, authors, or themes..." class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200">
-                        <button id="voiceSearchBtn" class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-forest-light hover:text-forest-accent transition-colors duration-300" title="Voice Search" aria-label="Voice Search">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <label for="search" class="sr-only">Search books, authors, or themes</label>
+                        <input 
+                            type="text" 
+                            id="search" 
+                            placeholder="Search books, authors, or themes..." 
+                            class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200"
+                            role="searchbox"
+                            aria-label="Search books, authors, or themes"
+                            aria-describedby="voiceSearchStatus">
+                        <button 
+                            id="voiceSearchBtn" 
+                            class="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 text-forest-light hover:text-forest-accent transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent" 
+                            title="Voice Search" 
+                            aria-label="Activate voice search"
+                            aria-controls="voiceSearchStatus">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
                             </svg>
                         </button>
                     </div>
-                    <div id="voiceSearchStatus" class="text-xs text-white/80 mt-1 opacity-0 transition-opacity duration-300"></div>
+                    <div id="voiceSearchStatus" class="text-xs text-white/80 mt-1 opacity-0 transition-opacity duration-300" role="status" aria-live="polite"></div>
                 </div>
                 <!-- Language Filter -->
                 <div>
-                    <label for="language" class="sr-only">Language</label>
-                    <select id="language" class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200">
+                    <label for="language" class="sr-only">Filter by language</label>
+                    <select 
+                        id="language" 
+                        class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200"
+                        aria-label="Filter by language">
                         <option value="">All Languages</option>
                         <option value="en">English</option>
                         <option value="es">Spanish</option>
@@ -160,8 +180,11 @@
                 </div>
                 <!-- Region Filter -->
                 <div>
-                    <label for="region" class="sr-only">Region</label>
-                    <select id="region" class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200">
+                    <label for="region" class="sr-only">Filter by region</label>
+                    <select 
+                        id="region" 
+                        class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200"
+                        aria-label="Filter by region">
                         <option value="">All Regions</option>
                         <option value="north-america">North America</option>
                         <option value="south-america">South America</option>
@@ -175,9 +198,13 @@
             </div>
             
             <!-- Sort and Active Filters Row -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mt-6 space-y-4 md:space-y-0">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mt-6 space-y-4 md:space-y-0" role="group" aria-label="Sort and filter controls">
                 <div class="w-full md:w-auto">
-                    <select id="sort" class="form-select w-full md:w-auto p-3 rounded-lg text-forest-light border-2 border-transparent focus:border-forest-accent focus:ring-0 transition-colors duration-300">
+                    <label for="sort" class="sr-only">Sort books by</label>
+                    <select 
+                        id="sort" 
+                        class="form-select w-full md:w-auto p-3 rounded-lg text-forest-light border-2 border-transparent focus:border-forest-accent focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent transition-colors duration-300"
+                        aria-label="Sort books by">
                         <option value="recent">Most Recent</option>
                         <option value="popular">Most Popular</option>
                         <option value="rating">Highest Rated</option>
@@ -185,20 +212,25 @@
                     </select>
                 </div>
                 
-                <div id="activeFilters" class="hidden flex-wrap gap-2">
-                    <span class="text-sm text-gray-300">Active filters:</span>
-                    <div class="filter-tags flex flex-wrap gap-2"></div>
-                    <button onclick="clearAllFilters()" class="text-sm text-forest-accent hover:text-white transition-colors duration-300">Clear All</button>
+                <div id="activeFilters" class="hidden flex-wrap gap-2" role="region" aria-label="Active filters">
+                    <span class="text-sm text-gray-300" id="activeFiltersLabel">Active filters:</span>
+                    <div class="filter-tags flex flex-wrap gap-2" role="list" aria-labelledby="activeFiltersLabel"></div>
+                    <button 
+                        onclick="clearAllFilters()" 
+                        class="text-sm text-forest-accent hover:text-white transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent"
+                        aria-label="Clear all filters">
+                        Clear All
+                    </button>
                 </div>
             </div>
         </section>
 
         <!-- Screen Reader Status Updates -->
-        <div aria-live="polite" aria-atomic="true" class="sr-only" id="searchStatus"></div>
-        <div aria-live="polite" class="sr-only" id="loadingStatus"></div>
+        <div aria-live="polite" aria-atomic="true" class="sr-only" id="searchStatus" role="status"></div>
+        <div aria-live="polite" class="sr-only" id="loadingStatus" role="status"></div>
         
         <!-- Results Summary -->
-        <div id="resultsInfo" class="text-forest-light text-sm mb-4 hidden" role="status" aria-live="polite">
+        <div id="resultsInfo" class="text-forest-light text-sm mb-4 hidden" role="status" aria-live="polite" aria-atomic="true">
             <!-- Results count will be inserted here -->
         </div>
 
@@ -208,8 +240,8 @@
         </main>
 
         <!-- Loading Indicator -->
-        <div id="loadingIndicator" class="text-center py-16 hidden" aria-hidden="true">
-            <div class="inline-flex items-center space-x-2">
+        <div id="loadingIndicator" class="text-center py-16 hidden" role="status" aria-label="Loading more books">
+            <div class="inline-flex items-center space-x-2" aria-hidden="true">
                 <div class="w-4 h-4 bg-forest-accent rounded-full animate-pulse"></div>
                 <div class="w-4 h-4 bg-forest-accent rounded-full animate-pulse" style="animation-delay: 0.3s;"></div>
                 <div class="w-4 h-4 bg-forest-accent rounded-full animate-pulse" style="animation-delay: 0.6s;"></div>
@@ -218,21 +250,35 @@
         </div>
 
         <!-- No Results Message -->
-        <div id="noResults" class="text-center py-20 hidden">
-            <div class="text-6xl mb-6 opacity-80">🌲</div>
+        <div id="noResults" class="text-center py-20 hidden" role="alert">
+            <div class="text-6xl mb-6 opacity-80" aria-hidden="true">🌲</div>
             <h3 class="text-3xl font-bold mb-3" style="font-family: 'Poppins', sans-serif; color:#4A5450;">The forest is quiet here…</h3>
             <p class="mb-8 max-w-xl mx-auto text-lg" style="color:#4A5450;">No books match your current filters. Try adjusting your search or exploring different regions.</p>
-            <button onclick="clearAllFilters()" class="bg-forest-secondary bg-forest-secondary-hover text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105">
+            <button 
+                onclick="clearAllFilters()" 
+                class="bg-forest-secondary hover:bg-forest-secondary-hover text-white font-bold py-3 px-8 rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent"
+                aria-label="Clear all filters and show all books">
                 Clear Filters
             </button>
         </div>
 
         <!-- End-of-feed message / CTAs -->
-        <div class="container mx-auto px-6 mt-16 mb-24 text-center">
+        <div class="container mx-auto px-6 mt-16 mb-24 text-center" role="complementary" aria-label="End of book list">
             <p class="mb-4" style="color:#4A5450;">You've reached a quiet clearing in the Forest. This is the end of the list—for now.</p>
             <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
-                <a href="submit.html" class="bg-forest-accent bg-forest-accent-hover text-white font-bold py-3 px-6 rounded-full transition-all duration-300">Submit a book</a>
-                <a href="about.html" class="font-medium underline hover:text-[#F58220]" style="color:#4A5450;">Learn about Noctua Forest</a>
+                <a 
+                    href="submit.html" 
+                    class="bg-forest-accent hover:bg-forest-accent-hover text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent"
+                    aria-label="Submit your book to Noctua Forest">
+                    Submit a book
+                </a>
+                <a 
+                    href="about.html" 
+                    class="font-medium underline hover:text-forest-accent transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent" 
+                    style="color:#4A5450;"
+                    aria-label="Learn more about Noctua Forest">
+                    Learn about Noctua Forest
+                </a>
             </div>
         </div>
 
