@@ -36,14 +36,25 @@
     <!-- Safari Compatibility Script -->
     <script src="assets/safari-compat.js"></script>
     
-    <!-- Google tag (gtag.js) -->
+    <!-- Google tag (gtag.js) with Consent Management -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-NJE78MQ7EX"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-NJE78MQ7EX');
+      
+      // Set default consent mode
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied'
+      });
+      
+      gtag('config', 'G-NJE78MQ7EX', {
+        'anonymize_ip': true
+      });
     </script>
+    
+    <!-- Cookie Consent Management -->
+    <script src="assets/cookie-consent.js"></script>
     <style>
         body {
             font-family: 'Noto Sans', sans-serif;

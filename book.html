@@ -14,14 +14,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
   
-  <!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js) with Consent Management -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-NJE78MQ7EX"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'G-NJE78MQ7EX');
+    
+    // Set default consent mode
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied'
+    });
+    
+    gtag('config', 'G-NJE78MQ7EX', {
+      'anonymize_ip': true
+    });
   </script>
+  
+  <!-- Cookie Consent Management -->
+  <script src="assets/cookie-consent.js"></script>
   
   <!-- Book Schema Markup (will be populated by JavaScript) -->
   <script type="application/ld+json" id="bookSchema">
@@ -129,29 +140,66 @@
         document.getElementById('loading').textContent = 'Missing book id.';
         return;
       }
+      
+      let b = null;
+      
       try{
+        // First try to get data from Firestore (for authenticated users)
         const snap = await getDoc(doc(db, 'books', id));
-        if(!snap.exists()){
-          document.getElementById('loading').textContent = 'Book not found.';
-          return;
+        if(snap.exists()){
+          b = snap.data();
         }
-        const b = snap.data();
+      } catch(firestoreError) {
+        console.log('Firestore not available or book missing, using fallback.', firestoreError);
+      }
+      
+      // If Firestore failed or book not found, try public API
+      if (!b) {
+        try {
+          const response = await fetch(`/api/books/${id}`);
+          if (response.ok) {
+            const apiData = await response.json();
+            if (apiData.success && apiData.book) {
+              b = apiData.book;
+              console.log('Loaded book from public API');
+            }
+          }
+        } catch(apiError) {
+          console.error('Public API also failed:', apiError);
+        }
+      }
+      
+      // If both methods failed
+      if (!b) {
+        document.getElementById('loading').textContent = 'Book not found.';
+        return;
+      }
         document.getElementById('loading').classList.add('hidden');
         const view = document.getElementById('bookView');
         view.classList.remove('hidden');
-        document.getElementById('title').textContent = b.title || 'Untitled';
-        document.getElementById('author').textContent = b.author ? `by ${b.author}` : '';
-        // Update breadcrumb
-        document.getElementById('breadcrumbBookTitle').textContent = b.title || 'Book Details';
-        document.getElementById('blurb').textContent = b.blurb || '';
-        document.getElementById('primaryLanguage').textContent = b.primaryLanguage || '';
-        document.getElementById('authorRegion').textContent = b.authorRegion || '';
-        document.getElementById('publicationYear').textContent = b.publicationYear || '';
-        document.getElementById('authorTags').textContent = b.authorTags || '';
+        
+        // Safely update elements with null checks
+        const updateElement = (id, content) => {
+          const element = document.getElementById(id);
+          if (element) element.textContent = content;
+        };
+        
+        updateElement('title', b.title || 'Untitled');
+        updateElement('author', b.author ? `by ${b.author}` : '');
+        updateElement('breadcrumbBookTitle', b.title || 'Book Details');
+        updateElement('blurb', b.blurb || '');
+        updateElement('primaryLanguage', b.primaryLanguage || '');
+        updateElement('authorRegion', b.authorRegion || '');
+        updateElement('publicationYear', b.publicationYear || '');
+        updateElement('authorTags', b.authorTags || '');
         const cover = document.getElementById('coverImg');
-        if(b.coverUrl){ cover.src = b.coverUrl; } else { cover.style.display='none'; }
+        if(cover) {
+          if(b.coverUrl){ cover.src = b.coverUrl; } else { cover.style.display='none'; }
+        }
         const link = document.getElementById('purchaseLink');
-        if(b.purchaseLink){ link.href = b.purchaseLink; } else { link.style.display='none'; }
+        if(link) {
+          if(b.purchaseLink){ link.href = b.purchaseLink; } else { link.style.display='none'; }
+        }
         
         // Update Book Schema Markup
         const bookSchema = document.getElementById('bookSchema');
@@ -181,7 +229,8 @@
         }
 
         const btn = document.getElementById('addReading');
-        btn.addEventListener('click', async ()=>{
+        if(btn) {
+          btn.addEventListener('click', async ()=>{
           const user = auth.currentUser;
           if(!user){ window.location.href = 'account.html'; return; }
           try{
@@ -198,7 +247,8 @@
             alert('Failed to add to reading list.');
             console.error(e);
           }
-        });
+          });
+        }
       }catch(err){
         console.error(err);
         document.getElementById('loading').textContent = 'Error loading book.';
