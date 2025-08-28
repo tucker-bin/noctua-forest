@@ -5,21 +5,54 @@
 
 (function() {
   'use strict';
-  
-  // Check if user has already made a choice
-  const hasConsent = localStorage.getItem('noctua-cookie-consent');
-  
-  if (hasConsent) {
-    if (hasConsent === 'accepted') {
-      enableAnalytics();
+
+  // Wait for DOM to be fully loaded
+  function whenDOMReady(callback) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', callback);
+    } else {
+      callback();
     }
-    return; // Don't show banner again
+  }
+
+  // Initialize when DOM is ready
+  whenDOMReady(() => {
+    // Ensure we have document.body
+    if (!document.body) {
+      console.warn('Cookie consent: document.body not available, retrying in 100ms');
+      setTimeout(initCookieConsent, 100);
+      return;
+    }
+    initCookieConsent();
+  });
+
+  function initCookieConsent() {
+    // Check if user has already made a choice
+    const hasConsent = localStorage.getItem('noctua-cookie-consent');
+    
+    if (hasConsent) {
+      if (hasConsent === 'accepted') {
+        enableAnalytics();
+      }
+      return; // Don't show banner again
+    }
+    
+    // Create and show cookie consent banner
+    createConsentBanner();
   }
   
-  // Create and show cookie consent banner
-  createConsentBanner();
-  
   function createConsentBanner() {
+    // Extra safety check for document.body
+    if (!document.body) {
+      console.warn('Cookie consent: document.body not available for banner');
+      return;
+    }
+
+    // Check if banner already exists
+    if (document.getElementById('cookie-consent-banner')) {
+      return;
+    }
+    
     const banner = document.createElement('div');
     banner.id = 'cookie-consent-banner';
     banner.innerHTML = `
@@ -33,8 +66,6 @@
         padding: 16px 20px;
         z-index: 10000;
         border-top: 2px solid #F58220;
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
         box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
       ">
         <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
@@ -71,63 +102,73 @@
       </div>
     `;
     
+    // Add banner to body
     document.body.appendChild(banner);
     
-    // Add hover effects
+    // Get buttons after banner is in DOM
     const acceptBtn = document.getElementById('cookie-accept');
     const essentialBtn = document.getElementById('cookie-essential');
     
-    acceptBtn.addEventListener('mouseenter', () => {
-      acceptBtn.style.background = '#E0751C';
-    });
-    acceptBtn.addEventListener('mouseleave', () => {
-      acceptBtn.style.background = '#F58220';
-    });
+    if (acceptBtn) {
+      acceptBtn.addEventListener('mouseenter', () => {
+        acceptBtn.style.background = '#E0751C';
+      });
+      acceptBtn.addEventListener('mouseleave', () => {
+        acceptBtn.style.background = '#F58220';
+      });
+      
+      acceptBtn.addEventListener('click', () => {
+        localStorage.setItem('noctua-cookie-consent', 'accepted');
+        banner.remove();
+        enableAnalytics();
+        showConsentMessage('All cookies accepted. Analytics enabled.');
+      });
+    }
     
-    essentialBtn.addEventListener('mouseenter', () => {
-      essentialBtn.style.background = 'rgba(224, 226, 219, 0.1)';
-    });
-    essentialBtn.addEventListener('mouseleave', () => {
-      essentialBtn.style.background = 'transparent';
-    });
-    
-    // Event listeners
-    acceptBtn.addEventListener('click', () => {
-      localStorage.setItem('noctua-cookie-consent', 'accepted');
-      banner.remove();
-      enableAnalytics();
-      showConsentMessage('All cookies accepted. Analytics enabled.');
-    });
-    
-    essentialBtn.addEventListener('click', () => {
-      localStorage.setItem('noctua-cookie-consent', 'essential');
-      banner.remove();
-      disableAnalytics();
-      showConsentMessage('Only essential cookies enabled. Analytics disabled.');
-    });
+    if (essentialBtn) {
+      essentialBtn.addEventListener('mouseenter', () => {
+        essentialBtn.style.background = 'rgba(224, 226, 219, 0.1)';
+      });
+      essentialBtn.addEventListener('mouseleave', () => {
+        essentialBtn.style.background = 'transparent';
+      });
+      
+      essentialBtn.addEventListener('click', () => {
+        localStorage.setItem('noctua-cookie-consent', 'essential');
+        banner.remove();
+        disableAnalytics();
+        showConsentMessage('Only essential cookies enabled. Analytics disabled.');
+      });
+    }
   }
   
   function enableAnalytics() {
-    // Enable Google Analytics if gtag is available
-    if (typeof gtag !== 'undefined') {
-      gtag('consent', 'update', {
-        'analytics_storage': 'granted'
-      });
-      console.log('Analytics enabled');
+    if (typeof gtag === 'undefined') {
+      console.warn('Cookie consent: gtag not available for enabling analytics');
+      return;
     }
+    gtag('consent', 'update', {
+      'analytics_storage': 'granted'
+    });
   }
   
   function disableAnalytics() {
-    // Disable Google Analytics
-    if (typeof gtag !== 'undefined') {
-      gtag('consent', 'update', {
-        'analytics_storage': 'denied'
-      });
-      console.log('Analytics disabled');
+    if (typeof gtag === 'undefined') {
+      console.warn('Cookie consent: gtag not available for disabling analytics');
+      return;
     }
+    gtag('consent', 'update', {
+      'analytics_storage': 'denied'
+    });
   }
   
   function showConsentMessage(message) {
+    // Extra safety check for document.body
+    if (!document.body) {
+      console.warn('Cookie consent: document.body not available for toast message');
+      return;
+    }
+    
     const toast = document.createElement('div');
     toast.innerHTML = `
       <div style="
@@ -158,8 +199,14 @@
     document.body.appendChild(toast);
     
     setTimeout(() => {
-      toast.style.animation = 'slideIn 0.3s ease-out reverse';
-      setTimeout(() => toast.remove(), 300);
+      if (toast.parentNode) {
+        toast.style.animation = 'slideIn 0.3s ease-out reverse';
+        setTimeout(() => {
+          if (toast.parentNode) {
+            toast.remove();
+          }
+        }, 300);
+      }
     }, 3000);
   }
   
@@ -168,5 +215,4 @@
     localStorage.removeItem('noctua-cookie-consent');
     location.reload();
   };
-  
 })();
