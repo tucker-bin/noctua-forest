@@ -234,10 +234,6 @@
     <!-- Firebase -->
     <script type="module">
         import { app } from './firebase-config.js';
-        import { initNavigation } from './components/Navigation.js';
-        
-        // Initialize navigation
-        initNavigation();
     </script>
 
     <script src="sample-books.js"></script>
@@ -246,17 +242,33 @@
         // Mobile menu toggle
         function toggleMobileMenu() {
             const nav = document.getElementById('nav');
+            const isOpen = nav.classList.contains('hidden');
+            
+            // Toggle visibility and layout
             nav.classList.toggle('hidden');
             nav.classList.toggle('flex');
             nav.classList.toggle('flex-col');
+            
+            // Toggle mobile positioning
             nav.classList.toggle('absolute');
             nav.classList.toggle('top-20');
             nav.classList.toggle('right-4');
-            nav.classList.toggle('bg-white');
-            nav.classList.toggle('p-4');
-            nav.classList.toggle('rounded-lg');
+            nav.classList.toggle('p-6');
+            nav.classList.toggle('rounded-xl');
             nav.classList.toggle('shadow-lg');
             nav.classList.toggle('z-50');
+            
+            // Toggle mobile styling
+            if (isOpen) {
+                nav.style.backgroundColor = '#3A4440';
+                nav.style.color = '#E8ECE6';
+            } else {
+                nav.style.backgroundColor = '';
+                nav.style.color = '';
+            }
+            
+            // Prevent body scroll when menu is open
+            document.body.style.overflow = isOpen ? 'hidden' : '';
         }
     </script>
 
