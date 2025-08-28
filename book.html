@@ -68,14 +68,14 @@
     <header class="flex justify-between items-center mb-8">
       <a href="welcome.html" class="flex items-center space-x-3">
         <img src="images/logo-40.png" srcset="images/logo-40.png 1x, images/logo-80.png 2x, images/logo-120.png 3x" sizes="40px" alt="Noctua Forest Logo" width="40" height="40" decoding="async" class="w-10 h-10">
-        <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+        <span class="text-2xl font-bold text-[#3A4440]" style="font-family: 'Poppins', sans-serif;">Noctua Forest</span>
       </a>
       <nav class="flex items-center space-x-6">
-        <a href="forest.html" class="hover:text-forest-accent" style="color:#4A5450">The Forest</a>
-        <a href="submit.html" class="hover:text-forest-accent" style="color:#4A5450">Submit Book</a>
-        <a href="contributor.html" class="hover:text-forest-accent" style="color:#4A5450">Contribute</a>
-        <a href="about.html" class="hover:text-forest-accent" style="color:#4A5450">About</a>
-        <a href="account.html" class="hover:text-forest-accent" style="color:#4A5450">
+        <a href="forest.html" class="hover:text-forest-accent" style="color:#3A4440">The Forest</a>
+        <a href="submit.html" class="hover:text-forest-accent" style="color:#3A4440">Submit Book</a>
+        <a href="contributor.html" class="hover:text-forest-accent" style="color:#3A4440">Contribute</a>
+        <a href="about.html" class="hover:text-forest-accent" style="color:#3A4440">About</a>
+        <a href="account.html" class="hover:text-forest-accent" style="color:#3A4440">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
         </a>
       </nav>
@@ -83,28 +83,28 @@
 
     <!-- Breadcrumb Navigation -->
     <nav class="max-w-5xl mx-auto mb-4" aria-label="Breadcrumb">
-      <ol class="flex items-center space-x-2 text-sm text-gray-600">
+      <ol class="flex items-center space-x-2 text-sm text-[#7A8580]">
         <li><a href="welcome.html" class="hover:text-[#F58220] transition-colors">Home</a></li>
         <li><span class="mx-2">/</span></li>
         <li><a href="forest.html" class="hover:text-[#F58220] transition-colors">The Forest</a></li>
         <li><span class="mx-2">/</span></li>
-        <li id="breadcrumbBookTitle" class="text-gray-800 font-medium" aria-current="page">Book Details</li>
+        <li id="breadcrumbBookTitle" class="text-[#3A4440] font-medium" aria-current="page">Book Details</li>
       </ol>
     </nav>
 
     <main id="main" class="max-w-5xl mx-auto">
-      <div id="loading" class="text-center text-forest-card">Loading…</div>
+      <div id="loading" class="text-center text-[#3A4440]">Loading…</div>
       <article id="bookView" class="hidden bg-white rounded-xl shadow-sm p-6 md:p-10">
         <div class="grid md:grid-cols-2 gap-8">
           <div>
             <img id="coverImg" class="w-full rounded-lg shadow" alt="Book cover" />
           </div>
           <div>
-            <h1 id="title" class="text-3xl font-bold mb-2" style="font-family: 'Poppins', sans-serif; color:#4A5450"></h1>
-            <p id="author" class="text-lg mb-4" style="color:#4A5450"></p>
-            <p id="blurb" class="text-gray-700 mb-6"></p>
+            <h1 id="title" class="text-3xl font-bold mb-2 text-[#3A4440]" style="font-family: 'Poppins', sans-serif;"></h1>
+            <p id="author" class="text-lg mb-4 text-[#4A5450]/90"></p>
+            <p id="blurb" class="text-[#4A5450]/80 mb-6"></p>
 
-            <div class="space-y-2 text-sm text-gray-600 mb-6">
+            <div class="space-y-2 text-sm text-[#7A8580] mb-6">
               <div><span class="font-semibold">Language:</span> <span id="primaryLanguage"></span></div>
               <div><span class="font-semibold">Region:</span> <span id="authorRegion"></span></div>
               <div><span class="font-semibold">Published:</span> <span id="publicationYear"></span></div>
