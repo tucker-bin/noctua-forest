@@ -56,10 +56,10 @@
         
         <!-- Breadcrumb Navigation -->
         <nav class="max-w-4xl mx-auto px-4 mb-6" aria-label="Breadcrumb">
-            <ol class="flex items-center space-x-2 text-sm text-gray-600">
+            <ol class="flex items-center space-x-2 text-sm text-[#7A8580]">
                 <li><a href="welcome.html" class="hover:text-[#F58220] transition-colors">Home</a></li>
                 <li><span class="mx-2">/</span></li>
-                <li class="text-gray-800 font-medium" aria-current="page">Submit Book</li>
+                <li class="text-[#E0E2DB] font-medium" aria-current="page">Submit Book</li>
             </ol>
         </nav>
 
@@ -67,54 +67,54 @@
         <article class="space-y-16">
             <!-- Hero Section -->
             <div class="text-center">
-                <h1 class="text-4xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Submit Your Book</h1>
-                <p class="text-xl mb-4" style="color: #4A5450;">Share your story with readers who value thoughtful storytelling.</p>
-                <p class="text-lg" style="color: #4A5450;">We prioritize narrative quality, genre craftsmanship, and meaningful reader engagement across all genres.</p>
+                <h1 class="text-4xl font-bold mb-6 text-[#3A4440]" style="font-family: 'Poppins', sans-serif;">Submit Your Book</h1>
+                <p class="text-xl mb-4 text-[#4A5450]">Share your story with readers who value thoughtful storytelling.</p>
+                <p class="text-lg text-[#4A5450]/80">We prioritize narrative quality, genre craftsmanship, and meaningful reader engagement across all genres.</p>
             </div>
 
         <form id="submissionForm" class="bg-[#4A5450] rounded-xl p-8 text-white space-y-6" novalidate>
           <div class="grid md:grid-cols-2 gap-6">
             <div class="space-y-2">
-              <label for="email" class="block font-medium">Your Email</label>
+              <label for="email" class="block font-medium text-white mb-1">Your Email</label>
               <input id="email" name="email" type="email" required placeholder="you@example.com" 
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             </div>
             <div class="space-y-2">
-              <label for="author" class="block font-medium">Author Name</label>
+              <label for="author" class="block font-medium text-white mb-1">Author Name</label>
               <input id="author" name="author" type="text" required placeholder="Author Name" 
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             </div>
           </div>
 
           <div class="grid md:grid-cols-2 gap-6">
             <div class="space-y-2">
-              <label for="title" class="block font-medium">Book Title</label>
+              <label for="title" class="block font-medium text-white mb-1">Book Title</label>
               <input id="title" name="title" type="text" required placeholder="Book Title" 
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             </div>
             <div class="space-y-2">
-              <label for="publisher" class="block font-medium">Publisher (or Self-Published)</label>
+              <label for="publisher" class="block font-medium text-white mb-1">Publisher (or Self-Published)</label>
               <input id="publisher" name="publisher" type="text" placeholder="Publisher or Self-Published" 
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             </div>
           </div>
 
           <div class="space-y-2">
-            <label for="blurb" class="block font-medium">Book Blurb</label>
+            <label for="blurb" class="block font-medium text-white mb-1">Book Blurb</label>
             <textarea id="blurb" name="blurb" rows="5" required placeholder="Short description of your book"
-              class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent"></textarea>
+              class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200"></textarea>
           </div>
 
           <div class="grid md:grid-cols-2 gap-6">
             <div class="space-y-2">
-              <label for="wordCount" class="block font-medium">Word Count</label>
+              <label for="wordCount" class="block font-medium text-white mb-1">Word Count</label>
               <input id="wordCount" name="wordCount" type="number" min="0" inputmode="numeric" placeholder="e.g., 65000" 
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             </div>
             <div class="space-y-2">
-              <label for="purchaseLink" class="block font-medium">Book Purchase Link</label>
+              <label for="purchaseLink" class="block font-medium text-white mb-1">Book Purchase Link</label>
               <input id="purchaseLink" name="purchaseLink" type="url" placeholder="https://..." 
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             </div>
           </div>
 
@@ -124,9 +124,9 @@
             
             <div class="grid md:grid-cols-2 gap-6">
               <div class="space-y-2">
-                <label for="primaryLanguage" class="block font-medium">Primary Language</label>
+                <label for="primaryLanguage" class="block font-medium text-white mb-1">Primary Language</label>
                 <select id="primaryLanguage" name="primaryLanguage" required
-                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200">
                   <option value="">Select language</option>
                   <option value="en">English</option>
                   <option value="es">Spanish</option>
@@ -145,9 +145,9 @@
               </div>
               
               <div class="space-y-2">
-                <label for="originalLanguage" class="block font-medium">Original Language (if translated)</label>
+                <label for="originalLanguage" class="block font-medium text-white mb-1">Original Language (if translated)</label>
                 <select id="originalLanguage" name="originalLanguage"
-                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200">
                   <option value="">Not a translation</option>
                   <option value="en">English</option>
                   <option value="es">Spanish</option>
@@ -168,9 +168,9 @@
             
             <div class="grid md:grid-cols-2 gap-6">
               <div class="space-y-2">
-                <label for="authorRegion" class="block font-medium">Author's Region</label>
+                <label for="authorRegion" class="block font-medium text-white mb-1">Author's Region</label>
                 <select id="authorRegion" name="authorRegion" required
-                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200">
                   <option value="">Select region</option>
                   <option value="north-america">North America</option>
                   <option value="south-america">South America</option>
@@ -183,16 +183,16 @@
               </div>
               
               <div class="space-y-2">
-                <label for="publicationYear" class="block font-medium">Publication Year</label>
+                <label for="publicationYear" class="block font-medium text-white mb-1">Publication Year</label>
                 <input id="publicationYear" name="publicationYear" type="number" min="1800" max="2030" placeholder="2024"
-                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                  class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
               </div>
             </div>
             
             <div class="space-y-2">
-              <label for="culturalThemes" class="block font-medium">Cultural Themes (optional)</label>
+              <label for="culturalThemes" class="block font-medium text-white mb-1">Cultural Themes (optional)</label>
               <input id="culturalThemes" name="culturalThemes" type="text" placeholder="e.g., diaspora, identity, tradition, family heritage"
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
               <p class="text-sm text-gray-300">Themes that reflect cultural experiences or perspectives in your work</p>
             </div>
           </fieldset>
@@ -202,18 +202,18 @@
             <legend class="text-lg font-bold mb-4">Genre & Classification</legend>
             
             <div class="space-y-2">
-              <label for="authorTags" class="block font-medium">Your Genre Tags</label>
+              <label for="authorTags" class="block font-medium text-white mb-1">Your Genre Tags</label>
               <input id="authorTags" name="authorTags" type="text" placeholder="Type tags separated by commas"
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
               <p class="text-sm text-gray-300">Create your own genre tags (e.g., "dark academia, philosophical fiction, coming-of-age")</p>
               <div id="tagPreview" class="flex flex-wrap gap-2 mt-2"></div>
             </div>
             
             <div class="grid md:grid-cols-2 gap-6">
               <div class="space-y-2">
-                <label for="targetAudience" class="block font-medium">Target Audience (optional)</label>
+                <label for="targetAudience" class="block font-medium text-white mb-1">Target Audience (optional)</label>
                 <select id="targetAudience" name="targetAudience"
-                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200">
                   <option value="">Not specified</option>
                   <option value="young-adult">Young Adult</option>
                   <option value="adult">Adult</option>
@@ -224,9 +224,9 @@
               </div>
               
               <div class="space-y-2">
-                <label for="bookLength" class="block font-medium">Book Length</label>
+                <label for="bookLength" class="block font-medium text-white mb-1">Book Length</label>
                 <select id="bookLength" name="bookLength"
-                  class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                  class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200">
                   <option value="">Not specified</option>
                   <option value="short">Short (under 50k words)</option>
                   <option value="medium">Medium (50k-80k words)</option>
@@ -238,31 +238,31 @@
 
           <div class="grid md:grid-cols-2 gap-6">
             <div class="space-y-2">
-              <label for="coverUrl" class="block font-medium">Book Cover (URL)</label>
+              <label for="coverUrl" class="block font-medium text-white mb-1">Book Cover (URL)</label>
               <input id="coverUrl" name="coverUrl" type="url" placeholder="https://..."
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             </div>
             <div class="space-y-2">
-              <label for="pdfUrl" class="block font-medium">
+              <label for="pdfUrl" class="block font-medium text-white mb-1">
                 Book (PDF) URL
                 <span aria-label="Help" title="Paste a direct HTTPS link to your book’s PDF. Use a public link (no login). Example: Firebase Storage download URL. Avoid Google Drive preview pages.">🛈</span>
               </label>
               <input id="pdfUrl" name="pdfUrl" type="url" placeholder="Direct public link to your PDF (https://…)"
-                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             </div>
           </div>
 
           <div class="space-y-2">
-            <label for="coverFile" class="block font-medium">Or Upload Cover (PNG/JPG)</label>
+            <label for="coverFile" class="block font-medium text-white mb-1">Or Upload Cover (PNG/JPG)</label>
             <input id="coverFile" name="coverFile" type="file" accept="image/*"
-              class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+              class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             <p class="text-sm text-gray-300">If both URL and file are provided, the uploaded file will be used.</p>
           </div>
 
           <div class="space-y-2">
-            <label for="contentWarnings" class="block font-medium">Content Warnings (optional)</label>
+            <label for="contentWarnings" class="block font-medium text-white mb-1">Content Warnings (optional)</label>
             <input id="contentWarnings" name="contentWarnings" type="text" placeholder="e.g., violence, grief"
-              class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+              class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
           </div>
 
           <div class="bg-[#5A6560] rounded-lg p-4 border border-[#7A8580]">
