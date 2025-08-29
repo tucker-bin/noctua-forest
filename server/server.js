@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 // Sample books data for API (in production, this would come from Firestore)
 const SAMPLE_BOOKS = [
@@ -47,6 +48,18 @@ const SAMPLE_BOOKS = [
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Force HTTPS in production
+if (process.env.NODE_ENV === 'production') {
+  app.enable('trust proxy');
+  app.use((req, res, next) => {
+    if (req.secure) {
+      next();
+    } else {
+      res.redirect('https://' + req.headers.host + req.url);
+    }
+  });
+}
+
 // Security headers (CSP centralized)
 const csp = [
   "default-src 'self' data:",
@@ -58,13 +71,22 @@ const csp = [
   "frame-src 'self' https://accounts.google.com https://apis.google.com https://my-rhyme-app.firebaseapp.com"
 ].join('; ');
 
-app.disable('x-powered-by');
-app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', csp);
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  next();
-});
+// Apply Helmet middleware with custom CSP
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'default-src': ["'self'", 'data:'],
+      'script-src': ["'self'", 'https://www.gstatic.com', 'https://apis.google.com', 'https://www.googletagmanager.com', "'unsafe-inline'"],
+      'connect-src': ["'self'", 'https://firestore.googleapis.com', 'https://securetoken.googleapis.com', 'https://identitytoolkit.googleapis.com', 'https://www.googleapis.com', 'https://www.gstatic.com', 'https://apis.google.com', 'https://www.google.com', 'https://www.google-analytics.com', 'https://analytics.google.com'],
+      'style-src': ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
+      'font-src': ["'self'", 'https://fonts.gstatic.com'],
+      'img-src': ["'self'", 'data:', 'https://*.googleusercontent.com', 'https://*.gstatic.com', 'https://firebasestorage.googleapis.com', 'https://www.google.com', 'https://images.unsplash.com'],
+      'frame-src': ["'self'", 'https://accounts.google.com', 'https://apis.google.com', 'https://my-rhyme-app.firebaseapp.com']
+    }
+  },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+}));
 
 app.use(express.json({ limit: '1mb' }));
 

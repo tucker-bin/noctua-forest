@@ -14,6 +14,11 @@ steps:
       - '--platform=managed'
       - '--allow-unauthenticated'
       - '--port=8080'
+      - '--min-instances=1'
+      - '--cpu=1'
+      - '--memory=512Mi'
+      - '--set-env-vars=NODE_ENV=production'
+      - '--set-secrets=GMAIL_USER=gmail-user:latest,GMAIL_APP_PASSWORD=gmail-app-password:latest'
 
 
 images:
