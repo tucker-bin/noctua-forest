@@ -32,7 +32,6 @@ body {
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  color: var(--color-forest-text);
   font-weight: 700;
 }
 
@@ -59,8 +58,8 @@ textarea::placeholder {
 /* Focus states */
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: var(--color-forest-accent);
-  box-shadow: 0 0 0 2px var(--color-forest-accent);
+  border-color: var(--color-forest-border);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
 }
 
 /* Brand colors */
