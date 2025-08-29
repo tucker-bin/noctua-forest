@@ -6,7 +6,7 @@ const showAlphaPopup = () => {
   const popup = document.createElement('div');
   popup.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3';
   popup.innerHTML = `
-    <div role="dialog" aria-modal="true" class="bg-forest-card text-forest-light p-5 md:p-8 rounded-xl w-full max-w-[90%] md:max-w-[500px] max-h-[85vh] overflow-y-auto relative">
+    <div role="dialog" aria-modal="true" class="bg-forest-card text-forest-light p-5 md:p-8 rounded-xl w-auto max-w-[520px] max-h-[85vh] overflow-y-auto relative" style="width: min(92vw, 520px);">
       <!-- Close button -->
       <button id="closePopupBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,29 +19,29 @@ const showAlphaPopup = () => {
       <p class="text-forest-light text-sm md:text-base mb-4 md:mb-6">You're invited to be a founding member of Noctua Forest, a new community for authors and readers. As an early Alpha member, your voice and submissions will directly influence the platform's growth.</p>
       
       <!-- Benefits list -->
-      <div class="bg-forest-secondary/30 rounded-lg p-4 md:p-6 mb-5 md:mb-6 border border-forest-accent">
+      <div class="bg-forest-secondary/30 rounded-lg p-4 md:p-6 mb-5 md:mb-6">
         <p class="font-medium mb-3 md:mb-4 text-sm md:text-base">Join now to be the first to:</p>
         <ul class="space-y-2 md:space-y-3 text-sm md:text-base">
           <li class="flex items-start">
-            <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-accent mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-light/80 mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
             <span>Get early feedback on your manuscripts</span>
           </li>
           <li class="flex items-start">
-            <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-accent mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-light/80 mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
             <span>Connect directly with early readers</span>
           </li>
           <li class="flex items-start">
-            <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-accent mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-light/80 mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
             <span>Influence the tools we build for authors</span>
           </li>
           <li class="flex items-start">
-            <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-accent mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-light/80 mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
             <span>Be part of our core community</span>
@@ -56,7 +56,7 @@ const showAlphaPopup = () => {
       <div class="space-y-3 md:space-y-4">
         <div class="relative">
           <input type="email" placeholder="Enter your email" required
-            class="w-full px-3 h-11 md:h-12 rounded bg-forest-secondary/30 border border-forest-accent text-forest-light placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-forest-accent focus:border-transparent text-sm md:text-base">
+            class="w-full px-3 h-11 md:h-12 rounded bg-forest-secondary/30 text-forest-light placeholder-forest-light/50 focus:outline-none focus:ring-2 focus:ring-forest-light/20 focus:border-transparent text-sm md:text-base">
         </div>
 
         <button id="signupBtn" 
