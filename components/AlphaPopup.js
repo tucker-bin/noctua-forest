@@ -6,7 +6,7 @@ const showAlphaPopup = () => {
   const popup = document.createElement('div');
   popup.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-3';
   popup.innerHTML = `
-    <div role="dialog" aria-modal="true" class="bg-forest-card text-forest-light p-5 md:p-8 rounded-xl w-auto max-w-[520px] max-h-[85vh] overflow-y-auto relative" style="width: min(92vw, 520px);">
+    <div role="dialog" aria-modal="true" class="bg-forest-card text-forest-light p-5 md:p-6 rounded-xl w-auto max-w-[480px] max-h-[85vh] overflow-y-auto relative" style="width: min(92vw, 480px);">
       <!-- Close button -->
       <button id="closePopupBtn" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
