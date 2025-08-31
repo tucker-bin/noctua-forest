@@ -132,6 +132,8 @@ const handleFormSubmission = (formId, formType) => {
         coverUrl: coverUrl || '',
         pdfUrl: formData.get('pdfUrl') || '',
         contentWarnings: formData.get('contentWarnings') || '',
+        amazonUrl: formData.get('amazonUrl') || '',
+        isbn: formData.get('isbn') || '',
         premium,
         userId: user.uid,
         approved: false,

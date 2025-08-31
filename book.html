@@ -233,6 +233,26 @@
           }
         }
         
+        // Final fallback to sample data if both Firestore and API failed
+        if (!b && window.SAMPLE_BOOKS) {
+          const sampleBook = window.SAMPLE_BOOKS.find(book => book.id == id);
+          if (sampleBook) {
+            b = {
+              title: sampleBook.title,
+              author: sampleBook.author,
+              blurb: sampleBook.blurb,
+              primaryLanguage: sampleBook.language,
+              authorRegion: sampleBook.region,
+              publicationYear: sampleBook.year,
+              authorTags: sampleBook.tags ? sampleBook.tags.join(', ') : '',
+              coverUrl: window.coverFor ? window.coverFor(sampleBook) : sampleBook.coverUrl,
+              amazonUrl: sampleBook.amazonUrl,
+              isbn: sampleBook.isbn
+            };
+            console.log('Loaded book from sample data fallback');
+          }
+        }
+        
         // If both methods failed
         if (!b) {
           document.getElementById('loading').textContent = 'Book not found.';
@@ -353,7 +373,6 @@
     loadBook();
   </script>
   <script src="sample-books.js"></script>
-  <script type="module" src="book.js"></script>
 </body>
 </html>
 

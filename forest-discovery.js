@@ -259,15 +259,29 @@ class ForestDiscovery {
                 <span aria-label="Publication year">${book.year}</span>
                 <span aria-label="Author region">${this.formatRegion(book.region)}</span>
             </div>
-            <div class="flex gap-2">
-                <a href="book.html?id=${book.id}" class="flex-1 text-center bg-forest-accent bg-forest-accent-hover text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105" aria-label="View details for ${book.title}">
-                    View Details
-                </a>
-                <button onclick="addToReadingList('${book.id}', '${book.title.replace(/'/g, "\\'")}', '${book.author.replace(/'/g, "\\'")}', this)" class="bg-[#F58220] hover:bg-[#E0751C] text-white p-2 rounded-full transition-all duration-300 group" title="Add to Reading List" aria-label="Add ${book.title} to reading list">
-                    <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                </button>
+            <div class="flex flex-col gap-2">
+                <div class="flex gap-2">
+                    <a href="book.html?id=${book.id}" class="flex-1 text-center bg-forest-accent bg-forest-accent-hover text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105" aria-label="View details for ${book.title}">
+                        View Details
+                    </a>
+                    <button onclick="addToReadingList('${book.id}', '${book.title.replace(/'/g, "\\'")}', '${book.author.replace(/'/g, "\\'")}', this)" class="bg-[#F58220] hover:bg-[#E0751C] text-white p-2 rounded-full transition-all duration-300 group" title="Add to Reading List" aria-label="Add ${book.title} to reading list">
+                        <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
+                    </button>
+                </div>
+                <!-- Purchase Options Row -->
+                <div class="flex gap-1 text-xs">
+                    <a href="${this.getAmazonAffiliateLink(book)}" target="_blank" rel="noopener" class="flex-1 text-center bg-[#FF9900] hover:bg-[#FF8800] text-white py-1 px-2 rounded transition-colors duration-200">
+                        Amazon
+                    </a>
+                    <a href="${this.getBookshopAffiliateLink(book)}" target="_blank" rel="noopener" class="flex-1 text-center bg-[#D73502] hover:bg-[#C02F02] text-white py-1 px-2 rounded transition-colors duration-200">
+                        Bookshop
+                    </a>
+                </div>
+                <div class="text-xs text-gray-400 text-center">
+                    <span>Affiliate links support Noctua Forest</span>
+                </div>
             </div>
         </div>
     `;
@@ -414,6 +428,44 @@ class ForestDiscovery {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
     return shuffled;
+  }
+
+  // Affiliate link generation methods
+  getAmazonAffiliateLink(book) {
+    // Your Amazon Associates ID (replace with your actual ID)
+    const affiliateId = "noctuafor-20"; // Replace with your actual ID
+    
+    // If book has Amazon URL from Firestore/submission, use it with your affiliate tag
+    if (book.amazonUrl) {
+        const url = new URL(book.amazonUrl);
+        url.searchParams.set('tag', affiliateId);
+        return url.toString();
+    }
+    
+    // If book has purchase link that's Amazon, add affiliate tag
+    if (book.purchaseLink && book.purchaseLink.includes('amazon.com')) {
+        const url = new URL(book.purchaseLink);
+        url.searchParams.set('tag', affiliateId);
+        return url.toString();
+    }
+    
+    // Otherwise, create search link with affiliate tag
+    const searchQuery = encodeURIComponent(`${book.title} ${book.author}`);
+    return `https://amazon.com/s?k=${searchQuery}&tag=${affiliateId}`;
+  }
+
+  getBookshopAffiliateLink(book) {
+    // Your Bookshop.org affiliate ID (get this from bookshop.org)
+    const affiliateId = "noctuaforest"; // Replace with your actual ID
+    
+    // If book has ISBN from Firestore/submission, use direct link
+    if (book.isbn) {
+        return `https://bookshop.org/a/${affiliateId}/${book.isbn}`;
+    }
+    
+    // Otherwise, search link
+    const searchQuery = encodeURIComponent(`${book.title} ${book.author}`);
+    return `https://bookshop.org/search?keywords=${searchQuery}&affiliate=${affiliateId}`;
   }
 }
 

@@ -245,10 +245,25 @@
             <div class="space-y-2">
               <label for="pdfUrl" class="block font-medium text-white mb-1">
                 Book (PDF) URL
-                <span aria-label="Help" title="Paste a direct HTTPS link to your book’s PDF. Use a public link (no login). Example: Firebase Storage download URL. Avoid Google Drive preview pages.">🛈</span>
+                <span aria-label="Help" title="Paste a direct HTTPS link to your book's PDF. Use a public link (no login). Example: Firebase Storage download URL. Avoid Google Drive preview pages.">🛈</span>
               </label>
               <input id="pdfUrl" name="pdfUrl" type="url" placeholder="Direct public link to your PDF (https://…)"
                 class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="amazonUrl" class="block font-medium text-white mb-1">Amazon Book URL (optional)</label>
+              <input id="amazonUrl" name="amazonUrl" type="url" placeholder="https://amazon.com/dp/..."
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+              <p class="text-sm text-gray-300">Help readers find your book on Amazon</p>
+            </div>
+            <div class="space-y-2">
+              <label for="isbn" class="block font-medium text-white mb-1">ISBN (optional)</label>
+              <input id="isbn" name="isbn" type="text" placeholder="978-0-123456-78-9"
+                class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+              <p class="text-sm text-gray-300">Your book's ISBN for easier discovery</p>
             </div>
           </div>
 
