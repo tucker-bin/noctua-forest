@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const NodeCache = require('node-cache');
+const fs = require('fs');
 
 // PA API cache (24h TTL, check every hour for expired items)
 const paCache = new NodeCache({ stdTTL: 86400, checkperiod: 3600 });
@@ -49,22 +50,8 @@ const SAMPLE_BOOKS = [
   }
 ];
 
-const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 8080;
-
-// Force HTTPS in production (except for health checks)
-if (process.env.NODE_ENV === 'production') {
-  app.enable('trust proxy');
-  app.use((req, res, next) => {
-    // Skip HTTPS redirect for health checks
-    if (req.secure || req.path === '/' || req.path === '/healthz') {
-      next();
-    } else {
-      res.redirect('https://' + req.headers.host + req.url);
-    }
-  });
-}
 
 // Security headers (CSP centralized)
 const csp = [
@@ -77,39 +64,6 @@ const csp = [
   "frame-src 'self' https://accounts.google.com https://apis.google.com https://my-rhyme-app.firebaseapp.com"
 ].join('; ');
 
-// PA API endpoint with caching
-app.get('/api/pa/items', async (req, res) => {
-  const { asin } = req.query;
-  if (!asin) {
-    return res.status(400).json({ error: 'ASIN required' });
-  }
-
-  // Check cache first
-  const cached = paCache.get(asin);
-  if (cached) {
-    return res.json(cached);
-  }
-
-  try {
-    // TODO: Replace with actual PA API call
-    // For now, return a placeholder that matches our schema
-    const mockData = {
-      asin,
-      title: 'Book Title',
-      author: 'Author Name',
-      imageUrl: `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.L.jpg`,
-      detailPageUrl: `https://www.amazon.com/dp/${asin}?tag=noctuaforest-20`
-    };
-
-    // Cache the result
-    paCache.set(asin, mockData);
-    res.json(mockData);
-  } catch (error) {
-    console.error('PA API error:', error);
-    res.status(500).json({ error: 'Failed to fetch product data' });
-  }
-});
-
 // Apply Helmet middleware with custom CSP
 app.use(helmet({
   contentSecurityPolicy: {
@@ -120,7 +74,7 @@ app.use(helmet({
       'connect-src': ["'self'", 'https://firestore.googleapis.com', 'https://securetoken.googleapis.com', 'https://identitytoolkit.googleapis.com', 'https://www.googleapis.com', 'https://www.gstatic.com', 'https://apis.google.com', 'https://www.google.com', 'https://www.google-analytics.com', 'https://analytics.google.com'],
       'style-src': ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
       'font-src': ["'self'", 'https://fonts.gstatic.com'],
-      'img-src': ["'self'", 'data:', 'https://*.googleusercontent.com', 'https://*.gstatic.com', 'https://firebasestorage.googleapis.com', 'https://www.google.com', 'https://images.unsplash.com'],
+      'img-src': ["'self'", 'data:', 'https://*.googleusercontent.com', 'https://*.gstatic.com', 'https://firebasestorage.googleapis.com', 'https://www.google.com', 'https://images.unsplash.com', 'https://images-na.ssl-images-amazon.com', 'https://m.media-amazon.com'],
       'frame-src': ["'self'", 'https://accounts.google.com', 'https://apis.google.com', 'https://my-rhyme-app.firebaseapp.com']
     }
   },
@@ -128,6 +82,23 @@ app.use(helmet({
 }));
 
 app.use(express.json({ limit: '1mb' }));
+
+// Static files - serve before HTTPS redirect
+const publicDir = path.join(__dirname, '..');
+app.use(express.static(publicDir, { extensions: ['html'] }));
+
+// Force HTTPS in production (except for health checks)
+if (process.env.NODE_ENV === 'production') {
+  app.enable('trust proxy');
+  app.use((req, res, next) => {
+    // Skip HTTPS redirect for health checks
+    if (req.secure || req.path === '/healthz') {
+      next();
+    } else {
+      res.redirect('https://' + req.headers.host + req.url);
+    }
+  });
+}
 
 // Basic rate limits
 const emailLimiter = rateLimit({
@@ -198,7 +169,7 @@ app.post('/api/email/applications', emailLimiter, async (req, res) => {
     if (status === 'approved') {
       lines.push(`Great news — your application has been approved.`);
     } else if (status === 'rejected') {
-      lines.push(`Thank you for your application. After review, we aren’t able to move forward at this time.`);
+      lines.push(`Thank you for your application. After review, we aren't able to move forward at this time.`);
     } else {
       lines.push(`Your application status: ${status}`);
     }
@@ -212,7 +183,7 @@ app.post('/api/email/applications', emailLimiter, async (req, res) => {
     const html = `
       <div style="font-family:Inter,Arial,sans-serif;line-height:1.5;color:#222">
         <p>Hello,</p>
-        <p>${status === 'approved' ? 'Great news — your application has been approved.' : (status === 'rejected' ? 'Thank you for your application. After review, we aren’t able to move forward at this time.' : `Your application status: ${status}`)}</p>
+        <p>${status === 'approved' ? 'Great news — your application has been approved.' : (status === 'rejected' ? 'Thank you for your application. After review, we aren't able to move forward at this time.' : `Your application status: ${status}`)}</p>
         ${(title || author) ? `<p>Submission: <strong>${title || 'Untitled'}</strong>${author ? ` — ${author}` : ''}</p>` : ''}
         <p style="margin-top:24px">— Noctua Forest</p>
       </div>`;
@@ -299,7 +270,7 @@ app.post('/api/email/auto-reply', emailLimiter, async (req, res) => {
     if (isBook) {
       lines.push('Thanks for submitting your book to Noctua Forest. Our team will review your submission and follow up.');
     } else {
-      lines.push('Thanks for applying to contribute to Noctua Forest. We’ll review your application and get back to you.');
+      lines.push('Thanks for applying to contribute to Noctua Forest. We'll review your application and get back to you.');
     }
     if (title || author) {
       lines.push('');
@@ -313,7 +284,7 @@ app.post('/api/email/auto-reply', emailLimiter, async (req, res) => {
         <p>Hello,</p>
         <p>${isBook
           ? 'Thanks for submitting your book to Noctua Forest. Our team will review your submission and follow up.'
-          : 'Thanks for applying to contribute to Noctua Forest. We’ll review your application and get back to you.'}</p>
+          : 'Thanks for applying to contribute to Noctua Forest. We'll review your application and get back to you.'}</p>
         ${(title || author) ? `<p>Submission: <strong>${title || 'Untitled'}</strong>${author ? ` — ${author}` : ''}</p>` : ''}
         <p style="margin-top:24px">— Noctua Forest</p>
       </div>`;
@@ -334,9 +305,38 @@ app.post('/api/email/auto-reply', emailLimiter, async (req, res) => {
   }
 });
 
-// Static files
-const publicDir = path.join(__dirname, '..');
-app.use(express.static(publicDir, { extensions: ['html'] }));
+// PA API endpoint with caching
+app.get('/api/pa/items', async (req, res) => {
+  const { asin } = req.query;
+  if (!asin) {
+    return res.status(400).json({ error: 'ASIN required' });
+  }
+
+  // Check cache first
+  const cached = paCache.get(asin);
+  if (cached) {
+    return res.json(cached);
+  }
+
+  try {
+    // TODO: Replace with actual PA API call
+    // For now, return a placeholder that matches our schema
+    const mockData = {
+      asin,
+      title: 'Book Title',
+      author: 'Author Name',
+      imageUrl: `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.L.jpg`,
+      detailPageUrl: `https://www.amazon.com/dp/${asin}?tag=noctuaforest-20`
+    };
+
+    // Cache the result
+    paCache.set(asin, mockData);
+    res.json(mockData);
+  } catch (error) {
+    console.error('PA API error:', error);
+    res.status(500).json({ error: 'Failed to fetch product data' });
+  }
+});
 
 // Admin: email logs (JSON)
 app.get('/api/admin/email-logs', (req, res) => {
@@ -365,7 +365,6 @@ app.post('/api/track/affiliate', (req, res) => {
     };
     affiliateEvents.push(entry);
     if (affiliateEvents.length > 5000) affiliateEvents.shift();
-    persistAffiliateEventsAsync();
     res.json({ ok: true });
   } catch (err) {
     res.status(200).json({ ok: true }); // never block client
@@ -544,5 +543,3 @@ process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err);
   process.exit(1);
 });
-
-
