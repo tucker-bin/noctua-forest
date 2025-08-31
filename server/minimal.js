@@ -20,6 +20,9 @@ app.get('/test', (req, res) => {
   });
 });
 
+// Enable trust proxy
+app.enable('trust proxy');
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.send('Noctua Forest is running');
