@@ -135,6 +135,7 @@ const handleFormSubmission = (formId, formType) => {
         contentWarnings: formData.get('contentWarnings') || '',
         amazonUrl: formData.get('amazonUrl') || '',
         isbn: formData.get('isbn') || '',
+        asin: formData.get('asin') || '',
         premium,
         userId: user.uid,
         approved: false,

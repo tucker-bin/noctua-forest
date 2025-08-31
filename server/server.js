@@ -4,6 +4,10 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const NodeCache = require('node-cache');
+
+// PA API cache (24h TTL, check every hour for expired items)
+const paCache = new NodeCache({ stdTTL: 86400, checkperiod: 3600 });
 
 // Sample books data for API (in production, this would come from Firestore)
 const SAMPLE_BOOKS = [
@@ -68,9 +72,42 @@ const csp = [
   "connect-src 'self' https://firestore.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://www.googleapis.com https://www.gstatic.com https://apis.google.com https://www.google.com https://www.google-analytics.com https://analytics.google.com",
   "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'",
   "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: https://*.googleusercontent.com https://*.gstatic.com https://firebasestorage.googleapis.com https://www.google.com https://images.unsplash.com",
+  "img-src 'self' data: https://*.googleusercontent.com https://*.gstatic.com https://firebasestorage.googleapis.com https://www.google.com https://images.unsplash.com https://images-na.ssl-images-amazon.com https://m.media-amazon.com",
   "frame-src 'self' https://accounts.google.com https://apis.google.com https://my-rhyme-app.firebaseapp.com"
 ].join('; ');
+
+// PA API endpoint with caching
+app.get('/api/pa/items', async (req, res) => {
+  const { asin } = req.query;
+  if (!asin) {
+    return res.status(400).json({ error: 'ASIN required' });
+  }
+
+  // Check cache first
+  const cached = paCache.get(asin);
+  if (cached) {
+    return res.json(cached);
+  }
+
+  try {
+    // TODO: Replace with actual PA API call
+    // For now, return a placeholder that matches our schema
+    const mockData = {
+      asin,
+      title: 'Book Title',
+      author: 'Author Name',
+      imageUrl: `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.L.jpg`,
+      detailPageUrl: `https://www.amazon.com/dp/${asin}?tag=noctuaforest-20`
+    };
+
+    // Cache the result
+    paCache.set(asin, mockData);
+    res.json(mockData);
+  } catch (error) {
+    console.error('PA API error:', error);
+    res.status(500).json({ error: 'Failed to fetch product data' });
+  }
+});
 
 // Apply Helmet middleware with custom CSP
 app.use(helmet({

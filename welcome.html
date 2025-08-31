@@ -105,6 +105,18 @@
             background-size: cover;
             background-position: center;
         }
+        /* Reviews carousel */
+        .nf-carousel-mask { 
+            -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+        }
+        .nf-carousel-track {
+            display: flex; gap: 1.5rem; align-items: center; will-change: transform;
+            animation: nf-scroll 36s linear infinite;
+        }
+        @keyframes nf-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .nf-carousel-item { flex: 0 0 auto; width: 160px; }
+        @media (min-width: 768px){ .nf-carousel-item { width: 200px; } }
     </style>
 </head>
 <body class="text-gray-800">
@@ -118,16 +130,19 @@
                 <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
             </a>
             <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg" style="font-family: 'Noto Sans', sans-serif;">
-                <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">The Forest</a>
-                <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Submit Book</a>
-                <a href="contributor.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">Contribute</a>
-                <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium" style="color: #4A5450;">About</a>
-                <a href="account.html" class="hover:text-forest-accent transition-colors duration-300" style="color: #4A5450;">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </a>
+                <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">The Forest</a>
+                <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">Submit Book</a>
+                <!-- Contribute link moved into Creator Resources in dashboard for creators -->
+                <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">About</a>
             </nav>
+            <div class="flex items-center gap-2">
+                <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                     <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+                <a href="account.html" class="hover:text-forest-accent transition-colors duration-300" aria-label="Account">
+                    <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                </a>
+            </div>
         </header>
     </div>
 
@@ -136,7 +151,7 @@
         <section class="hero-bg w-full">
             <div class="bg-black/60 text-white">
                 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
-                    <h1 class="text-4xl md:text-6xl font-bold font-heading mb-4">Welcome to <span class="text-[#F9A825]">Noctua Forest</span></h1>
+                    <h1 class="text-4xl md:text-6xl font-bold font-display mb-4">Welcome to <span class="text-[#F9A825]">Noctua Forest</span></h1>
                     <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">For the writers who burn the midnight oil. Share your manuscript or discover your next great read.</p>
                     <div class="flex justify-center gap-3">
                         <a href="forest.html" class="bg-[#F58220] hover:bg-[#E0751C] text-white font-bold py-3 px-8 rounded-full transition duration-300 shadow-lg">Explore</a>
@@ -204,9 +219,8 @@
                             <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Earn by sharing books you love</h3>
                             <ul class="list-disc pl-5 space-y-3 text-white/90 leading-relaxed">
                                 <li>Authenticity first: recommend what you genuinely enjoy</li>
-                                <li>Commission: 2.5% on Amazon sales for all creators</li>
-                                <li>Bookshop.org: 5% for new creators, 7.5% for VIP</li>
-                                <li>Premium Review referrals: 5% new, 10% VIP</li>
+                                <li>Earn commissions on referred purchases (Amazon & Bookshop)</li>
+                                <li>Optional Premium Review referrals available</li>
                             </ul>
                             <a href="creator-onboarding.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Join the Creator Program</a>
                         </div>
@@ -215,6 +229,16 @@
                             <p class="text-white/90 leading-relaxed">Monetize your book recommendations with clear, platform‑agnostic commissions and weekly payouts. Your audience trusts you—so do we.</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Curated Reviews Carousel -->
+        <section class="py-14">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color:#4A5450;">Read our curated reviews</h2>
+                <div class="relative overflow-hidden nf-carousel-mask rounded-xl bg-[#4A5450]/5 py-6">
+                    <div id="reviewsCarousel" class="nf-carousel-track"></div>
                 </div>
             </div>
         </section>
@@ -253,6 +277,7 @@
     <!-- Firebase -->
     <script type="module">
       import { app } from './firebase-config.js';
+      import { getFirestore, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
       import showAlphaPopup from './components/AlphaPopup.js';
 
       // Show alpha popup
@@ -282,7 +307,7 @@
           if (active){
             tab.classList.remove('bg-white/10','text-white/90','border','border-white/20');
             tab.classList.add('bg-[#F58220]','text-white','shadow');
-          } else {
+        } else {
             tab.classList.remove('bg-[#F58220]','text-white','shadow');
             tab.classList.add('bg-white/10','text-white/90','border','border-white/20');
           }
@@ -292,6 +317,104 @@
       tabReaders?.addEventListener('click', () => selectTab('readers'));
       tabWriters?.addEventListener('click', () => selectTab('writers'));
       tabCreators?.addEventListener('click', () => selectTab('creators'));
+
+      // Try to load curated books from Firestore for the carousel
+      (async function loadCuratedReviews(){
+        try{
+          const db = getFirestore(app);
+          const q = query(collection(db, 'books'), orderBy('publishedAt','desc'), limit(12));
+          const snap = await getDocs(q);
+          const track = document.getElementById('reviewsCarousel');
+          if (!track) return;
+          if (!snap.empty){
+            track.innerHTML = '';
+            const items = [];
+            snap.forEach(docSnap => {
+              const d = docSnap.data();
+              const a = document.createElement('a');
+              a.href = `book.html?id=${docSnap.id}`;
+              a.className = 'nf-carousel-item text-center';
+              a.setAttribute('aria-label', `Read our review: ${d.title || 'Untitled'} by ${d.author || ''}`);
+              const img = document.createElement('img');
+              const cover = d.coverUrl || '';
+              img.src = cover; img.alt = `${d.title || 'Untitled'} cover`; img.loading = 'lazy';
+              img.className = 'w-full h-auto rounded-lg shadow-md mb-2 object-contain';
+              img.width = 200; img.height = 300;
+              const cap = document.createElement('div');
+              cap.className = 'text-sm text-[#4A5450]';
+              cap.textContent = d.title || 'Untitled';
+              a.appendChild(img); a.appendChild(cap);
+              items.push(a);
+            });
+            const duo = items.concat(items.map(n=>n.cloneNode(true)));
+            duo.forEach(n => track.appendChild(n));
+          }
+        }catch(e){ /* fallback handled by non-module script */ }
+      })();
+    </script>
+    <script src="sample-books.js"></script>
+    <script>
+        // Mobile menu toggle with contrast-friendly styles
+        function toggleMobileMenu() {
+            const nav = document.getElementById('nav');
+            if (!nav) return;
+            const isHidden = nav.classList.contains('hidden');
+            // Toggle visibility & layout
+            nav.classList.toggle('hidden');
+            nav.classList.toggle('flex');
+            nav.classList.toggle('flex-col');
+            // Mobile positioning
+            nav.classList.toggle('absolute');
+            nav.classList.toggle('top-20');
+            nav.classList.toggle('right-4');
+            nav.classList.toggle('p-6');
+            nav.classList.toggle('rounded-xl');
+            nav.classList.toggle('shadow-lg');
+            nav.classList.toggle('z-50');
+            // High-contrast text/background when opened
+            if (isHidden) {
+                nav.style.backgroundColor = '#3A4440'; // dark
+                nav.style.color = '#E0E2DB'; // light text
+            } else {
+                nav.style.backgroundColor = '';
+                nav.style.color = '';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
+            if (menuButton) {
+                menuButton.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    toggleMobileMenu();
+                }, { passive: false });
+            }
+        });
+      // Build moving carousel from sample books
+      (function(){
+        try{
+          const track = document.getElementById('reviewsCarousel');
+          if(!track || track.children.length) return;
+          const books = (window.SAMPLE_BOOKS || []).slice(0, 8);
+          const duo = books.concat(books); // duplicate for seamless scroll
+          const makeItem = (b) => {
+            const a = document.createElement('a');
+            a.href = `book.html?id=${b.id}`;
+            a.className = 'nf-carousel-item text-center';
+            a.setAttribute('aria-label', `Read our review: ${b.title} by ${b.author}`);
+            const img = document.createElement('img');
+            const cover = (window.coverFor ? window.coverFor(b) : (b.coverUrl || ''));
+            img.src = cover; img.alt = `${b.title} cover`; img.loading = 'lazy';
+            img.className = 'w-full h-auto rounded-lg shadow-md mb-2 object-contain';
+            img.width = 200; img.height = 300;
+            const cap = document.createElement('div');
+            cap.className = 'text-sm text-[#4A5450]';
+            cap.textContent = b.title;
+            a.appendChild(img); a.appendChild(cap);
+            return a;
+          };
+          duo.forEach(b => track.appendChild(makeItem(b)));
+        }catch(e){ console.warn('carousel init failed', e); }
+      })();
     </script>
 </body>
 </html>
