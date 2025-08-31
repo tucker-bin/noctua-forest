@@ -53,39 +53,32 @@ const SAMPLE_BOOKS = [
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Security headers (CSP centralized)
-const csp = [
-  "default-src 'self' data:",
-  "script-src 'self' https://www.gstatic.com https://www.gstatic.com/firebasejs/ https://apis.google.com https://www.googletagmanager.com 'unsafe-inline'",
-  "connect-src 'self' https://firestore.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://www.googleapis.com https://www.gstatic.com https://apis.google.com https://www.google.com https://www.google-analytics.com https://analytics.google.com",
-  "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'",
-  "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' data: https://*.googleusercontent.com https://*.gstatic.com https://firebasestorage.googleapis.com https://www.google.com https://images.unsplash.com https://images-na.ssl-images-amazon.com https://m.media-amazon.com",
-  "frame-src 'self' https://accounts.google.com https://apis.google.com https://my-rhyme-app.firebaseapp.com"
-].join('; ');
+// Static files - serve before other middleware
+const publicDir = path.join(__dirname, '..');
+app.use(express.static(publicDir, { extensions: ['html'] }));
 
-// Apply Helmet middleware with custom CSP
+// Basic middleware
+app.use(express.json({ limit: '1mb' }));
+
+// Apply Helmet middleware with relaxed CSP
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      'default-src': ["'self'", 'data:'],
-      'script-src': ["'self'", 'https://www.gstatic.com', 'https://apis.google.com', 'https://www.googletagmanager.com', "'unsafe-inline'"],
-      'connect-src': ["'self'", 'https://firestore.googleapis.com', 'https://securetoken.googleapis.com', 'https://identitytoolkit.googleapis.com', 'https://www.googleapis.com', 'https://www.gstatic.com', 'https://apis.google.com', 'https://www.google.com', 'https://www.google-analytics.com', 'https://analytics.google.com'],
-      'style-src': ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
-      'font-src': ["'self'", 'https://fonts.gstatic.com'],
-      'img-src': ["'self'", 'data:', 'https://*.googleusercontent.com', 'https://*.gstatic.com', 'https://firebasestorage.googleapis.com', 'https://www.google.com', 'https://images.unsplash.com', 'https://images-na.ssl-images-amazon.com', 'https://m.media-amazon.com'],
-      'frame-src': ["'self'", 'https://accounts.google.com', 'https://apis.google.com', 'https://my-rhyme-app.firebaseapp.com']
-    }
+      defaultSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "data:", "https:", "http:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https:", "http:"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https:", "http:"],
+      imgSrc: ["'self'", "data:", "https:", "http:"],
+      connectSrc: ["'self'", "https:", "http:", "wss:", "ws:"],
+      fontSrc: ["'self'", "data:", "https:", "http:"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'self'", "https:", "http:"],
+    },
   },
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
 }));
-
-app.use(express.json({ limit: '1mb' }));
-
-// Static files - serve before HTTPS redirect
-const publicDir = path.join(__dirname, '..');
-app.use(express.static(publicDir, { extensions: ['html'] }));
 
 // Force HTTPS in production (except for health checks)
 if (process.env.NODE_ENV === 'production') {
