@@ -1,7 +1,7 @@
 FROM node:20-alpine
 
-# Install build dependencies for Sharp
-RUN apk add --no-cache python3 make g++ vips-dev
+# Install build dependencies and runtime tools
+RUN apk add --no-cache python3 make g++ vips-dev wget
 
 WORKDIR /app
 COPY package.json package-lock.json* ./

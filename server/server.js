@@ -490,8 +490,39 @@ console.log(`Environment: ${process.env.NODE_ENV}`);
 console.log(`Port: ${PORT}`);
 console.log(`Public directory: ${publicDir}`);
 
-app.listen(PORT, () => {
+// Verify public directory exists
+if (!fs.existsSync(publicDir)) {
+  console.error(`Error: Public directory ${publicDir} does not exist`);
+  process.exit(1);
+}
+
+// Verify welcome.html exists
+const welcomePath = path.join(publicDir, 'welcome.html');
+if (!fs.existsSync(welcomePath)) {
+  console.error(`Error: ${welcomePath} not found`);
+  process.exit(1);
+}
+
+// Start server with error handling
+const server = app.listen(PORT, () => {
   console.log(`Noctua Forest server running on port ${PORT}`);
+}).on('error', (err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
+});
+
+// Handle process signals
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err);
+  process.exit(1);
 });
 
 
