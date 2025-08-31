@@ -432,8 +432,8 @@ class ForestDiscovery {
 
   // Affiliate link generation methods
   getAmazonAffiliateLink(book) {
-    // Your Amazon Associates ID (replace with your actual ID)
-    const affiliateId = "noctuafor-20"; // Replace with your actual ID
+    // Your Amazon Associates ID
+    const affiliateId = "noctuaforest-20";
     
     // If book has Amazon URL from Firestore/submission, use it with your affiliate tag
     if (book.amazonUrl) {
