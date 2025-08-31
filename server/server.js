@@ -53,11 +53,12 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Force HTTPS in production
+// Force HTTPS in production (except for health checks)
 if (process.env.NODE_ENV === 'production') {
   app.enable('trust proxy');
   app.use((req, res, next) => {
-    if (req.secure) {
+    // Skip HTTPS redirect for health checks
+    if (req.secure || req.path === '/' || req.path === '/healthz') {
       next();
     } else {
       res.redirect('https://' + req.headers.host + req.url);
@@ -346,30 +347,8 @@ app.get('/api/admin/email-logs', (req, res) => {
   }
 });
 
-// Lightweight affiliate click tracking (anonymous) with file persistence
-const AFFILIATE_EVENTS_FILE = path.join(__dirname, 'affiliate-events.json');
+// Lightweight affiliate click tracking (memory-only in production)
 let affiliateEvents = [];
-
-function loadAffiliateEventsFromDisk() {
-  try {
-    if (fs.existsSync(AFFILIATE_EVENTS_FILE)) {
-      const raw = fs.readFileSync(AFFILIATE_EVENTS_FILE, 'utf8');
-      const data = JSON.parse(raw);
-      if (Array.isArray(data)) affiliateEvents = data;
-    }
-  } catch (err) {
-    console.warn('[affiliate] load failed:', err.message);
-  }
-}
-
-function persistAffiliateEventsAsync() {
-  try {
-    const json = JSON.stringify(affiliateEvents.slice(-20000));
-    fs.writeFile(AFFILIATE_EVENTS_FILE, json, { encoding: 'utf8' }, () => {});
-  } catch (_) { /* ignore */ }
-}
-
-loadAffiliateEventsFromDisk();
 app.post('/api/track/affiliate', (req, res) => {
   try {
     const { t, r, bId, bTitle, bAuthor, vendor } = req.body || {};
@@ -493,6 +472,11 @@ app.get('/api/books/:id', (req, res) => {
       error: 'Failed to fetch book' 
     });
   }
+});
+
+// Health check endpoint
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
 });
 
 // SPA-like fallback to welcome.html
