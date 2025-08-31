@@ -1,20 +1,5 @@
-// Paste your Firebase Web App config below and export the initialized app
-// Firebase Console → Project settings → Your apps → Web app → SDK setup and configuration
-// Example shape:
-// const firebaseConfig = {
-//   apiKey: "...",
-//   authDomain: "...",
-//   projectId: "...",
-//   storageBucket: "...",
-//   messagingSenderId: "...",
-//   appId: "..."
-// };
-
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
-import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-
-// TODO: replace with your real config
-const firebaseConfig = window.__FIREBASE_CONFIG__ || {
+// Firebase Web App config
+const firebaseConfig = {
   apiKey: "AIzaSyDkrIV0Ji28ULmGHDl6mLTMvRWQsyR4XFg",
   authDomain: "my-rhyme-app.firebaseapp.com",
   projectId: "my-rhyme-app",
@@ -23,6 +8,17 @@ const firebaseConfig = window.__FIREBASE_CONFIG__ || {
   appId: "1:487322724536:web:a5eb91460b22e57e2b2c4d"
 };
 
-export const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export default firebaseConfig;
+// Export as a module script
+const script = document.createElement('script');
+script.type = 'module';
+script.textContent = `
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+  import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+  const firebaseConfig = ${JSON.stringify(firebaseConfig, null, 2)};
+  export const app = initializeApp(firebaseConfig);
+  export const db = getFirestore(app);
+  window.__FIREBASE_APP__ = app;
+  window.__FIREBASE_DB__ = db;
+`;
+document.head.appendChild(script);
