@@ -500,6 +500,12 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(publicDir, 'welcome.html'));
 });
 
+// Log startup
+console.log('Starting Noctua Forest server...');
+console.log(`Environment: ${process.env.NODE_ENV}`);
+console.log(`Port: ${PORT}`);
+console.log(`Public directory: ${publicDir}`);
+
 app.listen(PORT, () => {
   console.log(`Noctua Forest server running on port ${PORT}`);
 });
