@@ -474,6 +474,11 @@ app.get('/api/books/:id', (req, res) => {
   }
 });
 
+// Test endpoints
+app.get('/test', (req, res) => {
+  res.json({ status: 'running', env: process.env.NODE_ENV });
+});
+
 // Health check endpoint
 app.get('/healthz', (req, res) => {
   res.status(200).send('OK');
@@ -485,27 +490,42 @@ app.get('*', (req, res) => {
 });
 
 // Log startup
-console.log('Starting Noctua Forest server...');
-console.log(`Environment: ${process.env.NODE_ENV}`);
-console.log(`Port: ${PORT}`);
-console.log(`Public directory: ${publicDir}`);
+console.log('=== Noctua Forest Server Starting ===');
+console.log('Environment:', process.env.NODE_ENV || 'development');
+console.log('Node version:', process.version);
+console.log('Platform:', process.platform);
+console.log('Port:', PORT);
+console.log('Public directory:', publicDir);
 
-// Verify public directory exists
-if (!fs.existsSync(publicDir)) {
-  console.error(`Error: Public directory ${publicDir} does not exist`);
-  process.exit(1);
-}
+// Verify directories and files
+try {
+  console.log('Checking public directory...');
+  if (!fs.existsSync(publicDir)) {
+    throw new Error(`Public directory ${publicDir} does not exist`);
+  }
+  console.log('Public directory exists');
 
-// Verify welcome.html exists
-const welcomePath = path.join(publicDir, 'welcome.html');
-if (!fs.existsSync(welcomePath)) {
-  console.error(`Error: ${welcomePath} not found`);
+  console.log('Checking welcome.html...');
+  const welcomePath = path.join(publicDir, 'welcome.html');
+  if (!fs.existsSync(welcomePath)) {
+    throw new Error(`${welcomePath} not found`);
+  }
+  console.log('welcome.html exists');
+
+  // List directory contents for debugging
+  console.log('Directory contents:');
+  fs.readdirSync(publicDir).forEach(file => {
+    console.log(`- ${file}`);
+  });
+} catch (err) {
+  console.error('Startup check failed:', err);
   process.exit(1);
 }
 
 // Start server with error handling
-const server = app.listen(PORT, () => {
-  console.log(`Noctua Forest server running on port ${PORT}`);
+console.log('Starting HTTP server...');
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`=== Server running on port ${PORT} ===`);
 }).on('error', (err) => {
   console.error('Failed to start server:', err);
   process.exit(1);

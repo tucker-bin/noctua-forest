@@ -18,7 +18,8 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Add healthcheck
-HEALTHCHECK --interval=30s --timeout=3s \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/healthz || exit 1
+# Add health check with more retries and longer timeout
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=3 --spider http://localhost:8080/healthz || exit 1
 
 CMD ["node", "server/server.js"]
