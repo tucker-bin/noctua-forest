@@ -121,6 +121,7 @@ const handleFormSubmission = (formId, formType) => {
         blurb: formData.get('blurb') || '',
         wordCount: formData.get('wordCount') ? Number(formData.get('wordCount')) : null,
         purchaseLink: formData.get('purchaseLink') || '',
+        purchaseLink2: formData.get('purchaseLink2') || '',
         primaryLanguage: formData.get('primaryLanguage') || '',
         originalLanguage: formData.get('originalLanguage') || '',
         authorRegion: formData.get('authorRegion') || '',

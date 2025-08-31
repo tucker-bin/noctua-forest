@@ -76,6 +76,46 @@
             </div>
         </div>
 
+        <!-- Affiliate Clicks Overview -->
+        <div class="bg-forest-card rounded-xl p-8 mb-12">
+            <div class="flex items-center mb-6">
+                <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V3a1 1 0 112 0v8h8a1 1 0 110 2h-8v8a1 1 0 11-2 0v-8H3a1 1 0 110-2h8z" />
+                </svg>
+                <h2 class="text-2xl font-bold text-white">Affiliate Clicks</h2>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="text-sm text-white/80">Last 24h</div>
+                    <div id="aff24h" class="text-3xl font-bold">0</div>
+                </div>
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="text-sm text-white/80">Last 7 days</div>
+                    <div id="aff7d" class="text-3xl font-bold">0</div>
+                </div>
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="text-sm text-white/80">Total (500 shown)</div>
+                    <div id="affTotal" class="text-3xl font-bold">0</div>
+                </div>
+            </div>
+            <div class="overflow-auto bg-forest-secondary rounded-lg">
+                <table class="min-w-full text-left text-sm text-white/90">
+                    <thead class="bg-[#3A4440] text-white">
+                        <tr>
+                            <th class="px-4 py-2">Time</th>
+                            <th class="px-4 py-2">Ref</th>
+                            <th class="px-4 py-2">Vendor</th>
+                            <th class="px-4 py-2">Book</th>
+                            <th class="px-4 py-2">Author</th>
+                            <th class="px-4 py-2">Book ID</th>
+                            <th class="px-4 py-2">UA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="affTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <!-- Review Book Submissions -->
         <div class="bg-forest-card rounded-xl p-8 mb-8">
             <div class="flex items-center mb-6">
@@ -297,6 +337,9 @@
             // Set up real-time listeners
             setupSubmissionsListener();
             setupReviewsListener();
+            fetchAffiliateEvents();
+            // refresh every 60s
+            setInterval(fetchAffiliateEvents, 60000);
         });
 
         // Signout handler (same pattern as user dashboard)
@@ -436,6 +479,46 @@
             } catch (err) {
                 console.warn('Applications listener failed:', err);
             }
+
+            // Fetch affiliate events and update UI
+            async function fetchAffiliateEvents() {
+                try {
+                    const res = await fetch('/api/admin/affiliate-events');
+                    const data = await res.json();
+                    if (!data?.ok) return;
+                    const events = Array.isArray(data.events) ? data.events : [];
+                    const table = document.getElementById('affTable');
+                    const last24h = Date.now() - 24*60*60*1000;
+                    const last7d = Date.now() - 7*24*60*60*1000;
+                    let c24 = 0, c7 = 0;
+                    table.innerHTML = '';
+                    events.forEach(ev => {
+                        const when = new Date(ev.t || ev.ts || Date.now());
+                        const tsMs = (typeof ev.t === 'number') ? ev.t : when.getTime();
+                        if (tsMs >= last24h) c24++;
+                        if (tsMs >= last7d) c7++;
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="px-4 py-2 whitespace-nowrap">${new Date(tsMs).toLocaleString()}</td>
+                            <td class="px-4 py-2">${(ev.r||'—')}</td>
+                            <td class="px-4 py-2">${(ev.vendor||'—')}</td>
+                            <td class="px-4 py-2">${(ev.bTitle||'—')}</td>
+                            <td class="px-4 py-2">${(ev.bAuthor||'—')}</td>
+                            <td class="px-4 py-2">${(ev.bId||'—')}</td>
+                            <td class="px-4 py-2 truncate max-w-[260px]">${(ev.ua||'').slice(0,120)}</td>
+                        `;
+                        table.appendChild(tr);
+                    });
+                    const totalEl = document.getElementById('affTotal');
+                    const d24El = document.getElementById('aff24h');
+                    const d7El = document.getElementById('aff7d');
+                    if (totalEl) totalEl.textContent = String(events.length);
+                    if (d24El) d24El.textContent = String(c24);
+                    if (d7El) d7El.textContent = String(c7);
+                } catch (e) {
+                    console.warn('affiliate events load failed', e);
+                }
+            }
         })();
 
         // Set up published books listener
@@ -518,6 +601,7 @@
                     coverUrl: s.coverUrl || '',
                     pdfUrl: s.pdfUrl || '',
                     purchaseLink: s.purchaseLink || '',
+                    purchaseLink2: s.purchaseLink2 || '',
                     amazonUrl: s.amazonUrl || '',
                     isbn: s.isbn || '',
                     premium: s.premium === true,

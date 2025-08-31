@@ -270,18 +270,7 @@ class ForestDiscovery {
                         </svg>
                     </button>
                 </div>
-                <!-- Purchase Options Row -->
-                <div class="flex gap-1 text-xs">
-                    <a href="${this.getAmazonAffiliateLink(book)}" target="_blank" rel="noopener" class="flex-1 text-center bg-[#FF9900] hover:bg-[#FF8800] text-white py-1 px-2 rounded transition-colors duration-200">
-                        Amazon
-                    </a>
-                    <a href="${this.getBookshopAffiliateLink(book)}" target="_blank" rel="noopener" class="flex-1 text-center bg-[#D73502] hover:bg-[#C02F02] text-white py-1 px-2 rounded transition-colors duration-200">
-                        Bookshop
-                    </a>
-                </div>
-                <div class="text-xs text-gray-400 text-center">
-                    <span>Affiliate links support Noctua Forest</span>
-                </div>
+                
             </div>
         </div>
     `;
@@ -439,6 +428,8 @@ class ForestDiscovery {
     if (book.amazonUrl) {
         const url = new URL(book.amazonUrl);
         url.searchParams.set('tag', affiliateId);
+        const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
+        if (ref) url.searchParams.set('ref', ref);
         return url.toString();
     }
     
@@ -446,12 +437,15 @@ class ForestDiscovery {
     if (book.purchaseLink && book.purchaseLink.includes('amazon.com')) {
         const url = new URL(book.purchaseLink);
         url.searchParams.set('tag', affiliateId);
+        const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
+        if (ref) url.searchParams.set('ref', ref);
         return url.toString();
     }
     
     // Otherwise, create search link with affiliate tag
     const searchQuery = encodeURIComponent(`${book.title} ${book.author}`);
-    return `https://amazon.com/s?k=${searchQuery}&tag=${affiliateId}`;
+    const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
+    return `https://amazon.com/s?k=${searchQuery}&tag=${affiliateId}${ref?`&ref=${encodeURIComponent(ref)}`:''}`;
   }
 
   getBookshopAffiliateLink(book) {
@@ -460,12 +454,14 @@ class ForestDiscovery {
     
     // If book has ISBN from Firestore/submission, use direct link
     if (book.isbn) {
-        return `https://bookshop.org/a/${affiliateId}/${book.isbn}`;
+        const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
+        return `https://bookshop.org/a/${affiliateId}/${book.isbn}${ref?`?ref=${encodeURIComponent(ref)}`:''}`;
     }
     
     // Otherwise, search link
     const searchQuery = encodeURIComponent(`${book.title} ${book.author}`);
-    return `https://bookshop.org/search?keywords=${searchQuery}&affiliate=${affiliateId}`;
+    const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
+    return `https://bookshop.org/search?keywords=${searchQuery}&affiliate=${affiliateId}${ref?`&ref=${encodeURIComponent(ref)}`:''}`;
   }
 }
 

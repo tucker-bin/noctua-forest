@@ -45,6 +45,7 @@ const SAMPLE_BOOKS = [
   }
 ];
 
+const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
@@ -303,6 +304,62 @@ app.use(express.static(publicDir, { extensions: ['html'] }));
 app.get('/api/admin/email-logs', (req, res) => {
   try {
     res.json({ ok: true, logs: emailLogs.slice().reverse() });
+  } catch (err) {
+    res.status(500).json({ error: 'failed' });
+  }
+});
+
+// Lightweight affiliate click tracking (anonymous) with file persistence
+const AFFILIATE_EVENTS_FILE = path.join(__dirname, 'affiliate-events.json');
+let affiliateEvents = [];
+
+function loadAffiliateEventsFromDisk() {
+  try {
+    if (fs.existsSync(AFFILIATE_EVENTS_FILE)) {
+      const raw = fs.readFileSync(AFFILIATE_EVENTS_FILE, 'utf8');
+      const data = JSON.parse(raw);
+      if (Array.isArray(data)) affiliateEvents = data;
+    }
+  } catch (err) {
+    console.warn('[affiliate] load failed:', err.message);
+  }
+}
+
+function persistAffiliateEventsAsync() {
+  try {
+    const json = JSON.stringify(affiliateEvents.slice(-20000));
+    fs.writeFile(AFFILIATE_EVENTS_FILE, json, { encoding: 'utf8' }, () => {});
+  } catch (_) { /* ignore */ }
+}
+
+loadAffiliateEventsFromDisk();
+app.post('/api/track/affiliate', (req, res) => {
+  try {
+    const { t, r, bId, bTitle, bAuthor, vendor } = req.body || {};
+    const entry = {
+      ts: new Date().toISOString(),
+      t: Number(t) || Date.now(),
+      r: (r || '').toString().slice(0, 64),
+      bId: (bId || '').toString().slice(0, 64),
+      bTitle: (bTitle || '').toString().slice(0, 160),
+      bAuthor: (bAuthor || '').toString().slice(0, 120),
+      vendor: (vendor || 'unknown').toString().slice(0, 32),
+      ip: (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').toString().slice(0, 64),
+      ua: (req.headers['user-agent'] || '').toString().slice(0, 160)
+    };
+    affiliateEvents.push(entry);
+    if (affiliateEvents.length > 5000) affiliateEvents.shift();
+    persistAffiliateEventsAsync();
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(200).json({ ok: true }); // never block client
+  }
+});
+
+// Admin: fetch recent affiliate events (simple JSON)
+app.get('/api/admin/affiliate-events', (req, res) => {
+  try {
+    res.json({ ok: true, events: affiliateEvents.slice(-500).reverse() });
   } catch (err) {
     res.status(500).json({ error: 'failed' });
   }

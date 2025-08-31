@@ -139,7 +139,7 @@
 
     <main id="main" class="max-w-5xl mx-auto" role="main">
       <div id="loading" class="text-center text-[#3A4440]" role="status" aria-live="polite">Loading…</div>
-      <article id="bookView" class="hidden bg-white rounded-xl shadow-sm p-6 md:p-10" aria-labelledby="title">
+      <article id="bookView" class="hidden bg-forest-card text-white rounded-xl shadow-sm p-6 md:p-10" aria-labelledby="title">
         <div class="grid md:grid-cols-2 gap-8">
           <div>
             <img 
@@ -150,15 +150,15 @@
               aria-labelledby="title" />
           </div>
           <div>
-            <h1 id="title" class="text-3xl font-bold mb-2 text-[#3A4440]" style="font-family: 'Poppins', sans-serif;"></h1>
-            <p id="author" class="text-lg mb-4 text-[#4A5450]/90"></p>
-            <p id="blurb" class="text-[#4A5450]/80 mb-6"></p>
+            <h1 id="title" class="text-3xl font-bold mb-2 text-white" style="font-family: 'Poppins', sans-serif;"></h1>
+            <p id="author" class="text-lg mb-4 text-white/90"></p>
+            <p id="blurb" class="text-white/80 mb-6"></p>
 
-            <div class="space-y-2 text-sm text-[#7A8580] mb-6" role="list" aria-label="Book details">
-              <div role="listitem"><span class="font-semibold">Language:</span> <span id="primaryLanguage"></span></div>
-              <div role="listitem"><span class="font-semibold">Region:</span> <span id="authorRegion"></span></div>
-              <div role="listitem"><span class="font-semibold">Published:</span> <span id="publicationYear"></span></div>
-              <div role="listitem"><span class="font-semibold">Tags:</span> <span id="authorTags"></span></div>
+            <div class="space-y-2 text-sm text-white/80 mb-6" role="list" aria-label="Book details">
+              <div role="listitem"><span class="font-semibold text-white">Language:</span> <span id="primaryLanguage"></span></div>
+              <div role="listitem"><span class="font-semibold text-white">Region:</span> <span id="authorRegion"></span></div>
+              <div role="listitem"><span class="font-semibold text-white">Published:</span> <span id="publicationYear"></span></div>
+              <div role="listitem"><span class="font-semibold text-white">Tags:</span> <span id="authorTags"></span></div>
             </div>
 
             <div class="flex flex-wrap gap-3">
@@ -166,13 +166,21 @@
                 id="purchaseLink" 
                 href="#" 
                 target="_blank" 
-                class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent transition-colors duration-300"
+                class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/20 transition-colors duration-300"
                 aria-label="Buy or learn more about this book">
                 Buy / Learn more
               </a>
+              <a 
+                id="purchaseLink2" 
+                href="#" 
+                target="_blank" 
+                class="hidden px-5 py-2 bg-[#5A6560] text-white rounded-full hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/20 transition-colors duration-300"
+                aria-label="Alternative purchase link">
+                Alternate Link
+              </a>
               <button 
                 id="addReading" 
-                class="px-5 py-2 bg-forest-secondary text-white rounded-full hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent transition-colors duration-300"
+                class="px-5 py-2 bg-forest-secondary text-white rounded-full hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/20 transition-colors duration-300"
                 aria-label="Add book to your reading list">
                 Add to Reading List
               </button>
@@ -298,8 +306,9 @@
           }
         }
         
-        // Handle purchase link
+        // Handle purchase links
         const link = document.getElementById('purchaseLink');
+        const link2 = document.getElementById('purchaseLink2');
         if(link) {
           if(b.purchaseLink) {
             link.href = b.purchaseLink;
@@ -312,6 +321,18 @@
             }
           } else {
             link.style.display = 'none';
+          }
+        }
+
+        if(link2) {
+          if (b.purchaseLink2) {
+            link2.href = b.purchaseLink2;
+            link2.classList.remove('hidden');
+          } else if (!b.purchaseLink) {
+            // fallback: sample affiliate search if neither present
+            const q = encodeURIComponent(`${b.title||''} ${b.author||''}`);
+            link2.href = `https://bookshop.org/search?keywords=${q}`;
+            link2.classList.remove('hidden');
           }
         }
         

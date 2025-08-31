@@ -139,6 +139,54 @@
                 </div>
             </div>
 
+            <!-- Creator Resources (hidden for non-creators) -->
+            <div id="creatorResources" class="hidden bg-forest-card rounded-2xl p-8 mt-8">
+                <div class="flex items-center mb-6">
+                    <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                    </svg>
+                    <h2 class="text-2xl font-bold text-white">Creator Resources</h2>
+                </div>
+                <p class="text-white/90 mb-4">Authenticity wins. Share books you truly enjoy. Your commission terms:</p>
+                <ul class="list-disc pl-5 text-white/90 space-y-1 mb-6">
+                    <li>Amazon sales: <strong>2.5%</strong> (all creators)</li>
+                    <li>Bookshop.org sales: <strong>5%</strong> (new) / <strong>7.5%</strong> (VIP)</li>
+                    <li>Premium Review referrals: <strong>5%</strong> (new) / <strong>10%</strong> (VIP)</li>
+                </ul>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-forest-secondary rounded-xl p-6 text-white">
+                        <h3 class="font-semibold mb-2">Your creator code</h3>
+                        <div class="flex items-center gap-3">
+                            <code id="creatorCode" class="px-3 py-1 bg-[#3A4440] rounded">—</code>
+                            <button id="copyCode" class="px-3 py-1 bg-forest-accent rounded text-white hover:opacity-90">Copy</button>
+                        </div>
+                        <p class="text-white/80 text-sm mt-2">Use this code in your links to track referrals.</p>
+                    </div>
+                    <div class="bg-forest-secondary rounded-xl p-6 text-white">
+                        <h3 class="font-semibold mb-2">Share links</h3>
+                        <div class="space-y-2 text-sm">
+                            <div>
+                                <div class="mb-1">Site link</div>
+                                <div class="flex gap-2">
+                                    <input id="siteLink" class="flex-1 px-3 py-2 rounded bg-[#3A4440] border border-[#7A8580]" readonly />
+                                    <button id="copySite" class="px-3 py-2 bg-forest-accent rounded text-white hover:opacity-90">Copy</button>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="mb-1">Example book link</div>
+                                <div class="flex gap-2">
+                                    <input id="bookLink" class="flex-1 px-3 py-2 rounded bg-[#3A4440] border border-[#7A8580]" readonly />
+                                    <button id="copyBook" class="px-3 py-2 bg-forest-accent rounded text-white hover:opacity-90">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 bg-[#3A4440] rounded-lg p-4 text-white/90 text-sm">
+                    <p class="font-semibold mb-1">Suggested caption</p>
+                    <p id="suggestedCaption">I only share books I genuinely enjoy. Explore my picks on Noctua Forest: <span class="underline" id="captionLink">—</span></p>
+                </div>
+            </div>
             <!-- Settings -->
             <div class="bg-forest-card rounded-xl p-8 mt-8">
                 <div class="flex items-center mb-6">

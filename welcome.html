@@ -163,6 +163,7 @@
                     <div class="flex gap-3 mb-8">
                         <button id="tab-readers" aria-selected="true" class="px-5 py-2.5 rounded-full bg-[#F58220] text-white shadow">Readers</button>
                         <button id="tab-writers" aria-selected="false" class="px-5 py-2.5 rounded-full bg-white/10 text-white/90 hover:bg-white/20 border border-white/20">Writers</button>
+                        <button id="tab-creators" aria-selected="false" class="px-5 py-2.5 rounded-full bg-white/10 text-white/90 hover:bg-white/20 border border-white/20">Creators</button>
                     </div>
 
                     <!-- Panels -->
@@ -195,6 +196,23 @@
                         <div class="bg-forest-secondary text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
                             <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Support that scales</h3>
                             <p class="text-white/90 leading-relaxed">From first submission to featured spotlights, we help your work meet the right readers—without the noise.</p>
+                        </div>
+                    </div>
+
+                    <div id="panel-creators" class="hidden grid md:grid-cols-2 gap-8 items-stretch">
+                        <div class="bg-forest-card text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
+                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Earn by sharing books you love</h3>
+                            <ul class="list-disc pl-5 space-y-3 text-white/90 leading-relaxed">
+                                <li>Authenticity first: recommend what you genuinely enjoy</li>
+                                <li>Commission: 2.5% on Amazon sales for all creators</li>
+                                <li>Bookshop.org: 5% for new creators, 7.5% for VIP</li>
+                                <li>Premium Review referrals: 5% new, 10% VIP</li>
+                            </ul>
+                            <a href="creator-onboarding.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Join the Creator Program</a>
+                        </div>
+                        <div class="bg-forest-secondary text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
+                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Simple, transparent, fair</h3>
+                            <p class="text-white/90 leading-relaxed">Monetize your book recommendations with clear, platform‑agnostic commissions and weekly payouts. Your audience trusts you—so do we.</p>
                         </div>
                     </div>
                 </div>
@@ -240,36 +258,40 @@
       // Show alpha popup
       showAlphaPopup();
 
-      // Tabs logic
+      // Tabs logic (Readers / Writers / Creators)
       const tabReaders = document.getElementById('tab-readers');
       const tabWriters = document.getElementById('tab-writers');
+      const tabCreators = document.getElementById('tab-creators');
       const panelReaders = document.getElementById('panel-readers');
       const panelWriters = document.getElementById('panel-writers');
-      function activate(which){
-        if (which === 'readers'){
-          panelReaders.classList.remove('hidden');
-          panelReaders.classList.add('grid');
-          panelWriters.classList.add('hidden');
-          tabReaders.setAttribute('aria-selected','true');
-          tabWriters.setAttribute('aria-selected','false');
-          tabReaders.classList.remove('bg-white/10','text-white/90','border','border-white/20');
-          tabReaders.classList.add('bg-[#F58220]','text-white','shadow');
-          tabWriters.classList.remove('bg-[#F58220]','text-white','shadow');
-          tabWriters.classList.add('bg-white/10','text-white/90','border','border-white/20');
-        } else {
-          panelWriters.classList.remove('hidden');
-          panelWriters.classList.add('grid');
-          panelReaders.classList.add('hidden');
-          tabReaders.setAttribute('aria-selected','false');
-          tabWriters.setAttribute('aria-selected','true');
-          tabWriters.classList.remove('bg-white/10','text-white/90','border','border-white/20');
-          tabWriters.classList.add('bg-[#F58220]','text-white','shadow');
-          tabReaders.classList.remove('bg-[#F58220]','text-white','shadow');
-          tabReaders.classList.add('bg-white/10','text-white/90','border','border-white/20');
-        }
+      const panelCreators = document.getElementById('panel-creators');
+
+      function selectTab(which){
+        const tabs = {
+          readers: { tab: tabReaders, panel: panelReaders },
+          writers: { tab: tabWriters, panel: panelWriters },
+          creators: { tab: tabCreators, panel: panelCreators },
+        };
+        Object.entries(tabs).forEach(([key, nodes]) => {
+          const { tab, panel } = nodes;
+          if (!tab || !panel) return;
+          const active = key === which;
+          panel.classList.toggle('hidden', !active);
+          panel.classList.toggle('grid', active);
+          tab.setAttribute('aria-selected', active ? 'true' : 'false');
+          if (active){
+            tab.classList.remove('bg-white/10','text-white/90','border','border-white/20');
+            tab.classList.add('bg-[#F58220]','text-white','shadow');
+          } else {
+            tab.classList.remove('bg-[#F58220]','text-white','shadow');
+            tab.classList.add('bg-white/10','text-white/90','border','border-white/20');
+          }
+        });
       }
-      tabReaders?.addEventListener('click', () => activate('readers'));
-      tabWriters?.addEventListener('click', () => activate('writers'));
+
+      tabReaders?.addEventListener('click', () => selectTab('readers'));
+      tabWriters?.addEventListener('click', () => selectTab('writers'));
+      tabCreators?.addEventListener('click', () => selectTab('creators'));
     </script>
 </body>
 </html>
