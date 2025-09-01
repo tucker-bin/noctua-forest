@@ -94,23 +94,6 @@
             </div>
           </div>
 
-          <!-- Author Verification -->
-          <div class="bg-[#5A6560] rounded-lg p-4 border border-[#7A8580]">
-            <label class="flex items-center space-x-3">
-              <input type="checkbox" id="verifyAuthor" class="w-5 h-5 rounded border-[#7A8580] bg-[#4A5450] checked:bg-[#F58220]" />
-              <span class="font-bold">Verify Author Identity</span>
-            </label>
-            <div class="text-sm text-gray-200 mt-2 space-y-1">
-              <p>Claim this book profile as the author to:</p>
-              <ul class="list-disc pl-5 space-y-1">
-                <li>Display verified badge on your book profile</li>
-                <li>Earn full commission on your own book sales</li>
-                <li>Customize your author profile and brand</li>
-              </ul>
-              <p class="text-gray-300 mt-2">We'll verify your identity through your publisher or platform (Amazon KDP, Bookshop, etc.)</p>
-            </div>
-          </div>
-
           <div class="grid md:grid-cols-2 gap-6">
             <div class="space-y-2">
               <label for="title" class="block font-medium text-white mb-1">Book Title</label>
@@ -381,31 +364,12 @@
       showAlphaPopup();
 
       // Initialize form handler (uses shared app from firebase-config.js)
-      // Custom form handler for book submission
       document.getElementById('submissionForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const form = e.target;
         const data = Object.fromEntries(new FormData(form));
-        
-        // Add verification request if checked
-        data.verificationRequested = form.querySelector('#verifyAuthor').checked;
-        
         try {
-          // Submit book data
           await handleFormSubmission('book', data);
-          
-          // If verification requested, create verification request
-          if (data.verificationRequested) {
-            await addDoc(collection(db, 'verificationRequests'), {
-              userId: auth.currentUser.uid,
-              bookTitle: data.title,
-              authorName: data.author,
-              status: 'pending',
-              createdAt: serverTimestamp()
-            });
-          }
-          
-          // Show success modal
           showSubmissionModal({
             title: data.title,
             premium: form.querySelector('#premiumReview').checked,

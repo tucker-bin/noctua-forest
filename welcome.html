@@ -202,7 +202,7 @@
                 <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">About</a>
             </nav>
             <div class="flex items-center space-x-8">
-                <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                <button id="mobileMenuBtn" class="md:hidden" aria-label="Toggle menu">
                      <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
                 <a href="account.html" class="hover:text-forest-accent transition-colors duration-300" aria-label="Account">
@@ -223,6 +223,16 @@
                         <a href="forest.html" class="bg-[#F58220] hover:bg-[#E0751C] text-white font-bold py-3 px-8 rounded-full transition duration-300 shadow-lg">Explore</a>
                         <a href="submit.html" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-bold py-3 px-6 md:px-8 rounded-full transition duration-300 border border-white/50">Submit Your Book</a>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Curated Reviews Carousel -->
+        <section class="py-14">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color:#4A5450;">Read our curated reviews</h2>
+                <div class="relative overflow-hidden nf-carousel-mask rounded-xl bg-[#4A5450]/5 py-6">
+                    <div id="reviewsCarousel" class="nf-carousel-track"></div>
                 </div>
             </div>
         </section>
@@ -299,16 +309,6 @@
             </div>
         </section>
 
-        <!-- Curated Reviews Carousel -->
-        <section class="py-14">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-2xl md:text-3xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color:#4A5450;">Read our curated reviews</h2>
-                <div class="relative overflow-hidden nf-carousel-mask rounded-xl bg-[#4A5450]/5 py-6">
-                    <div id="reviewsCarousel" class="nf-carousel-track"></div>
-                </div>
-            </div>
-        </section>
-
         <!-- New Author Promo (toggleable) -->
         <section id="newAuthorPromo" class="py-10 hidden">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -345,34 +345,76 @@
             </div>
         </section>
 
-        <!-- FAQ (compact) -->
-        <section class="py-14">
+        <!-- FAQ with dropdowns -->
+        <section class="py-14 bg-forest-card">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-2xl md:text-3xl font-bold mb-4" style="font-family: 'Poppins', sans-serif; color:#4A5450;">Frequently asked questions</h2>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
-                        <h3 class="font-semibold text-[#3A4440] mb-2">What is included in a staff review?</h3>
-                        <p class="text-[#4A5450]">Approximately 500 words from our staff plus 1–2 pull quotes, pinned on your book page for readers.</p>
+                <h2 class="text-2xl md:text-3xl font-bold mb-8 text-white" style="font-family: 'Poppins', sans-serif;">Frequently asked questions</h2>
+                <div class="max-w-3xl mx-auto space-y-4">
+                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full px-6 py-4 text-left flex justify-between items-center text-white">
+                            <span class="font-semibold">What is included in a staff review?</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-white/80">
+                            Approximately 500 words from our staff plus 1–2 pull quotes, pinned on your book page for readers.
+                        </div>
                     </div>
-                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
-                        <h3 class="font-semibold text-[#3A4440] mb-2">How long does it take?</h3>
-                        <p class="text-[#4A5450]">Typical turnaround is 1–2 weeks depending on the queue. You will see timing at checkout.</p>
+                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full px-6 py-4 text-left flex justify-between items-center text-white">
+                            <span class="font-semibold">How long does it take?</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-white/80">
+                            Typical turnaround is 1–2 weeks depending on the queue. You will see timing at checkout.
+                        </div>
                     </div>
-                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
-                        <h3 class="font-semibold text-[#3A4440] mb-2">Can I share the review elsewhere?</h3>
-                        <p class="text-[#4A5450]">Yes. You can share it on your site, socials, and marketing materials with attribution to Noctua Forest.</p>
+                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full px-6 py-4 text-left flex justify-between items-center text-white">
+                            <span class="font-semibold">Can I share the review elsewhere?</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-white/80">
+                            Yes. You can share it on your site, socials, and marketing materials with attribution to Noctua Forest.
+                        </div>
                     </div>
-                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
-                        <h3 class="font-semibold text-[#3A4440] mb-2">Is this a retailer review?</h3>
-                        <p class="text-[#4A5450]">No. We do not sell retailer reviews. This is an editorial review for your readers and website.</p>
+                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full px-6 py-4 text-left flex justify-between items-center text-white">
+                            <span class="font-semibold">Is this a retailer review?</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-white/80">
+                            No. We do not sell retailer reviews. This is an editorial review for your readers and website.
+                        </div>
                     </div>
-                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
-                        <h3 class="font-semibold text-[#3A4440] mb-2">What does membership include?</h3>
-                        <p class="text-[#4A5450]">Access to our creator network, reading lists, community reviews, and monthly author Q&As. <a href="https://buy.stripe.com/6oU9ATfwO5mJ9PY9tQaVa02" class="text-forest-accent hover:underline">Join for $4.99/month</a>. The staff review is a <a href="https://book.stripe.com/8x214n70i5mJ1js7lIaVa01" class="text-forest-accent hover:underline">one-time service</a>.</p>
+                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full px-6 py-4 text-left flex justify-between items-center text-white">
+                            <span class="font-semibold">What does membership include?</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-white/80">
+                            Access to our creator network, reading lists, community reviews, and monthly author Q&As. <a href="membership.html" class="underline">Join membership</a>. The staff review is a <a href="submit.html" class="underline">one-time service</a>.
+                        </div>
                     </div>
-                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
-                        <h3 class="font-semibold text-[#3A4440] mb-2">What if you decline or miss the window?</h3>
-                        <p class="text-[#4A5450]">If we decline your book or cannot fulfill within the stated timeframe, you may request a refund.</p>
+                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full px-6 py-4 text-left flex justify-between items-center text-white">
+                            <span class="font-semibold">What if you decline or miss the window?</span>
+                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-content hidden px-6 pb-4 text-white/80">
+                            If we decline your book or cannot fulfill within the stated timeframe, you may request a refund.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -411,11 +453,9 @@
     </footer>
 
     <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js" type="module"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js" type="module"></script>
-    <script src="firebase-config.js"></script>
     <script type="module">
-      import { getFirestore, collection, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+      import { app, db } from './firebase-config.js';
+      import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
       import showAlphaPopup from './components/AlphaPopup.js';
 
       // Show alpha popup
@@ -513,12 +553,10 @@
             }
         }
         document.addEventListener('DOMContentLoaded', () => {
-            const menuButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
+            const menuButton = document.getElementById('mobileMenuBtn');
             if (menuButton) {
-                menuButton.addEventListener('touchend', (e) => {
-                    e.preventDefault();
-                    toggleMobileMenu();
-                }, { passive: false });
+                menuButton.addEventListener('click', () => toggleMobileMenu());
+                menuButton.addEventListener('touchend', (e) => { e.preventDefault(); toggleMobileMenu(); }, { passive: false });
             }
         });
       // Handle newsletter subscription
@@ -577,6 +615,27 @@
           duo.forEach(b => track.appendChild(makeItem(b)));
         }catch(e){ console.warn('carousel init failed', e); }
       })();
+
+      // FAQ dropdowns
+      document.querySelectorAll('.faq-toggle').forEach(button => {
+        button.addEventListener('click', () => {
+          const content = button.nextElementSibling;
+          const arrow = button.querySelector('svg');
+          const isOpen = !content.classList.contains('hidden');
+          
+          // Close all other FAQs
+          document.querySelectorAll('.faq-content').forEach(c => {
+            if (c !== content) {
+              c.classList.add('hidden');
+              c.previousElementSibling.querySelector('svg').classList.remove('rotate-180');
+            }
+          });
+          
+          // Toggle this FAQ
+          content.classList.toggle('hidden');
+          arrow.classList.toggle('rotate-180');
+        });
+      });
 
       // Toggle new author promo via global flag (can be set server-side)
       try {
