@@ -417,7 +417,7 @@
             if (isHidden) {
                 nav.style.backgroundColor = '#3A4440'; // dark
                 nav.style.color = '#E0E2DB'; // light text
-                nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; a.classList.add('block'); a.classList.add('py-3'); a.classList.add('px-4'); a.classList.remove('md:py-0'); a.classList.remove('md:px-0'); });
+                nav.querySelectorAll('a').forEach(function(a){ a.style.setProperty('color', '#E0E2DB', 'important'); a.classList.add('block'); a.classList.add('py-3'); a.classList.add('px-4'); a.classList.remove('md:py-0'); a.classList.remove('md:px-0'); });
             } else {
                 nav.style.backgroundColor = '';
                 nav.style.color = '';
