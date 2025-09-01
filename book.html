@@ -216,6 +216,9 @@
 
             <p id="actionMsg" class="mt-4 text-green-600 hidden" role="status" aria-live="polite">Added to your reading list.</p>
             <p id="creatorAttribution" class="mt-4 text-sm text-white/70 hidden" role="status"></p>
+            <p id="memberAttribution" class="mt-2 text-sm text-white/70 hidden" role="status">
+              <a href="https://buy.stripe.com/6oU9ATfwO5mJ9PY9tQaVa02" class="text-forest-accent hover:underline">Join Noctua Forest</a> to create your own curated lists.
+            </p>
           </div>
         </div>
 
@@ -675,13 +678,22 @@
           // Silent fail; non-critical
         }
 
-        // Display creator list count
+        // Display creator list count and member CTA
         try {
             const creatorListCount = await getActiveListsCount(id);
             const creatorAttribution = document.getElementById('creatorAttribution');
+            const memberAttribution = document.getElementById('memberAttribution');
+            
             if (creatorAttribution && creatorListCount > 0) {
                 creatorAttribution.textContent = `Featured in ${creatorListCount} creator list${creatorListCount === 1 ? '' : 's'}.`;
                 creatorAttribution.classList.remove('hidden');
+            }
+
+            // Show member CTA if not logged in or not a member
+            const userDoc = auth.currentUser ? await getDoc(doc(db, 'users', auth.currentUser.uid)) : null;
+            const data = userDoc?.exists() ? userDoc.data() : {};
+            if (!auth.currentUser || data.membership !== 'active') {
+                memberAttribution?.classList.remove('hidden');
             }
         } catch (err) {
             console.warn('Could not load creator list count', err);

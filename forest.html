@@ -297,13 +297,43 @@
                     Learn about Noctua Forest
                 </a>
             </div>
+            <div id="membershipCTA" class="hidden mt-8 bg-forest-card rounded-xl p-8 max-w-2xl mx-auto">
+                <h3 class="text-xl font-bold text-white mb-3">Create Your Own Reading Lists</h3>
+                <p class="text-white/80 mb-4">Join Noctua Forest to curate and share your favorite books. Earn commissions when readers discover great books through your lists.</p>
+                <a href="https://buy.stripe.com/6oU9ATfwO5mJ9PY9tQaVa02" class="inline-block bg-forest-accent hover:bg-forest-accent-hover text-white font-bold py-3 px-6 rounded-full transition-all duration-300">
+                    Join for $4.99/month
+                </a>
+            </div>
         </div>
 
     </div>
 
     <!-- Firebase -->
     <script type="module">
-        import { app } from './firebase-config.js';
+        import { app, db } from './firebase-config.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+        const auth = getAuth(app);
+        onAuthStateChanged(auth, async (user) => {
+            const membershipCTA = document.getElementById('membershipCTA');
+            if (!membershipCTA) return;
+
+            if (!user) {
+                membershipCTA.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const data = userDoc.exists() ? userDoc.data() : {};
+                if (data.membership !== 'active') {
+                    membershipCTA.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.warn('Could not check membership status:', err);
+            }
+        });
     </script>
 
     <script src="sample-books.js"></script>
