@@ -157,7 +157,15 @@
           </div>
           <div>
             <h1 id="title" class="text-3xl font-bold mb-2 text-white" style="font-family: 'Poppins', sans-serif;"></h1>
-            <p id="author" class="text-lg mb-4 text-white/90"></p>
+            <div class="flex items-center gap-2 mb-4">
+              <p id="author" class="text-lg text-white/90"></p>
+              <div id="verifiedBadge" class="hidden bg-forest-accent/10 text-forest-accent px-2 py-0.5 rounded-full text-sm flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Verified Author
+              </div>
+            </div>
             <p id="blurb" class="text-white/80 mb-6"></p>
 
             <div class="space-y-2 text-sm text-white/80 mb-6" role="list" aria-label="Book details">
@@ -530,6 +538,16 @@
         updateElement('authorRegion', b.authorRegion || '');
         updateElement('publicationYear', b.publicationYear || '');
         updateElement('authorTags', b.authorTags || '');
+
+        // Show verified badge if author is verified
+        const verifiedBadge = document.getElementById('verifiedBadge');
+        if (verifiedBadge) {
+          if (b.authorVerified) {
+            verifiedBadge.classList.remove('hidden');
+          } else {
+            verifiedBadge.classList.add('hidden');
+          }
+        }
         
         // Handle cover image with PA API integration and fallbacks
         const cover = document.getElementById('coverImg');
@@ -729,11 +747,25 @@
       const div = document.createElement('div');
       div.className = 'bg-[#3A4440] rounded-lg p-4';
       div.innerHTML = `
-        <div class="flex justify-between items-start mb-2">
-          <div class="font-medium text-white">${review.authorForestName || 'Anonymous Forest Dweller'}</div>
-          <div class="text-sm text-white/60">${formatDate(review.createdAt)}</div>
+        <div class="flex items-start gap-4">
+          <div class="flex-none">
+            ${review.authorAvatarUrl ? 
+              `<img src="${review.authorAvatarUrl}" alt="Avatar" class="w-10 h-10 rounded-full object-cover">` :
+              `<div class="w-10 h-10 rounded-full bg-[#5A6560] flex items-center justify-center">
+                <svg class="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              </div>`
+            }
+          </div>
+          <div class="flex-1">
+            <div class="flex justify-between items-start mb-2">
+              <div class="font-medium text-white">${review.authorForestName || 'Anonymous Forest Dweller'}</div>
+              <div class="text-sm text-white/60">${formatDate(review.createdAt)}</div>
+            </div>
+            <div class="text-white/80">${review.text}</div>
+          </div>
         </div>
-        <div class="text-white/80">${review.text}</div>
       `;
       return div;
     }
@@ -813,10 +845,15 @@
           if (!reviewText) return;
 
           try {
+            // Get user data for avatar
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            const userData = userDoc.exists() ? userDoc.data() : {};
+            
             await addReview({
               bookId,
               text: reviewText,
-              authorId: user.uid
+              authorId: user.uid,
+              authorAvatarUrl: userData.avatarUrl || null
             });
             reviewForm.reset();
           } catch (error) {

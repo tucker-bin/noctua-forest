@@ -114,31 +114,57 @@
                 </div>
             </div>
 
-            <!-- Forest Name (moved out of Settings) -->
+            <!-- Forest Name & Avatar -->
             <div class="bg-forest-card rounded-xl p-8 mb-8">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-2xl font-bold text-white">Forest Name</h2>
-                        <p class="text-white/80 text-sm">Your unique identity in the Noctua Forest community</p>
+                        <h2 class="text-2xl font-bold text-white">Forest Identity</h2>
+                        <p class="text-white/80 text-sm">Your unique presence in the Noctua Forest community</p>
                     </div>
                     <div class="relative group">
-                        <button type="button" class="text-white/60 hover:text-white" aria-label="Forest Name Info">
+                        <button type="button" class="text-white/60 hover:text-white" aria-label="Forest Identity Info">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
                             </svg>
                         </button>
                         <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-64 p-4 bg-[#3A4440] rounded-lg shadow-lg text-sm text-white/90 z-10">
-                            Your Forest Name is used when you write reviews and interact with the community. It's generated from nature-themed words to maintain a consistent atmosphere in the forest.
+                            Your Forest Name and Avatar represent you in reviews and community interactions. Members can customize their avatar with a profile photo.
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-3">
-                    <input id="forestName" type="text" readonly class="flex-1 px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
-                    <button type="button" id="regenerateForestName" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90 transition-opacity">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                        </svg>
-                    </button>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Avatar Section -->
+                    <div class="flex-none">
+                        <div class="relative">
+                            <div id="avatarPreview" class="w-24 h-24 rounded-full bg-[#3A4440] border-2 border-[#7A8580] overflow-hidden flex items-center justify-center">
+                                <!-- Default forest icon or uploaded image will be shown here -->
+                                <svg class="w-12 h-12 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                </svg>
+                            </div>
+                            <div id="avatarUpload" class="hidden absolute inset-0 bg-black/60 rounded-full flex items-center justify-center">
+                                <input type="file" id="avatarInput" accept="image/*" class="hidden">
+                                <button type="button" onclick="document.getElementById('avatarInput').click()" class="text-white hover:text-forest-accent transition-colors duration-300">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <p id="avatarStatus" class="text-sm text-white/60 mt-2 text-center">Unlock custom avatars with membership</p>
+                    </div>
+                    <!-- Forest Name Section -->
+                    <div class="flex-1">
+                        <label for="forestName" class="block text-sm font-medium text-white/90 mb-2">Forest Name</label>
+                        <div class="flex gap-3">
+                            <input id="forestName" type="text" readonly class="flex-1 px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                            <button type="button" id="regenerateForestName" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90 transition-opacity">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -324,6 +350,59 @@
                         </div>
                     </div>
                 </div>
+                <!-- Performance Analytics -->
+                <div class="mt-8 bg-forest-secondary rounded-xl p-6 text-white">
+                    <h3 class="text-lg font-semibold mb-4">Performance Analytics</h3>
+                    <div class="grid md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-[#3A4440] rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-white/70 mb-1">Total Earnings</h4>
+                            <p id="totalEarnings" class="text-2xl font-bold">$0.00</p>
+                            <div class="text-xs text-white/50 mt-1">Last 30 days</div>
+                        </div>
+                        <div class="bg-[#3A4440] rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-white/70 mb-1">List Views</h4>
+                            <p id="listViews" class="text-2xl font-bold">0</p>
+                            <div class="text-xs text-white/50 mt-1">Last 30 days</div>
+                        </div>
+                        <div class="bg-[#3A4440] rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-white/70 mb-1">Click-through Rate</h4>
+                            <p id="ctr" class="text-2xl font-bold">0%</p>
+                            <div class="text-xs text-white/50 mt-1">Last 30 days</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Earnings Breakdown -->
+                    <div class="bg-[#3A4440] rounded-lg p-4 mb-6">
+                        <h4 class="font-medium mb-3">Earnings Breakdown</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="font-medium">Your Books</div>
+                                    <div class="text-sm text-white/70">7.5% commission + royalties</div>
+                                </div>
+                                <div id="ownBookEarnings" class="text-lg font-bold">$0.00</div>
+                            </div>
+                            <div class="border-t border-white/10"></div>
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <div class="font-medium">Recommendations</div>
+                                    <div class="text-sm text-white/70">7.5% commission on other books</div>
+                                </div>
+                                <div id="recEarnings" class="text-lg font-bold">$0.00</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Performing Lists -->
+                    <div class="bg-[#3A4440] rounded-lg p-4">
+                        <h4 class="font-medium mb-3">Top Performing Lists</h4>
+                        <div id="topLists" class="space-y-3">
+                            <!-- Lists will be populated here -->
+                            <div class="text-sm text-white/50 text-center py-2">No list data yet</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Creator blogging resources -->
                 <div class="mt-6 grid md:grid-cols-2 gap-6">
                     <div class="bg-forest-secondary rounded-xl p-6 text-white">
@@ -464,7 +543,8 @@
     </script>
     <script type="module">
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-        import { doc, getDoc, collection, query, where, getDocs, deleteDoc, orderBy, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { doc, getDoc, collection, query, where, getDocs, deleteDoc, orderBy, setDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js';
         import { 
             createList, getUserLists, updateList, deleteList, shareList, getList 
         } from './js/readingListService.js';
@@ -877,6 +957,65 @@
                 });
             }
 
+            // Initialize Avatar System
+            const avatarPreview = document.getElementById('avatarPreview');
+            const avatarUpload = document.getElementById('avatarUpload');
+            const avatarInput = document.getElementById('avatarInput');
+            const avatarStatus = document.getElementById('avatarStatus');
+
+            // Check membership status and enable avatar upload if member
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const data = userDoc.exists() ? userDoc.data() : {};
+                
+                if (data.membership === 'active') {
+                    avatarUpload.classList.remove('hidden');
+                    avatarStatus.textContent = 'Click to upload custom avatar';
+                    
+                    // Show existing avatar if any
+                    if (data.avatarUrl) {
+                        avatarPreview.innerHTML = `<img src="${data.avatarUrl}" alt="Your avatar" class="w-full h-full object-cover">`;
+                    }
+                }
+
+                // Handle avatar upload
+                if (avatarInput) {
+                    avatarInput.addEventListener('change', async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+
+                        try {
+                            // Show loading state
+                            avatarStatus.textContent = 'Uploading...';
+                            
+                            // Upload to Firebase Storage
+                            const storageRef = ref(storage, `avatars/${user.uid}`);
+                            await uploadBytes(storageRef, file);
+                            const avatarUrl = await getDownloadURL(storageRef);
+                            
+                            // Update user document
+                            await updateDoc(doc(db, 'users', user.uid), {
+                                avatarUrl,
+                                updatedAt: serverTimestamp()
+                            });
+                            
+                            // Update preview
+                            avatarPreview.innerHTML = `<img src="${avatarUrl}" alt="Your avatar" class="w-full h-full object-cover">`;
+                            avatarStatus.textContent = 'Avatar updated successfully';
+                            
+                            setTimeout(() => {
+                                avatarStatus.textContent = 'Click to upload custom avatar';
+                            }, 3000);
+                        } catch (err) {
+                            console.error('Avatar upload failed:', err);
+                            avatarStatus.textContent = 'Failed to upload avatar. Please try again.';
+                        }
+                    });
+                }
+            } catch (err) {
+                console.warn('Could not initialize avatar system:', err);
+            }
+
             // Initialize Forest Name system
             try {
                 await import('./js/forestNameService.js');
@@ -947,6 +1086,8 @@
                     statusEl?.classList.add('hidden');
                     ctaEl?.classList.add('hidden');
                     document.getElementById('creatorResources')?.classList.remove('hidden');
+                    // Load analytics data for approved creators
+                    loadAnalytics();
                 } else {
                     statusEl?.classList.add('hidden');
                     ctaEl?.classList.remove('hidden');
