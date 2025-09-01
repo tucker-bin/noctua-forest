@@ -176,8 +176,15 @@ app.post('/api/email/applications', emailLimiter, async (req, res) => {
     const html = `
       <div style="font-family:Inter,Arial,sans-serif;line-height:1.5;color:#222">
         <p>Hello,</p>
-        <p>${status === 'approved' ? 'Great news — your application has been approved.' : (status === 'rejected' ? 'Thank you for your application. After review, we aren't able to move forward at this time.' : `Your application status: ${status}`)}</p>
-        ${(title || author) ? `<p>Submission: <strong>${title || 'Untitled'}</strong>${author ? ` — ${author}` : ''}</p>` : ''}
+        <p>${status === 'approved'
+          ? 'Great news — your application has been approved.'
+          : (status === 'rejected'
+              ? 'Thank you for your application. After review, we aren\'t able to move forward at this time.'
+              : ('Your application status: ' + status))}
+        </p>
+        ${ (title || author)
+            ? ('<p>Submission: <strong>' + (title || 'Untitled') + '</strong>' + (author ? ' — ' + author : '') + '</p>')
+            : '' }
         <p style="margin-top:24px">— Noctua Forest</p>
       </div>`;
 
@@ -277,8 +284,11 @@ app.post('/api/email/auto-reply', emailLimiter, async (req, res) => {
         <p>Hello,</p>
         <p>${isBook
           ? 'Thanks for submitting your book to Noctua Forest. Our team will review your submission and follow up.'
-          : 'Thanks for applying to contribute to Noctua Forest. We'll review your application and get back to you.'}</p>
-        ${(title || author) ? `<p>Submission: <strong>${title || 'Untitled'}</strong>${author ? ` — ${author}` : ''}</p>` : ''}
+          : 'Thanks for applying to contribute to Noctua Forest. We\'ll review your application and get back to you.'}
+        </p>
+        ${ (title || author)
+            ? ('<p>Submission: <strong>' + (title || 'Untitled') + '</strong>' + (author ? ' — ' + author : '') + '</p>')
+            : '' }
         <p style="margin-top:24px">— Noctua Forest</p>
       </div>`;
 
