@@ -137,9 +137,11 @@
       if (isHidden) {
         nav.style.backgroundColor = '#3A4440'; // dark
         nav.style.color = '#E0E2DB'; // light text
+        nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; });
       } else {
         nav.style.backgroundColor = '';
         nav.style.color = '';
+        nav.querySelectorAll('a').forEach(function(a){ a.style.color = ''; });
       }
     }
     document.addEventListener('DOMContentLoaded', () => {

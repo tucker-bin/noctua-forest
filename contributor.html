@@ -337,8 +337,15 @@
             nav.classList.toggle('rounded-xl');
             nav.classList.toggle('shadow-lg');
             nav.classList.toggle('z-50');
-            if (isHidden) { nav.style.backgroundColor = '#3A4440'; nav.style.color = '#E0E2DB'; }
-            else { nav.style.backgroundColor = ''; nav.style.color = ''; }
+            if (isHidden) {
+                nav.style.backgroundColor = '#3A4440';
+                nav.style.color = '#E0E2DB';
+                nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; });
+            } else {
+                nav.style.backgroundColor = '';
+                nav.style.color = '';
+                nav.querySelectorAll('a').forEach(function(a){ a.style.color = ''; });
+            }
         }
         document.addEventListener('DOMContentLoaded', () => {
             const btn = document.querySelector('button[onclick="toggleMobileMenu()"]');
