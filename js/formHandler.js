@@ -173,7 +173,7 @@ const handleFormSubmission = (formId, formType) => {
         } catch (_) {}
       } else {
         // Fallback: simple confirm
-        const goPremium = premium && window.confirm('Submission received. Proceed to Premium Review payment?');
+        const goPremium = premium && window.confirm('Submission received. Proceed to Noctua Forest + Staff Book Review payment?');
         const success = document.getElementById('submissionSuccess');
         if (success) success.classList.remove('hidden');
         if (goPremium && window.__STRIPE_PREMIUM_REVIEW_LINK__) {

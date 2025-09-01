@@ -2,7 +2,7 @@
 import { db } from './firebase-config.js';
 import { 
     collection, doc, getDoc, setDoc, getDocs, 
-    query, where, updateDoc, deleteDoc 
+    query, where, updateDoc, deleteDoc, writeBatch, serverTimestamp 
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { generateUniqueName, initializeUsedNames } from './forestNameService.js';
 
@@ -49,23 +49,24 @@ export async function assignNewForestName(userId) {
     }
 
     // Save to Firestore atomically
-    const batch = db.batch();
+    const batch = writeBatch(db);
     
     // Add to forest names collection
     const forestNameDoc = doc(db, FOREST_NAMES_COLLECTION, userId);
     batch.set(forestNameDoc, {
         name: newName,
         userId,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
     });
 
     // Update user document
     const userDoc = doc(db, USERS_COLLECTION, userId);
-    batch.update(userDoc, {
+    // Ensure user doc exists before update; use set with merge for safety
+    batch.set(userDoc, {
         forestName: newName,
-        forestNameUpdatedAt: new Date()
-    });
+        forestNameUpdatedAt: serverTimestamp()
+    }, { merge: true });
 
     await batch.commit();
     return newName;
@@ -90,22 +91,22 @@ export async function updateForestName(userId, newName) {
         throw new Error('Forest name is already taken');
     }
 
-    const batch = db.batch();
+    const batch = writeBatch(db);
 
     // Update forest names collection
     const forestNameDoc = doc(db, FOREST_NAMES_COLLECTION, userId);
     batch.set(forestNameDoc, {
         name: newName,
         userId,
-        updatedAt: new Date()
+        updatedAt: serverTimestamp()
     }, { merge: true });
 
     // Update user document
     const userDoc = doc(db, USERS_COLLECTION, userId);
-    batch.update(userDoc, {
+    batch.set(userDoc, {
         forestName: newName,
-        forestNameUpdatedAt: new Date()
-    });
+        forestNameUpdatedAt: serverTimestamp()
+    }, { merge: true });
 
     await batch.commit();
 }

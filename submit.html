@@ -76,8 +76,8 @@
             <!-- Hero Section -->
             <div class="text-center">
                 <h1 class="text-4xl font-bold mb-6 text-[#3A4440]" style="font-family: 'Poppins', sans-serif;">Submit Your Book</h1>
-                <p class="text-xl mb-4 text-[#4A5450]">Share your story with readers who value thoughtful storytelling.</p>
-                <p class="text-lg text-[#4A5450]/80">We prioritize narrative quality, genre craftsmanship, and meaningful reader engagement across all genres.</p>
+                <p class="text-xl mb-4 text-[#4A5450]">Self-publish and promote your work in The Forest</p>
+                <p class="text-lg text-[#4A5450]/80">Create custom reading lists, earn affiliate commissions, and connect with engaged readers. Free to join.</p>
             </div>
 
         <form id="submissionForm" class="bg-[#4A5450] rounded-xl p-8 text-white space-y-6" novalidate>
@@ -111,6 +111,7 @@
             <label for="blurb" class="block font-medium text-white mb-1">Book Blurb</label>
             <textarea id="blurb" name="blurb" rows="5" required placeholder="Short description of your book"
               class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200"></textarea>
+            <p class="text-sm text-gray-300">Aim for 120–200 words. Tell us the premise, tone, and the readers who will enjoy it.</p>
           </div>
 
           <div class="grid md:grid-cols-2 gap-6">
@@ -118,11 +119,13 @@
               <label for="wordCount" class="block font-medium text-white mb-1">Word Count</label>
               <input id="wordCount" name="wordCount" type="number" min="0" inputmode="numeric" placeholder="e.g., 65000" 
                 class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+              <p class="text-sm text-gray-300">An estimate helps us plan the reading and set expectations.</p>
             </div>
             <div class="space-y-2">
               <label for="purchaseLink" class="block font-medium text-white mb-1">Book Purchase Link</label>
               <input id="purchaseLink" name="purchaseLink" type="url" placeholder="https://..." 
                 class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+              <p class="text-sm text-gray-300">Used for buy buttons on your book page (Amazon, Bookshop, or similar).</p>
             </div>
             <div class="space-y-2">
               <label for="purchaseLink2" class="block font-medium text-white mb-1">Secondary Purchase Link (optional)</label>
@@ -212,7 +215,7 @@
 
           <!-- Genre & Classification Section -->
           <fieldset class="space-y-6">
-            <legend class="text-lg font-bold mb-4">Genre & Classification</legend>
+            <legend class="text-lg font-bold mb-4">Genre and classification</legend>
             
             <div class="space-y-2">
               <label for="authorTags" class="block font-medium text-white mb-1">Your Genre Tags</label>
@@ -287,7 +290,7 @@
           </div>
 
           <div class="space-y-2">
-            <label for="coverFile" class="block font-medium text-white mb-1">Or Upload Cover (PNG/JPG)</label>
+            <label for="coverFile" class="block font-medium text-white mb-1">Or upload cover (PNG/JPG)</label>
             <input id="coverFile" name="coverFile" type="file" accept="image/*"
               class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
             <p class="text-sm text-gray-300">If both URL and file are provided, the uploaded file will be used.</p>
@@ -302,15 +305,24 @@
           <div class="bg-[#5A6560] rounded-lg p-4 border border-[#7A8580]">
             <label class="flex items-center space-x-3">
               <input type="checkbox" id="premiumReview" class="w-5 h-5 rounded border-[#7A8580] bg-[#4A5450] checked:bg-[#F58220]" />
-              <span class="font-bold">Premium Review Service</span>
+              <span class="font-bold">Noctua Forest + Staff Book Review</span>
             </label>
-            <p class="text-sm text-gray-300 mt-2">Guaranteed detailed review and priority placement in The Forest.</p>
+            <div class="text-sm text-gray-200 mt-2 space-y-1">
+              <p>Approximately 500 words from expert staff, pinned on your books page.</p>
+              <p>Optional feature exposure on our landing page, newsletters, or social media at our editorial discretion.</p>
+              <p>Turnaround: typically 1–2 weeks depending on queue.</p>
+              <p class="text-gray-300">By paying through our secure link, you also enroll in a $4.99 monthly membership to The Forest. The staff review is one-time; you can cancel membership anytime.</p>
+            </div>
+            <div class="text-xs text-gray-300 mt-3">
+              <p>Refund policy: If we decline your book or cannot fulfill the review within the timeframe, you may request a refund.</p>
+              <p class="mt-1">We do not sell retailer reviews. This is an editorial review for your site and readers, disclosed per guidelines.</p>
+            </div>
           </div>
 
           <div class="mt-8">
             <button type="submit" 
               class="w-full md:w-auto px-8 py-3 bg-[#F58220] hover:bg-[#E67615] text-white font-medium rounded-full transition duration-300">
-              Submit to The Forest
+              Get Reviewed
             </button>
             <p id="submissionSuccess" class="hidden mt-4 text-green-400">Thank you! Your submission was received.</p>
           </div>
@@ -322,12 +334,12 @@
             <h3 class="text-xl font-bold mb-2 text-[#4A5450]">Thanks for your submission</h3>
             <p id="submissionModalDesc" class="text-gray-700 mb-4">We'll review it shortly.</p>
             <div id="premiumCta" class="hidden bg-amber-50 border border-amber-200 text-amber-800 rounded-md p-3 mb-4">
-              Want a guaranteed detailed review and priority placement? Continue to Premium Review.
+              Want to boost your visibility and earnings? Upgrade to premium for enhanced features and commission rates.
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <button id="modalSubmitAnother" class="px-4 py-2 bg-[#F58220] hover:bg-[#E67615] text-white rounded-md">Submit Another</button>
               <a id="modalViewDashboard" href="dashboard.html" class="px-4 py-2 text-center bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-md">Dashboard</a>
-              <button id="modalPremium" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Premium Review</button>
+              <button id="modalPremium" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md">Noctua Forest + Staff Book Review</button>
             </div>
           </div>
         </div>

@@ -83,6 +83,72 @@
     ]
   }
   </script>
+
+  <!-- Service + FAQ Schema Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Noctua Forest + Staff Book Review",
+    "provider": {
+      "@type": "Organization",
+      "name": "Noctua Forest",
+      "url": "https://noctuaforest.com"
+    },
+    "areaServed": "Worldwide",
+    "serviceType": "Editorial book review for authors",
+    "description": "Approximately 500-word editorial staff review pinned on your book page, with optional discretionary feature mentions on landing page, newsletters, or social media.",
+    "termsOfService": "https://noctuaforest.com/terms.html"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is included in a staff review?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Approximately 500 words from our staff plus 1–2 pull quotes, pinned on your deep book page for readers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does it take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Typical turnaround is 1–2 weeks depending on the queue. Timing is shown at checkout."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I share the review elsewhere?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. You may share it on your website, social channels, and marketing materials with attribution to Noctua Forest."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is this a retailer review?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. We do not sell retailer reviews. This is an editorial review for your readers and website."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What if you decline or miss the window?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "If we decline your book or cannot fulfill within the stated timeframe, you may request a refund."
+        }
+      }
+    ]
+  }
+  </script>
   
   <style>
         body {
@@ -164,15 +230,15 @@
         <!-- Value Proposition: For Readers / For Writers -->
         <section class="py-20">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="bg-forest-card text-white rounded-2xl shadow-sm p-8 md:p-14">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
-                        <h2 class="text-3xl md:text-4xl font-bold leading-tight" style="font-family: 'Poppins', sans-serif;">Find your place in the Forest</h2>
-                        <div class="flex items-center gap-4 text-sm md:text-base text-gray-200">
-                            <span>Join <strong>50+ Featured Authors</strong></span>
-                            <span class="hidden md:inline text-gray-400">|</span>
-                            <span><strong>10,000+ Engaged Readers</strong></span>
-                        </div>
+                            <div class="bg-forest-card text-white rounded-2xl shadow-sm p-8 md:p-14">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+                    <h2 class="text-3xl md:text-4xl font-bold leading-tight" style="font-family: 'Poppins', sans-serif;">Find your place in the Forest</h2>
+                    <div class="flex items-center gap-4 text-sm md:text-base text-gray-200">
+                        <span>Join <strong>50+ Featured Books</strong></span>
+                        <span class="hidden md:inline text-gray-400">|</span>
+                        <span><strong>10,000+ Engaged Readers</strong></span>
                     </div>
+                </div>
 
                     <!-- Tabs -->
                     <div class="flex gap-3 mb-8">
@@ -204,7 +270,7 @@
                             <ul class="list-disc pl-5 space-y-3 text-white/90 leading-relaxed">
                                 <li>Submit your manuscript and reach engaged readers</li>
                                 <li>Gain visibility in a curated discovery feed</li>
-                                <li>Opt for Premium Review for detailed, timely feedback</li>
+                                <li>Optional staff review for detailed feedback</li>
                             </ul>
                             <a href="submit.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Submit Your Blurb</a>
                         </div>
@@ -220,7 +286,7 @@
                             <ul class="list-disc pl-5 space-y-3 text-white/90 leading-relaxed">
                                 <li>Authenticity first: recommend what you genuinely enjoy</li>
                                 <li>Earn commissions on referred purchases (Amazon & Bookshop)</li>
-                                <li>Optional Premium Review referrals available</li>
+                                <li>Optional staff review referrals available</li>
                             </ul>
                             <a href="creator-onboarding.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Join the Creator Program</a>
                         </div>
@@ -239,6 +305,75 @@
                 <h2 class="text-2xl md:text-3xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color:#4A5450;">Read our curated reviews</h2>
                 <div class="relative overflow-hidden nf-carousel-mask rounded-xl bg-[#4A5450]/5 py-6">
                     <div id="reviewsCarousel" class="nf-carousel-track"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Author Promo (toggleable) -->
+        <section id="newAuthorPromo" class="py-10 hidden">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-forest-card text-white rounded-2xl p-6 md:p-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-1" style="font-family: 'Poppins', sans-serif;">New author? Get discovered</h3>
+                        <p class="text-white/90">We occasionally feature debut and indie titles submitted to The Forest. Opt‑in when you submit; mentions are editorial and not guaranteed.</p>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <a href="submit.html" class="inline-block px-6 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Submit Your Book</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Us -->
+        <section class="py-14">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4" style="font-family: 'Poppins', sans-serif; color:#4A5450;">Why authors choose Noctua Forest</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-forest-card text-white rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-2">Honest editorial reviews</h3>
+                        <p class="text-white/90">A professional staff review you can share with readers and on your site. We do not sell retailer reviews.</p>
+                    </div>
+                    <div class="bg-forest-card text-white rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-2">Pinned on your book page</h3>
+                        <p class="text-white/90">Approximately 500 words plus pull quotes, pinned on your deep book page for lasting context.</p>
+                    </div>
+                    <div class="bg-forest-card text-white rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-2">Clear steps and timelines</h3>
+                        <p class="text-white/90">Simple submission, clear turnaround, and discretionary feature mentions when a fit. <a class="underline" href="submit.html">Learn how we work</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ (compact) -->
+        <section class="py-14">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4" style="font-family: 'Poppins', sans-serif; color:#4A5450;">Frequently asked questions</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
+                        <h3 class="font-semibold text-[#3A4440] mb-2">What is included in a staff review?</h3>
+                        <p class="text-[#4A5450]">Approximately 500 words from our staff plus 1–2 pull quotes, pinned on your book page for readers.</p>
+                    </div>
+                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
+                        <h3 class="font-semibold text-[#3A4440] mb-2">How long does it take?</h3>
+                        <p class="text-[#4A5450]">Typical turnaround is 1–2 weeks depending on the queue. You will see timing at checkout.</p>
+                    </div>
+                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
+                        <h3 class="font-semibold text-[#3A4440] mb-2">Can I share the review elsewhere?</h3>
+                        <p class="text-[#4A5450]">Yes. You can share it on your site, socials, and marketing materials with attribution to Noctua Forest.</p>
+                    </div>
+                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
+                        <h3 class="font-semibold text-[#3A4440] mb-2">Is this a retailer review?</h3>
+                        <p class="text-[#4A5450]">No. We do not sell retailer reviews. This is an editorial review for your readers and website.</p>
+                    </div>
+                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
+                        <h3 class="font-semibold text-[#3A4440] mb-2">What does membership include?</h3>
+                        <p class="text-[#4A5450]">Access to our creator network, reading lists, community reviews, and monthly author Q&As. The staff review is a one-time service.</p>
+                    </div>
+                    <div class="bg-[#fff] rounded-xl p-6 border border-[#e6e6e6]">
+                        <h3 class="font-semibold text-[#3A4440] mb-2">What if you decline or miss the window?</h3>
+                        <p class="text-[#4A5450]">If we decline your book or cannot fulfill within the stated timeframe, you may request a refund.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -442,6 +577,13 @@
           duo.forEach(b => track.appendChild(makeItem(b)));
         }catch(e){ console.warn('carousel init failed', e); }
       })();
+
+      // Toggle new author promo via global flag (can be set server-side)
+      try {
+        const showPromo = window.__SHOW_NEW_AUTHOR_PROMO__ === true;
+        const promo = document.getElementById('newAuthorPromo');
+        if (promo) promo.classList.toggle('hidden', !showPromo);
+      } catch (_) {}
     </script>
 </body>
 </html>

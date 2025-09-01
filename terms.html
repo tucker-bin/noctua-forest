@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terms of Service — Noctua Forest</title>
   <link rel="stylesheet" href="assets/tailwind.css">
+  <link rel="stylesheet" href="assets/base-styles.css">
+  <link rel="stylesheet" href="assets/nav.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
@@ -30,7 +32,7 @@
         <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color: #4A5450;">Submit Book</a>
         <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color: #4A5450;">About</a>
       </nav>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center space-x-8">
         <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
           <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
         </button>
@@ -40,6 +42,7 @@
       </div>
     </header>
   </div>
+  <div id="navOverlay" class="nav-overlay"></div>
 
   <main class="container mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex-1">
     <article class="bg-forest-card text-white rounded-2xl shadow-sm p-6 md:p-10 max-w-4xl mx-auto">
@@ -56,14 +59,15 @@
       <h2 class="text-xl font-semibold mt-8 mb-3">2) Content & submissions</h2>
       <ul class="list-disc pl-6 text-gray-100 space-y-2">
         <li>You retain ownership of your content. You grant us a non‑exclusive license to host, display, and process it solely to operate features you use (e.g., submissions, reviews).</li>
-        <li>You promise you have the rights to what you upload and that it doesn’t violate any laws or third‑party rights.</li>
+        <li>You promise you have the rights to what you upload and that it doesn't violate any laws or third‑party rights.</li>
         <li>We may remove content that violates these terms or applicable law.</li>
+        <li>We do not sell retailer reviews. Reviews on Noctua Forest are editorial and community-driven, disclosed per guidelines.</li>
       </ul>
 
       <h2 class="text-xl font-semibold mt-8 mb-3">3) Payments & premium services</h2>
       <ul class="list-disc pl-6 text-gray-100 space-y-2">
         <li>Payments are handled by Stripe. We don’t store full card details.</li>
-        <li>Premium services (e.g., Premium Review) are described at checkout; refunds are handled consistent with that offer and applicable law.</li>
+        <li>Premium services (e.g., Noctua Forest + Staff Book Review) are described at checkout; refunds are handled consistent with that offer and applicable law.</li>
       </ul>
 
       <h2 class="text-xl font-semibold mt-8 mb-3">4) Acceptable use</h2>
@@ -96,36 +100,7 @@
       <p>&copy; 2025 Noctua Forest. All rights reserved.</p>
     </div>
   </footer>
-  <script>
-    function toggleMobileMenu() {
-      const nav = document.getElementById('nav');
-      if (!nav) return;
-      const isHidden = nav.classList.contains('hidden');
-      nav.classList.toggle('hidden');
-      nav.classList.toggle('flex');
-      nav.classList.toggle('flex-col');
-      nav.classList.toggle('absolute');
-      nav.classList.toggle('top-20');
-      nav.classList.toggle('right-4');
-      nav.classList.toggle('p-6');
-      nav.classList.toggle('rounded-xl');
-      nav.classList.toggle('shadow-lg');
-      nav.classList.toggle('z-50');
-      if (isHidden) {
-        nav.style.backgroundColor = '#3A4440';
-        nav.style.color = '#E0E2DB';
-        nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; });
-      } else {
-        nav.style.backgroundColor = '';
-        nav.style.color = '';
-        nav.querySelectorAll('a').forEach(function(a){ a.style.color = ''; });
-      }
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-      const btn = document.querySelector('button[onclick="toggleMobileMenu()"]');
-      if (btn) btn.addEventListener('touchend', (e)=>{ e.preventDefault(); toggleMobileMenu(); }, { passive: false });
-    });
-  </script>
+  <script src="assets/nav.js"></script>
 </body>
 </html>
 

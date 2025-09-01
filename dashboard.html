@@ -103,18 +103,35 @@
                 </div>
             </div>
 
-            <!-- Your Books -->
+            <!-- Forest Name (moved out of Settings) -->
             <div class="bg-forest-card rounded-xl p-8 mb-8">
-                <div class="flex items-center mb-6">
-                    <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                    <h2 class="text-2xl font-bold text-white">Your Books</h2>
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Forest Name</h2>
+                        <p class="text-white/80 text-sm">Your unique identity in the Noctua Forest community</p>
+                    </div>
+                    <div class="relative group">
+                        <button type="button" class="text-white/60 hover:text-white" aria-label="Forest Name Info">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                            </svg>
+                        </button>
+                        <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-64 p-4 bg-[#3A4440] rounded-lg shadow-lg text-sm text-white/90 z-10">
+                            Your Forest Name is used when you write reviews and interact with the community. It's generated from nature-themed words to maintain a consistent atmosphere in the forest.
+                        </div>
+                    </div>
                 </div>
-                <div id="submissionsList" class="space-y-4">
-                    <!-- Books will be populated here -->
+                <div class="flex gap-3">
+                    <input id="forestName" type="text" readonly class="flex-1 px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                    <button type="button" id="regenerateForestName" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90 transition-opacity">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
                 </div>
             </div>
+
+            <!-- Your Books (moved below Reading Lists) -->
 
             <!-- Reading Lists -->
             <div class="bg-forest-card rounded-xl p-8 mb-8">
@@ -187,6 +204,20 @@
                 </div>
             </div>
 
+            <!-- Your Books (restored section) -->
+            <div class="bg-forest-card rounded-xl p-8 mb-8">
+                <div class="flex items-center mb-6">
+                    <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    <h2 class="text-2xl font-bold text-white">Your Books</h2>
+                </div>
+                <div id="submissionsList" class="space-y-4">
+                    <!-- Books will be populated here -->
+                </div>
+                <p class="text-white/60 text-xs mt-4">Author analytics are coming soon.</p>
+            </div>
+
             <!-- Share Modal -->
             <div id="shareModal" class="hidden fixed inset-0 bg-black/60 items-center justify-center z-50">
                 <div class="bg-forest-card rounded-xl w-full max-w-lg mx-4 p-6">
@@ -198,7 +229,7 @@
                                 <input type="text" id="shareLink" readonly
                                     class="flex-1 px-4 py-2 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white">
                                 <button id="copyLink" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90">
-                                    Copy
+                                    Copy Link
                                 </button>
                             </div>
                         </div>
@@ -249,9 +280,9 @@
                 </div>
                 <p class="text-white/90 mb-4">Authenticity wins. Share books you truly enjoy. Your commission terms:</p>
                 <ul class="list-disc pl-5 text-white/90 space-y-1 mb-6">
-                    <li>Amazon sales: <strong>2.5%</strong> (all creators)</li>
-                    <li>Bookshop.org sales: <strong>5%</strong> (new) / <strong>7.5%</strong> (VIP)</li>
-                    <li>Premium Review referrals: <strong>5%</strong> (new) / <strong>10%</strong> (VIP)</li>
+                    <li>Amazon sales: <strong>2.5%</strong></li>
+                    <li>Bookshop.org sales: <strong>5%</strong></li>
+                    <li>Premium Review referrals: <strong>5%</strong></li>
                 </ul>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-forest-secondary rounded-xl p-6 text-white">
@@ -328,39 +359,12 @@
                             <p class="text-white/90 text-sm mt-1">Share books you love and earn commission</p>
                         </div>
                         <a href="creator-application.html" class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 transition-opacity">
-                            Apply Now
+                            Start Earning
                         </a>
                     </div>
                 </div>
 
                 <form id="settingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-white">
-                    <!-- Forest Name -->
-                    <div class="md:col-span-2 bg-forest-secondary rounded-xl p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <div>
-                                <label for="forestName" class="block text-lg font-semibold mb-1">Forest Name</label>
-                                <p class="text-white/80 text-sm">Your unique identity in the Noctua Forest community</p>
-                            </div>
-                            <div class="relative group">
-                                <button type="button" class="text-white/60 hover:text-white" aria-label="Forest Name Info">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
-                                    </svg>
-                                </button>
-                                <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-64 p-4 bg-[#3A4440] rounded-lg shadow-lg text-sm text-white/90 z-10">
-                                    Your Forest Name is used when you write reviews and interact with the community. It's generated from nature-themed words to maintain a consistent atmosphere in the forest.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex gap-3">
-                            <input id="forestName" type="text" readonly class="flex-1 px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
-                            <button type="button" id="regenerateForestName" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90 transition-opacity">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
 
                     <!-- Social Links -->
                     <div class="md:col-span-2">
@@ -451,7 +455,7 @@
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
         import { doc, getDoc, collection, query, where, getDocs, deleteDoc, orderBy, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
         import { 
-            createList, getUserLists, updateList, deleteList, shareList 
+            createList, getUserLists, updateList, deleteList, shareList, getList 
         } from './js/readingListService.js';
         import { app as firebaseApp, db as firebaseDb } from './firebase-config.js';
 

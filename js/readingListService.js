@@ -1,12 +1,14 @@
 // Reading List Service
 import { db } from './firebase-config.js';
 import { 
-    collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc,
-    query, where, orderBy, serverTimestamp, arrayUnion, arrayRemove 
+    collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, setDoc,
+    query, where, orderBy, serverTimestamp, arrayUnion, arrayRemove, limit 
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
 const LISTS_COLLECTION = 'readingLists';
 const SHARES_COLLECTION = 'listShares';
+const LIST_SAVES_COLLECTION = 'listSaves';
+const LIST_ATTRIBUTIONS_COLLECTION = 'listAttributions';
 
 /**
  * Create a new reading list
@@ -144,6 +146,27 @@ export async function addBookToList(listId, book) {
         stats,
         updatedAt: serverTimestamp()
     });
+
+    // Track save for global count (idempotent per list+book)
+    const saveId = `${listId}_${book.id}`;
+    await setDoc(doc(db, LIST_SAVES_COLLECTION, saveId), {
+        listId,
+        userId: data.userId,
+        bookId: book.id,
+        createdAt: serverTimestamp()
+    }, { merge: true });
+
+    // Track attribution for creator lists (idempotent)
+    const userDoc = await getDoc(doc(db, 'users', data.userId));
+    if (userDoc.exists() && userDoc.data().applicationStatus === 'approved') {
+        const attributionId = `${listId}_${book.id}`;
+        await setDoc(doc(db, LIST_ATTRIBUTIONS_COLLECTION, attributionId), {
+            listId,
+            creatorId: data.userId,
+            bookId: book.id,
+            createdAt: serverTimestamp()
+        }, { merge: true });
+    }
 }
 
 /**
@@ -186,6 +209,14 @@ export async function removeBookFromList(listId, bookId) {
         stats,
         updatedAt: serverTimestamp()
     });
+
+    // Remove corresponding save record
+    const saveId = `${listId}_${bookId}`;
+    await deleteDoc(doc(db, LIST_SAVES_COLLECTION, saveId)).catch(()=>{});
+
+    // Remove corresponding attribution record
+    const attributionId = `${listId}_${bookId}`;
+    await deleteDoc(doc(db, LIST_ATTRIBUTIONS_COLLECTION, attributionId)).catch(()=>{});
 }
 
 /**
@@ -220,9 +251,10 @@ export async function reorderBooks(listId, newOrder) {
 /**
  * Generate a shareable link for a list
  * @param {string} listId - The list ID
+ * @param {string} creatorId - The creator's user ID
  * @returns {Promise<string>} The share ID
  */
-export async function shareList(listId) {
+export async function shareList(listId, creatorId) {
     // Check if share already exists
     const sharesQuery = query(
         collection(db, SHARES_COLLECTION),
@@ -232,12 +264,18 @@ export async function shareList(listId) {
     const sharesDocs = await getDocs(sharesQuery);
     
     if (!sharesDocs.empty) {
+        // Ensure creatorId is present
+        const shareRef = sharesDocs.docs[0].ref;
+        if (!sharesDocs.docs[0].data().creatorId) {
+            await updateDoc(shareRef, { creatorId });
+        }
         return sharesDocs.docs[0].id;
     }
     
     // Create new share
     const shareDoc = await addDoc(collection(db, SHARES_COLLECTION), {
         listId,
+        creatorId,
         createdAt: serverTimestamp()
     });
     
@@ -253,8 +291,14 @@ export async function getSharedList(shareId) {
     const shareDoc = await getDoc(doc(db, SHARES_COLLECTION, shareId));
     if (!shareDoc.exists()) return null;
     
-    const listId = shareDoc.data().listId;
-    return getList(listId);
+    const shareData = shareDoc.data();
+    const list = await getList(shareData.listId);
+    if (!list) return null;
+
+    return {
+        ...list,
+        creatorId: shareData.creatorId, // Pass creatorId along
+    };
 }
 
 /**
@@ -279,4 +323,26 @@ export async function cloneList(shareId, userId) {
     
     const docRef = await addDoc(collection(db, LISTS_COLLECTION), newList);
     return docRef.id;
+}
+
+/**
+ * Get total number of lists (all users) that contain a given book
+ * @param {string} bookId
+ * @returns {Promise<number>}
+ */
+export async function getBookSaveCount(bookId) {
+    const q = query(collection(db, LIST_SAVES_COLLECTION), where('bookId', '==', bookId));
+    const snap = await getDocs(q);
+    return snap.size;
+}
+
+/**
+ * Get total number of active creator lists that contain a given book
+ * @param {string} bookId
+ * @returns {Promise<number>}
+ */
+export async function getActiveListsCount(bookId) {
+    const q = query(collection(db, LIST_ATTRIBUTIONS_COLLECTION), where('bookId', '==', bookId));
+    const snap = await getDocs(q);
+    return snap.size;
 }

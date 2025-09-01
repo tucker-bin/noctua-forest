@@ -174,7 +174,7 @@
                 target="_blank" 
                 class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/20 transition-colors duration-300"
                 aria-label="Buy or learn more about this book">
-                Buy / Learn more
+                Buy or Learn More
               </a>
               <a 
                 id="purchaseLink2" 
@@ -215,12 +215,14 @@
             </div>
 
             <p id="actionMsg" class="mt-4 text-green-600 hidden" role="status" aria-live="polite">Added to your reading list.</p>
+            <p id="creatorAttribution" class="mt-4 text-sm text-white/70 hidden" role="status"></p>
           </div>
         </div>
 
         <!-- Reader Reviews Section -->
         <div class="mt-12 border-t border-white/20 pt-8">
           <h2 class="text-2xl font-bold mb-6 text-white" style="font-family: 'Poppins', sans-serif;">Reader Reviews</h2>
+          <p class="text-white/60 text-sm mb-4">We do not sell retailer reviews. Reviews here are editorial and for readers of Noctua Forest.</p>
           
           <!-- Review List -->
           <div id="reviewList" class="space-y-6 mb-8">
@@ -312,13 +314,23 @@
     import { app, db } from './firebase-config.js';
     import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
     import { doc, getDoc, addDoc, collection, serverTimestamp, query, where, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-    import { createList, getUserLists, addBookToList, getList } from './js/readingListService.js';
+    import { createList, getUserLists, addBookToList, getList, getActiveListsCount } from './js/readingListService.js';
 
     const auth = getAuth(app);
 
     function getParam(name){
       const url = new URL(window.location.href);
       return url.searchParams.get(name);
+    }
+
+    // Persist referral code from URL
+    const ref = getParam('ref');
+    if (ref) {
+        try {
+            sessionStorage.setItem('nf_ref', ref);
+        } catch (e) {
+            console.warn('Could not persist referral code.', e);
+        }
     }
 
     // Handle list management
@@ -649,26 +661,30 @@
           genre: b.genre
         };
 
-        const btn = document.getElementById('addReading');
-        if(btn) {
-          btn.addEventListener('click', async ()=>{
-          const user = auth.currentUser;
-          if(!user){ window.location.href = 'account.html'; return; }
-          try{
-            await addDoc(collection(db,'readingList'),{
-              userId: user.uid,
-              bookId: id,
-              title: b.title || '',
-              author: b.author || '',
-              createdAt: serverTimestamp(),
-            });
-            const msg = document.getElementById('actionMsg');
-            msg.classList.remove('hidden');
-          }catch(e){
-            alert('Failed to add to reading list.');
-            console.error(e);
+        // Display list save count (readers + creators)
+        try {
+          const { getBookSaveCount } = await import('./js/readingListService.js');
+          const count = await getBookSaveCount(id);
+          const actionMsg = document.getElementById('actionMsg');
+          if (actionMsg) {
+            actionMsg.textContent = count > 0 ? `Saved in ${count} list${count===1?'':'s'}.` : 'Be the first to save this to a list.';
+            actionMsg.classList.remove('hidden');
+            actionMsg.classList.add('text-white');
           }
-          });
+        } catch (err) {
+          // Silent fail; non-critical
+        }
+
+        // Display creator list count
+        try {
+            const creatorListCount = await getActiveListsCount(id);
+            const creatorAttribution = document.getElementById('creatorAttribution');
+            if (creatorAttribution && creatorListCount > 0) {
+                creatorAttribution.textContent = `Featured in ${creatorListCount} creator list${creatorListCount === 1 ? '' : 's'}.`;
+                creatorAttribution.classList.remove('hidden');
+            }
+        } catch (err) {
+            console.warn('Could not load creator list count', err);
         }
       }catch(err){
         console.error(err);

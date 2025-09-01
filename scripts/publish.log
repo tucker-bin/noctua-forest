@@ -1,3 +1,21 @@
 ==== PUBLISH Mon 09/01/2025 13:22:01.16 ==== 
 true
 https://github.com/tucker-bin/my-ryhme-app.git
+warning: in the working copy of 'scripts/publish.log', LF will be replaced by CRLF the next time Git touches it
+[main 680673e] publish: site update
+ 16 files changed, 2415 insertions(+), 228 deletions(-)
+ create mode 100644 creator-application.html
+ create mode 100644 docs/auth-domain-setup.md
+ create mode 100644 firebase-config.new.js
+ create mode 100644 js/forestNameFirestore.js
+ create mode 100644 js/forestNameService.js
+ create mode 100644 js/readingListService.js
+ create mode 100644 js/reviewsMigration.js
+ create mode 100644 lists.html
+ delete mode 100644 newsletter.html
+ create mode 100644 scripts/update-auth-domain.bat
+ create mode 100644 scripts/update-auth-domain.js
+Pushing to origin/main with --force-with-lease ... 
+branch 'main' set up to track 'origin/main'.
+To https://github.com/tucker-bin/my-ryhme-app.git
+   3e7b8a1..680673e  main -> main

@@ -121,7 +121,7 @@
                         <input type="text" id="shareLink" readonly
                             class="flex-1 px-4 py-2 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white">
                         <button id="copyLink" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90">
-                            Copy
+                            Copy Link
                         </button>
                     </div>
                 </div>
@@ -200,7 +200,7 @@
                 // Create books grid
                 const grid = document.getElementById('booksGrid');
                 grid.innerHTML = books.map(book => `
-                    <a href="book.html?id=${book.id}" class="group">
+                    <a href="book.html?id=${book.id}&ref=${list.creatorId || ''}" class="group">
                         <div class="aspect-[2/3] rounded-lg overflow-hidden mb-2">
                             <img src="${book.coverUrl || 'images/placeholder.jpg'}" 
                                 alt="${book.title}" 
@@ -329,7 +329,11 @@
                 const shareFacebook = document.getElementById('shareFacebook');
 
                 shareBtn.addEventListener('click', () => {
-                    shareLink.value = window.location.href;
+                    const shareUrl = new URL(window.location.href);
+                    if (list.creatorId) {
+                        shareUrl.searchParams.set('ref', list.creatorId);
+                    }
+                    shareLink.value = shareUrl.toString();
                     shareModal.classList.remove('hidden');
                     shareModal.classList.add('flex');
 
@@ -337,7 +341,7 @@
                     const qrCode = document.getElementById('qrCode');
                     qrCode.innerHTML = '';
                     new QRCode(qrCode, {
-                        text: window.location.href,
+                        text: shareUrl.toString(),
                         width: 128,
                         height: 128
                     });
@@ -357,11 +361,11 @@
 
                 shareTwitter.addEventListener('click', () => {
                     const text = `Check out this reading list on Noctua Forest: ${list.name}`;
-                    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`);
+                    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareLink.value)}&text=${encodeURIComponent(text)}`);
                 });
 
                 shareFacebook.addEventListener('click', () => {
-                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`);
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink.value)}`);
                 });
 
             } catch (err) {
