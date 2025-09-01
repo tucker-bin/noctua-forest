@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact Us — Noctua Forest</title>
   <link rel="stylesheet" href="assets/tailwind.css">
+  <link rel="stylesheet" href="assets/base-styles.css">
+  <link rel="stylesheet" href="assets/nav.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
@@ -26,19 +28,20 @@
         <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
       </a>
       <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
-        <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#4A5450">The Forest</a>
-        <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#4A5450">Submit Book</a>
-        <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#4A5450">About</a>
+        <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">The Forest</a>
+        <a href="submit.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Submit Book</a>
+        <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">About</a>
       </nav>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center space-x-8">
         <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
           <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
         </button>
-        <a href="account.html" class="hover:text-forest-accent transition-colors duration-300" aria-label="Account">
+        <a href="account.html" class="hover:text-forest-accent transition-colors duration-300 nav-link" aria-label="Account">
           <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
         </a>
       </div>
     </header>
+    <div id="navOverlay" class="nav-overlay"></div>
 
     <main class="max-w-2xl mx-auto bg-[#4A5450] text-white rounded-xl shadow-sm p-6 md:p-10">
       <h1 class="text-3xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color:#4A5450">Contact Us</h1>
@@ -105,31 +108,7 @@
       }
     });
   </script>
-  <script>
-    function toggleMobileMenu() {
-      const nav = document.getElementById('nav');
-      if (!nav) return;
-      const isHidden = nav.classList.contains('hidden');
-      nav.classList.toggle('hidden');
-      nav.classList.toggle('flex');
-      nav.classList.toggle('flex-col');
-      // Unified mobile nav look
-      nav.classList.toggle('nf-mobile-nav');
-      if (isHidden) {
-        nav.style.backgroundColor = '#3A4440';
-        nav.style.color = '#E0E2DB';
-        nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; a.classList.add('block'); a.classList.add('py-3'); a.classList.add('px-4'); a.classList.remove('md:py-0'); a.classList.remove('md:px-0'); });
-      } else {
-        nav.style.backgroundColor = '';
-        nav.style.color = '';
-        nav.querySelectorAll('a').forEach(function(a){ a.style.color = ''; });
-      }
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-      const btn = document.querySelector('button[onclick="toggleMobileMenu()"]');
-      if (btn) btn.addEventListener('touchend', (e)=>{ e.preventDefault(); toggleMobileMenu(); }, { passive: false });
-    });
-  </script>
+  <script src="assets/nav.js"></script>
 </body>
 </html>
 
