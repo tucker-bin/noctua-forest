@@ -98,9 +98,7 @@
                             <h3 class="text-lg font-semibold text-white">Reviews Written</h3>
                         </div>
                         <p id="reviewsCount" class="text-3xl font-bold text-white">0</p>
-                        <div class="mt-4">
-                            <a href="contact.html" class="inline-block px-4 py-2 bg-[#F58220] text-white rounded-md hover:opacity-90">Contact Us</a>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -118,16 +116,113 @@
                 </div>
             </div>
 
-            <!-- Reading List -->
+            <!-- Reading Lists -->
             <div class="bg-forest-card rounded-xl p-8 mb-8">
-                <div class="flex items-center mb-6">
-                    <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                    <h2 class="text-2xl font-bold text-white">Reading List</h2>
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center">
+                        <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                        </svg>
+                        <h2 class="text-2xl font-bold text-white">Reading Lists</h2>
+                    </div>
+                    <button id="createList" class="px-4 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 transition-opacity flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        New List
+                    </button>
                 </div>
-                <div id="readingList" class="space-y-4">
-                    <!-- Reading list will be populated here -->
+
+                <!-- List Controls -->
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-4">
+                        <select id="listSort" class="bg-[#3A4440] text-white rounded-lg px-3 py-2 border border-[#7A8580]">
+                            <option value="updated">Last Updated</option>
+                            <option value="name">Name</option>
+                            <option value="books">Book Count</option>
+                        </select>
+                        <input type="text" id="listSearch" placeholder="Search lists..." 
+                            class="bg-[#3A4440] text-white rounded-lg px-3 py-2 border border-[#7A8580] placeholder-gray-400">
+                    </div>
+                </div>
+
+                <!-- Lists Grid -->
+                <div id="readingLists" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Lists will be populated here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyLists" class="hidden text-center py-8">
+                    <p class="text-white/80 mb-4">You haven't created any reading lists yet.</p>
+                    <button class="create-list-btn px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90">
+                        Create Your First List
+                    </button>
+                </div>
+            </div>
+
+            <!-- List Edit Modal -->
+            <div id="listModal" class="hidden fixed inset-0 bg-black/60 items-center justify-center z-50">
+                <div class="bg-forest-card rounded-xl w-full max-w-lg mx-4 p-6">
+                    <h3 class="text-xl font-bold mb-4 text-white">Edit List</h3>
+                    <form id="listForm" class="space-y-4">
+                        <div>
+                            <label for="listName" class="block text-sm font-medium text-white/90 mb-1">List Name</label>
+                            <input type="text" id="listName" required
+                                class="w-full px-4 py-2 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white">
+                        </div>
+                        <div>
+                            <label for="listDescription" class="block text-sm font-medium text-white/90 mb-1">Description (Optional)</label>
+                            <textarea id="listDescription" rows="3"
+                                class="w-full px-4 py-2 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white"></textarea>
+                        </div>
+                        <div class="flex justify-end gap-3">
+                            <button type="button" id="cancelList" class="px-4 py-2 bg-[#3A4440] text-white rounded-full hover:opacity-90">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-4 py-2 bg-forest-accent text-white rounded-full hover:opacity-90">
+                                Save List
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Share Modal -->
+            <div id="shareModal" class="hidden fixed inset-0 bg-black/60 items-center justify-center z-50">
+                <div class="bg-forest-card rounded-xl w-full max-w-lg mx-4 p-6">
+                    <h3 class="text-xl font-bold mb-4 text-white">Share List</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-white/90 mb-1">Shareable Link</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="shareLink" readonly
+                                    class="flex-1 px-4 py-2 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white">
+                                <button id="copyLink" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90">
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-white/90 mb-2">Share On</label>
+                            <div class="flex gap-3">
+                                <button id="shareTwitter" class="flex-1 px-4 py-2 bg-[#1DA1F2] text-white rounded-lg hover:opacity-90">
+                                    Twitter
+                                </button>
+                                <button id="shareFacebook" class="flex-1 px-4 py-2 bg-[#4267B2] text-white rounded-lg hover:opacity-90">
+                                    Facebook
+                                </button>
+                            </div>
+                        </div>
+                        <div id="qrCodeContainer" class="hidden text-center">
+                            <label class="block text-sm font-medium text-white/90 mb-2">QR Code</label>
+                            <div id="qrCode" class="inline-block bg-white p-4 rounded-lg"></div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button id="closeShare" class="px-4 py-2 bg-[#3A4440] text-white rounded-full hover:opacity-90">
+                                Close
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -208,7 +303,81 @@
                     </svg>
                     <h2 class="text-2xl font-bold text-white">Settings</h2>
                 </div>
+                <!-- Creator Application Status -->
+                <div id="creatorApplicationStatus" class="hidden md:col-span-2 bg-forest-accent rounded-xl p-6 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Creator Application</h3>
+                            <p class="text-white/90 text-sm mt-1">Your application is being reviewed</p>
+                        </div>
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-white animate-spin mr-2" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span class="text-white font-medium">Pending Review</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Creator Application CTA -->
+                <div id="creatorApplicationCTA" class="hidden md:col-span-2 bg-forest-secondary rounded-xl p-6 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">Become a Creator</h3>
+                            <p class="text-white/90 text-sm mt-1">Share books you love and earn commission</p>
+                        </div>
+                        <a href="creator-application.html" class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 transition-opacity">
+                            Apply Now
+                        </a>
+                    </div>
+                </div>
+
                 <form id="settingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-6 text-white">
+                    <!-- Forest Name -->
+                    <div class="md:col-span-2 bg-forest-secondary rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <label for="forestName" class="block text-lg font-semibold mb-1">Forest Name</label>
+                                <p class="text-white/80 text-sm">Your unique identity in the Noctua Forest community</p>
+                            </div>
+                            <div class="relative group">
+                                <button type="button" class="text-white/60 hover:text-white" aria-label="Forest Name Info">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                                    </svg>
+                                </button>
+                                <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-64 p-4 bg-[#3A4440] rounded-lg shadow-lg text-sm text-white/90 z-10">
+                                    Your Forest Name is used when you write reviews and interact with the community. It's generated from nature-themed words to maintain a consistent atmosphere in the forest.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <input id="forestName" type="text" readonly class="flex-1 px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                            <button type="button" id="regenerateForestName" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90 transition-opacity">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="md:col-span-2">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold">Social Links</h3>
+                            <div class="relative group">
+                                <button type="button" class="text-white/60 hover:text-white" aria-label="Social Links Info">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                                    </svg>
+                                </button>
+                                <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-64 p-4 bg-[#3A4440] rounded-lg shadow-lg text-sm text-white/90 z-10">
+                                    Your social links are displayed on your profile and can be updated here or through the creator application form.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div>
                         <label for="website" class="block text-sm mb-1">Website</label>
                         <input id="website" type="url" placeholder="https://example.com" class="w-full px-4 py-3 rounded-lg bg-forest-secondary border border-[#7A8580] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
@@ -281,6 +450,9 @@
     <script type="module">
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
         import { doc, getDoc, collection, query, where, getDocs, deleteDoc, orderBy, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { 
+            createList, getUserLists, updateList, deleteList, shareList 
+        } from './js/readingListService.js';
         import { app as firebaseApp, db as firebaseDb } from './firebase-config.js';
 
         // Wait for DOM to be ready
@@ -377,63 +549,259 @@
                 });
             }
 
-            // Load reading list and update stats
-            const readingList = document.getElementById('readingList');
-            let readingListSnap;
-            try {
-                const readingListQuery = query(collection(db, 'readingList'), where('userId', '==', user.uid));
-                readingListSnap = await getDocs(readingListQuery);
-                document.getElementById('readingListCount').textContent = readingListSnap.size;
-            } catch (err) {
-                console.warn('Reading list query failed:', err);
-                readingListSnap = { empty: true, forEach: () => {} };
-                document.getElementById('readingListCount').textContent = '0';
-            }
-            
-            if (readingListSnap.empty) {
-                readingList.innerHTML = `
-                    <div class="text-gray-200">
-                        Your reading list is empty. 
-                        <a href="forest.html" class="text-forest-accent hover:text-forest-accent/80">Explore books in The Forest</a>
-                    </div>
-                `;
-            } else {
-                readingList.innerHTML = '';
-                readingListSnap.forEach(doc => {
-                    const data = doc.data();
-                    const div = document.createElement('div');
-                    div.className = 'bg-forest-secondary p-6 rounded-lg border border-[#7A8580] hover:border-[#F58220] transition-colors duration-300';
+            // Load reading lists
+            const listsContainer = document.getElementById('readingLists');
+            const emptyState = document.getElementById('emptyLists');
+            const listModal = document.getElementById('listModal');
+            const listForm = document.getElementById('listForm');
+            const shareModal = document.getElementById('shareModal');
+            let currentListId = null;
+
+            async function loadLists() {
+                try {
+                    const lists = await getUserLists(user.uid);
+                    document.getElementById('readingListCount').textContent = lists.length;
                     
-                    // Format date
-                    const addedDate = data.addedAt?.toDate ? data.addedAt.toDate().toLocaleDateString() : 'Recently';
+                    if (lists.length === 0) {
+                        listsContainer.innerHTML = '';
+                        emptyState.classList.remove('hidden');
+                        return;
+                    }
+
+                    emptyState.classList.add('hidden');
+                    listsContainer.innerHTML = '';
                     
-                    div.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="flex-1">
-                                <h3 class="font-bold text-white text-lg mb-1">${data.title}</h3>
-                                <p class="text-gray-200 mb-2">by ${data.author}</p>
-                                <p class="text-xs text-gray-400">Added: ${addedDate}</p>
+                    lists.forEach(list => {
+                        const div = document.createElement('div');
+                        div.className = 'bg-forest-secondary p-6 rounded-lg border border-[#7A8580] hover:border-[#F58220] transition-colors duration-300';
+                        
+                        // Create book cover collage or placeholder
+                        const coverHtml = list.books && list.books.length > 0 
+                            ? `<div class="grid grid-cols-2 gap-2 mb-4 aspect-[4/3]">
+                                ${list.books.slice(0, 4).map(book => `
+                                    <img src="${book.coverUrl || 'images/placeholder.jpg'}" 
+                                        alt="${book.title}" 
+                                        class="w-full h-full object-cover rounded-lg"
+                                        loading="lazy">
+                                `).join('')}
+                               </div>`
+                            : `<div class="bg-[#3A4440] rounded-lg mb-4 aspect-[4/3] flex items-center justify-center">
+                                <svg class="w-12 h-12 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                               </div>`;
+                        
+                        const bookCount = list.books?.length || 0;
+                        const lastUpdate = list.updatedAt?.toDate 
+                            ? list.updatedAt.toDate().toLocaleDateString() 
+                            : 'Recently';
+                        
+                        div.innerHTML = `
+                            ${coverHtml}
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-white text-lg">${list.name}</h3>
+                                    <p class="text-white/60 text-sm">${bookCount} book${bookCount !== 1 ? 's' : ''}</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="editList('${list.id}')" class="text-white/60 hover:text-white transition-colors duration-300" title="Edit list">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                        </svg>
+                                    </button>
+                                    <button onclick="shareList('${list.id}')" class="text-white/60 hover:text-white transition-colors duration-300" title="Share list">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                        </svg>
+                                    </button>
+                                    <button onclick="deleteList('${list.id}')" class="text-white/60 hover:text-red-400 transition-colors duration-300" title="Delete list">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
-                            <button onclick="removeFromReadingList('${doc.id}')" class="text-gray-200 hover:text-red-400 transition-colors duration-300 ml-4" title="Remove from reading list">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="flex gap-2">
-                            <a href="book.html?id=${data.bookId}" class="flex-1 text-center bg-[#F58220] hover:bg-[#E0751C] text-white font-medium py-2 px-4 rounded-full transition-colors duration-300">
-                                View Details
-                            </a>
-                            <button onclick="markAsRead('${doc.id}', '${data.title.replace(/'/g, "\\'")}', this)" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full transition-colors duration-300" title="Mark as read">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </button>
+                            ${list.description ? `<p class="text-white/80 text-sm">${list.description}</p>` : ''}
+                            <p class="text-white/60 text-xs mt-2">Updated: ${lastUpdate}</p>
+                        `;
+                        listsContainer.appendChild(div);
+                    });
+                } catch (err) {
+                    console.error('Failed to load lists:', err);
+                    listsContainer.innerHTML = `
+                        <div class="text-white/60 text-center py-4">
+                            Unable to load reading lists. Please try again.
                         </div>
                     `;
-                    readingList.appendChild(div);
-                });
+                }
             }
+
+            // Create/Edit List
+            document.getElementById('createList').addEventListener('click', () => {
+                currentListId = null;
+                listForm.reset();
+                listModal.classList.remove('hidden');
+                listModal.classList.add('flex');
+            });
+
+            document.querySelectorAll('.create-list-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentListId = null;
+                    listForm.reset();
+                    listModal.classList.remove('hidden');
+                    listModal.classList.add('flex');
+                });
+            });
+
+            document.getElementById('cancelList').addEventListener('click', () => {
+                listModal.classList.add('hidden');
+                listModal.classList.remove('flex');
+            });
+
+            listForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('listName').value.trim();
+                const description = document.getElementById('listDescription').value.trim();
+
+                try {
+                    if (currentListId) {
+                        await updateList(currentListId, { name, description });
+                    } else {
+                        await createList(user.uid, name, description);
+                    }
+                    listModal.classList.add('hidden');
+                    listModal.classList.remove('flex');
+                    await loadLists();
+                } catch (err) {
+                    console.error('Failed to save list:', err);
+                    alert('Failed to save list. Please try again.');
+                }
+            });
+
+            // Share List
+            window.shareList = async (listId) => {
+                try {
+                    const shareId = await shareList(listId);
+                    const shareLink = `${window.location.origin}/lists.html?id=${shareId}`;
+                    document.getElementById('shareLink').value = shareLink;
+                    
+                    // Show QR code
+                    const qrContainer = document.getElementById('qrCodeContainer');
+                    const qrCode = document.getElementById('qrCode');
+                    qrContainer.classList.remove('hidden');
+                    
+                    // Use QRCode.js or similar library here
+                    if (window.QRCode) {
+                        qrCode.innerHTML = '';
+                        new QRCode(qrCode, {
+                            text: shareLink,
+                            width: 128,
+                            height: 128
+                        });
+                    }
+                    
+                    shareModal.classList.remove('hidden');
+                    shareModal.classList.add('flex');
+                } catch (err) {
+                    console.error('Failed to share list:', err);
+                    alert('Failed to generate share link. Please try again.');
+                }
+            };
+
+            // Copy share link
+            document.getElementById('copyLink').addEventListener('click', () => {
+                const linkInput = document.getElementById('shareLink');
+                linkInput.select();
+                document.execCommand('copy');
+                const btn = document.getElementById('copyLink');
+                btn.textContent = 'Copied!';
+                setTimeout(() => btn.textContent = 'Copy', 2000);
+            });
+
+            // Social sharing
+            document.getElementById('shareTwitter').addEventListener('click', () => {
+                const url = document.getElementById('shareLink').value;
+                window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check out my reading list on Noctua Forest!`);
+            });
+
+            document.getElementById('shareFacebook').addEventListener('click', () => {
+                const url = document.getElementById('shareLink').value;
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+            });
+
+            document.getElementById('closeShare').addEventListener('click', () => {
+                shareModal.classList.add('hidden');
+                shareModal.classList.remove('flex');
+            });
+
+            // Edit List
+            window.editList = async (listId) => {
+                try {
+                    const list = await getList(listId);
+                    if (!list) throw new Error('List not found');
+                    
+                    currentListId = listId;
+                    document.getElementById('listName').value = list.name;
+                    document.getElementById('listDescription').value = list.description || '';
+                    
+                    listModal.classList.remove('hidden');
+                    listModal.classList.add('flex');
+                } catch (err) {
+                    console.error('Failed to load list:', err);
+                    alert('Failed to load list details. Please try again.');
+                }
+            };
+
+            // Delete List
+            window.deleteList = async (listId) => {
+                if (!confirm('Are you sure you want to delete this list?')) return;
+                
+                try {
+                    await deleteList(listId);
+                    await loadLists();
+                } catch (err) {
+                    console.error('Failed to delete list:', err);
+                    alert('Failed to delete list. Please try again.');
+                }
+            };
+
+            // Search and Sort
+            const searchInput = document.getElementById('listSearch');
+            const sortSelect = document.getElementById('listSort');
+            
+            searchInput.addEventListener('input', async () => {
+                const query = searchInput.value.toLowerCase();
+                const lists = await getUserLists(user.uid);
+                
+                const filtered = lists.filter(list => 
+                    list.name.toLowerCase().includes(query) ||
+                    list.description?.toLowerCase().includes(query)
+                );
+                
+                renderLists(filtered);
+            });
+            
+            sortSelect.addEventListener('change', async () => {
+                const lists = await getUserLists(user.uid);
+                const sortBy = sortSelect.value;
+                
+                lists.sort((a, b) => {
+                    switch (sortBy) {
+                        case 'name':
+                            return a.name.localeCompare(b.name);
+                        case 'books':
+                            return (b.books?.length || 0) - (a.books?.length || 0);
+                        case 'updated':
+                        default:
+                            return b.updatedAt - a.updatedAt;
+                    }
+                });
+                
+                renderLists(lists);
+            });
+
+            // Initial load
+            loadLists();
 
             // Load reviews
             const reviewsList = document.getElementById('reviewsList');
@@ -492,6 +860,75 @@
                     `;
                     reviewsList.appendChild(div);
                 });
+            }
+
+            // Initialize Forest Name system
+            try {
+                await import('./js/forestNameService.js');
+                await import('./js/forestNameFirestore.js').then(async ({ initializeFromFirestore, getUserForestName, assignNewForestName }) => {
+                    // Initialize with existing names
+                    await initializeFromFirestore();
+
+                    // Get or generate user's forest name
+                    const forestNameInput = document.getElementById('forestName');
+                    const regenerateBtn = document.getElementById('regenerateForestName');
+                    
+                    if (forestNameInput && regenerateBtn) {
+                        // Get existing forest name
+                        const currentName = await getUserForestName(user.uid);
+                        if (currentName) {
+                            forestNameInput.value = currentName;
+                        } else {
+                            // Generate new name for new users
+                            try {
+                                const newName = await assignNewForestName(user.uid);
+                                forestNameInput.value = newName;
+                            } catch (err) {
+                                console.error('Failed to assign forest name:', err);
+                                forestNameInput.value = 'Failed to generate name';
+                            }
+                        }
+
+                        // Handle regenerate button
+                        regenerateBtn.addEventListener('click', async () => {
+                            try {
+                                const newName = await assignNewForestName(user.uid);
+                                forestNameInput.value = newName;
+                            } catch (err) {
+                                console.error('Failed to regenerate forest name:', err);
+                                alert('Failed to generate new name. Please try again.');
+                            }
+                        });
+                    }
+                });
+            } catch (err) {
+                console.error('Failed to initialize Forest Name system:', err);
+            }
+
+            // Check creator application status
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const data = userDoc.exists() ? userDoc.data() : {};
+                
+                // Show appropriate application UI
+                const applicationStatus = data.applicationStatus;
+                const statusEl = document.getElementById('creatorApplicationStatus');
+                const ctaEl = document.getElementById('creatorApplicationCTA');
+                
+                if (applicationStatus === 'pending') {
+                    statusEl?.classList.remove('hidden');
+                    ctaEl?.classList.add('hidden');
+                } else if (applicationStatus === 'approved') {
+                    statusEl?.classList.add('hidden');
+                    ctaEl?.classList.add('hidden');
+                    document.getElementById('creatorResources')?.classList.remove('hidden');
+                } else {
+                    statusEl?.classList.add('hidden');
+                    ctaEl?.classList.remove('hidden');
+                }
+
+            } catch (err) {
+                console.warn('Failed to check creator status:', err);
             }
 
             // Load & bind Settings form
