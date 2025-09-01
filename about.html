@@ -50,7 +50,7 @@
                 <!-- Contribute moved to Creator Resources inside dashboard for creators -->
                 <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color: #4A5450;">About</a>
             </nav>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center space-x-8">
                 <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
                      <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
@@ -161,21 +161,17 @@
             nav.classList.toggle('hidden');
             nav.classList.toggle('flex');
             nav.classList.toggle('flex-col');
-            // Mobile positioning
-            nav.classList.toggle('absolute');
-            nav.classList.toggle('top-20');
-            nav.classList.toggle('right-4');
-            nav.classList.toggle('p-6');
-            nav.classList.toggle('rounded-xl');
-            nav.classList.toggle('shadow-lg');
-            nav.classList.toggle('z-50');
+            // Unified mobile nav look
+            nav.classList.toggle('nf-mobile-nav');
             // High-contrast text/background when opened
             if (isHidden) {
                 nav.style.backgroundColor = '#3A4440'; // dark
                 nav.style.color = '#E0E2DB'; // light text
+                nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; a.classList.add('block'); a.classList.add('py-3'); a.classList.add('px-4'); a.classList.remove('md:py-0'); a.classList.remove('md:px-0'); });
             } else {
                 nav.style.backgroundColor = '';
                 nav.style.color = '';
+                nav.querySelectorAll('a').forEach(function(a){ a.style.color = ''; });
             }
         }
         document.addEventListener('DOMContentLoaded', () => {

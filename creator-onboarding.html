@@ -106,17 +106,12 @@
       nav.classList.toggle('hidden');
       nav.classList.toggle('flex');
       nav.classList.toggle('flex-col');
-      nav.classList.toggle('absolute');
-      nav.classList.toggle('top-20');
-      nav.classList.toggle('right-4');
-      nav.classList.toggle('p-6');
-      nav.classList.toggle('rounded-xl');
-      nav.classList.toggle('shadow-lg');
-      nav.classList.toggle('z-50');
+      // Unified mobile nav look
+      nav.classList.toggle('nf-mobile-nav');
       if (isHidden) {
         nav.style.backgroundColor = '#3A4440';
         nav.style.color = '#E0E2DB';
-        nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; });
+        nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; a.classList.add('block'); a.classList.add('py-3'); a.classList.add('px-4'); a.classList.remove('md:py-0'); a.classList.remove('md:px-0'); });
       } else {
         nav.style.backgroundColor = '';
         nav.style.color = '';
