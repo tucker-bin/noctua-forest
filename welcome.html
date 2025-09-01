@@ -129,7 +129,7 @@
                 <img src="images/logo.png" alt="Noctua Forest Logo" width="40" height="40" decoding="async" class="w-10 h-10">
                 <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
             </a>
-            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg" style="font-family: 'Noto Sans', sans-serif;">
+            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
                 <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">The Forest</a>
                 <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">Submit Book</a>
                 <!-- Contribute link moved into Creator Resources in dashboard for creators -->
@@ -365,20 +365,14 @@
             nav.classList.toggle('hidden');
             nav.classList.toggle('flex');
             nav.classList.toggle('flex-col');
-            // Mobile positioning
-            nav.classList.toggle('absolute');
-            nav.classList.toggle('top-20');
-            nav.classList.toggle('right-4');
-            nav.classList.toggle('p-6');
-            nav.classList.toggle('rounded-xl');
-            nav.classList.toggle('shadow-lg');
-            nav.classList.toggle('z-50');
+            // Unified mobile nav look
+            nav.classList.toggle('nf-mobile-nav');
             // High-contrast text/background when opened
             if (isHidden) {
                 nav.style.backgroundColor = '#3A4440'; // dark
                 nav.style.color = '#E0E2DB'; // light text
                 // Ensure links inherit contrast color on mobile
-                nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; });
+                nav.querySelectorAll('a').forEach(function(a){ a.style.color = '#E0E2DB'; a.classList.add('block'); a.classList.add('py-3'); a.classList.add('px-4'); a.classList.remove('md:py-0'); a.classList.remove('md:px-0'); });
             } else {
                 nav.style.backgroundColor = '';
                 nav.style.color = '';
