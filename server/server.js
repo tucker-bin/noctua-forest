@@ -270,7 +270,7 @@ app.post('/api/email/auto-reply', emailLimiter, async (req, res) => {
     if (isBook) {
       lines.push('Thanks for submitting your book to Noctua Forest. Our team will review your submission and follow up.');
     } else {
-      lines.push('Thanks for applying to contribute to Noctua Forest. We'll review your application and get back to you.');
+      lines.push('Thanks for applying to contribute to Noctua Forest. We\'ll review your application and get back to you.');
     }
     if (title || author) {
       lines.push('');
