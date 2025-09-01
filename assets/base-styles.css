@@ -121,26 +121,28 @@ input:focus, select:focus, textarea:focus {
   font-weight: 700;
 }
 
-/* Mobile nav unified appearance */
-.nf-mobile-nav {
-  position: absolute;
-  left: 1rem;
-  right: 1rem;
-  top: 5rem; /* approx top-20 */
-  padding: 1.5rem; /* p-6 */
-  border-radius: 0.75rem; /* rounded-xl */
-  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-  background-color: var(--color-forest-card);
-  color: var(--color-forest-light);
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
+/* Mobile nav - only applies when nav is opened on mobile */
+@media (max-width: 767px) {
+  .mobile-nav-open {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    top: 5rem;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    background-color: var(--color-forest-card) !important;
+    color: var(--color-forest-light) !important;
+    z-index: 50;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.25rem;
+  }
 
-.nf-mobile-nav a {
-  display: block;
-  padding: 0.75rem 1rem; /* py-3 px-4 */
-  text-align: left;
-  color: var(--color-forest-light);
+  .mobile-nav-open a {
+    display: block !important;
+    padding: 0.75rem 1rem !important;
+    text-align: left !important;
+    color: var(--color-forest-light) !important;
+  }
 }

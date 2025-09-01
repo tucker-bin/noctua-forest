@@ -154,24 +154,22 @@
     <script>
         // Mobile menu toggle with contrast-friendly styles
         function toggleMobileMenu() {
+            // Only run on mobile - prevent desktop interference
+            if (window.innerWidth >= 768) return;
+            
             const nav = document.getElementById('nav');
             if (!nav) return;
+            
             const isHidden = nav.classList.contains('hidden');
-            // Toggle visibility & layout
-            nav.classList.toggle('hidden');
-            nav.classList.toggle('flex');
-            nav.classList.toggle('flex-col');
-            // Unified mobile nav look
-            nav.classList.toggle('nf-mobile-nav');
-            // High-contrast text/background when opened
+            
             if (isHidden) {
-                nav.style.backgroundColor = '#3A4440'; // dark
-                nav.style.color = '#E0E2DB'; // light text
-                nav.querySelectorAll('a').forEach(function(a){ a.style.setProperty('color', '#E0E2DB', 'important'); a.classList.add('block'); a.classList.add('py-3'); a.classList.add('px-4'); a.classList.remove('md:py-0'); a.classList.remove('md:px-0'); });
+                // Show mobile menu
+                nav.classList.remove('hidden');
+                nav.classList.add('mobile-nav-open');
             } else {
-                nav.style.backgroundColor = '';
-                nav.style.color = '';
-                nav.querySelectorAll('a').forEach(function(a){ a.style.color = ''; });
+                // Hide mobile menu
+                nav.classList.add('hidden');
+                nav.classList.remove('mobile-nav-open');
             }
         }
         document.addEventListener('DOMContentLoaded', () => {
