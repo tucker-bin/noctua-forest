@@ -29,11 +29,18 @@
   }
 
   document.addEventListener('DOMContentLoaded', function(){
-    const btn = document.querySelector('button[onclick="toggleMobileMenu()"]');
     const nav = document.getElementById('nav');
-    if (btn){
-      btn.addEventListener('touchend', function(e){ if (window.innerWidth < 768){ e.preventDefault(); toggleMobileMenu(); } }, { passive: false });
-    }
+
+    // Remove inline handlers (CSP-safe) and bind programmatically
+    document.querySelectorAll('button[onclick]')
+      .forEach(function(button){
+        const handler = button.getAttribute('onclick');
+        if (handler && handler.replace(/\s+/g,'') === 'toggleMobileMenu()'){
+          button.removeAttribute('onclick');
+          button.addEventListener('click', function(){ toggleMobileMenu(); });
+          button.addEventListener('touchend', function(e){ if (window.innerWidth < 768){ e.preventDefault(); toggleMobileMenu(); } }, { passive: false });
+        }
+      });
     const overlay = document.getElementById('navOverlay');
     if (overlay){
       overlay.addEventListener('click', function(){ if (nav) closeNav(nav); });
