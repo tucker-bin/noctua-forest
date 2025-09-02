@@ -1,5 +1,5 @@
 // Forest Name Firestore Integration
-import { db } from './firebase-config.js';
+import { db } from '../firebase-config.js';
 import { 
     collection, doc, getDoc, setDoc, getDocs, 
     query, where, updateDoc, deleteDoc, writeBatch, serverTimestamp 

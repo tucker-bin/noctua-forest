@@ -1,5 +1,5 @@
 // Reading List Service
-import { db } from './firebase-config.js';
+import { db } from '../firebase-config.js';
 import { 
     collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc, setDoc,
     query, where, orderBy, serverTimestamp, arrayUnion, arrayRemove, limit 

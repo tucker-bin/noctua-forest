@@ -1,5 +1,5 @@
 // Reviews Migration Service
-import { db } from './firebase-config.js';
+import { db } from '../firebase-config.js';
 import { 
     collection, getDocs, addDoc, deleteDoc,
     query, where, orderBy, serverTimestamp 
