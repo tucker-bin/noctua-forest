@@ -47,24 +47,56 @@ service cloud.firestore {
       allow update, delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
     }
 
-    // Reading list items
+    // Reading list items (legacy)
     match /readingList/{itemId} {
       allow read, create, update, delete: if isSignedIn() &&
         (request.resource.data.userId == request.auth.uid || resource.data.userId == request.auth.uid);
     }
 
-    // Contributor applications
-    match /applications/{appId} {
+    // Reading lists (new structure)
+    match /readingLists/{listId} {
+      allow read, create, update, delete: if isSignedIn() &&
+        (request.resource.data.userId == request.auth.uid || resource.data.userId == request.auth.uid);
+    }
+
+    // List shares
+    match /listShares/{shareId} {
+      allow read: if true; // Public shares
+      allow create, update, delete: if isSignedIn();
+    }
+
+    // List saves
+    match /listSaves/{saveId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+
+    // List attributions
+    match /listAttributions/{attributionId} {
+      allow read, create, update, delete: if isSignedIn();
+    }
+
+    // Newsletter subscribers (email only)
+    match /newsletter_subscribers/{subId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Flagged content for moderation
+    match /flagged_content/{flagId} {
       allow create: if isSignedIn();
       allow read, update, delete: if isAdmin();
     }
 
-    // Newsletter subscribers (email only)
-    match /subscribers/{subId} {
-      allow create: if true;
+    // Reports
+    match /reports/{reportId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Sales tracking
+    match /sales/{saleId} {
+      allow create: if isSignedIn();
       allow read, update, delete: if isAdmin();
     }
   }
 }
-
-

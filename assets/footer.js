@@ -1,28 +1,12 @@
-// Global Footer Component with Google Translate Widget
+// Global Footer Component with Simple Browser Translate
 class GlobalFooter {
   constructor() {
     this.init();
   }
 
   init() {
-    // Add Google Translate script
-    this.addGoogleTranslateScript();
-    
     // Create footer HTML
     this.createFooter();
-    
-    // Initialize translate widget
-    this.initTranslateWidget();
-  }
-
-  addGoogleTranslateScript() {
-    if (document.getElementById('google-translate-script')) return;
-    
-    const script = document.createElement('script');
-    script.id = 'google-translate-script';
-    script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-    script.async = true;
-    document.head.appendChild(script);
   }
 
   createFooter() {
@@ -47,10 +31,35 @@ class GlobalFooter {
               Discover books by mood and share authentic reviews that power our community's recommendations.
             </p>
             
-            <!-- Google Translate Widget -->
+            <!-- Simple Browser Translate -->
             <div class="mt-4">
               <div class="text-sm text-forest-light/60 mb-2">Translate this page:</div>
-              <div id="google_translate_element"></div>
+              <div class="flex flex-wrap gap-2">
+                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=es', '_blank')" 
+                        class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
+                  Español
+                </button>
+                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=fr', '_blank')" 
+                        class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
+                  Français
+                </button>
+                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=de', '_blank')" 
+                        class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
+                  Deutsch
+                </button>
+                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=zh', '_blank')" 
+                        class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
+                  中文
+                </button>
+                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=ja', '_blank')" 
+                        class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
+                  日本語
+                </button>
+                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=auto', '_blank')" 
+                        class="text-xs bg-forest-accent hover:bg-[#E0751C] text-white px-3 py-1 rounded-full transition-colors">
+                  More Languages →
+                </button>
+              </div>
             </div>
           </div>
 
@@ -112,61 +121,6 @@ class GlobalFooter {
     const body = document.body;
     if (body) {
       body.appendChild(footer);
-    }
-  }
-
-  initTranslateWidget() {
-    // Wait for Google Translate script to load
-    const checkScript = setInterval(() => {
-      if (window.google && window.google.translate) {
-        clearInterval(checkScript);
-        this.setupTranslateWidget();
-      }
-    }, 100);
-
-    // Fallback if script doesn't load
-    setTimeout(() => {
-      clearInterval(checkScript);
-      if (!window.google || !window.google.translate) {
-        this.showTranslateFallback();
-      }
-    }, 5000);
-  }
-
-  setupTranslateWidget() {
-    try {
-      window.googleTranslateElementInit = () => {
-        new window.google.translate.TranslateElement({
-          pageLanguage: 'en',
-          includedLanguages: 'ar,zh,de,en,es,fr,hi,it,ja,ko,pt,ru,tr,ur',
-          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
-          autoDisplay: false,
-          gaTrack: false
-        }, 'google_translate_element');
-      };
-
-      // Trigger initialization
-      if (window.googleTranslateElementInit) {
-        window.googleTranslateElementInit();
-      }
-    } catch (error) {
-      console.warn('Google Translate widget failed to initialize:', error);
-      this.showTranslateFallback();
-    }
-  }
-
-  showTranslateFallback() {
-    const translateElement = document.getElementById('google_translate_element');
-    if (translateElement) {
-      translateElement.innerHTML = `
-        <div class="text-sm text-forest-light/60">
-          <a href="https://translate.google.com/translate?u=${encodeURIComponent(window.location.href)}&sl=en&tl=auto" 
-             target="_blank" 
-             class="text-forest-accent hover:underline">
-            Translate with Google Translate →
-          </a>
-        </div>
-      `;
     }
   }
 }
