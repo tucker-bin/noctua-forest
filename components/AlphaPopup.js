@@ -15,42 +15,42 @@ const showAlphaPopup = () => {
       </button>
 
       <!-- Main content -->
-      <h2 class="text-xl md:text-3xl font-bold mb-3 md:mb-4" style="font-family: 'Poppins', sans-serif;">Shape the Future of Storytelling</h2>
-      <p class="text-forest-light text-sm md:text-base mb-4 md:mb-6">You're invited to be a founding member of Noctua Forest, a new community for authors and readers. As an early Alpha member, your voice and submissions will directly influence the platform's growth.</p>
+      <h2 class="text-xl md:text-3xl font-bold mb-3 md:mb-4" style="font-family: 'Poppins', sans-serif;">Join the Night Owl Community</h2>
+      <p class="text-forest-light text-sm md:text-base mb-4 md:mb-6">Welcome to Noctua Forest, where authentic book lovers share genuine reading experiences and earn while helping others discover great books.</p>
       
       <!-- Benefits list -->
       <div class="bg-forest-secondary/30 rounded-lg p-4 md:p-6 mb-5 md:mb-6">
-        <p class="font-medium mb-3 md:mb-4 text-sm md:text-base">Join now to be the first to:</p>
+        <p class="font-medium mb-3 md:mb-4 text-sm md:text-base">As a Night Owl, you can:</p>
         <ul class="space-y-2 md:space-y-3 text-sm md:text-base">
           <li class="flex items-start">
             <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-light/80 mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
-            <span>Get early feedback on your manuscripts</span>
+            <span>Share authentic book reviews with mood tags</span>
           </li>
           <li class="flex items-start">
             <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-light/80 mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
-            <span>Connect directly with early readers</span>
+            <span>Build curated reading lists for your audience</span>
           </li>
           <li class="flex items-start">
             <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-light/80 mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
-            <span>Influence the tools we build for authors</span>
+            <span>Earn commissions on book sales (1.5% - 3%)</span>
           </li>
           <li class="flex items-start">
             <svg class="w-4 h-4 md:w-5 md:h-5 text-forest-light/80 mt-1 mr-2 md:mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
-            <span>Be part of our core community</span>
+            <span>Power our authentic recommendation engine</span>
           </li>
         </ul>
       </div>
 
       <!-- Social proof -->
-      <p class="text-xs md:text-sm text-forest-light/80 mb-5 md:mb-6 text-center">Join 150+ night owls shaping our community.</p>
+      <p class="text-xs md:text-sm text-forest-light/80 mb-5 md:mb-6 text-center">Join 150+ night owls building authentic book discovery.</p>
 
       <!-- Email capture form -->
       <div class="space-y-3 md:space-y-4">
@@ -61,7 +61,7 @@ const showAlphaPopup = () => {
 
         <button id="signupBtn" 
           class="w-full bg-forest-accent hover:bg-[#E67615] text-white font-medium h-11 md:h-12 rounded transition duration-300 text-sm md:text-base">
-          Become a Founding Member
+          Join the Night Owls
         </button>
 
         <!-- Social sign-in -->
@@ -113,7 +113,7 @@ const showAlphaPopup = () => {
       const savedFormData = sessionStorage.getItem('savedFormData');
       if (savedFormData) {
         const { type } = JSON.parse(savedFormData);
-        window.location.href = type === 'book' ? '/submit.html' : '/contributor.html';
+        window.location.href = type === 'book' ? '/reviews.html' : '/contributor.html';
       } else {
         window.location.href = '/forest.html';
       }

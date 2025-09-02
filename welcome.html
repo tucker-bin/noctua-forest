@@ -39,6 +39,9 @@
   <!-- Cookie Consent Management -->
   <script src="assets/cookie-consent.js"></script>
   
+  <!-- Global Footer with Google Translate -->
+  <script src="assets/footer.js"></script>
+  
   <!-- Organization Schema Markup -->
   <script type="application/ld+json">
   {
@@ -198,8 +201,8 @@
             </a>
             <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
                 <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">The Forest</a>
-                <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">Submit Book</a>
-                <!-- Contribute link moved into Creator Resources in dashboard for creators -->
+                <a href="reviews.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">Write a Review</a>
+                <a href="help.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">Help</a>
                 <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center">About</a>
             </nav>
             <div class="flex items-center space-x-8">
@@ -219,10 +222,10 @@
             <div class="bg-black/60 text-white">
                 <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-32 text-center">
                     <h1 class="text-4xl md:text-6xl font-bold font-display mb-4">Welcome to <span class="text-[#F9A825]">Noctua Forest</span></h1>
-                    <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">Create curated reading lists, share books you love, and earn commissions on qualifying purchases.</p>
+                    <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">Discover books by mood and share authentic reviews that power our community s recommendations.</p>
                     <div class="flex justify-center gap-3">
                         <a href="forest.html" class="bg-[#F58220] hover:bg-[#E0751C] text-white font-bold py-3 px-8 rounded-full transition duration-300 shadow-lg">Explore</a>
-                        <a href="submit.html" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-bold py-3 px-6 md:px-8 rounded-full transition duration-300 border border-white/50">Submit Your Book</a>
+                        <a href="reviews.html" class="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white font-bold py-3 px-6 md:px-8 rounded-full transition duration-300 border border-white/50">Write a Review</a>
                     </div>
                 </div>
             </div>
@@ -255,7 +258,7 @@
                     <div class="flex gap-3 mb-8">
                         <button id="tab-readers" aria-selected="true" class="px-5 py-2.5 rounded-full bg-[#F58220] text-white shadow">Readers</button>
                         <button id="tab-writers" aria-selected="false" class="px-5 py-2.5 rounded-full bg-white/10 text-white/90 hover:bg-white/20 border border-white/20">Writers</button>
-                        <button id="tab-creators" aria-selected="false" class="px-5 py-2.5 rounded-full bg-white/10 text-white/90 hover:bg-white/20 border border-white/20">Creators</button>
+                        <button id="tab-creators" aria-selected="false" class="px-5 py-2.5 rounded-full bg-white/10 text-white/90 hover:bg-white/20 border border-white/20">Night Owls</button>
                     </div>
 
                     <!-- Panels -->
@@ -263,9 +266,9 @@
                         <div class="bg-forest-card text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
                             <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Why readers love Noctua</h3>
                             <ul class="list-disc pl-5 space-y-3 text-white/90 leading-relaxed">
-                                <li>Discover hand‑picked gems across unique genres</li>
-                                <li>Follow emerging voices and indie favorites</li>
-                                <li>Filter by language, region, and cultural themes</li>
+                                <li>Find books that match your current mood and pace</li>
+                                <li>Track your reading habits with insightful stats</li>
+                                <li>Discover books through curated lists from fellow Night Owls</li>
                             </ul>
                             <a href="forest.html" class="inline-block mt-6 px-8 py-3 md:px-9 md:py-3.5 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Explore the Forest</a>
                         </div>
@@ -283,7 +286,7 @@
                                 <li>Gain visibility in a curated discovery feed</li>
                                 <li>Optional staff review for detailed feedback</li>
                             </ul>
-                            <a href="submit.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Submit Your Blurb</a>
+                            <a href="reviews.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Write a Review</a>
                         </div>
                         <div class="bg-forest-secondary text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
                             <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Support that scales</h3>
@@ -293,17 +296,17 @@
 
                     <div id="panel-creators" class="hidden grid md:grid-cols-2 gap-8 items-stretch">
                         <div class="bg-forest-card text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
-                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Earn by sharing books you love</h3>
+                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Share your reading journey</h3>
                             <ul class="list-disc pl-5 space-y-3 text-white/90 leading-relaxed">
-                                <li>Curate and share curated reading lists</li>
-                                <li>Earn commissions on qualifying purchases (Bookshop.org & Amazon)</li>
-                                <li>Simple attribution from your list links</li>
+                                <li>Create and share themed reading lists</li>
+                                <li>Earn commissions on books others discover through your lists</li>
+                                <li>Build your reputation as a trusted book curator</li>
                             </ul>
-                            <a href="creator-onboarding.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Apply as an Author-Creator</a>
+                            <a href="membership.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Join as a Night Owl</a>
                         </div>
                         <div class="bg-forest-secondary text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
-                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Simple, transparent, fair</h3>
-                            <p class="text-white/90 leading-relaxed">Creators earn commissions on purchases driven by their lists. Clear tracking, creator-first payouts.</p>
+                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Grow with the community</h3>
+                            <p class="text-white/90 leading-relaxed">As you share quality recommendations, you'll unlock higher commission tiers and recognition within the Forest.</p>
                         </div>
                     </div>
                 </div>
@@ -319,7 +322,28 @@
                         <p class="text-white/90">We occasionally feature debut and indie titles submitted to The Forest. Opt‑in when you submit; mentions are editorial and not guaranteed.</p>
                     </div>
                     <div class="flex-shrink-0">
-                        <a href="submit.html" class="inline-block px-6 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Submit Your Book</a>
+                        <a href="reviews.html" class="inline-block px-6 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Write a Review</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Reading Experience -->
+        <section class="py-14">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-2xl md:text-3xl font-bold mb-4" style="font-family: 'Poppins', sans-serif; color:#4A5450;">Your reading journey, organized</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-forest-card text-white rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-2">Mood-based discovery</h3>
+                        <p class="text-white/90">Find books that match your current mood - adventurous, contemplative, fast-paced, or slow and emotional.</p>
+                    </div>
+                    <div class="bg-forest-card text-white rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-2">Reading challenges & tracking</h3>
+                        <p class="text-white/90">Set personal reading goals, track your progress, and see how your reading habits develop over time.</p>
+                    </div>
+                    <div class="bg-forest-card text-white rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-2">Community recommendations</h3>
+                        <p class="text-white/90">Discover books through curated lists from fellow Night Owls who share your reading interests.</p>
                     </div>
                 </div>
             </div>
@@ -339,85 +363,21 @@
                         <p class="text-white/90">Approximately 500 words plus pull quotes, pinned on your deep book page for lasting context.</p>
                     </div>
                     <div class="bg-forest-card text-white rounded-xl p-6">
-                        <h3 class="text-lg font-semibold mb-2">Clear steps and timelines</h3>
-                        <p class="text-white/90">Simple submission, clear turnaround, and discretionary feature mentions when a fit. <a class="underline" href="submit.html">Learn how we work</a>.</p>
+                        <h3 class="text-lg font-semibold mb-2">Community discovery</h3>
+                        <p class="text-white/90">Get discovered by passionate readers who actively seek new books and share recommendations with others.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- FAQ with dropdowns -->
+        <!-- Help Center Link -->
         <section class="py-14 bg-forest-card">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-2xl md:text-3xl font-bold mb-8 text-white" style="font-family: 'Poppins', sans-serif;">Frequently asked questions</h2>
-                <div class="max-w-3xl mx-auto space-y-4">
-                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
-                        <button class="faq-toggle w-full px-6 py-5 text-left flex justify-between items-center text-white">
-                            <span class="font-semibold">What do I get with a staff review?</span>
-                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-5 text-white/80 leading-relaxed">
-                            A ~500-word editorial from our team with 1–2 pull quotes and context for readers. Your review is pinned on your deep book page and can be excerpted on your site with attribution.
-                        </div>
-                    </div>
-                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
-                        <button class="faq-toggle w-full px-6 py-5 text-left flex justify-between items-center text-white">
-                            <span class="font-semibold">How fast is turnaround?</span>
-                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-5 text-white/80 leading-relaxed">
-                            Most reviews publish within 1–2 weeks depending on the queue. The current estimate is shown during checkout and on your receipt.
-                        </div>
-                    </div>
-                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
-                        <button class="faq-toggle w-full px-6 py-5 text-left flex justify-between items-center text-white">
-                            <span class="font-semibold">Can I share or quote my review?</span>
-                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-5 text-white/80 leading-relaxed">
-                            Yes. You may excerpt your review on your website, social channels, and marketing materials with attribution to Noctua Forest and a link back to your book page.
-                        </div>
-                    </div>
-                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
-                        <button class="faq-toggle w-full px-6 py-5 text-left flex justify-between items-center text-white">
-                            <span class="font-semibold">Is this a retailer or pay-for-rating review?</span>
-                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-5 text-white/80 leading-relaxed">
-                            No. We do not sell retailer reviews or star ratings. This is an independent editorial for your readers and site, written by our staff.
-                        </div>
-                    </div>
-                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
-                        <button class="faq-toggle w-full px-6 py-5 text-left flex justify-between items-center text-white">
-                            <span class="font-semibold">What does membership include?</span>
-                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-5 text-white/80 leading-relaxed">
-                            Access to our creator network, reading lists, community reviews, and monthly author Q&As. <a href="membership.html" class="underline">Join membership</a>. The staff review is a <a href="submit.html" class="underline">one-time service</a>.
-                        </div>
-                    </div>
-                    <div class="bg-[#3A4440] rounded-xl overflow-hidden">
-                        <button class="faq-toggle w-full px-6 py-5 text-left flex justify-between items-center text-white">
-                            <span class="font-semibold">What if you decline or miss the window?</span>
-                            <svg class="w-5 h-5 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div class="faq-content hidden px-6 pb-5 text-white/80 leading-relaxed">
-                            If we decline your book or cannot fulfill within the stated timeframe, you may request a full refund.
-                        </div>
-                    </div>
-                </div>
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white" style="font-family: 'Poppins', sans-serif;">Need help?</h2>
+                <p class="text-white/90 text-lg mb-8 max-w-2xl mx-auto">Find answers to common questions, learn about our policies, and get support for your Noctua Forest experience.</p>
+                <a href="help.html" class="inline-block bg-forest-accent hover:bg-[#E0751C] text-white font-bold py-4 px-8 rounded-full transition duration-300 text-lg">
+                    Visit Help Center
+                </a>
             </div>
         </section>
 
@@ -441,17 +401,7 @@
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="w-full text-white py-12" style="background-color: #4A5450;">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex justify-center items-center space-x-4 mb-4">
-                <a href="privacy.html" class="text-gray-300 hover:text-white transition duration-300">Privacy Policy</a>
-                <span class="text-gray-500">|</span>
-                <a href="terms.html" class="text-gray-300 hover:text-white transition duration-300">Terms of Service</a>
-            </div>
-            <p>&copy; 2025 Noctua Forest. All rights reserved.</p>
-        </div>
-    </footer>
+
 
     <!-- Firebase -->
     <script type="module">
@@ -462,20 +412,20 @@
       // Show alpha popup
       showAlphaPopup();
 
-      // Tabs logic (Readers / Writers / Creators)
-      const tabReaders = document.getElementById('tab-readers');
-      const tabWriters = document.getElementById('tab-writers');
-      const tabCreators = document.getElementById('tab-creators');
-      const panelReaders = document.getElementById('panel-readers');
-      const panelWriters = document.getElementById('panel-writers');
-      const panelCreators = document.getElementById('panel-creators');
+              // Tabs logic (Readers / Writers / Night Owls)
+        const tabReaders = document.getElementById('tab-readers');
+        const tabWriters = document.getElementById('tab-writers');
+        const tabCreators = document.getElementById('tab-creators');
+        const panelReaders = document.getElementById('panel-readers');
+        const panelWriters = document.getElementById('panel-writers');
+        const panelCreators = document.getElementById('panel-creators');
 
-      function selectTab(which){
-        const tabs = {
-          readers: { tab: tabReaders, panel: panelReaders },
-          writers: { tab: tabWriters, panel: panelWriters },
-          creators: { tab: tabCreators, panel: panelCreators },
-        };
+        function selectTab(which){
+            const tabs = {
+                readers: { tab: tabReaders, panel: panelReaders },
+                writers: { tab: tabWriters, panel: panelWriters },
+                creators: { tab: tabCreators, panel: panelCreators },
+            };
         Object.entries(tabs).forEach(([key, nodes]) => {
           const { tab, panel } = nodes;
           if (!tab || !panel) return;
@@ -531,7 +481,7 @@
         }catch(e){ /* fallback handled by non-module script */ }
       })();
     </script>
-    <script src="sample-books.js"></script>
+    <!-- sample-books.js removed -->
     <script>
         // Mobile menu toggle with contrast-friendly styles
         function toggleMobileMenu() {
@@ -617,26 +567,7 @@
         }catch(e){ console.warn('carousel init failed', e); }
       })();
 
-      // FAQ dropdowns
-      document.querySelectorAll('.faq-toggle').forEach(button => {
-        button.addEventListener('click', () => {
-          const content = button.nextElementSibling;
-          const arrow = button.querySelector('svg');
-          const isOpen = !content.classList.contains('hidden');
-          
-          // Close all other FAQs
-          document.querySelectorAll('.faq-content').forEach(c => {
-            if (c !== content) {
-              c.classList.add('hidden');
-              c.previousElementSibling.querySelector('svg').classList.remove('rotate-180');
-            }
-          });
-          
-          // Toggle this FAQ
-          content.classList.toggle('hidden');
-          arrow.classList.toggle('rotate-180');
-        });
-      });
+
 
       // Toggle new author promo via global flag (can be set server-side)
       try {

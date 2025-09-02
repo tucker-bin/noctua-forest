@@ -63,6 +63,10 @@
     
     <!-- Cookie Consent Management -->
     <script src="assets/cookie-consent.js"></script>
+    
+    <!-- Global Footer with Google Translate -->
+    <script src="assets/footer.js"></script>
+    
     <style>
         body {
             font-family: 'Noto Sans', sans-serif;
@@ -108,8 +112,9 @@
                 <span class="text-2xl font-bold text-[#3A4440]" style="font-family: 'Poppins', sans-serif;">Noctua Forest</span>
             </a>
             <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
-                <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color: #3A4440;">Submit Book</a>
-                <!-- Contribute moved to Creator Resources inside dashboard for creators -->
+                <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color: #3A4440;">The Forest</a>
+                <a href="reviews.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color: #3A4440;">Write a Review</a>
+                <a href="help.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color: #3A4440;">Help</a>
                 <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color: #3A4440;">About</a>
             </nav>
             <div class="flex items-center space-x-8">
@@ -135,7 +140,7 @@
                 </svg>
                 <p class="leading-relaxed">
                     <span class="font-semibold">Affiliate disclosure:</span>
-                    As an Amazon Associate and Bookshop.org affiliate, purchases through our links help support the platform and creators at no extra cost to you.
+                    As an Amazon Associate, purchases through our links help support the platform and curators at no extra cost to you.
                 </p>
                 <button id="dismissAff" class="ml-auto text-[#4A5450] text-xs opacity-60 hover:opacity-100 focus:outline-none">Dismiss</button>
             </div>
@@ -285,10 +290,10 @@
             <p class="mb-4" style="color:#4A5450;">You've reached a quiet clearing in the Forest. This is the end of the list—for now.</p>
             <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
                 <a 
-                    href="submit.html" 
+                    href="reviews.html" 
                     class="bg-forest-accent hover:bg-forest-accent-hover text-white font-bold py-3 px-6 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent"
-                    aria-label="Submit your book to Noctua Forest">
-                    Submit a book
+                    aria-label="Write a book review on Noctua Forest">
+                    Write a Review
                 </a>
                 <a 
                     href="about.html" 
@@ -315,8 +320,8 @@
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
         import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
-        const auth = getAuth(app);
-        onAuthStateChanged(auth, async (user) => {
+        const membershipAuth = getAuth(app);
+        onAuthStateChanged(membershipAuth, async (user) => {
             const membershipCTA = document.getElementById('membershipCTA');
             if (!membershipCTA) return;
 

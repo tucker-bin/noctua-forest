@@ -1,161 +1,152 @@
-// Forest Name Generator Service
-// Provides unique, thematic usernames for the Noctua Forest community
+// Forest Name Service
+import { db } from '../firebase-config.js';
+import { doc, getDoc, setDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
-const wordPools = {
-    // Nature-themed adjectives
-    mystical: [
-        'Silent', 'Shadowy', 'Moonlit', 'Whispering', 'Ancient', 'Hooting', 'Nocturnal',
-        'Hidden', 'Wandering', 'Sleeping', 'Dreaming', 'Fading', 'Twilight', 'Murmuring',
-        'Glimmering', 'Starlit', 'Drowsy', 'Misty', 'Creeping', 'Howling'
-    ],
-    elemental: [
-        'Dewy', 'Mossy', 'Foggy', 'Stormy', 'Windy', 'Icy', 'Frosty',
-        'Snowy', 'Rainy', 'Sunny', 'Cloudy', 'Misty', 'Breezy', 'Dusty'
-    ],
-    seasonal: [
-        'Autumn', 'Winter', 'Spring', 'Summer', 'Vernal', 'Hibernal',
-        'Solstice', 'Dawn', 'Dusk', 'Midnight', 'Twilight', 'Eclipse'
-    ],
-    colors: [
-        'Golden', 'Silver', 'Copper', 'Azure', 'Crimson', 'Emerald',
-        'Amber', 'Indigo', 'Violet', 'Russet', 'Ochre', 'Sage'
-    ],
+// Forest-themed adjectives and nouns for name generation
+const adjectives = [
+  'Ancient', 'Whispering', 'Mystic', 'Emerald', 'Silent', 'Hidden', 'Moonlit',
+  'Twilight', 'Verdant', 'Mossy', 'Misty', 'Wandering', 'Starlit', 'Dappled',
+  'Peaceful', 'Wise', 'Wild', 'Gentle', 'Serene', 'Enchanted', 'Luminous',
+  'Shadowed', 'Tranquil', 'Ethereal', 'Glowing', 'Dreaming', 'Radiant', 'Sacred'
+];
 
-    // Forest creatures and elements
-    fauna: [
-        'Owl', 'Fox', 'Badger', 'Moth', 'Fawn', 'Wolf', 'Raven',
-        'Hawk', 'Deer', 'Bear', 'Hare', 'Lynx', 'Vole', 'Wren',
-        'Crow', 'Elk', 'Dove', 'Swan', 'Finch', 'Thrush'
-    ],
-    flora: [
-        'Fern', 'Moss', 'Thicket', 'Grove', 'Bramble', 'Willow',
-        'Oak', 'Pine', 'Birch', 'Maple', 'Cedar', 'Aspen', 'Elm',
-        'Hazel', 'Rowan', 'Alder', 'Juniper', 'Spruce', 'Hemlock'
-    ],
-    landscape: [
-        'Creek', 'Stone', 'Branch', 'Hollow', 'River', 'Glen',
-        'Vale', 'Ridge', 'Peak', 'Dale', 'Path', 'Trail', 'Brook',
-        'Stream', 'Meadow', 'Glade', 'Forest', 'Wood', 'Copse'
-    ],
-    ethereal: [
-        'Firefly', 'Wisp', 'Spore', 'Spirit', 'Ghost', 'Shadow',
-        'Light', 'Spark', 'Flame', 'Ember', 'Mist', 'Shade', 'Echo'
-    ]
-};
-
-// Track used names for uniqueness checking
-let usedNames = new Set();
+const nouns = [
+  'Grove', 'Owl', 'Pine', 'Brook', 'Maple', 'Fern', 'Oak', 'Birch', 'Willow',
+  'Stream', 'Raven', 'Fox', 'Deer', 'Wolf', 'Hawk', 'Cedar', 'Path', 'Glade',
+  'Spring', 'Hollow', 'Vale', 'Ridge', 'Thicket', 'Meadow', 'Glen', 'Haven',
+  'Copse', 'Clearing', 'Pond', 'Aspen', 'Elm', 'Wren', 'Sparrow', 'Jay'
+];
 
 /**
- * Initialize the service with existing names
- * @param {Set<string>} existingNames - Set of names already in use
+ * Generate a random Forest Name
  */
-export function initializeUsedNames(existingNames) {
-    usedNames = new Set(existingNames);
+function generateForestName() {
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const noun = nouns[Math.floor(Math.random() * nouns.length)];
+  return `${adj}${noun}`;
 }
 
 /**
- * Get a random item from an array
- * @param {Array} array - Array to pick from
- * @returns {string} Random item
+ * Check if a Forest Name is available
  */
-function getRandomItem(array) {
-    return array[Math.floor(Math.random() * array.length)];
-}
-
-/**
- * Generate a unique forest name
- * @param {number} maxAttempts - Maximum number of attempts to generate unique name
- * @returns {string|null} Unique forest name or null if maxAttempts reached
- */
-export function generateUniqueName(maxAttempts = 100) {
-    for (let i = 0; i < maxAttempts; i++) {
-        // Pick random categories for variety
-        const adjectiveCategory = getRandomItem(Object.keys(wordPools).filter(k => 
-            ['mystical', 'elemental', 'seasonal', 'colors'].includes(k)));
-        const nounCategory = getRandomItem(Object.keys(wordPools).filter(k => 
-            ['fauna', 'flora', 'landscape', 'ethereal'].includes(k)));
-
-        const adjective = getRandomItem(wordPools[adjectiveCategory]);
-        const noun = getRandomItem(wordPools[nounCategory]);
-        
-        const name = `${adjective}${noun}`;
-        
-        if (!usedNames.has(name)) {
-            usedNames.add(name);
-            return name;
-        }
-    }
-    return null; // Could not generate unique name
-}
-
-/**
- * Check if a forest name is available
- * @param {string} name - Name to check
- * @returns {boolean} True if name is available
- */
-export function isNameAvailable(name) {
-    return !usedNames.has(name);
-}
-
-/**
- * Reserve a specific forest name
- * @param {string} name - Name to reserve
- * @returns {boolean} True if successfully reserved
- */
-export function reserveName(name) {
-    if (isNameAvailable(name)) {
-        usedNames.add(name);
-        return true;
-    }
+async function isNameAvailable(name) {
+  try {
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, where('forestName', '==', name));
+    const snapshot = await getDocs(q);
+    return snapshot.empty;
+  } catch (err) {
+    console.error('Error checking name availability:', err);
     return false;
+  }
 }
 
 /**
- * Release a forest name back into the pool
- * @param {string} name - Name to release
+ * Generate a unique Forest Name
  */
-export function releaseName(name) {
-    usedNames.delete(name);
+async function generateUniqueName() {
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  while (attempts < maxAttempts) {
+    const name = generateForestName();
+    if (await isNameAvailable(name)) {
+      return name;
+    }
+    attempts++;
+  }
+
+  // If we couldn't find a unique name, add a random number
+  const baseForestName = generateForestName();
+  const randomNum = Math.floor(Math.random() * 1000);
+  return `${baseForestName}${randomNum}`;
 }
 
 /**
- * Get all adjective categories
- * @returns {string[]} Array of adjective category names
+ * Set a user's Forest Name
  */
-export function getAdjectiveCategories() {
-    return ['mystical', 'elemental', 'seasonal', 'colors'];
-}
-
-/**
- * Get all noun categories
- * @returns {string[]} Array of noun category names
- */
-export function getNounCategories() {
-    return ['fauna', 'flora', 'landscape', 'ethereal'];
-}
-
-/**
- * Get words from a specific category
- * @param {string} category - Category name
- * @returns {string[]|null} Array of words or null if category doesn't exist
- */
-export function getWordsInCategory(category) {
-    return wordPools[category] || null;
-}
-
-/**
- * Calculate total possible combinations
- * @returns {number} Total possible unique names
- */
-export function getTotalPossibleNames() {
-    const adjCount = Object.keys(wordPools)
-        .filter(k => ['mystical', 'elemental', 'seasonal', 'colors'].includes(k))
-        .reduce((sum, k) => sum + wordPools[k].length, 0);
+export async function setForestName(userId, forestName) {
+  try {
+    // Check if name is available (unless it's their current name)
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    const currentName = userDoc.exists() ? userDoc.data().forestName : null;
     
-    const nounCount = Object.keys(wordPools)
-        .filter(k => ['fauna', 'flora', 'landscape', 'ethereal'].includes(k))
-        .reduce((sum, k) => sum + wordPools[k].length, 0);
-    
-    return adjCount * nounCount;
+    if (forestName !== currentName && !(await isNameAvailable(forestName))) {
+      throw new Error('This Forest Name is already taken');
+    }
+
+    // Update user document
+    await setDoc(doc(db, 'users', userId), {
+      forestName,
+      updatedAt: new Date()
+    }, { merge: true });
+
+    return forestName;
+  } catch (err) {
+    console.error('Error setting Forest Name:', err);
+    throw err;
+  }
+}
+
+/**
+ * Get a user's Forest Name
+ */
+export async function getForestName(userId) {
+  try {
+    const userDoc = await getDoc(doc(db, 'users', userId));
+    if (!userDoc.exists()) {
+      return null;
+    }
+    return userDoc.data().forestName || null;
+  } catch (err) {
+    console.error('Error getting Forest Name:', err);
+    return null;
+  }
+}
+
+/**
+ * Generate and set a random Forest Name for a user
+ */
+export async function generateForestNameForUser(userId) {
+  try {
+    const name = await generateUniqueName();
+    await setForestName(userId, name);
+    return name;
+  } catch (err) {
+    console.error('Error generating Forest Name:', err);
+    throw err;
+  }
+}
+
+/**
+ * Validate a Forest Name
+ */
+export function validateForestName(name) {
+  // Must be 3-30 characters
+  if (name.length < 3 || name.length > 30) {
+    return {
+      valid: false,
+      error: 'Forest Name must be between 3 and 30 characters'
+    };
+  }
+
+  // Only letters, numbers, and underscores
+  if (!/^[a-zA-Z0-9_]+$/.test(name)) {
+    return {
+      valid: false,
+      error: 'Forest Name can only contain letters, numbers, and underscores'
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
+ * Format a Forest Name for display
+ */
+export function formatForestName(name) {
+  if (!name) return 'Anonymous Forest Dweller';
+  
+  // Add spaces before capital letters (except first letter)
+  return name.replace(/([A-Z])/g, ' $1').trim();
 }

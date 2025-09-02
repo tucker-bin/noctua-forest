@@ -37,8 +37,8 @@
             </a>
             <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
                 <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">The Forest</a>
-                <a href="submit.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Submit Book</a>
-                <!-- Contribute link intentionally omitted here; creators see it in Creator Resources -->
+                <a href="reviews.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Write a Review</a>
+                <!-- Contribute link intentionally omitted here; curators see it in Curator Resources -->
                 <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">About</a>
             </nav>
             <div class="flex items-center space-x-8">
@@ -105,35 +105,35 @@
                             <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                             </svg>
-                            <h3 class="text-lg font-semibold text-white">Membership</h3>
+                            <h3 class="text-lg font-semibold text-white">Night Owl Status</h3>
                         </div>
                         <div class="space-y-2">
-                            <p id="membershipLevel" class="text-white/90">Free Account</p>
-                            <a href="https://buy.stripe.com/6oU9ATfwO5mJ9PY9tQaVa02" class="inline-block text-sm text-forest-accent hover:underline">Upgrade to unlock creator features</a>
+                            <p id="membershipLevel" class="text-white/90">Active Night Owl</p>
+                            <p class="text-sm text-white/70">Earn commissions on book sales from your shared lists</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Forest Name & Avatar -->
+            <!-- Avatar Management -->
             <div class="bg-forest-card rounded-xl p-8 mb-8">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h2 class="text-2xl font-bold text-white">Forest Identity</h2>
-                        <p class="text-white/80 text-sm">Your unique presence in the Noctua Forest community</p>
+                        <h2 class="text-2xl font-bold text-white">Avatar</h2>
+                        <p class="text-white/80 text-sm">Your visual identity in the Noctua Forest community</p>
                     </div>
                     <div class="relative group">
-                        <button type="button" class="text-white/60 hover:text-white" aria-label="Forest Identity Info">
+                        <button type="button" class="text-white/60 hover:text-white" aria-label="Avatar Info">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
                             </svg>
                         </button>
                         <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-64 p-4 bg-[#3A4440] rounded-lg shadow-lg text-sm text-white/90 z-10">
-                            Your Forest Name and Avatar represent you in reviews and community interactions. Members can customize their avatar with a profile photo.
+                            Your avatar represents you in reviews and community interactions. Forest names are randomly assigned for each comment to maintain privacy and authenticity.
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex justify-center">
                     <!-- Avatar Section -->
                     <div class="flex-none">
                         <div class="relative">
@@ -153,18 +153,6 @@
                             </div>
                         </div>
                         <p id="avatarStatus" class="text-sm text-white/60 mt-2 text-center">Unlock custom avatars with membership</p>
-                    </div>
-                    <!-- Forest Name Section -->
-                    <div class="flex-1">
-                        <label for="forestName" class="block text-sm font-medium text-white/90 mb-2">Forest Name</label>
-                        <div class="flex gap-3">
-                            <input id="forestName" type="text" readonly class="flex-1 px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
-                            <button type="button" id="regenerateForestName" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90 transition-opacity">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -308,25 +296,24 @@
                 </div>
             </div>
 
-            <!-- Creator Resources (hidden for non-creators) -->
-            <div id="creatorResources" class="hidden bg-forest-card rounded-2xl p-8 mt-8">
+            <!-- Curator Resources (hidden for non-curators) -->
+            <div id="curatorResources" class="hidden bg-forest-card rounded-2xl p-8 mt-8">
                 <div class="flex items-center mb-6">
                     <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
                     </svg>
-                    <h2 class="text-2xl font-bold text-white">Creator Resources</h2>
+                    <h2 class="text-2xl font-bold text-white">Curator Resources</h2>
                 </div>
                 <p class="text-white/90 mb-4">Authenticity wins. Share books you truly enjoy. Your commission terms:</p>
                 <ul class="list-disc pl-5 text-white/90 space-y-1 mb-6">
                     <li>Amazon sales: <strong>2.5%</strong></li>
-                    <li>Bookshop.org sales: <strong>5%</strong></li>
                     <li>Premium Review referrals: <strong>5%</strong></li>
                 </ul>
                 <div class="grid md:grid-cols-2 gap-6">
                     <div class="bg-forest-secondary rounded-xl p-6 text-white">
-                        <h3 class="font-semibold mb-2">Your creator code</h3>
+                        <h3 class="font-semibold mb-2">Your curator code</h3>
                         <div class="flex items-center gap-3">
-                            <code id="creatorCode" class="px-3 py-1 bg-[#3A4440] rounded">—</code>
+                            <code id="curatorCode" class="px-3 py-1 bg-[#3A4440] rounded">—</code>
                             <button id="copyCode" class="px-3 py-1 bg-forest-accent rounded text-white hover:opacity-90">Copy</button>
                         </div>
                         <p class="text-white/80 text-sm mt-2">Use this code in your links to track referrals.</p>
@@ -404,19 +391,104 @@
                     </div>
                 </div>
 
-                <!-- Creator blogging resources -->
+                <!-- Curator blogging resources -->
                 <div class="mt-6 grid md:grid-cols-2 gap-6">
                     <div class="bg-forest-secondary rounded-xl p-6 text-white">
                         <h3 class="font-semibold mb-2">Write for our Blog (Medium)</h3>
-                        <p class="text-white/80 text-sm mb-3">Share essays, reviews, or interviews for the Noctua Forest blog on Medium. Contributors can link their creator code in posts to earn commission from referred readers.</p>
+                        <p class="text-white/80 text-sm mb-3">Share essays, reviews, or interviews for the Noctua Forest blog on Medium. Contributors can link their curator code in posts to earn commission from referred readers.</p>
                         <a href="contributor.html" class="inline-block px-4 py-2 bg-forest-accent text-white rounded-md hover:opacity-90">Open Contributor Page</a>
                     </div>
                 </div>
                 <div class="mt-6 bg-[#3A4440] rounded-lg p-4 text-white/90 text-sm">
                     <p class="font-semibold mb-1">Suggested caption</p>
-                    <p id="suggestedCaption">I only share books I genuinely enjoy. Explore my picks on Noctua Forest: <span class="underline" id="captionLink">—</span></p>
+                    <p id="suggestedCaption">I only share books I genuinely enjoy. Read my reviews on Noctua Forest: <span class="underline" id="captionLink">—</span></p>
                 </div>
             </div>
+
+            <!-- Night Owl Dashboard (for all users) -->
+            <div id="nightOwlDashboard" class="bg-forest-card rounded-2xl p-8 mt-8">
+                <div class="flex items-center mb-6">
+                    <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    <h2 class="text-2xl font-bold text-white">Night Owl Dashboard</h2>
+                </div>
+                <p class="text-white/90 mb-6">Track your reading community impact and earnings potential. All Night Owls automatically participate in our Curator Program.</p>
+                
+                <!-- Commission Tier Status -->
+                <div class="bg-forest-secondary rounded-xl p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-white">Your Commission Tier</h3>
+                        <div class="text-sm text-white/70" id="tierUpdateInfo">Updates monthly</div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-[#3A4440] rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-white" id="currentTier">Fledgling</div>
+                            <div class="text-sm text-white/70">Current Tier</div>
+                        </div>
+                        <div class="bg-[#3A4440] rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-white" id="commissionRate">1.5%</div>
+                            <div class="text-sm text-white/70">Commission Rate</div>
+                        </div>
+                        <div class="bg-[#3A4440] rounded-lg p-4 text-center">
+                            <div class="text-2xl font-bold text-white" id="monthlySales">0</div>
+                            <div class="text-sm text-white/70">Books This Month</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tier Progress -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-white/70">Fledgling (1.5%)</span>
+                            <span class="text-white/70">0-14 books/month</span>
+                        </div>
+                        <div class="w-full bg-[#3A4440] rounded-full h-2">
+                            <div class="bg-forest-accent h-2 rounded-full transition-all duration-500" id="tierProgress" style="width: 0%"></div>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-white/70">Night Owl (2.25%)</span>
+                            <span class="text-white/70">15+ books/month</span>
+                        </div>
+                        <div class="w-full bg-[#3A4440] rounded-full h-2">
+                            <div class="bg-forest-accent h-2 rounded-full transition-all duration-500" id="tierProgress2" style="width: 0%"></div>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-white/70">Elder Owl (3%)</span>
+                            <span class="text-white/70">100+ books/month</span>
+                        </div>
+                        <div class="w-full bg-[#3A4440] rounded-full h-2">
+                            <div class="bg-forest-accent h-2 rounded-full transition-all duration-500" id="tierProgress3" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Monthly Performance -->
+                <div class="bg-forest-secondary rounded-xl p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">Monthly Performance</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-[#3A4440] rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-white/70 mb-1">Books Shared</h4>
+                            <p id="monthlyBooksShared" class="text-2xl font-bold text-white">0</p>
+                            <div class="text-xs text-white/50 mt-1">From your lists this month</div>
+                        </div>
+                        <div class="bg-[#3A4440] rounded-lg p-4">
+                            <h4 class="text-sm font-medium text-white/70 mb-1">List Engagement</h4>
+                            <p id="monthlyListViews" class="text-2xl font-bold text-white">0</p>
+                            <div class="text-xs text-white/50 mt-1">List views this month</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="bg-forest-secondary rounded-xl p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">Recent Activity</h3>
+                    <div id="recentActivity" class="space-y-3">
+                        <div class="text-sm text-white/50 text-center py-4">No recent activity yet</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Settings -->
             <div class="bg-forest-card rounded-xl p-8 mt-8">
                 <div class="flex items-center mb-6">
@@ -425,11 +497,11 @@
                     </svg>
                     <h2 class="text-2xl font-bold text-white">Settings</h2>
                 </div>
-                <!-- Creator Application Status -->
-                <div id="creatorApplicationStatus" class="hidden md:col-span-2 bg-forest-accent rounded-xl p-6 mb-6">
+                <!-- Curator Application Status -->
+                <div id="curatorApplicationStatus" class="hidden md:col-span-2 bg-forest-accent rounded-xl p-6 mb-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-semibold text-white">Creator Application</h3>
+                            <h3 class="text-lg font-semibold text-white">Curator Application</h3>
                             <p class="text-white/90 text-sm mt-1">Your application is being reviewed</p>
                         </div>
                         <div class="flex items-center">
@@ -442,14 +514,14 @@
                     </div>
                 </div>
 
-                <!-- Creator Application CTA -->
-                <div id="creatorApplicationCTA" class="hidden md:col-span-2 bg-forest-secondary rounded-xl p-6 mb-6">
+                <!-- Curator Application CTA -->
+                <div id="curatorApplicationCTA" class="hidden md:col-span-2 bg-forest-secondary rounded-xl p-6 mb-6">
                     <div class="flex items-center justify-between">
                         <div>
-                            <h3 class="text-lg font-semibold text-white">Become a Creator</h3>
+                            <h3 class="text-lg font-semibold text-white">Become a Curator</h3>
                             <p class="text-white/90 text-sm mt-1">Share books you love and earn commission</p>
                         </div>
-                        <a href="creator-application.html" class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 transition-opacity">
+                        <a href="curator-application.html" class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 transition-opacity">
                             Start Earning
                         </a>
                     </div>
@@ -468,7 +540,7 @@
                                     </svg>
                                 </button>
                                 <div class="hidden group-hover:block absolute right-0 top-full mt-2 w-64 p-4 bg-[#3A4440] rounded-lg shadow-lg text-sm text-white/90 z-10">
-                                    Your social links are displayed on your profile and can be updated here or through the creator application form.
+                                    Your social links are displayed on your profile and can be updated here in Settings.
                                 </div>
                             </div>
                         </div>
@@ -500,6 +572,42 @@
                     <div>
                         <label for="tiktok" class="block text-sm mb-1">TikTok</label>
                         <input id="tiktok" type="url" placeholder="https://www.tiktok.com/@handle" class="w-full px-4 py-3 rounded-lg bg-forest-secondary border border-[#7A8580] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                    </div>
+                    <!-- Reading Preferences -->
+                    <div class="md:col-span-2 bg-forest-secondary rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-3">Reading Preferences</h3>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="prefLanguage" class="block text-sm mb-1">Preferred language</label>
+                                <select id="prefLanguage" class="w-full px-4 py-3 rounded-lg bg-forest-secondary border border-[#7A8580] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                                    <option value="">No preference</option>
+                                    <option value="en">English</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="de">German</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="zh">Chinese</option>
+                                    <option value="ar">Arabic</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="prefDevice" class="block text-sm mb-1">Preferred reading device</label>
+                                <select id="prefDevice" class="w-full px-4 py-3 rounded-lg bg-forest-secondary border border-[#7A8580] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                                    <option value="">No preference</option>
+                                    <option value="print">Printed copy</option>
+                                    <option value="ebook">E‑book</option>
+                                    <option value="audiobook">Audiobook</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-1">
+                                <label for="prefGenres" class="block text-sm mb-1">Favorite genres (comma separated)</label>
+                                <input id="prefGenres" type="text" placeholder="literary fiction, sci‑fi" class="w-full px-4 py-3 rounded-lg bg-forest-secondary border border-[#7A8580] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                            </div>
+                            <div class="md:col-span-1">
+                                <label for="prefBlacklist" class="block text-sm mb-1">Excluded keywords (comma separated)</label>
+                                <input id="prefBlacklist" type="text" placeholder="spoilers, gore" class="w-full px-4 py-3 rounded-lg bg-forest-secondary border border-[#7A8580] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent" />
+                            </div>
+                        </div>
                     </div>
                     <div class="flex items-end gap-3 flex-wrap">
                         <button id="saveSettings" type="submit" class="px-6 py-3 bg-forest-accent text-white rounded-full hover:opacity-90">Save Settings</button>
@@ -616,7 +724,7 @@
                 submissionsList.innerHTML = `
                     <div class="text-gray-200">
                         No books yet. 
-                        <a href="submit.html" class="text-forest-accent hover:text-forest-accent/80">Submit your first book</a>
+                        <a href="reviews.html" class="text-forest-accent hover:text-forest-accent/80">Share your first book</a>
                     </div>
                 `;
             } else {
@@ -1017,87 +1125,6 @@
                 console.warn('Could not initialize avatar system:', err);
             }
 
-            // Initialize Forest Name system
-            try {
-                await import('./js/forestNameService.js');
-                await import('./js/forestNameFirestore.js').then(async ({ initializeFromFirestore, getUserForestName, assignNewForestName }) => {
-                    // Initialize with existing names
-                    await initializeFromFirestore();
-
-                    // Get or generate user's forest name
-                    const forestNameInput = document.getElementById('forestName');
-                    const regenerateBtn = document.getElementById('regenerateForestName');
-                    
-                    if (forestNameInput && regenerateBtn) {
-                        // Get existing forest name
-                        const currentName = await getUserForestName(user.uid);
-                        if (currentName) {
-                            forestNameInput.value = currentName;
-                        } else {
-                            // Generate new name for new users
-                            try {
-                                const newName = await assignNewForestName(user.uid);
-                                forestNameInput.value = newName;
-                            } catch (err) {
-                                console.error('Failed to assign forest name:', err);
-                                forestNameInput.value = 'Failed to generate name';
-                            }
-                        }
-
-                        // Handle regenerate button
-                        regenerateBtn.addEventListener('click', async () => {
-                            try {
-                                const newName = await assignNewForestName(user.uid);
-                                forestNameInput.value = newName;
-                            } catch (err) {
-                                console.error('Failed to regenerate forest name:', err);
-                                alert('Failed to generate new name. Please try again.');
-                            }
-                        });
-                    }
-                });
-            } catch (err) {
-                console.error('Failed to initialize Forest Name system:', err);
-            }
-
-            // Check creator application status
-            try {
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                const data = userDoc.exists() ? userDoc.data() : {};
-                
-                // Update membership status
-                const membershipLevel = document.getElementById('membershipLevel');
-                const membershipStatus = document.getElementById('membershipStatus');
-                if (data.membership === 'active') {
-                    membershipLevel.textContent = 'Active Member';
-                    membershipStatus.classList.remove('bg-forest-secondary');
-                    membershipStatus.classList.add('bg-forest-accent');
-                    membershipStatus.querySelector('a').textContent = 'Manage membership';
-                }
-                
-                // Show appropriate application UI
-                const applicationStatus = data.applicationStatus;
-                const statusEl = document.getElementById('creatorApplicationStatus');
-                const ctaEl = document.getElementById('creatorApplicationCTA');
-                
-                if (applicationStatus === 'pending') {
-                    statusEl?.classList.remove('hidden');
-                    ctaEl?.classList.add('hidden');
-                } else if (applicationStatus === 'approved') {
-                    statusEl?.classList.add('hidden');
-                    ctaEl?.classList.add('hidden');
-                    document.getElementById('creatorResources')?.classList.remove('hidden');
-                    // Load analytics data for approved creators
-                    loadAnalytics();
-                } else {
-                    statusEl?.classList.add('hidden');
-                    ctaEl?.classList.remove('hidden');
-                }
-
-            } catch (err) {
-                console.warn('Failed to check creator status:', err);
-            }
-
             // Load & bind Settings form
             try {
                 const settingsForm = document.getElementById('settingsForm');
@@ -1109,6 +1136,15 @@
                         const el = document.getElementById(id);
                         if (el && data?.links?.[id]) el.value = data.links[id];
                     });
+                    // Load preferences
+                    try {
+                        const prefs = data.preferences || {};
+                        const setVal = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+                        setVal('prefLanguage', prefs.language || '');
+                        setVal('prefDevice', prefs.device || '');
+                        setVal('prefGenres', Array.isArray(prefs.genres) ? prefs.genres.join(', ') : (prefs.genres || ''));
+                        setVal('prefBlacklist', Array.isArray(prefs.excludedKeywords) ? prefs.excludedKeywords.join(', ') : (prefs.excludedKeywords || ''));
+                    } catch(_) {}
                     settingsForm.addEventListener('submit', async (ev) => {
                         ev.preventDefault();
                         const links = {
@@ -1120,8 +1156,15 @@
                             youtube: document.getElementById('youtube')?.value?.trim() || '',
                             tiktok: document.getElementById('tiktok')?.value?.trim() || '',
                         };
+                        const parseCSV = (val) => val.split(',').map(s => s.trim()).filter(Boolean);
+                        const preferences = {
+                            language: document.getElementById('prefLanguage')?.value || '',
+                            device: document.getElementById('prefDevice')?.value || '',
+                            genres: parseCSV(document.getElementById('prefGenres')?.value || ''),
+                            excludedKeywords: parseCSV(document.getElementById('prefBlacklist')?.value || ''),
+                        };
                         try {
-                            await setDoc(doc(db, 'users', user.uid), { links }, { merge: true });
+                            await setDoc(doc(db, 'users', user.uid), { links, preferences }, { merge: true });
                             if (statusEl) { statusEl.textContent = 'Settings saved.'; setTimeout(()=> statusEl.textContent='', 2000); }
                         } catch (e) {
                             console.error('Save settings failed', e);
@@ -1196,7 +1239,8 @@
             };
         });
     </script>
-<div id="navOverlay" class="nav-overlay"></div>
-<script src="assets/nav.js"></script>
+    
+    <!-- Global Footer with Google Translate -->
+    <script src="assets/footer.js"></script>
 </body>
 </html>

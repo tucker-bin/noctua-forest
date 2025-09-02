@@ -7,7 +7,7 @@ Audience: Authors across all genres seeking engaged readers and readers who valu
 Website structure
 - `welcome.html`: landing page with CTAs to The Forest and submission
 - `forest.html`: book discovery community (The Forest)
-- `submit.html`: book submission form with optional premium review
+- `reviews.html`: book review submission form with reading verification
 - `contributor.html`: contributor application form for writers and industry professionals
 - `newsletter.html`: newsletter signup with redirect to forest
 - `about.html`: mission, contact, imprint

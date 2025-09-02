@@ -40,6 +40,9 @@
   <!-- Cookie Consent Management -->
   <script src="assets/cookie-consent.js"></script>
   
+  <!-- Global Footer with Google Translate -->
+  <script src="assets/footer.js"></script>
+  
   <!-- Book Schema Markup (will be populated by JavaScript) -->
   <script type="application/ld+json" id="bookSchema">
   {
@@ -105,6 +108,36 @@
     .ios .full-height {
       height: -webkit-fill-available;
     }
+
+    /* Vote button styles */
+    .vote-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      background-color: #3A4440;
+      color: #E0E2DB80;
+      transition: all 0.2s;
+    }
+
+    .vote-button:hover {
+      background-color: #4A5450;
+      color: #E0E2DB;
+    }
+
+    .vote-button.active {
+      background-color: #F58220;
+      color: #E0E2DB;
+    }
+
+    .vote-button.helpful.active {
+      background-color: #22C55E;
+    }
+
+    .vote-button.unhelpful.active {
+      background-color: #EF4444;
+    }
   </style>
 </head>
 <body>
@@ -122,7 +155,8 @@
       </a>
       <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" role="navigation" aria-label="Main navigation" style="font-family: 'Noto Sans', sans-serif;">
         <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">The Forest</a>
-        <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">Submit Book</a>
+        <a href="reviews.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">Write a Review</a>
+        <a href="help.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">Help</a>
         <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">About</a>
       </nav>
       <div class="flex items-center gap-2">
@@ -162,14 +196,9 @@
             <h1 id="title" class="text-3xl font-bold mb-2 text-white" style="font-family: 'Poppins', sans-serif;"></h1>
             <div class="flex items-center gap-2 mb-4">
               <p id="author" class="text-lg text-white/90"></p>
-              <div id="verifiedBadge" class="hidden bg-forest-accent/10 text-forest-accent px-2 py-0.5 rounded-full text-sm flex items-center gap-1">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-                Verified Author
-              </div>
+
             </div>
-            <p id="blurb" class="text-white/80 mb-6"></p>
+            <!-- Description removed by product decision -->
 
             <div class="space-y-2 text-sm text-white/80 mb-6" role="list" aria-label="Book details">
               <div role="listitem"><span class="font-semibold text-white">Language:</span> <span id="primaryLanguage"></span></div>
@@ -225,8 +254,15 @@
               </div>
             </div>
 
+            <!-- Book Moods (moved here) -->
+            <div class="mt-6">
+              <h3 class="text-lg font-semibold mb-3 text-white">Book Moods</h3>
+              <div id="wordCloud" class="min-h-[88px] text-white/90"></div>
+              <p id="copyFormatSummary" class="mt-3 text-white/80 text-sm"></p>
+            </div>
+
             <p id="actionMsg" class="mt-4 text-green-600 hidden" role="status" aria-live="polite">Added to your reading list.</p>
-            <p id="creatorAttribution" class="mt-4 text-sm text-white/70 hidden" role="status"></p>
+            <p id="curatorAttribution" class="mt-4 text-sm text-white/70 hidden" role="status"></p>
             <p id="memberAttribution" class="mt-2 text-sm text-white/70 hidden" role="status">
               <a href="https://buy.stripe.com/6oU9ATfwO5mJ9PY9tQaVa02" class="text-forest-accent hover:underline">Join Noctua Forest</a> to create your own curated lists.
             </p>
@@ -236,22 +272,180 @@
         <!-- Reader Reviews Section -->
         <div class="mt-12 border-t border-white/20 pt-8">
           <h2 class="text-2xl font-bold mb-6 text-white" style="font-family: 'Poppins', sans-serif;">Reader Reviews</h2>
-          <p class="text-white/60 text-sm mb-4">We do not sell retailer reviews. Reviews here are editorial and for readers of Noctua Forest.</p>
+          
+          <!-- At-a-Glance Summary (warnings only) -->
+          <section id="reviewSummary" class="mb-8 bg-[#3A4440] rounded-lg p-6">
+            <h3 class="text-lg font-semibold mb-3 text-white">Content Warnings</h3>
+            <div id="warningsSpoiler" class="text-sm">
+              <button id="toggleWarnings" class="px-3 py-1 rounded-full bg-[#4A5450] text-white hover:bg-[#5A6560] transition">Show warnings</button>
+              <div id="warningsList" class="mt-3 hidden"></div>
+            </div>
+          </section>
+          
+          <!-- Review Controls -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="text-white/80 text-sm">Sort by</div>
+            <select id="reviewSort" class="bg-[#3A4440] text-white rounded-lg px-3 py-2 border border-white/10">
+              <option value="newest">Newest</option>
+              <option value="helpful">Most Helpful</option>
+            </select>
+          </div>
           
           <!-- Review List -->
-          <div id="reviewList" class="space-y-6 mb-8">
+          <div id="reviewList" class="grid md:grid-cols-2 gap-6 mb-8">
             <!-- Reviews will be loaded here -->
           </div>
 
+          <!-- Empty State -->
+          <div id="reviewsEmpty" class="hidden text-center py-12 bg-[#3A4440] rounded-lg">
+            <div class="mb-4">
+              <svg class="w-12 h-12 mx-auto text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-white mb-2">Be the first to share your thoughts!</h3>
+            <p class="text-white/80 max-w-xl mx-auto mb-6">Your review helps other readers discover this book. Tag moods and themes, and warn about sensitive content.</p>
+            <a href="reviews.html" class="inline-block px-6 py-3 bg-forest-accent text-white rounded-full hover:opacity-90">Write the First Review</a>
+          </div>
+
+          <!-- Bottom CTA (only when no reviews) -->
+          <div id="bottomReviewCta" class="hidden text-center mt-8">
+            <a href="reviews.html" class="inline-block px-6 py-3 bg-forest-accent text-white rounded-full hover:opacity-90">Add Your Review</a>
+          </div>
+          
+          <!-- Similar Books -->
+          <div class="mt-12 border-t border-white/20 pt-8 space-y-8">
+            <!-- More from Author -->
+            <div id="moreFromAuthor" class="hidden">
+              <h2 class="text-2xl font-bold mb-6 text-white" style="font-family: 'Poppins', sans-serif;">More from this Author</h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-6 book-grid">
+                <!-- Books will be loaded here -->
+              </div>
+            </div>
+
+            <!-- Similar Books -->
+            <div id="similarBooks" class="hidden">
+              <h2 class="text-2xl font-bold mb-6 text-white" style="font-family: 'Poppins', sans-serif;">Similar Books</h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-6 book-grid">
+                <!-- Books will be loaded here -->
+              </div>
+            </div>
+
+            <!-- Frequently Listed Together -->
+            <div id="listedTogether" class="hidden">
+              <h2 class="text-2xl font-bold mb-6 text-white" style="font-family: 'Poppins', sans-serif;">Frequently Listed Together</h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-6 book-grid">
+                <!-- Books will be loaded here -->
+              </div>
+            </div>
+          </div>
+
           <!-- Review Form -->
-          <div id="reviewForm" class="hidden">
-            <form id="addReviewForm" class="space-y-4">
+          <div id="reviewForm" class="hidden bg-[#3A4440] rounded-lg p-6">
+            <form id="addReviewForm" class="space-y-6">
               <div>
                 <label for="reviewText" class="block font-medium text-white mb-2">Write a Review</label>
                 <textarea id="reviewText" name="reviewText" rows="3" required
-                  class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200"
+                  class="w-full px-4 py-3 rounded-lg bg-[#4A5450] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200"
                   placeholder="Share your thoughts about this book..."></textarea>
               </div>
+
+              <!-- Interest Level removed by product decision -->
+
+              <!-- Mood Selection -->
+              <div>
+                <label class="block font-medium text-white mb-2">What moods or feelings did this book evoke? (Select all that apply)</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="inspiring" class="mr-2">
+                    <span>Inspiring</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="heartwarming" class="mr-2">
+                    <span>Heartwarming</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="mysterious" class="mr-2">
+                    <span>Mysterious</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="suspenseful" class="mr-2">
+                    <span>Suspenseful</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="funny" class="mr-2">
+                    <span>Funny</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="dark" class="mr-2">
+                    <span>Dark</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="thoughtful" class="mr-2">
+                    <span>Thoughtful</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="adventurous" class="mr-2">
+                    <span>Adventurous</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="romantic" class="mr-2">
+                    <span>Romantic</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="emotional" class="mr-2">
+                    <span>Emotional</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="informative" class="mr-2">
+                    <span>Informative</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="moods[]" value="relaxing" class="mr-2">
+                    <span>Relaxing</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Content Warnings -->
+              <div>
+                <label class="block font-medium text-white mb-2">Content Warnings (Select all that apply)</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <label class="flex items-center">
+                    <input type="checkbox" name="contentWarnings[]" value="violence" class="mr-2">
+                    <span>Violence</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="contentWarnings[]" value="sexual_content" class="mr-2">
+                    <span>Sexual Content</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="contentWarnings[]" value="language" class="mr-2">
+                    <span>Strong Language</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="contentWarnings[]" value="substance" class="mr-2">
+                    <span>Substance Use</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="contentWarnings[]" value="trauma" class="mr-2">
+                    <span>Trauma</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="contentWarnings[]" value="self_harm" class="mr-2">
+                    <span>Self Harm</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="contentWarnings[]" value="eating" class="mr-2">
+                    <span>Eating Disorders</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="contentWarnings[]" value="phobias" class="mr-2">
+                    <span>Phobias</span>
+                  </label>
+                </div>
+              </div>
+
               <div class="flex justify-end">
                 <button type="submit"
                   class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white/20 transition-colors duration-300">
@@ -279,7 +473,14 @@
     <div class="bg-white rounded-xl w-full max-w-md mx-4 p-6">
       <h3 class="text-xl font-bold mb-4 text-[#4A5450]">Review Policy</h3>
       <div class="prose prose-sm text-[#4A5450] mb-6">
-        <p>Please keep reviews respectful and constructive. We reserve the right to remove reviews that:</p>
+        <p>Noctua Forest is built on authentic, personal reading experiences. We have a strict policy against AI-generated content:</p>
+        <ul class="list-disc pl-5 space-y-2">
+          <li class="text-red-600 font-medium">AI-generated reviews are strictly prohibited and will be removed</li>
+          <li>Reviews must be based on your actual reading experience</li>
+          <li>Share your genuine thoughts, feelings, and insights</li>
+          <li>Focus on how the book affected you personally</li>
+        </ul>
+        <p class="mt-4">Additionally, we reserve the right to remove reviews that:</p>
         <ul class="list-disc pl-5 space-y-2">
           <li>Contain offensive or inappropriate language</li>
           <li>Are spam or promotional in nature</li>
@@ -329,6 +530,12 @@
     import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
     import { doc, getDoc, addDoc, collection, serverTimestamp, query, where, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
     import { createList, getUserLists, addBookToList, getList, getActiveListsCount } from './js/readingListService.js';
+    import { getUserVote, voteOnReview, formatVoteCount } from './js/reviewVotingService.js';
+    import { getBookMoods, getContentWarnings, getHelpfulCount, formatMoodName, formatWarningName, getMoodColor } from './js/reviewService.js';
+    import { getCopyFormatStats } from './js/reviewService.js';
+    import { validateReview, flagContent } from './js/moderationService.js';
+    import { getSimilarBooks, getMoreFromAuthor, getFrequentlyListedTogether } from './js/recommendationService.js';
+    import { reportReview } from './js/reportingService.js';
 
     const auth = getAuth(app);
 
@@ -457,9 +664,63 @@
             listDropdown.classList.add('hidden');
         } catch (err) {
             console.error('Failed to add to list:', err);
-            alert('Failed to add book to list. Please try again.');
+            if (err.message.includes('review this book')) {
+              const confirmed = confirm('You need to review this book before adding it to a list. Would you like to write a review now?');
+              if (confirmed) {
+                document.getElementById('reviewForm').classList.remove('hidden');
+                document.getElementById('reviewText').focus();
+              }
+            } else {
+              alert('Failed to add book to list. Please try again.');
+            }
         }
     };
+
+    async function loadRecommendations(bookId, book) {
+      try {
+        // More from Author
+        if (book.author) {
+          const authorBooks = await getMoreFromAuthor(book.author, bookId);
+          if (authorBooks.length > 0) {
+            const container = document.getElementById('moreFromAuthor');
+            const grid = container.querySelector('.book-grid');
+            grid.innerHTML = '';
+            authorBooks.forEach(book => {
+              grid.appendChild(renderBookCard(book));
+            });
+            container.classList.remove('hidden');
+          }
+        }
+
+        // Similar Books
+        const moods = book.moods || [];
+        const genres = book.genres || [];
+        const similarBooks = await getSimilarBooks(bookId, { moods, genres });
+        if (similarBooks.length > 0) {
+          const container = document.getElementById('similarBooks');
+          const grid = container.querySelector('.book-grid');
+          grid.innerHTML = '';
+          similarBooks.forEach(book => {
+            grid.appendChild(renderBookCard(book));
+          });
+          container.classList.remove('hidden');
+        }
+
+        // Frequently Listed Together
+        const listedBooks = await getFrequentlyListedTogether(bookId);
+        if (listedBooks.length > 0) {
+          const container = document.getElementById('listedTogether');
+          const grid = container.querySelector('.book-grid');
+          grid.innerHTML = '';
+          listedBooks.forEach(book => {
+            grid.appendChild(renderBookCard(book));
+          });
+          container.classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Error loading recommendations:', err);
+      }
+    }
 
     async function loadBook(){
       try {
@@ -497,25 +758,7 @@
           }
         }
         
-        // Final fallback to sample data if both Firestore and API failed
-        if (!b && window.SAMPLE_BOOKS) {
-          const sampleBook = window.SAMPLE_BOOKS.find(book => book.id == id);
-          if (sampleBook) {
-            b = {
-              title: sampleBook.title,
-              author: sampleBook.author,
-              blurb: sampleBook.blurb,
-              primaryLanguage: sampleBook.language,
-              authorRegion: sampleBook.region,
-              publicationYear: sampleBook.year,
-              authorTags: sampleBook.tags ? sampleBook.tags.join(', ') : '',
-              coverUrl: window.coverFor ? window.coverFor(sampleBook) : sampleBook.coverUrl,
-              amazonUrl: sampleBook.amazonUrl,
-              isbn: sampleBook.isbn
-            };
-            console.log('Loaded book from sample data fallback');
-          }
-        }
+        // Removed sample fallback
         
         // If both methods failed
         if (!b) {
@@ -536,27 +779,20 @@
         updateElement('title', b.title || 'Untitled');
         updateElement('author', b.author ? `by ${b.author}` : '');
         updateElement('breadcrumbBookTitle', b.title || 'Book Details');
-        updateElement('blurb', b.blurb || '');
+        // Description intentionally not displayed
         updateElement('primaryLanguage', b.primaryLanguage || '');
         updateElement('authorRegion', b.authorRegion || '');
         updateElement('publicationYear', b.publicationYear || '');
         updateElement('authorTags', b.authorTags || '');
 
-        // Show verified badge if author is verified
-        const verifiedBadge = document.getElementById('verifiedBadge');
-        if (verifiedBadge) {
-          if (b.authorVerified) {
-            verifiedBadge.classList.remove('hidden');
-          } else {
-            verifiedBadge.classList.add('hidden');
-          }
-        }
+
         
-        // Handle cover image with PA API integration and fallbacks
+        // Handle cover image with PA API integration (no storage beyond 24h; we only use returned URL)
         const cover = document.getElementById('coverImg');
         if(cover) {
           cover.classList.add('loading-img');
           let coverUrl = null;
+          let amazonHref = null;
 
           // Try PA API first if ASIN available
           if (b.asin) {
@@ -567,14 +803,17 @@
                 if (paData.imageUrl) {
                   coverUrl = paData.imageUrl;
                 }
+                if (paData.detailPageUrl) {
+                  amazonHref = paData.detailPageUrl;
+                }
               }
             } catch (paError) {
               console.warn('PA API failed:', paError);
             }
           }
 
-          // Fallback to direct coverUrl
-          if (!coverUrl && b.coverUrl) {
+          // Do not use non-PA images unless we have uploader rights; if provided by Firestore with rights, allow
+          if (!coverUrl && b.coverUrl && b.coverRights === true) {
             coverUrl = b.coverUrl;
           }
 
@@ -583,6 +822,17 @@
             img.onload = () => {
               cover.src = coverUrl;
               cover.classList.remove('loading-img');
+              // Wrap cover with Amazon link if available
+              try {
+                const link = document.getElementById('purchaseLink');
+                const a = document.createElement('a');
+                a.href = amazonHref || link?.href || '#';
+                a.target = '_blank';
+                a.setAttribute('aria-label', 'View on Amazon');
+                const parent = cover.parentNode;
+                a.appendChild(cover.cloneNode(true));
+                parent.replaceChild(a, cover);
+              } catch (_) {}
             };
             img.onerror = () => {
               cover.style.display = 'none';
@@ -601,22 +851,7 @@
         function getRef(){ try{ return sessionStorage.getItem('nf_ref') || ''; }catch(_){ return ''; } }
         function withAmazonTag(url){ try{ const u=new URL(url); u.searchParams.set('tag','noctuaforest-20'); const r=getRef(); if(r) u.searchParams.set('ref', r); return u.toString(); }catch(_){ return url; } }
         function amazonSearch(){ const q=encodeURIComponent(`${b.title||''} ${b.author||''}`); const r=getRef(); return `https://amazon.com/s?k=${q}&tag=noctuaforest-20${r?`&ref=${encodeURIComponent(r)}`:''}`; }
-        function bookshopLink(){
-          // Use shop link per user's configuration
-          const base = 'https://bookshop.org/shop/noctuaforest';
-          const r = getRef();
-          return r ? `${base}?ref=${encodeURIComponent(r)}` : base;
-        }
-
-        // Determine best primary/secondary
-        const candidates = [];
-        if (b.amazonUrl) candidates.push({ href: withAmazonTag(b.amazonUrl), label: 'Amazon' });
-        if (b.purchaseLink && b.purchaseLink.includes('amazon.com')) candidates.push({ href: withAmazonTag(b.purchaseLink), label: 'Amazon' });
-        if (b.purchaseLink && b.purchaseLink.includes('bookshop.org')) candidates.push({ href: b.purchaseLink, label: 'Bookshop' });
-        if (b.purchaseLink2 && b.purchaseLink2.includes('bookshop.org')) candidates.push({ href: b.purchaseLink2, label: 'Bookshop' });
-        // Fallbacks
-        if (!candidates.some(c=>c.label==='Amazon')) candidates.push({ href: amazonSearch(), label: 'Amazon' });
-        if (!candidates.some(c=>c.label==='Bookshop')) candidates.push({ href: bookshopLink(), label: 'Bookshop' });
+        // Bookshop links removed by product decision
 
         // Deduplicate by label then href
         const seen = new Set();
@@ -659,7 +894,7 @@
               "@type": "Person",
               "name": b.author || "Unknown"
             },
-            "description": b.blurb || "",
+            "description": "",
             "datePublished": b.publicationYear || "",
             "inLanguage": b.primaryLanguage || "en",
             "publisher": {
@@ -685,7 +920,10 @@
           genre: b.genre
         };
 
-        // Display list save count (readers + creators)
+        // Load recommendations
+        await loadRecommendations(id, b);
+
+        // Display list save count (readers + curators)
         try {
           const { getBookSaveCount } = await import('./js/readingListService.js');
           const count = await getBookSaveCount(id);
@@ -699,15 +937,15 @@
           // Silent fail; non-critical
         }
 
-        // Display creator list count and member CTA
+        // Display curator list count and member CTA
         try {
-            const creatorListCount = await getActiveListsCount(id);
-            const creatorAttribution = document.getElementById('creatorAttribution');
+            const curatorListCount = await getActiveListsCount(id);
+            const curatorAttribution = document.getElementById('curatorAttribution');
             const memberAttribution = document.getElementById('memberAttribution');
             
-            if (creatorAttribution && creatorListCount > 0) {
-                creatorAttribution.textContent = `Featured in ${creatorListCount} creator list${creatorListCount === 1 ? '' : 's'}.`;
-                creatorAttribution.classList.remove('hidden');
+            if (curatorAttribution && curatorListCount > 0) {
+                curatorAttribution.textContent = `Featured in ${curatorListCount} curator list${curatorListCount === 1 ? '' : 's'}.`;
+                curatorAttribution.classList.remove('hidden');
             }
 
             // Show member CTA if not logged in or not a member
@@ -717,7 +955,7 @@
                 memberAttribution?.classList.remove('hidden');
             }
         } catch (err) {
-            console.warn('Could not load creator list count', err);
+            console.warn('Could not load curator list count', err);
         }
       }catch(err){
         console.error(err);
@@ -746,140 +984,421 @@
       }).format(date);
     }
 
-    function renderReview(review) {
-      const div = document.createElement('div');
-      div.className = 'bg-[#3A4440] rounded-lg p-4';
-      div.innerHTML = `
-        <div class="flex items-start gap-4">
-          <div class="flex-none">
-            ${review.authorAvatarUrl ? 
-              `<img src="${review.authorAvatarUrl}" alt="Avatar" class="w-10 h-10 rounded-full object-cover">` :
-              `<div class="w-10 h-10 rounded-full bg-[#5A6560] flex items-center justify-center">
-                <svg class="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>`
-            }
-          </div>
-          <div class="flex-1">
-            <div class="flex justify-between items-start mb-2">
-              <div class="font-medium text-white">${review.authorForestName || 'Anonymous Forest Dweller'}</div>
-              <div class="text-sm text-white/60">${formatDate(review.createdAt)}</div>
+    function renderBookCard(book) {
+      const card = document.createElement('a');
+      card.href = `book.html?id=${book.id}`;
+      card.className = 'block bg-[#3A4440] rounded-lg overflow-hidden hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent';
+      
+      card.innerHTML = `
+        <div class="aspect-[2/3] bg-[#4A5450] relative">
+          ${book.coverUrl ? `
+            <img 
+              src="${book.coverUrl}" 
+              alt="${book.title} cover"
+              class="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            >
+          ` : `
+            <div class="absolute inset-0 flex items-center justify-center">
+              <svg class="w-12 h-12 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
             </div>
-            <div class="text-white/80">${review.text}</div>
-          </div>
+          `}
+        </div>
+        <div class="p-4">
+          <h3 class="font-medium text-white line-clamp-2">${book.title}</h3>
+          <p class="text-sm text-white/60 mt-1">${book.author}</p>
         </div>
       `;
-      return div;
+
+      return card;
     }
 
-    async function setupReviews(bookId) {
-      const reviewList = document.getElementById('reviewList');
-      const reviewForm = document.getElementById('addReviewForm');
-      const policyModal = document.getElementById('policyModal');
-      const closePolicyModal = document.getElementById('closePolicyModal');
+    async function renderWordCloud(moodStats){
+      const container = document.getElementById('wordCloud');
+      if (!container) return;
+      if (!moodStats || !moodStats.moods || moodStats.moods.length === 0){
+        container.innerHTML = '<div class="text-white/60 text-sm">No mood data yet</div>';
+        return;
+      }
+      const max = Math.max(...moodStats.moods.map(m=>m.count||m.percentage||1));
+      container.innerHTML = '';
+      container.style.display = 'flex';
+      container.style.flexWrap = 'wrap';
+      container.style.gap = '12px';
+      moodStats.moods.forEach(({ mood, count=0, percentage=0 }) => {
+        const weight = count || percentage;
+        const size = 14 + Math.round((weight / max) * 20); // 14px - 34px
+        const span = document.createElement('span');
+        span.textContent = mood.charAt(0).toUpperCase() + mood.slice(1);
+        span.style.fontSize = size + 'px';
+        span.className = 'select-none';
+        container.appendChild(span);
+      });
+    }
 
-      // Import review services
-      const { addReview, migrateAllComments, isCommentsEmpty } = await import('./js/reviewsMigration.js');
+    function renderWarningsSpoiler(warningStats){
+      const btn = document.getElementById('toggleWarnings');
+      const list = document.getElementById('warningsList');
+      if (!btn || !list) return;
+      let open = false;
+      function setClosed(){
+        list.classList.add('hidden');
+        btn.textContent = 'Show warnings';
+      }
+      function setOpen(){
+        list.classList.remove('hidden');
+        btn.textContent = 'Hide warnings';
+      }
+      btn.onclick = () => { open = !open; open ? setOpen() : setClosed(); };
 
-      // Check for and migrate any remaining comments
-      try {
-        const hasComments = !(await isCommentsEmpty());
-        if (hasComments) {
-          console.log('Migrating comments to reviews...');
-          const stats = await migrateAllComments();
-          console.log('Migration complete:', stats);
-        }
-      } catch (err) {
-        console.warn('Comment migration check failed:', err);
+      if (!warningStats || !warningStats.warnings || warningStats.warnings.length === 0){
+        list.innerHTML = '<div class="text-white/60 text-sm">No content warnings reported</div>';
+        setClosed();
+        return;
+      }
+      list.innerHTML = warningStats.warnings.map(({ warning, count }) => `
+        <div class="text-white/90 text-sm">${warning.replaceAll('_',' ')} (${count})</div>
+      `).join('');
+      setClosed();
+    }
+
+    function formatBasic(text){
+      // bold **text**, italics *text*
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1<\/strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1<\/em>');
+    }
+
+    function createReadMore(text, maxChars = 240){
+      if (!text || text.length <= maxChars) return { html: formatBasic(text), truncated: false };
+      const short = text.slice(0, maxChars).trim();
+      const html = `${formatBasic(short)}<span class="text-white/60">… </span><button class="underline text-forest-accent" data-readmore>Read more</button>`;
+      return { html, truncated: true };
+    }
+
+    async function renderReview(review) {
+      const div = document.createElement('div');
+      div.className = 'bg-[#3A4440] rounded-lg p-6';
+
+      // Get current user's vote
+      let userVote = null;
+      if (auth.currentUser) {
+        userVote = await getUserVote(review.id, auth.currentUser.uid);
       }
 
-      // Show/hide review form based on auth state
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          showReviewForm();
-        } else {
-          showSignInPrompt();
-        }
-      });
+      const { html, truncated } = createReadMore(review.text || '');
 
-      // Listen for reviews
-      const reviewsQuery = query(
-        collection(db, 'reviews'),
-        where('bookId', '==', bookId),
-        orderBy('createdAt', 'desc'),
-        limit(50)
-      );
+      div.innerHTML = `
+        <div class="space-y-4">
+          <div class="flex items-start justify-between">
+            <div class="flex items-center gap-3">
+              ${review.authorAvatarUrl ? 
+                `<img src="${review.authorAvatarUrl}" alt="Avatar" class="w-10 h-10 rounded-full object-cover">` :
+                `<div class="w-10 h-10 rounded-full bg-[#5A6560] flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                </div>`
+              }
+              <div>
+                <div class="font-medium text-white">${review.authorForestName || 'Anonymous Night Owl'}</div>
+                <div class="text-sm text-white/60">${formatDate(review.createdAt)}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button 
+                class="vote-button helpful ${userVote === 'helpful' ? 'active' : ''}"
+                data-review-id="${review.id}"
+                data-vote="helpful"
+                title="Mark as helpful">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                </svg>
+                <span class="vote-count">${formatVoteCount(review.helpfulCount || 0)}</span>
+              </button>
+              <button 
+                class="vote-button unhelpful ${userVote === 'unhelpful' ? 'active' : ''}"
+                data-review-id="${review.id}"
+                data-vote="unhelpful"
+                title="Mark as unhelpful">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5 0v2a2 2 0 01-2 2h-2.5" />
+                </svg>
+                <span class="vote-count">${formatVoteCount(review.unhelpfulCount || 0)}</span>
+              </button>
+              <button 
+                class="vote-button report ml-2"
+                data-review-id="${review.id}"
+                title="Report review"
+                onclick="reportReview('${review.id}')">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </button>
+            </div>
+          </div>
 
-      const unsubscribe = onSnapshot(reviewsQuery, (snapshot) => {
-        reviewList.innerHTML = '';
-        if (snapshot.empty) {
-          reviewList.innerHTML = '<p class="text-white/60 text-center py-4">No reviews yet. Be the first to share your thoughts!</p>';
-          return;
-        }
-        snapshot.forEach((doc) => {
-          const review = doc.data();
-          reviewList.appendChild(renderReview(review));
-        });
-      }, (error) => {
-        console.error('Error loading reviews:', error);
-        reviewList.innerHTML = '<p class="text-white/60 text-center py-4">Unable to load reviews. Please try again later.</p>';
-      });
+          <div class="text-white/80 review-text">${html}</div>
 
-      // Handle review submission
-      if (reviewForm) {
-        let policyAccepted = false;
+          ${review.moods && review.moods.length > 0 ? `
+            <div class="flex flex-wrap gap-2 mt-4">
+              ${review.moods.map(mood => `
+                <span class="px-2 py-1 rounded-full text-xs text-white ${getMoodColor(mood)}">
+                  ${formatMoodName(mood)}
+                </span>
+              `).join('')}
+            </div>
+          ` : ''}
 
-        reviewForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const user = auth.currentUser;
-          if (!user) {
-            showSignInPrompt();
-            return;
-          }
+          ${review.contentWarnings && review.contentWarnings.length > 0 ? `
+            <div class="flex flex-wrap gap-2 mt-2">
+              ${review.contentWarnings.map(warning => `
+                <span class="px-2 py-1 rounded-full text-xs bg-red-500/20 text-red-400">
+                  ${formatWarningName(warning)}
+                </span>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `;
 
-          if (!policyAccepted) {
-            policyModal.classList.remove('hidden');
-            policyModal.classList.add('flex');
-            return;
-          }
-
-          const reviewText = reviewForm.reviewText.value.trim();
-          if (!reviewText) return;
-
-          try {
-            // Get user data for avatar
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            const userData = userDoc.exists() ? userDoc.data() : {};
-            
-            await addReview({
-              bookId,
-              text: reviewText,
-              authorId: user.uid,
-              authorAvatarUrl: userData.avatarUrl || null
-            });
-            reviewForm.reset();
-          } catch (error) {
-            console.error('Error posting review:', error);
-            alert('Unable to post review. Please try again.');
-          }
-        });
-
-        // Handle policy acceptance
-        if (closePolicyModal) {
-          closePolicyModal.addEventListener('click', () => {
-            policyAccepted = true;
-            policyModal.classList.add('hidden');
-            policyModal.classList.remove('flex');
-            // Auto-submit the form after policy acceptance
-            reviewForm.requestSubmit();
+      // Read more toggle
+      if (truncated){
+        const btn = div.querySelector('[data-readmore]');
+        if (btn){
+          btn.addEventListener('click', () => {
+            const full = formatBasic(review.text || '');
+            const textEl = div.querySelector('.review-text');
+            textEl.innerHTML = full;
           });
         }
       }
 
-      // Cleanup on page leave
+      // Voting handlers
+      const voteButtons = div.querySelectorAll('.vote-button');
+      voteButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+          if (!auth.currentUser) {
+            showSignInPrompt();
+            return;
+          }
+
+          const reviewId = button.dataset.reviewId;
+          const vote = button.dataset.vote;
+          const currentVote = button.classList.contains('active') ? null : vote;
+          try {
+            const counts = await voteOnReview(reviewId, auth.currentUser.uid, currentVote);
+            const helpfulButton = div.querySelector('.vote-button.helpful');
+            const unhelpfulButton = div.querySelector('.vote-button.unhelpful');
+            helpfulButton.querySelector('.vote-count').textContent = formatVoteCount(counts.helpful);
+            unhelpfulButton.querySelector('.vote-count').textContent = formatVoteCount(counts.unhelpful);
+            helpfulButton.classList.toggle('active', currentVote === 'helpful');
+            unhelpfulButton.classList.toggle('active', currentVote === 'unhelpful');
+          } catch (err) { console.error('Error voting:', err); }
+        });
+      });
+
+      return div;
+    }
+
+    async function updateReviewStats(bookId) {
+      try {
+        // Word cloud from mood stats
+        const moodStats = await getBookMoods(bookId);
+        await renderWordCloud(moodStats);
+
+        // Summarized warnings with spoiler toggle
+        const warningStats = await getContentWarnings(bookId);
+        renderWarningsSpoiler(warningStats);
+
+        // Copy format natural language summary
+        const fmt = await getCopyFormatStats(bookId);
+        const fmtEl = document.getElementById('copyFormatSummary');
+        if (fmtEl) {
+          if (fmt.total > 0) {
+            const digital = fmt.ebook + fmt.audiobook;
+            const pDigital = Math.round((digital / fmt.total) * 100);
+            const pPrint = Math.round((fmt.print / fmt.total) * 100);
+            if (pDigital >= pPrint) {
+              fmtEl.textContent = `${pDigital}% of readers own a digital copy`;
+            } else {
+              fmtEl.textContent = `${pPrint}% of readers own a printed copy`;
+            }
+          } else {
+            fmtEl.textContent = '';
+          }
+        }
+      } catch (err) {
+        console.error('Error updating summary stats:', err);
+      }
+    }
+
+    async function setupReviews(bookId) {
+      const reviewList = document.getElementById('reviewList');
+      const reviewsEmpty = document.getElementById('reviewsEmpty');
+      const reviewSort = document.getElementById('reviewSort');
+      const policyModal = document.getElementById('policyModal');
+      const closePolicyModal = document.getElementById('closePolicyModal');
+
+      const { addReview, migrateAllComments, isCommentsEmpty } = await import('./js/reviewsMigration.js');
+
+      // Migration check (unchanged)
+      try { const hasComments = !(await isCommentsEmpty()); if (hasComments){ const stats = await migrateAllComments(); } } catch(_) {}
+
+      onAuthStateChanged(auth, (user) => { if (user) { showReviewForm(); } else { showSignInPrompt(); } });
+
+      // Build base query and sorting
+      let orderField = 'createdAt';
+      let orderDir = 'desc';
+      function applySort(){
+        const val = reviewSort?.value || 'newest';
+        if (val === 'helpful'){ orderField = 'helpfulCount'; orderDir = 'desc'; }
+        else { orderField = 'createdAt'; orderDir = 'desc'; }
+        subscribe();
+      }
+      reviewSort?.addEventListener('change', applySort);
+
+      let unsubscribe = () => {};
+      function subscribe(){
+        unsubscribe();
+        const qy = query(
+          collection(db, 'reviews'),
+          where('bookId', '==', bookId),
+          orderBy(orderField, orderDir),
+          limit(50)
+        );
+        unsubscribe = onSnapshot(qy, async (snapshot) => {
+          reviewList.innerHTML = '';
+          if (snapshot.empty) {
+            reviewsEmpty.classList.remove('hidden');
+            const bottomCta = document.getElementById('bottomReviewCta');
+            bottomCta?.classList.remove('hidden');
+            return;
+          }
+          reviewsEmpty.classList.add('hidden');
+          const bottomCta = document.getElementById('bottomReviewCta');
+          bottomCta?.classList.add('hidden');
+          const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          for (const r of docs){ reviewList.appendChild(await renderReview(r)); }
+        }, (error) => {
+          console.error('Error loading reviews:', error);
+          reviewList.innerHTML = '<p class="text-white/60 text-center py-4">Unable to load reviews. Please try again later.</p>';
+        });
+      }
+
+      // Initial subscription
+      applySort();
+
+      // Review submission handler stays similar (but without interest)
+      const reviewForm = document.getElementById('addReviewForm');
+      if (reviewForm) {
+        let policyAccepted = false;
+        reviewForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const user = auth.currentUser; if (!user){ showSignInPrompt(); return; }
+          if (!policyAccepted){ policyModal.classList.remove('hidden'); policyModal.classList.add('flex'); return; }
+
+          const formData = new FormData(reviewForm);
+          const reviewText = (formData.get('reviewText') || '').trim();
+          const moods = Array.from(formData.getAll('moods[]'));
+          const contentWarnings = Array.from(formData.getAll('contentWarnings[]'));
+          if (!reviewText) return;
+          try {
+            const validation = await validateReview(user.uid, { text: reviewText, bookId, moods, contentWarnings });
+            if (validation?.valid === false){ alert(validation.error || 'Review did not pass validation.'); return; }
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            const userData = userDoc.exists() ? userDoc.data() : {};
+            await addReview({ bookId, text: reviewText, authorId: user.uid, authorForestName: userData.forestName || null, authorAvatarUrl: userData.avatarUrl || null, moods, contentWarnings, createdAt: serverTimestamp() });
+            reviewForm.reset();
+          } catch (err){ console.error('Error posting review:', err); alert('Unable to post review. Please try again.'); }
+        });
+        if (closePolicyModal){ closePolicyModal.addEventListener('click', () => { policyAccepted = true; policyModal.classList.add('hidden'); policyModal.classList.remove('flex'); reviewForm.requestSubmit(); }); }
+      }
+
+      // Initial summary load
+      await updateReviewStats(bookId);
+
+      // Cleanup
       window.addEventListener('unload', () => unsubscribe());
     }
+
+    // Report review function
+    window.reportReview = async (reviewId) => {
+      if (!auth.currentUser) {
+        showSignInPrompt();
+        return;
+      }
+
+      // Create report modal
+      const reportModal = document.createElement('div');
+      reportModal.className = 'fixed inset-0 bg-black/60 flex items-center justify-center z-50';
+      reportModal.innerHTML = `
+        <div class="bg-white rounded-xl w-full max-w-md mx-4 p-6">
+          <h3 class="text-xl font-bold mb-4 text-[#4A5450]">Report Review</h3>
+          <form id="reportForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-[#4A5450] mb-2">Reason for reporting</label>
+              <select class="w-full px-4 py-2 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] text-[#4A5450]" required>
+                <option value="">Select a reason...</option>
+                <option value="ai_generated">Appears to be AI-generated</option>
+                <option value="spam">Spam or promotional content</option>
+                <option value="inappropriate">Inappropriate content</option>
+                <option value="harassment">Harassment or personal attack</option>
+                <option value="duplicate">Duplicate review</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[#4A5450] mb-2">Additional details (optional)</label>
+              <textarea class="w-full px-4 py-2 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] text-[#4A5450]" rows="3" placeholder="Please provide any additional context that will help us understand your report..."></textarea>
+            </div>
+            <div class="flex justify-end gap-3">
+              <button type="button" class="px-4 py-2 bg-[#F1F5F9] text-[#4A5450] rounded-md hover:bg-[#E2E8F0]" onclick="this.parentElement.parentElement.parentElement.parentElement.remove()">
+                Cancel
+              </button>
+              <button type="submit" class="px-4 py-2 bg-[#4A5450] text-white rounded-md hover:bg-[#3A4440]">
+                Submit Report
+              </button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      document.body.appendChild(reportModal);
+
+      // Handle report submission
+      const form = reportModal.querySelector('#reportForm');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const reason = form.querySelector('select').value;
+        const details = form.querySelector('textarea').value;
+
+        try {
+          await reportReview(reviewId, reason, auth.currentUser.uid, details);
+          reportModal.remove();
+
+          // Show confirmation
+          const confirmModal = document.createElement('div');
+          confirmModal.className = 'fixed inset-0 bg-black/60 flex items-center justify-center z-50';
+          confirmModal.innerHTML = `
+            <div class="bg-white rounded-xl w-full max-w-md mx-4 p-6">
+              <h3 class="text-xl font-bold mb-4 text-[#4A5450]">Report Submitted</h3>
+              <p class="text-[#4A5450] mb-6">Thank you for helping maintain the quality of our community. We'll review this report promptly.</p>
+              <button class="w-full px-4 py-2 bg-[#4A5450] text-white rounded-md hover:bg-[#3A4440]" onclick="this.parentElement.parentElement.remove()">
+                Close
+              </button>
+            </div>
+          `;
+          document.body.appendChild(confirmModal);
+        } catch (err) {
+          console.error('Error submitting report:', err);
+          alert('Unable to submit report. Please try again.');
+        }
+      });
+    };
 
     onAuthStateChanged(auth, ()=>{}); // establish auth; no redirect required
     const bookId = getParam('id');
@@ -888,7 +1407,6 @@
       setupReviews(bookId);
     }
   </script>
-  <script src="sample-books.js"></script>
   <div id="navOverlay" class="nav-overlay"></div>
   <script src="assets/nav.js"></script>
 </body>

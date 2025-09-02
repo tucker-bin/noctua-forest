@@ -118,6 +118,20 @@ export async function addBookToList(listId, book) {
     const data = snapshot.data();
     const books = data.books || [];
     const stats = data.stats || { languages: {}, genres: {}, authors: {} };
+
+    // Check if user has reviewed this book
+    const reviewsRef = collection(db, 'reviews');
+    const q = query(
+        reviewsRef,
+        where('bookId', '==', book.id),
+        where('authorId', '==', data.userId),
+        limit(1)
+    );
+    const reviewSnapshot = await getDocs(q);
+
+    if (reviewSnapshot.empty) {
+        throw new Error('Please review this book before adding it to your list');
+    }
     
     // Update stats
     if (book.primaryLanguage) {
@@ -156,13 +170,13 @@ export async function addBookToList(listId, book) {
         createdAt: serverTimestamp()
     }, { merge: true });
 
-    // Track attribution for creator lists (idempotent)
+    // Track attribution for curator lists (idempotent)
     const userDoc = await getDoc(doc(db, 'users', data.userId));
     if (userDoc.exists() && userDoc.data().applicationStatus === 'approved') {
         const attributionId = `${listId}_${book.id}`;
         await setDoc(doc(db, LIST_ATTRIBUTIONS_COLLECTION, attributionId), {
             listId,
-            creatorId: data.userId,
+            curatorId: data.userId,
             bookId: book.id,
             createdAt: serverTimestamp()
         }, { merge: true });
@@ -251,10 +265,10 @@ export async function reorderBooks(listId, newOrder) {
 /**
  * Generate a shareable link for a list
  * @param {string} listId - The list ID
- * @param {string} creatorId - The creator's user ID
+ * @param {string} curatorId - The curator's user ID
  * @returns {Promise<string>} The share ID
  */
-export async function shareList(listId, creatorId) {
+export async function shareList(listId, curatorId) {
     // Check if share already exists
     const sharesQuery = query(
         collection(db, SHARES_COLLECTION),
@@ -264,10 +278,10 @@ export async function shareList(listId, creatorId) {
     const sharesDocs = await getDocs(sharesQuery);
     
     if (!sharesDocs.empty) {
-        // Ensure creatorId is present
+        // Ensure curatorId is present
         const shareRef = sharesDocs.docs[0].ref;
-        if (!sharesDocs.docs[0].data().creatorId) {
-            await updateDoc(shareRef, { creatorId });
+        if (!sharesDocs.docs[0].data().curatorId) {
+            await updateDoc(shareRef, { curatorId });
         }
         return sharesDocs.docs[0].id;
     }
@@ -275,7 +289,7 @@ export async function shareList(listId, creatorId) {
     // Create new share
     const shareDoc = await addDoc(collection(db, SHARES_COLLECTION), {
         listId,
-        creatorId,
+        curatorId,
         createdAt: serverTimestamp()
     });
     
@@ -297,7 +311,7 @@ export async function getSharedList(shareId) {
 
     return {
         ...list,
-        creatorId: shareData.creatorId, // Pass creatorId along
+        curatorId: shareData.curatorId, // Pass curatorId along
     };
 }
 
@@ -337,7 +351,7 @@ export async function getBookSaveCount(bookId) {
 }
 
 /**
- * Get total number of active creator lists that contain a given book
+ * Get total number of active curator lists that contain a given book
  * @param {string} bookId
  * @returns {Promise<number>}
  */

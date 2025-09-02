@@ -1,3 +1,17 @@
+import { app, db } from './firebase-config.js';
+import { 
+  collection, 
+  query, 
+  where, 
+  orderBy, 
+  limit, 
+  startAfter, 
+  getDocs,
+  doc,
+  getDoc
+} from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+
 // Helper function to truncate text with fade effect
 function truncateText(text, maxLength = 200) {
   if (text.length <= maxLength) {
@@ -19,24 +33,61 @@ function truncateText(text, maxLength = 200) {
 // Forest Discovery System - Infinite Scroll & Filtering
 class ForestDiscovery {
   constructor() {
-    this.currentPage = 0;
-    this.isLoading = false;
-    this.hasMoreBooks = true;
     this.filters = {
       search: '',
       language: '',
       region: '',
       sort: 'recent'
     };
+    this.preferences = { excludedKeywords: [], genres: [] };
     this.books = [];
+    this.currentPage = 1;
+    this.hasMoreBooks = true;
+    this.isLoading = false;
+    this.lastDoc = null;
     
     this.init();
+    this.loadUserPreferences();
   }
 
   init() {
     this.setupEventListeners();
     this.loadInitialBooks();
     this.setupInfiniteScroll();
+  }
+
+  async loadUserPreferences() {
+    try {
+      const auth = getAuth();
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) return;
+        
+        try {
+          const userDoc = await getDoc(doc(db, 'users', user.uid));
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            this.preferences = data.preferences || { excludedKeywords: [], genres: [] };
+            
+            // Apply default filters from preferences
+            if (this.preferences.language) {
+              this.filters.language = this.preferences.language;
+              const langSelect = document.getElementById('language');
+              if (langSelect) langSelect.value = this.preferences.language;
+            }
+            
+            // Apply excluded keywords filtering
+            if (this.preferences.excludedKeywords && this.preferences.excludedKeywords.length > 0) {
+              this.updateActiveFilters();
+              this.resetAndReload();
+            }
+          }
+        } catch (error) {
+          console.warn('Could not load user preferences:', error);
+        }
+      });
+    } catch (error) {
+      console.warn('Could not initialize preferences loading:', error);
+    }
   }
 
   setupEventListeners() {
@@ -136,54 +187,132 @@ class ForestDiscovery {
   }
 
   async fetchBooks(page, filters) {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Shared sample data
-    const sampleBooks = (window.SAMPLE_BOOKS || []);
-
-    // Apply filters
-    let filteredBooks = [...sampleBooks];
-
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filteredBooks = filteredBooks.filter(book => 
-        book.title.toLowerCase().includes(searchTerm) ||
-        book.author.toLowerCase().includes(searchTerm) ||
-        book.tags.some(tag => tag.toLowerCase().includes(searchTerm))
-      );
-    }
-
-    if (filters.language) {
-      filteredBooks = filteredBooks.filter(book => book.language === filters.language);
-    }
-
-    if (filters.region) {
-      filteredBooks = filteredBooks.filter(book => book.region === filters.region);
-    }
-
-    // Apply sorting
-    switch (filters.sort) {
-      case 'popular':
-        filteredBooks.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'rating':
-        filteredBooks.sort((a, b) => b.rating - a.rating);
-        break;
-      case 'recent':
-        filteredBooks.sort((a, b) => b.year - a.year);
-        break;
-      case 'random':
-        filteredBooks = this.shuffleArray([...filteredBooks]);
-        break;
-    }
-
-    // Simulate pagination
-    const perPage = 6;
-    const start = page * perPage;
-    const end = start + perPage;
+    if (this.isLoading) return [];
     
-    return filteredBooks.slice(start, end);
+    try {
+      // Build Firestore query
+      let booksQuery = collection(db, 'books');
+      
+      // Apply filters
+      if (filters.language && filters.language !== '') {
+        booksQuery = query(booksQuery, where('language', '==', filters.language));
+      }
+      
+      if (filters.region && filters.region !== '') {
+        booksQuery = query(booksQuery, where('region', '==', filters.region));
+      }
+      
+      // Apply sorting
+      let sortField = 'createdAt';
+      let sortDirection = 'desc';
+      
+      switch (filters.sort) {
+        case 'popular':
+          sortField = 'popularity';
+          sortDirection = 'desc';
+          break;
+        case 'recent':
+          sortField = 'createdAt';
+          sortDirection = 'desc';
+          break;
+        case 'rating':
+          sortField = 'averageRating';
+          sortDirection = 'desc';
+          break;
+        case 'random':
+          // For random, we'll shuffle client-side after fetching
+          sortField = 'createdAt';
+          sortDirection = 'desc';
+          break;
+      }
+      
+      // Apply pagination
+      const pageSize = 12;
+      let paginatedQuery = query(
+        booksQuery,
+        orderBy(sortField, sortDirection),
+        limit(pageSize)
+      );
+      
+      // If not first page, use cursor pagination
+      if (page > 1 && this.lastDoc) {
+        paginatedQuery = query(
+          booksQuery,
+          orderBy(sortField, sortDirection),
+          startAfter(this.lastDoc),
+          limit(pageSize)
+        );
+      }
+      
+      const snapshot = await getDocs(paginatedQuery);
+      
+      if (snapshot.empty) {
+        return [];
+      }
+      
+      // Store last document for next page
+      this.lastDoc = snapshot.docs[snapshot.docs.length - 1];
+      
+      // Convert to book objects
+      const books = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          title: data.title || '',
+          author: data.author || '',
+          coverUrl: data.coverUrl || '',
+          language: data.language || 'en',
+          region: data.region || '',
+          year: data.publicationDate ? new Date(data.publicationDate).getFullYear() : null,
+          tags: data.categories || [],
+          popularity: data.popularity || 0,
+          averageRating: data.averageRating || 0,
+          reviewCount: data.reviewCount || 0,
+          copyFormat: data.copyFormat || '',
+          createdAt: data.createdAt?.toDate?.() || new Date()
+        };
+      });
+      
+      // Apply copy format filter if specified
+      if (filters.copyFormat && filters.copyFormat !== '') {
+        const filteredBooks = books.filter(book => {
+          if (!book.copyFormat) return true; // Include books without format data
+          return book.copyFormat === filters.copyFormat;
+        });
+        return filteredBooks;
+      }
+      
+      // Apply search filter client-side for now
+      if (filters.search && filters.search.trim() !== '') {
+        const searchTerm = filters.search.toLowerCase().trim();
+        return books.filter(book => {
+          const inTitle = book.title.toLowerCase().includes(searchTerm);
+          const inAuthor = book.author.toLowerCase().includes(searchTerm);
+          const inTags = book.tags.some(tag => tag.toLowerCase().includes(searchTerm));
+          return inTitle || inAuthor || inTags;
+        });
+      }
+      
+      // Apply excluded keywords filtering from user preferences
+      if (this.preferences && Array.isArray(this.preferences.excludedKeywords) && this.preferences.excludedKeywords.length > 0) {
+        const excludedTerms = this.preferences.excludedKeywords.map(term => term.toLowerCase().trim()).filter(Boolean);
+        return books.filter(book => {
+          const bookText = `${book.title} ${book.author} ${book.tags.join(' ')}`.toLowerCase();
+          return !excludedTerms.some(term => bookText.includes(term));
+        });
+      }
+      
+      // Apply random sorting if requested
+      if (filters.sort === 'random') {
+        return this.shuffleArray([...books]);
+      }
+      
+      return books;
+      
+    } catch (error) {
+      console.error('Error fetching books from Firestore:', error);
+      return [];
+    }
   }
 
   renderBooks(books) {
@@ -448,21 +577,7 @@ class ForestDiscovery {
     return `https://amazon.com/s?k=${searchQuery}&tag=${affiliateId}${ref?`&ref=${encodeURIComponent(ref)}`:''}`;
   }
 
-  getBookshopAffiliateLink(book) {
-    // Your Bookshop.org affiliate ID (get this from bookshop.org)
-    const affiliateId = "noctuaforest"; // Replace with your actual ID
-    
-    // If book has ISBN from Firestore/submission, use direct link
-    if (book.isbn) {
-        const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
-        return `https://bookshop.org/a/${affiliateId}/${book.isbn}${ref?`?ref=${encodeURIComponent(ref)}`:''}`;
-    }
-    
-    // Otherwise, search link
-    const searchQuery = encodeURIComponent(`${book.title} ${book.author}`);
-    const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
-    return `https://bookshop.org/search?keywords=${searchQuery}&affiliate=${affiliateId}${ref?`&ref=${encodeURIComponent(ref)}`:''}`;
-  }
+  // Bookshop affiliate links removed by product decision
 }
 
 // Global functions

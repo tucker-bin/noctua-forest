@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Book Reviews — Noctua Forest</title>
+    <meta name="description" content="Share your reading experiences with the community. Write authentic reviews, add mood tags, and help others discover great books." />
+    <link rel="stylesheet" href="assets/tailwind.css">
+    <link rel="stylesheet" href="assets/base-styles.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    <link rel="stylesheet" href="assets/nav.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-0ZWN1Z3DYQ');
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: #fbebcc;
+            color: #2D3748;
+        }
+    </style>
+  </head>
+  <body>
+    <a href="#nav" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to navigation</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to main content</a>
+
+    <!-- Main Container -->
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header/Navigation -->
+        <header class="flex justify-between items-center mb-12">
+            <a href="welcome.html" class="flex items-center space-x-3">
+                <img src="images/logo.png" alt="Noctua Forest Logo" width="40" height="40" decoding="async" class="w-10 h-10">
+                <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+            </a>
+            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
+                <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">The Forest</a>
+                <a href="reviews.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Write a Review</a>
+                <a href="help.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Help</a>
+                <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">About</a>
+            </nav>
+            <div class="flex items-center space-x-8">
+                <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                     <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+                <a href="account.html" class="hover:text-forest-accent transition-colors duration-300 nav-link" aria-label="Account">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </a>
+            </div>
+        </header>
+        <div id="navOverlay" class="nav-overlay"></div>
+        
+        <!-- Breadcrumb Navigation -->
+        <nav class="max-w-5xl mx-auto px-4 mb-6" aria-label="Breadcrumb">
+            <ol class="breadcrumb flex items-center space-x-2 text-sm">
+                <li><a href="welcome.html" class="hover:text-forest-accent transition-colors">Home</a></li>
+                <li><span class="mx-2">/</span></li>
+                <li class="breadcrumb-current" aria-current="page">Reviews</li>
+            </ol>
+        </nav>
+
+    <main id="main" class="max-w-4xl mx-auto px-4">
+        <article class="space-y-16">
+            <!-- Hero Section -->
+            <div class="text-center">
+                <h1 class="text-4xl font-bold mb-6 text-[#3A4440]" style="font-family: 'Poppins', sans-serif;">Share Your Reading Experience</h1>
+                <p class="text-xl mb-4 text-[#4A5450]">Help others discover great books through your authentic reviews</p>
+                <p class="text-lg text-[#4A5450]/80">Your reviews power our recommendation engine and help build meaningful reading lists</p>
+            </div>
+
+            <!-- How It Works -->
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-[#4A5450] rounded-xl p-6 text-white">
+                    <div class="text-forest-accent text-2xl font-bold mb-4">1</div>
+                    <h2 class="text-lg font-semibold mb-2">Write Authentic Reviews</h2>
+                    <p class="text-white/80">Share your genuine reading experience with mood tags and content warnings</p>
+                </div>
+                <div class="bg-[#4A5450] rounded-xl p-6 text-white">
+                    <div class="text-forest-accent text-2xl font-bold mb-4">2</div>
+                    <h2 class="text-lg font-semibold mb-2">Build Reading Lists</h2>
+                    <p class="text-white/80">Create curated lists of books you've actually read and loved</p>
+                </div>
+                <div class="bg-[#4A5450] rounded-xl p-6 text-white">
+                    <div class="text-forest-accent text-2xl font-bold mb-4">3</div>
+                    <h2 class="text-lg font-semibold mb-2">Earn While Sharing</h2>
+                    <p class="text-white/80">Get commissions when readers discover books through your authentic recommendations</p>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form id="submissionForm" class="bg-[#4A5450] rounded-xl p-8 text-white space-y-6" novalidate>
+                <div class="space-y-2">
+                    <label for="amazonUrl" class="block font-medium text-white mb-1">Amazon Book Link</label>
+                    <input id="amazonUrl" name="amazonUrl" type="url" required placeholder="https://amazon.com/dp/..."
+                        class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+                    <p class="text-sm text-gray-300">We'll fetch the book details automatically</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="title" class="block font-medium text-white mb-1">Book Title</label>
+                        <input id="title" name="title" type="text" required placeholder="Book Title" 
+                            class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+                    </div>
+                    <div class="space-y-2">
+                        <label for="author" class="block font-medium text-white mb-1">Author Name</label>
+                        <input id="author" name="author" type="text" required placeholder="Author Name" 
+                            class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="review" class="block font-medium text-white mb-1">Your Review</label>
+                    <textarea id="review" name="review" rows="5" required placeholder="Share your thoughts about this book..."
+                        class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200 resize-y"
+                        style="min-height: 140px; max-height: 600px; overflow-y: auto;"></textarea>
+                    <p class="text-sm text-gray-300">What did you like? What stood out? Who would enjoy this book?</p>
+                    
+                    <!-- Review Validation Feedback -->
+                    <div id="validationFeedback" class="hidden mt-3 p-3 rounded-lg border transition-all duration-300">
+                        <div class="flex items-start space-x-2">
+                            <div id="validationIcon" class="flex-shrink-0 mt-0.5"></div>
+                            <div class="flex-1">
+                                <div id="validationTitle" class="font-medium text-sm"></div>
+                                <div id="validationMessage" class="text-xs mt-1"></div>
+                                <div id="validationDetails" class="text-xs mt-2 space-y-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                  <div class="space-y-2">
+                    <label class="block font-medium text-white mb-1">How did you read it? (optional)</label>
+                    <select id="copyFormat" name="copyFormat" class="w-full px-4 py-2 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white">
+                      <option value="">Prefer not to say</option>
+                      <option value="print">Printed copy</option>
+                      <option value="ebook">E‑book</option>
+                      <option value="audiobook">Audiobook</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Mood & Experience Section -->
+                <fieldset class="space-y-6">
+                    <legend class="text-lg font-bold mb-4">Reading Experience</legend>
+                    
+                    <div class="space-y-4">
+                        <!-- Interest rating removed by product decision -->
+
+                        <div class="space-y-2">
+                            <label class="block font-medium text-white mb-2">What moods or feelings did this book evoke? (Select all that apply)</label>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="inspiring" class="mr-2">
+                                    <span>Inspiring</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="heartwarming" class="mr-2">
+                                    <span>Heartwarming</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="mysterious" class="mr-2">
+                                    <span>Mysterious</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="suspenseful" class="mr-2">
+                                    <span>Suspenseful</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="funny" class="mr-2">
+                                    <span>Funny</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="dark" class="mr-2">
+                                    <span>Dark</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="thoughtful" class="mr-2">
+                                    <span>Thoughtful</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="adventurous" class="mr-2">
+                                    <span>Adventurous</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="romantic" class="mr-2">
+                                    <span>Romantic</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="emotional" class="mr-2">
+                                    <span>Emotional</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="informative" class="mr-2">
+                                    <span>Informative</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="moods[]" value="relaxing" class="mr-2">
+                                    <span>Relaxing</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="space-y-2">
+                    <label for="contentWarnings" class="block font-medium text-white mb-1">Content Warnings</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contentWarnings[]" value="violence" class="mr-2">
+                            <span>Violence</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contentWarnings[]" value="sexual_content" class="mr-2">
+                            <span>Sexual Content</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contentWarnings[]" value="language" class="mr-2">
+                            <span>Strong Language</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contentWarnings[]" value="substance" class="mr-2">
+                            <span>Substance Use</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contentWarnings[]" value="trauma" class="mr-2">
+                            <span>Trauma</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contentWarnings[]" value="self_harm" class="mr-2">
+                            <span>Self Harm</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contentWarnings[]" value="eating" class="mr-2">
+                            <span>Eating Disorders</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" name="contentWarnings[]" value="phobias" class="mr-2">
+                            <span>Phobias</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="bg-[#5A6560] rounded-lg p-4 border border-[#7A8580]">
+                    <p class="font-bold mb-2">Reading Verification</p>
+                    <label class="flex items-center mb-2">
+                        <input type="checkbox" id="hasReadBook" name="hasReadBook" required class="mr-2">
+                        <span>I confirm that I have read this book</span>
+                    </label>
+                    <label class="flex items-center mb-2">
+                        <input type="checkbox" id="authenticReview" name="authenticReview" required class="mr-2">
+                        <span>This review is based on my genuine reading experience</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="noAI" name="noAI" required class="mr-2">
+                        <span>This review was written by me, not generated by AI</span>
+                    </label>
+                </div>
+
+                <div class="mt-8">
+                    <button type="submit" 
+                        class="w-full md:w-auto px-8 py-3 bg-[#F58220] hover:bg-[#E67615] text-white font-medium rounded-full transition duration-300">
+                        Submit Review
+                    </button>
+                    <p id="submissionSuccess" class="hidden mt-4 text-green-400">Thank you! Your review was received.</p>
+                </div>
+            </form>
+
+            <!-- Submission Modal -->
+            <div id="submissionModal" class="hidden fixed inset-0 bg-black/60 items-center justify-center">
+                <div class="bg-white rounded-xl w-full max-w-md mx-4 p-6">
+                    <h3 class="text-xl font-bold mb-2 text-[#4A5450]">Thanks for your review!</h3>
+                    <p id="submissionModalDesc" class="text-gray-700 mb-4">Your authentic review will appear on the book's page shortly.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="modalSubmitAnother" class="px-4 py-2 bg-[#F58220] hover:bg-[#E67615] text-white rounded-md">Review Another</button>
+                        <a id="modalViewDashboard" href="dashboard.html" class="px-4 py-2 text-center bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-md">Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <script type="module">
+      import { app, db } from './firebase-config.js';
+      import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+      import { collection, addDoc, serverTimestamp, doc, getDoc, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+      import showAlphaPopup from './components/AlphaPopup.js';
+      import { fetchBookMetadata, fillFormWithMetadata } from './js/amazonService.js';
+      import { searchBooks, extractASIN } from './js/bookSearchService.js';
+      import { validateReview, analyzeReviewForAI } from './js/reviewValidationService.js';
+      import { submitReview } from './js/reviewService.js';
+
+      const auth = getAuth(app);
+
+      // Show alpha popup on first visit
+      showAlphaPopup();
+
+      // Real-time review validation
+      const reviewTextarea = document.getElementById('review');
+      const validationFeedback = document.getElementById('validationFeedback');
+      let validationTimeout;
+
+      function autoResizeTextarea(el){
+        if (!el) return;
+        el.style.height = 'auto';
+        const newHeight = Math.min(el.scrollHeight + 2, 600);
+        el.style.height = newHeight + 'px';
+      }
+
+      // Initialize size once loaded
+      requestAnimationFrame(() => autoResizeTextarea(reviewTextarea));
+
+      reviewTextarea.addEventListener('input', (e) => {
+        const text = e.target.value.trim();
+
+        // Auto-resize as user types
+        autoResizeTextarea(reviewTextarea);
+        
+        // Clear any pending validation
+        if (validationTimeout) clearTimeout(validationTimeout);
+        
+        // Hide feedback if text is empty
+        if (!text) {
+          validationFeedback.classList.add('hidden');
+          return;
+        }
+        
+        // Wait for user to stop typing
+        validationTimeout = setTimeout(() => {
+          const analysis = analyzeReviewForAI(text);
+          updateValidationFeedback(analysis);
+        }, 1000);
+      });
+
+      function updateValidationFeedback(analysis) {
+        const icon = document.getElementById('validationIcon');
+        const title = document.getElementById('validationTitle');
+        const message = document.getElementById('validationMessage');
+        const details = document.getElementById('validationDetails');
+        
+        // Clear previous content
+        icon.innerHTML = '';
+        title.textContent = '';
+        message.textContent = '';
+        details.innerHTML = '';
+        
+        if (analysis.isLikelyAI) {
+          // High risk - show warning
+          icon.innerHTML = '⚠️';
+          title.textContent = 'AI Detection Alert';
+          title.className = 'font-medium text-sm text-red-400';
+          message.textContent = 'Your review appears to contain AI-generated content patterns.';
+          message.className = 'text-xs mt-1 text-red-300';
+          
+          // Show specific issues
+          if (analysis.reasons.length > 0) {
+            analysis.reasons.forEach(reason => {
+              const reasonDiv = document.createElement('div');
+              reasonDiv.className = 'text-red-300';
+              reasonDiv.textContent = `• ${reason}`;
+              details.appendChild(reasonDiv);
+            });
+          }
+          
+          validationFeedback.className = 'mt-3 p-3 rounded-lg border border-red-500 bg-red-900/20 transition-all duration-300';
+        } else if (analysis.confidence > 0.3) {
+          // Medium risk - show caution
+          icon.innerHTML = '💡';
+          title.textContent = 'Content Quality Tips';
+          title.className = 'font-medium text-sm text-yellow-400';
+          message.textContent = 'Consider making your review more personal and specific.';
+          message.className = 'text-xs mt-1 text-yellow-300';
+          
+          // Show suggestions
+          if (analysis.reasons.length > 0) {
+            analysis.reasons.forEach(reason => {
+              const reasonDiv = document.createElement('div');
+              reasonDiv.className = 'text-yellow-300';
+              reasonDiv.textContent = `• ${reason}`;
+              details.appendChild(reasonDiv);
+            });
+          }
+          
+          validationFeedback.className = 'mt-3 p-3 rounded-lg border border-yellow-500 bg-yellow-900/20 transition-all duration-300';
+        } else {
+          // Low risk - show positive feedback
+          icon.innerHTML = '✅';
+          title.textContent = 'Great Review!';
+          title.className = 'font-medium text-sm text-green-400';
+          message.textContent = 'Your review looks authentic and personal.';
+          message.className = 'text-xs mt-1 text-green-300';
+          
+          validationFeedback.className = 'mt-3 p-3 rounded-lg border border-green-500 bg-green-900/20 transition-all duration-300';
+        }
+        
+        validationFeedback.classList.remove('hidden');
+      }
+
+      async function getUserHistory(userId) {
+        try {
+          const reviewsRef = query(collection(db, 'reviews'), where('authorId', '==', userId), orderBy('createdAt', 'desc'), limit(10));
+          const snap = await getDocs(reviewsRef);
+          const reviews = snap.docs.map(d => ({ createdAt: d.data().createdAt?.toMillis?.() || Date.now(), text: d.data().text || '' }));
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          const createdAt = userDoc.exists() && userDoc.data().createdAt?.toMillis ? userDoc.data().createdAt.toMillis() : Date.now() - 7*24*60*60*1000;
+          return { reviews, accountAge: createdAt, reviewCount: reviews.length };
+        } catch (_) {
+          return { reviews: [], accountAge: Date.now() - 7*24*60*60*1000, reviewCount: 0 };
+        }
+      }
+
+      // Handle Amazon URL input
+      const amazonUrlInput = document.getElementById('amazonUrl');
+      let lastUrl = '';
+      let fetchTimeout;
+
+      amazonUrlInput.addEventListener('input', (e) => {
+        const url = e.target.value.trim();
+        if (url === lastUrl) return;
+        lastUrl = url;
+
+        // Clear any pending fetch
+        if (fetchTimeout) clearTimeout(fetchTimeout);
+
+        // Wait for user to stop typing
+        fetchTimeout = setTimeout(async () => {
+          if (!url) return;
+          
+          try {
+            const loadingMsg = document.createElement('p');
+            loadingMsg.id = 'fetchingMetadata';
+            loadingMsg.className = 'text-sm text-gray-300 mt-1';
+            loadingMsg.textContent = 'Fetching book details...';
+            amazonUrlInput.parentNode.appendChild(loadingMsg);
+
+            // First check if we already have this book
+            const asin = extractASIN(url);
+            if (asin) {
+              const result = await searchBooks({ asin });
+              if (result.found) {
+                loadingMsg.className = 'text-sm text-forest-accent mt-1';
+                loadingMsg.textContent = 'Book found in The Forest! Redirecting to add your review...';
+                setTimeout(() => {
+                  window.location.href = `book.html?id=${result.book.id}#review`;
+                }, 1500);
+                return;
+              }
+            }
+
+            // If not found, fetch from Amazon
+            const metadata = await fetchBookMetadata(url);
+            
+            // Check for duplicates by ISBN
+            if (metadata.isbn) {
+              const result = await searchBooks({ isbn: metadata.isbn });
+              if (result.found) {
+                loadingMsg.className = 'text-sm text-forest-accent mt-1';
+                loadingMsg.textContent = 'Book found in The Forest! Redirecting to add your review...';
+                setTimeout(() => {
+                  window.location.href = `book.html?id=${result.book.id}#review`;
+                }, 1500);
+                return;
+              }
+            }
+
+            // Fill form if no duplicates found
+            fillFormWithMetadata(metadata);
+            loadingMsg.textContent = 'Book details loaded!';
+            setTimeout(() => loadingMsg.remove(), 3000);
+          } catch (err) {
+            const errorMsg = document.getElementById('fetchingMetadata');
+            if (errorMsg) {
+              errorMsg.className = 'text-sm text-red-400 mt-1';
+              errorMsg.textContent = err.message;
+              setTimeout(() => errorMsg.remove(), 5000);
+            }
+          }
+        }, 1000);
+      });
+
+      // Initialize form handler
+      document.getElementById('submissionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        let data = Object.fromEntries(new FormData(form));
+
+        // Get selected moods
+        const moods = Array.from(form.querySelectorAll('input[name="moods[]"]:checked'))
+          .map(input => input.value);
+        data.moods = moods;
+
+        // Get selected content warnings
+        const warnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked'))
+          .map(input => input.value);
+        data.contentWarnings = warnings;
+        // Optional copy format
+        data.copyFormat = (form.querySelector('#copyFormat')?.value || '').trim();
+
+        // Validate reading verification
+        if (!data.hasReadBook || !data.authenticReview || !data.noAI) {
+          alert('Please complete all reading verification checks before submitting your review.');
+          return;
+        }
+
+        // Ensure authentication
+        if (!auth.currentUser) {
+          sessionStorage.setItem('savedFormData', JSON.stringify({ type: 'bookReview', data }));
+          alert('Please sign in to submit your review. Your form has been saved.');
+          window.location.href = 'account.html';
+          return;
+        }
+
+        // Comprehensive review validation
+        try {
+          const history = await getUserHistory(auth.currentUser.uid);
+          const validation = validateReview({
+            text: data.review,
+            hasReadBook: !!data.hasReadBook,
+            authenticReview: !!data.authenticReview,
+            noAI: !!data.noAI
+          }, history);
+          if (!validation.isValid) {
+            alert(`Review validation failed:\n${validation.issues.join('\n')}`);
+            return;
+          }
+          if (validation.requiresModeration) {
+            const riskLevel = validation.riskLevel;
+            if (riskLevel === 'critical') {
+              alert('Your review appears to be AI-generated and cannot be submitted. Please write a personal, authentic review.');
+              return;
+            }
+            if (!confirm('Your review will go to moderation to protect our recommendation engine. Proceed?')) {
+              return;
+            }
+          }
+        } catch (err) {
+          console.error('Validation error:', err);
+          alert('Review validation failed. Please try again.');
+          return;
+        }
+
+        try {
+          // Final duplicate check before submission
+          const asin = extractASIN(data.amazonUrl);
+          if (asin) {
+            const result = await searchBooks({ asin });
+            if (result.found) {
+              window.location.href = `book.html?id=${result.book.id}#review`;
+              return;
+            }
+          }
+
+          // Fetch final metadata
+          const metadata = await fetchBookMetadata(data.amazonUrl);
+          
+          // Check for duplicates by ISBN
+          if (metadata.isbn) {
+            const result = await searchBooks({ isbn: metadata.isbn });
+            if (result.found) {
+              window.location.href = `book.html?id=${result.book.id}#review`;
+              return;
+            }
+          }
+
+          // Check for duplicates by title/author
+          const result = await searchBooks({ title: data.title, author: data.author });
+          if (result.found) {
+            if (confirm('We found a similar book in The Forest. Would you like to review that one instead?')) {
+              window.location.href = `book.html?id=${result.book.id}#review`;
+              return;
+            }
+          }
+
+          // Prepare and create book document
+          const bookPayload = {
+            title: data.title,
+            author: data.author,
+            amazonUrl: data.amazonUrl,
+            asin: metadata.asin || asin || '',
+            isbn: metadata.isbn || '',
+            coverUrl: metadata.coverUrl || '',
+            publisher: metadata.publisher || '',
+            publicationDate: metadata.publicationDate || '',
+            pageCount: metadata.pageCount || null,
+            categories: metadata.categories || [],
+            status: 'active',
+            createdBy: auth.currentUser.uid,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          };
+
+          const bookRef = await addDoc(collection(db, 'books'), bookPayload);
+
+          // Submit the review
+          const createdReview = await submitReview({
+            bookId: bookRef.id,
+            text: data.review,
+            authorId: auth.currentUser.uid,
+            authorAvatarUrl: auth.currentUser.photoURL || '',
+            // interestLevel removed,
+            moods: data.moods || [],
+            contentWarnings: data.contentWarnings || [],
+            copyFormat: data.copyFormat || '',
+            hasReadBook: !!data.hasReadBook,
+            authenticReview: !!data.authenticReview,
+            noAI: !!data.noAI
+          });
+
+          // If validation indicated moderation, create a flagged_content record (post-submit)
+          try {
+            if (validation?.requiresModeration) {
+              await addDoc(collection(db, 'flagged_content'), {
+                reviewId: createdReview?.id || null,
+                authorId: auth.currentUser.uid,
+                riskLevel: validation.riskLevel,
+                reasons: validation.issues || [],
+                aiConfidence: validation.aiAnalysis?.confidence || 0,
+                behaviorConfidence: validation.behaviorAnalysis?.confidence || 0,
+                status: 'pending',
+                createdAt: serverTimestamp()
+              });
+            }
+          } catch (_) {}
+
+          showSubmissionModal({ title: data.title });
+        } catch (error) {
+          console.error('Submission failed:', error);
+          alert('Failed to submit review. Please try again.');
+        }
+      });
+
+      // Modal controller for submission
+      window.showSubmissionModal = ({ title }) => {
+        const modal = document.getElementById('submissionModal');
+        const desc = document.getElementById('submissionModalDesc');
+        const submitAnother = document.getElementById('modalSubmitAnother');
+        if (!modal) return;
+        if (title) desc.textContent = `"${title}" was received. Your review will appear shortly.`;
+
+        // Submit another (refresh form)
+        submitAnother.onclick = () => {
+          modal.classList.add('hidden');
+          try { document.getElementById('submissionForm').reset(); } catch (_) {}
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // Show modal
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      };
+
+      // Restore form data if returning from signup
+      const savedFormData = sessionStorage.getItem('savedFormData');
+      if (savedFormData) {
+        const { type, data } = JSON.parse(savedFormData);
+        if (type === 'bookReview') {
+          Object.entries(data).forEach(([key, value]) => {
+            const input = document.getElementById(key);
+            if (input) {
+              if (input.type === 'checkbox') {
+                input.checked = value === 'on' || value === true;
+              } else {
+                input.value = value;
+              }
+            }
+          });
+          // Clear saved data
+          sessionStorage.removeItem('savedFormData');
+        }
+      }
+    </script>
+
+    <!-- Global Footer with Google Translate -->
+    <script src="assets/footer.js"></script>
+    
+    <script src="assets/nav.js"></script>
+  </body>
+</html>

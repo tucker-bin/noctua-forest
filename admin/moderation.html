@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Moderation Queue — Noctua Forest</title>
+    <link rel="stylesheet" href="../assets/tailwind.css">
+    <link rel="stylesheet" href="../assets/base-styles.css">
+  </head>
+  <body class="bg-[#fbebcc] text-[#2D3748]">
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 class="text-2xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color:#3A4440;">Moderation Queue</h1>
+      <div id="queue" class="grid gap-4"></div>
+    </main>
+
+    <script type="module">
+      import { app, db } from '../firebase-config.js';
+      import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+      import { collection, query, where, orderBy, limit, getDocs, doc, deleteDoc, setDoc, serverTimestamp, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+      const auth = getAuth(app);
+      const queueEl = document.getElementById('queue');
+
+      async function ensureAdmin(){
+        return new Promise((resolve) => {
+          auth.onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = '../account.html'; return; }
+            try {
+              const u = await getDoc(doc(db, 'users', user.uid));
+              if (!u.exists() || !u.data().isAdmin) { window.location.href = '../dashboard.html'; return; }
+              resolve(user);
+            } catch (_) { window.location.href = '../dashboard.html'; }
+          });
+        });
+      }
+
+      await ensureAdmin();
+
+      async function loadQueue(){
+        queueEl.innerHTML = '';
+        const q = query(
+          collection(db, 'flagged_content'),
+          where('status', '==', 'pending'),
+          orderBy('createdAt','desc'),
+          limit(50)
+        );
+        const snap = await getDocs(q);
+        if (snap.empty){
+          queueEl.innerHTML = '<div class="text-[#4A5450]">No items pending moderation.</div>';
+          return;
+        }
+        snap.forEach(docSnap => {
+          const item = docSnap.data();
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-lg shadow p-4 border border-[#E5E7EB]';
+          card.innerHTML = `
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-sm text-[#6B7280]">Review ID: ${item.reviewId || '—'}</div>
+                <div class="text-sm text-[#6B7280]">Author: ${item.authorId || '—'}</div>
+                <div class="text-sm text-[#6B7280]">Risk: <span class="font-semibold">${item.riskLevel}</span> (AI ${Math.round((item.aiConfidence||0)*100)}%, Behavior ${Math.round((item.behaviorConfidence||0)*100)}%)</div>
+                <div class="text-sm text-[#6B7280]">Reasons: ${(item.reasons||[]).join(', ') || '—'}</div>
+              </div>
+              <div class="flex gap-2">
+                <button class="approve px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded">Approve</button>
+                <button class="remove px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded">Remove</button>
+              </div>
+            </div>
+          `;
+          card.querySelector('.approve').onclick = async (e) => {
+            const btn = e.currentTarget;
+            const other = card.querySelector('.remove');
+            btn.disabled = true; other.disabled = true;
+            const prev = btn.textContent; btn.textContent = 'Approving...';
+            await setDoc(doc(db, 'flagged_content', docSnap.id), { status: 'approved', moderatedAt: serverTimestamp() }, { merge: true });
+            await loadQueue();
+          };
+          card.querySelector('.remove').onclick = async (e) => {
+            const btn = e.currentTarget;
+            const other = card.querySelector('.approve');
+            btn.disabled = true; other.disabled = true;
+            const prev = btn.textContent; btn.textContent = 'Removing...';
+            try {
+              if (item.reviewId) await deleteDoc(doc(db, 'reviews', item.reviewId));
+            } catch(_) {}
+            await setDoc(doc(db, 'flagged_content', docSnap.id), { status: 'removed', moderatedAt: serverTimestamp() }, { merge: true });
+            await loadQueue();
+          };
+          queueEl.appendChild(card);
+        });
+      }
+
+      loadQueue();
+    </script>
+    
+    <!-- Global Footer with Google Translate -->
+    <script src="../assets/footer.js"></script>
+  </body>
+</html>

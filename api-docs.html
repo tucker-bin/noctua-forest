@@ -63,7 +63,7 @@
             </a>
             <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
                 <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#4A5450">The Forest</a>
-                <a href="submit.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#4A5450">Submit Book</a>
+                <a href="reviews.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#4A5450">Write a Review</a>
                 <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#4A5450">About</a>
             </nav>
             <div class="flex items-center gap-2">
@@ -287,5 +287,8 @@ fetch('https://noctuaforest.com/api/books/midnight-calculations')
     if (btn) btn.addEventListener('touchend', (e)=>{ e.preventDefault(); toggleMobileMenu(); }, { passive: false });
   });
 </script>
+  
+  <!-- Global Footer with Google Translate -->
+  <script src="assets/footer.js"></script>
 </body>
 </html>

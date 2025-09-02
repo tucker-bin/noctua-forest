@@ -24,7 +24,7 @@
             </a>
             <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
                 <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">The Forest</a>
-                <a href="submit.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Submit Book</a>
+                <a href="reviews.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Write a Review</a>
                 <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">About</a>
             </nav>
             <div class="flex items-center space-x-8">
@@ -76,7 +76,7 @@
                         </div>
                     </div>
 
-                    <!-- Stats (for creators/admins) -->
+                    <!-- Stats (for curators/admins) -->
                     <div id="listStats" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-[#3A4440] rounded-lg p-4">
                             <h3 class="text-sm font-medium text-white/60 mb-2">Languages</h3>
@@ -215,22 +215,22 @@
                     </a>
                 `).join('');
 
-                // Check if user is creator/admin
-                let isCreatorOrAdmin = false;
+                // Check if user is curator/admin
+                let isCuratorOrAdmin = false;
                 if (auth.currentUser) {
                     try {
                         const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
                         if (userDoc.exists()) {
                             const userData = userDoc.data();
-                            isCreatorOrAdmin = userData.isAdmin || userData.applicationStatus === 'approved';
+                            isCuratorOrAdmin = userData.isAdmin || userData.applicationStatus === 'approved';
                         }
                     } catch (err) {
                         console.warn('Failed to check user status:', err);
                     }
                 }
 
-                // Show stats for creators/admins
-                if (isCreatorOrAdmin) {
+                // Show stats for curators/admins
+                if (isCuratorOrAdmin) {
                     const { stats } = list;
                     const chartOptions = {
                         responsive: true,
@@ -333,9 +333,9 @@
 
                 shareBtn.addEventListener('click', () => {
                     const shareUrl = new URL(window.location.href);
-                    if (list.creatorId) {
-                        shareUrl.searchParams.set('ref', list.creatorId);
-                    }
+                            if (list.curatorId) {
+            shareUrl.searchParams.set('ref', list.curatorId);
+        }
                     shareLink.value = shareUrl.toString();
                     shareModal.classList.remove('hidden');
                     shareModal.classList.add('flex');
@@ -380,5 +380,8 @@
 
         loadList();
     </script>
+    
+    <!-- Global Footer with Google Translate -->
+    <script src="assets/footer.js"></script>
 </body>
 </html>
