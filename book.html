@@ -9,6 +9,12 @@
   <meta name="apple-mobile-web-app-title" content="Noctua Forest">
   <meta name="theme-color" content="#4A5450">
   <title>Book — Noctua Forest</title>
+  <meta name="description" content="Discover authentic reader reviews and book recommendations on Noctua Forest. Join our Night Owl community for curated book discovery.">
+  <meta property="og:title" content="Book — Noctua Forest">
+  <meta property="og:description" content="Discover authentic reader reviews and book recommendations on Noctua Forest.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://noctuaforest.com/book.html">
   <link rel="stylesheet" href="assets/tailwind.css">
   <link rel="stylesheet" href="assets/base-styles.css">
   <link rel="stylesheet" href="assets/nav.css">
@@ -179,6 +185,34 @@
         <li id="breadcrumbBookTitle" class="breadcrumb-current" aria-current="page">Book Details</li>
       </ol>
     </nav>
+
+    <!-- Breadcrumb Structured Data -->
+    <script type="application/ld+json" id="breadcrumbSchema">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://noctuaforest.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "The Forest",
+          "item": "https://noctuaforest.com/forest.html"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Book Details",
+          "item": "https://noctuaforest.com/book.html"
+        }
+      ]
+    }
+    </script>
 
     <main id="main" class="max-w-5xl mx-auto" role="main">
       <div id="loading" class="text-center text-[#3A4440]" role="status" aria-live="polite">Loading…</div>
@@ -883,7 +917,7 @@
           }
         }
         
-        // Update Book Schema Markup
+        // Update Book Schema Markup with comprehensive data for LLMs
         const bookSchema = document.getElementById('bookSchema');
         if (bookSchema) {
           const schema = {
@@ -894,17 +928,34 @@
               "@type": "Person",
               "name": b.author || "Unknown"
             },
-            "description": "",
             "datePublished": b.publicationYear || "",
             "inLanguage": b.primaryLanguage || "en",
+            "genre": b.categories || b.authorTags || "",
             "publisher": {
               "@type": "Organization", 
-              "name": "Noctua Forest"
+              "name": b.publisher || "Independent"
             },
+            "isbn": b.isbn || "",
+            "url": window.location.href,
+            "image": b.coverUrl || "",
             "offers": {
               "@type": "Offer",
               "availability": "https://schema.org/InStock",
-              "url": (document.getElementById('purchaseLink')?.href) || window.location.href
+              "url": (document.getElementById('purchaseLink')?.href) || window.location.href,
+              "seller": {
+                "@type": "Organization",
+                "name": "Amazon"
+              }
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "0",
+              "reviewCount": "0",
+              "description": "Community reviews focus on authentic reading experiences rather than numerical ratings"
+            },
+            "mainEntityOfPage": {
+              "@type": "WebPage",
+              "@id": window.location.href
             }
           };
           bookSchema.textContent = JSON.stringify(schema, null, 2);

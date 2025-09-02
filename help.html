@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Help Center — Noctua Forest</title>
     <meta name="description" content="Find answers to common questions about Noctua Forest, Night Owl membership, book reviews, and more.">
+    <meta property="og:title" content="Help Center — Noctua Forest">
+    <meta property="og:description" content="Get help with Noctua Forest book discovery, reviews, and Night Owl membership.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://noctuaforest.com/help.html">
     <link rel="stylesheet" href="assets/tailwind.css">
     <link rel="stylesheet" href="assets/base-styles.css">
     <link rel="icon" type="image/png" href="favicon.png">
@@ -14,6 +19,40 @@
     
     <!-- Global Footer with Google Translate -->
     <script src="assets/footer.js"></script>
+    
+    <!-- FAQ Page Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What do I get with a staff review?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A ~500-word editorial from our team with 1–2 pull quotes and context for readers. Your review is pinned on your deep book page and can be excerpted on your site with attribution."
+          }
+        },
+        {
+          "@type": "Question", 
+          "name": "How do Night Owl commissions work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "All Night Owl members automatically participate in our curator program. You earn commissions when readers purchase books through your shared lists. Commission rates start at 1.5% and increase based on monthly sales volume."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are your review guidelines?",
+          "acceptedAnswer": {
+            "@type": "Answer", 
+            "text": "Reviews must be authentic and based on your actual reading experience. AI-generated reviews are strictly prohibited. You must verify that you've read the book before reviewing."
+          }
+        }
+      ]
+    }
+    </script>
     
     <style>
         body { font-family: 'Noto Sans', sans-serif; background-color: #fbebcc; }
