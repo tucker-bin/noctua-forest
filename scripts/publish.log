@@ -1,3 +1,12 @@
 ==== PUBLISH Tue 09/02/2025 16:17:52.54 ==== 
 true
 https://github.com/tucker-bin/my-ryhme-app.git
+warning: in the working copy of 'forest.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/publish.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'welcome.html', LF will be replaced by CRLF the next time Git touches it
+[main 035a410] publish: site update
+ 6 files changed, 241 insertions(+), 692 deletions(-)
+Pushing to origin/main with --force-with-lease ... 
+branch 'main' set up to track 'origin/main'.
+To https://github.com/tucker-bin/my-ryhme-app.git
+   5dfa17f..035a410  main -> main

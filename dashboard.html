@@ -339,8 +339,27 @@
                     </div>
                 </div>
                 <!-- Performance Analytics -->
-                <div class="mt-8 bg-forest-secondary rounded-xl p-6 text-white">
-                    <h3 class="text-lg font-semibold mb-4">Performance Analytics</h3>
+                <div class="mt-8 bg-forest-secondary rounded-xl p-6 text-white relative">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold">Performance Analytics</h3>
+                        <div class="bg-forest-accent px-3 py-1 rounded-full text-xs font-medium">
+                            Curator Plus
+                        </div>
+                    </div>
+                    
+                    <!-- Locked State Overlay -->
+                    <div id="analyticsLocked" class="absolute inset-0 bg-black/60 rounded-xl flex items-center justify-center z-10">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 mx-auto mb-4 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            <h4 class="text-lg font-semibold text-white mb-2">Unlock full insights with Curator Plus</h4>
+                            <p class="text-white/80 mb-4">Get detailed analytics, customizable landing pages, and more.</p>
+                            <a href="membership.html" class="inline-block bg-forest-accent hover:bg-[#E0751C] text-white font-semibold py-2 px-6 rounded-full transition duration-300">
+                                Learn about Curator Plus
+                            </a>
+                        </div>
+                    </div>
                     <div class="grid md:grid-cols-3 gap-6 mb-6">
                         <div class="bg-[#3A4440] rounded-lg p-4">
                             <h4 class="text-sm font-medium text-white/70 mb-1">Total Earnings</h4>
@@ -696,12 +715,29 @@
             // Check if admin (gracefully handle permission-denied)
             try {
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
-                if (userDoc.exists() && userDoc.data().isAdmin) {
+                const userData = userDoc.exists() ? userDoc.data() : {};
+                
+                if (userData.isAdmin) {
                     window.location.href = 'admin/dashboard.html';
                     return;
                 }
+                
+                // Check Curator Plus membership status
+                const analyticsLocked = document.getElementById('analyticsLocked');
+                if (analyticsLocked) {
+                    if (userData.membership === 'active' || userData.curatorPlus === true) {
+                        analyticsLocked.style.display = 'none';
+                    } else {
+                        analyticsLocked.style.display = 'flex';
+                    }
+                }
             } catch (err) {
                 console.warn('User admin check failed (continuing as non-admin):', err);
+                // Show locked state as fallback
+                const analyticsLocked = document.getElementById('analyticsLocked');
+                if (analyticsLocked) {
+                    analyticsLocked.style.display = 'flex';
+                }
             }
 
             // Display user info

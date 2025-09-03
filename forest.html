@@ -49,7 +49,7 @@
                 </a>
             </div>
         </header>
-    </div>
+        </div>
 
     <!-- Hero Section -->
     <main>
@@ -64,20 +64,20 @@
                         <div class="flex-1">
                             <input type="text" id="searchInput" placeholder="Search books, authors, or moods..." 
                                    class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-forest-accent focus:border-transparent text-lg">
-                        </div>
+            </div>
                         <div class="flex gap-3">
                             <select id="languageFilter" class="px-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-forest-accent">
-                                <option value="">All Languages</option>
-                                <option value="en">English</option>
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                                <option value="ja">Japanese</option>
-                                <option value="zh">Chinese</option>
-                                <option value="ar">Arabic</option>
-                            </select>
+                        <option value="">All Languages</option>
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="ja">Japanese</option>
+                        <option value="zh">Chinese</option>
+                        <option value="ar">Arabic</option>
+                    </select>
                             <select id="regionFilter" class="px-4 py-4 rounded-xl bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-forest-accent">
-                                <option value="">All Regions</option>
+                        <option value="">All Regions</option>
                                 <option value="us">United States</option>
                                 <option value="uk">United Kingdom</option>
                                 <option value="ca">Canada</option>
@@ -89,10 +89,10 @@
                                 <option value="print">Print</option>
                                 <option value="ebook">E-book</option>
                                 <option value="audiobook">Audiobook</option>
-                            </select>
-                        </div>
-                    </div>
-                    
+                    </select>
+                </div>
+            </div>
+            
                     <div class="flex flex-wrap gap-2 justify-center">
                         <button class="mood-filter px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors" data-mood="adventurous">Adventurous</button>
                         <button class="mood-filter px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors" data-mood="emotional">Emotional</button>
@@ -100,7 +100,7 @@
                         <button class="mood-filter px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors" data-mood="mysterious">Mysterious</button>
                         <button class="mood-filter px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors" data-mood="inspiring">Inspiring</button>
                         <button class="mood-filter px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors" data-mood="romantic">Romantic</button>
-                    </div>
+                </div>
                 </div>
             </div>
         </section>
@@ -123,19 +123,19 @@
                 <div id="loadingState" class="text-center py-12">
                     <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-forest-accent"></div>
                     <p class="mt-4 text-gray-600">Loading books...</p>
-                </div>
+        </div>
 
                 <!-- Books Grid -->
                 <div id="booksGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                     <!-- Books will be populated here -->
-                </div>
+        </div>
 
                 <!-- Load More Button -->
                 <div class="text-center">
                     <button id="loadMoreBtn" class="hidden px-8 py-3 bg-forest-accent hover:bg-forest-accent-hover text-white font-semibold rounded-full transition-all duration-300">
                         Load More Books
-                    </button>
-                </div>
+            </button>
+        </div>
 
                 <!-- Empty State -->
                 <div id="emptyState" class="hidden text-center py-16">
@@ -152,13 +152,15 @@
                 </div>
             </div>
             <div id="membershipCTA" class="hidden mt-8 bg-forest-card rounded-xl p-8 max-w-2xl mx-auto">
-                <h3 class="text-xl font-bold text-white mb-3">Become a Night Owl Curator</h3>
-                <p class="text-white/80 mb-4">Join our community of book lovers who share authentic recommendations and earn commissions when readers discover great books through your curated lists.</p>
+                <h3 class="text-xl font-bold text-white mb-3">Everything you need is free</h3>
+                <p class="text-white/80 mb-4">Write reviews, create lists, and earn commissions — all free. Curator Plus adds optional tools for curators who want more insight and polish.</p>
                 <div class="flex flex-col sm:flex-row gap-3 items-center">
-                    <a href="membership.html" class="inline-block bg-forest-accent hover:bg-forest-accent-hover text-white font-bold py-3 px-6 rounded-full transition-all duration-300">
-                        Join the Night Owls
+                    <a href="dashboard.html" class="inline-block bg-white/10 hover:bg-white/20 text-white border border-white/20 font-bold py-3 px-6 rounded-full transition-all duration-300">
+                        Start free
                     </a>
-                    <span class="text-white/60 text-sm">$2.95/month • Cancel anytime</span>
+                    <a href="membership.html" class="inline-block bg-forest-accent hover:bg-forest-accent-hover text-white font-bold py-3 px-6 rounded-full transition-all duration-300">
+                        Learn about Curator Plus
+                    </a>
                 </div>
             </div>
         </div>
@@ -182,11 +184,11 @@
                 const userData = userDoc.data();
                 
                 // Show membership CTA if user is not a member
-                const membershipCTA = document.getElementById('membershipCTA');
-                if (!membershipCTA) return;
-                
+            const membershipCTA = document.getElementById('membershipCTA');
+            if (!membershipCTA) return;
+
                 if (!userData?.membership || userData.membership !== 'active') {
-                    membershipCTA.classList.remove('hidden');
+                membershipCTA.classList.remove('hidden');
                 } else {
                     membershipCTA.classList.add('hidden');
                 }
