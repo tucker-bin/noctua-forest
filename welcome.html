@@ -261,59 +261,21 @@
                         </div>
                     </div>
 
-                    <!-- Tabs -->
-                    <div class="flex flex-col sm:flex-row gap-3 mb-8">
-                        <button id="tab-readers" aria-selected="true" class="w-full sm:w-auto text-center whitespace-nowrap px-5 py-2.5 rounded-full bg-[#F58220] text-white shadow">Readers</button>
-                        <button id="tab-writers" aria-selected="false" class="w-full sm:w-auto text-center whitespace-nowrap px-5 py-2.5 rounded-full bg-white/10 text-white/90 hover:bg-white/20 border border-white/20">Writers</button>
-                        <button id="tab-creators" aria-selected="false" class="w-full sm:w-auto text-center whitespace-nowrap px-5 py-2.5 rounded-full bg-white/10 text-white/90 hover:bg-white/20 border border-white/20">Night Owls</button>
-                    </div>
-
-                    <!-- Panels -->
-                    <div id="panel-readers" class="grid md:grid-cols-2 gap-8 items-stretch">
+                    <!-- Unified Night Owl Identity -->
+                    <div class="grid md:grid-cols-2 gap-8 items-stretch">
                         <div class="bg-forest-card text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
-                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Why readers love Noctua</h3>
+                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">What Night Owls do</h3>
                             <ul class="list-disc pl-5 space-y-3 text-white/90 leading-relaxed">
-                                <li>Find books that match your current mood and pace</li>
-                                <li>Track your reading habits with insightful stats</li>
-                                <li>Discover books through curated lists from fellow Night Owls</li>
+                                <li>Discover books that match your current mood and pace</li>
+                                <li>Share authentic reviews that help others find their next read</li>
+                                <li>Create curated lists and earn commissions on books others discover</li>
+                                <li>Build your reputation as a trusted book curator</li>
                             </ul>
                             <a href="forest.html" class="inline-block mt-6 px-8 py-3 md:px-9 md:py-3.5 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Explore the Forest</a>
                         </div>
                         <div class="bg-forest-secondary text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
-                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Curated for quality</h3>
-                            <p class="text-white/90 leading-relaxed">Our boutique approach emphasizes thoughtful discovery over volume. Every book earns its place among the trees.</p>
-                        </div>
-                    </div>
-
-                    <div id="panel-writers" class="hidden grid md:grid-cols-2 gap-8 items-stretch">
-                        <div class="bg-forest-card text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
-                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Why writers choose Noctua</h3>
-                            <ul class="list-disc pl-5 space-y-3 text-white/90 leading-relaxed">
-                                <li>Submit your manuscript and reach engaged readers</li>
-                                <li>Gain visibility in a curated discovery feed</li>
-                                <li>Optional staff review for detailed feedback</li>
-                            </ul>
-                            <a href="reviews.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Write a Review</a>
-                        </div>
-                        <div class="bg-forest-secondary text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
-                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Support that scales</h3>
-                            <p class="text-white/90 leading-relaxed">From first submission to featured spotlights, we help your work meet the right readers—without the noise.</p>
-                        </div>
-                    </div>
-
-                    <div id="panel-creators" class="hidden grid md:grid-cols-2 gap-8 items-stretch">
-                        <div class="bg-forest-card text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
-                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Share your reading journey</h3>
-                            <ul class="list-disc pl-5 space-y-3 text-white/90 leading-relaxed">
-                                <li>Create and share themed reading lists</li>
-                                <li>Earn commissions on books others discover through your lists</li>
-                                <li>Build your reputation as a trusted book curator</li>
-                            </ul>
-                            <a href="membership.html" class="inline-block mt-6 px-7 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full">Join as a Night Owl</a>
-                        </div>
-                        <div class="bg-forest-secondary text-white rounded-xl px-6 py-10 md:px-8 min-h-[260px]">
-                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">Grow with the community</h3>
-                            <p class="text-white/90 leading-relaxed">As you share quality recommendations, you'll unlock higher commission tiers and recognition within the Forest.</p>
+                            <h3 class="text-2xl font-bold mb-4 text-white" style="font-family: 'Poppins', sans-serif;">One identity, many ways to participate</h3>
+                            <p class="text-white/90 leading-relaxed">Whether you're reading, writing, or curating, you're a Night Owl. Our community celebrates the unified identity of book lovers who share their passion and help others discover great reads.</p>
                         </div>
                     </div>
                 </div>
@@ -419,40 +381,7 @@
       // Show alpha popup
       showAlphaPopup();
 
-              // Tabs logic (Readers / Writers / Night Owls)
-        const tabReaders = document.getElementById('tab-readers');
-        const tabWriters = document.getElementById('tab-writers');
-        const tabCreators = document.getElementById('tab-creators');
-        const panelReaders = document.getElementById('panel-readers');
-        const panelWriters = document.getElementById('panel-writers');
-        const panelCreators = document.getElementById('panel-creators');
 
-        function selectTab(which){
-            const tabs = {
-                readers: { tab: tabReaders, panel: panelReaders },
-                writers: { tab: tabWriters, panel: panelWriters },
-                creators: { tab: tabCreators, panel: panelCreators },
-            };
-        Object.entries(tabs).forEach(([key, nodes]) => {
-          const { tab, panel } = nodes;
-          if (!tab || !panel) return;
-          const active = key === which;
-          panel.classList.toggle('hidden', !active);
-          panel.classList.toggle('grid', active);
-          tab.setAttribute('aria-selected', active ? 'true' : 'false');
-          if (active){
-            tab.classList.remove('bg-white/10','text-white/90','border','border-white/20');
-            tab.classList.add('bg-[#F58220]','text-white','shadow');
-        } else {
-            tab.classList.remove('bg-[#F58220]','text-white','shadow');
-            tab.classList.add('bg-white/10','text-white/90','border','border-white/20');
-          }
-        });
-      }
-
-      tabReaders?.addEventListener('click', () => selectTab('readers'));
-      tabWriters?.addEventListener('click', () => selectTab('writers'));
-      tabCreators?.addEventListener('click', () => selectTab('creators'));
 
       // Try to load curated books from Firestore for the carousel
       (async function loadCuratedReviews(){
