@@ -103,10 +103,12 @@ class ForestDiscovery {
     });
 
     // Filter selects
-    ['language', 'region', 'sort'].forEach(filterId => {
-      const select = document.getElementById(filterId);
+    // Map UI IDs to internal filter keys for robustness
+    const idToFilterKey = { language: 'language', region: 'region', sortSelect: 'sort' };
+    Object.entries(idToFilterKey).forEach(([id, key]) => {
+      const select = document.getElementById(id);
       select?.addEventListener('change', (e) => {
-        this.filters[filterId] = e.target.value;
+        this.filters[key] = e.target.value;
         this.updateActiveFilters();
         this.resetAndReload();
       });
@@ -211,14 +213,11 @@ class ForestDiscovery {
           sortField = 'popularity';
           sortDirection = 'desc';
           break;
-        case 'recent':
+        case 'recent': // 'Newest' in UI
           sortField = 'createdAt';
           sortDirection = 'desc';
           break;
-        case 'rating':
-          sortField = 'averageRating';
-          sortDirection = 'desc';
-          break;
+        // No ratings in product — remove/ignore legacy option
         case 'random':
           // For random, we'll shuffle client-side after fetching
           sortField = 'createdAt';
@@ -492,10 +491,14 @@ class ForestDiscovery {
     };
 
     // Reset UI elements
-    document.getElementById('search').value = '';
-    document.getElementById('language').value = '';
-    document.getElementById('region').value = '';
-    document.getElementById('sort').value = 'recent';
+    const searchEl = document.getElementById('search');
+    if (searchEl) searchEl.value = '';
+    const langEl = document.getElementById('language');
+    if (langEl) langEl.value = '';
+    const regionEl = document.getElementById('region');
+    if (regionEl) regionEl.value = '';
+    const sortEl = document.getElementById('sortSelect') || document.getElementById('sort');
+    if (sortEl) sortEl.value = 'recent';
 
     this.updateActiveFilters();
     this.resetAndReload();

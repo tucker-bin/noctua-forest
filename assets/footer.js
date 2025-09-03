@@ -109,10 +109,6 @@ class GlobalFooter {
           <p class="text-sm text-forest-light/60">
             © ${new Date().getFullYear()} Noctua Forest. All rights reserved.
           </p>
-          <p class="text-xs text-forest-light/50 mt-2">
-            Published: January 2025 | Last updated: January 20, 2025 | 
-            <span class="notranslate">Noctua Forest</span> is a curated book discovery platform
-          </p>
         </div>
       </div>
     `;
