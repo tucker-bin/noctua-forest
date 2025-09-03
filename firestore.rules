@@ -98,5 +98,43 @@ service cloud.firestore {
       allow create: if isSignedIn();
       allow read, update, delete: if isAdmin();
     }
+
+    // Analytics collections
+    match /analytics/{analyticsId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isSignedIn() && 
+        (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /listViews/{viewId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isSignedIn() && 
+        (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    match /listClicks/{clickId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isSignedIn() && 
+        (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Curator landing pages
+    match /curatorLandingPages/{userId} {
+      allow read, create, update, delete: if isSignedIn() && 
+        (request.auth.uid == userId || isAdmin());
+    }
+
+    // To-review queue
+    match /toReviewQueue/{queueId} {
+      allow read, create, update, delete: if isSignedIn() && 
+        (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // Support tickets
+    match /supportTickets/{ticketId} {
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isSignedIn() && 
+        (resource.data.userId == request.auth.uid || isAdmin());
+    }
   }
 }

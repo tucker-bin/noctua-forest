@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Import — Noctua Forest</title>
+    <meta name="description" content="Import books from CSV to your To-Review queue with Curator Plus">
+    <link rel="stylesheet" href="assets/tailwind.css">
+    <link rel="stylesheet" href="assets/base-styles.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#fbebcc]">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <header class="flex justify-between items-center mb-8">
+            <a href="dashboard.html" class="flex items-center space-x-3">
+                <svg class="w-6 h-6 text-forest-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z"/>
+                </svg>
+                <span class="text-lg font-medium text-forest-accent">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center space-x-3">
+                <img src="images/logo.png" alt="Noctua Forest Logo" width="32" height="32" decoding="async" class="w-8 h-8">
+                <span class="text-xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+            </div>
+        </header>
+
+        <main class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="bg-forest-card rounded-xl p-8 mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h1 class="text-3xl font-bold text-white mb-2" style="font-family: 'Poppins', sans-serif;">CSV Import</h1>
+                        <p class="text-white/80">Import books from CSV to your To-Review queue</p>
+                    </div>
+                    <div class="bg-forest-accent px-4 py-2 rounded-full text-sm font-medium">
+                        Curator Plus
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="bg-white rounded-xl p-8 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-[#4A5450]">Upload CSV File</h2>
+                
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-6">
+                    <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p class="text-lg font-medium text-[#4A5450] mb-2">Drop your CSV file here</p>
+                    <p class="text-gray-600 mb-4">or click to browse</p>
+                    <input type="file" id="csvFile" accept=".csv" class="hidden">
+                    <button id="selectFile" class="px-6 py-3 bg-forest-accent text-white rounded-lg font-medium hover:bg-[#E0751C] transition duration-300">
+                        Select CSV File
+                    </button>
+                </div>
+
+                <!-- CSV Format Info -->
+                <div class="bg-gray-50 rounded-lg p-6">
+                    <h3 class="font-semibold text-[#4A5450] mb-3">CSV Format Requirements</h3>
+                    <div class="grid md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <h4 class="font-medium text-[#4A5450] mb-2">Required Columns:</h4>
+                            <ul class="space-y-1 text-gray-600">
+                                <li>• title (book title)</li>
+                                <li>• author (author name)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-[#4A5450] mb-2">Optional Columns:</h4>
+                            <ul class="space-y-1 text-gray-600">
+                                <li>• isbn, asin, amazon_url</li>
+                                <li>• publisher, publication_date</li>
+                                <li>• pages, genre, language</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-3 bg-blue-50 rounded border-l-4 border-blue-400">
+                        <p class="text-sm text-blue-800">
+                            <strong>Example:</strong> title,author,isbn,amazon_url<br>
+                            "The Great Gatsby","F. Scott Fitzgerald","9780743273565","https://amazon.com/dp/0743273567"
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Results -->
+            <div id="importResults" class="hidden bg-white rounded-xl p-8 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-[#4A5450]">Import Results</h2>
+                <div id="resultsContent"></div>
+            </div>
+
+            <!-- To-Review Queue -->
+            <div class="bg-white rounded-xl p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-[#4A5450]">Your To-Review Queue</h2>
+                    <button id="refreshQueue" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition duration-300">
+                        Refresh
+                    </button>
+                </div>
+                
+                <div id="queueContent">
+                    <div class="text-center py-8">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-forest-accent mx-auto mb-4"></div>
+                        <p class="text-gray-600">Loading queue...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { app, db } from './firebase-config.js';
+        import { parseCSV, normalizeBookData, addToReviewQueue, getToReviewQueue, removeFromQueue, markAsReviewed } from './js/csvImportService.js';
+
+        const auth = getAuth(app);
+        let currentUser = null;
+
+        // Check authentication and membership
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'account.html';
+                return;
+            }
+
+            currentUser = user;
+            
+            // Check if user has Curator Plus
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const userData = userDoc.exists() ? userDoc.data() : {};
+                
+                if (!userData.membership || userData.membership !== 'active') {
+                    alert('Curator Plus membership required to access this feature.');
+                    window.location.href = 'membership.html';
+                    return;
+                }
+            } catch (error) {
+                console.error('Error checking membership:', error);
+                alert('Error verifying membership. Please try again.');
+                return;
+            }
+
+            // Load initial queue
+            await loadQueue();
+            
+            // Set up event listeners
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // File selection
+            document.getElementById('selectFile').addEventListener('click', () => {
+                document.getElementById('csvFile').click();
+            });
+
+            // File upload
+            document.getElementById('csvFile').addEventListener('change', handleFileUpload);
+
+            // Refresh queue
+            document.getElementById('refreshQueue').addEventListener('click', loadQueue);
+        }
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Please select a CSV file.');
+                return;
+            }
+
+            try {
+                const csvContent = await readFileAsText(file);
+                const rawBooks = parseCSV(csvContent);
+                
+                if (rawBooks.length === 0) {
+                    alert('No books found in CSV file.');
+                    return;
+                }
+
+                // Normalize book data
+                const normalizedBooks = rawBooks.map(normalizeBookData);
+                
+                // Show import progress
+                showImportProgress(normalizedBooks.length);
+                
+                // Import books
+                const results = await addToReviewQueue(currentUser.uid, normalizedBooks);
+                
+                // Show results
+                showImportResults(results);
+                
+                // Refresh queue
+                await loadQueue();
+                
+            } catch (error) {
+                console.error('Error processing CSV:', error);
+                alert('Error processing CSV file. Please check the format and try again.');
+            }
+        }
+
+        function readFileAsText(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        function showImportProgress(count) {
+            const resultsDiv = document.getElementById('importResults');
+            const contentDiv = document.getElementById('resultsContent');
+            
+            resultsDiv.classList.remove('hidden');
+            contentDiv.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-forest-accent mx-auto mb-4"></div>
+                    <p class="text-gray-600">Importing ${count} books...</p>
+                </div>
+            `;
+        }
+
+        function showImportResults(results) {
+            const contentDiv = document.getElementById('resultsContent');
+            
+            contentDiv.innerHTML = `
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-green-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-green-600">${results.imported}</div>
+                        <div class="text-sm text-green-800">New Books</div>
+                    </div>
+                    <div class="bg-blue-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-blue-600">${results.duplicates}</div>
+                        <div class="text-sm text-blue-800">Existing Books</div>
+                    </div>
+                    <div class="bg-red-50 rounded-lg p-4 text-center">
+                        <div class="text-2xl font-bold text-red-600">${results.errors}</div>
+                        <div class="text-sm text-red-800">Errors</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 max-h-64 overflow-y-auto">
+                    ${results.books.map(book => `
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <div class="font-medium">${book.title}</div>
+                                <div class="text-sm text-gray-600">${book.author}</div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-1 rounded text-xs font-medium ${
+                                    book.status === 'new' ? 'bg-green-100 text-green-800' :
+                                    book.status === 'existing' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-red-100 text-red-800'
+                                }">
+                                    ${book.status}
+                                </span>
+                                ${book.status === 'error' ? `<span class="text-xs text-red-600">${book.error}</span>` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function loadQueue() {
+            try {
+                const queue = await getToReviewQueue(currentUser.uid);
+                const contentDiv = document.getElementById('queueContent');
+                
+                if (queue.length === 0) {
+                    contentDiv.innerHTML = `
+                        <div class="text-center py-8">
+                            <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            <h3 class="text-lg font-medium text-gray-800 mb-2">No books in queue</h3>
+                            <p class="text-gray-600">Import a CSV file to add books to your review queue.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                contentDiv.innerHTML = `
+                    <div class="space-y-3">
+                        ${queue.map(item => `
+                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="font-medium text-[#4A5450]">${item.bookTitle}</div>
+                                    <div class="text-sm text-gray-600">${item.bookAuthor}</div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        Added ${new Date(item.addedAt?.toDate()).toLocaleDateString()}
+                                    </div>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="px-2 py-1 rounded text-xs font-medium ${
+                                        item.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                        item.status === 'reviewed' ? 'bg-green-100 text-green-800' :
+                                        'bg-gray-100 text-gray-800'
+                                    }">
+                                        ${item.status}
+                                    </span>
+                                    <div class="flex space-x-1">
+                                        ${item.status === 'pending' ? `
+                                            <button onclick="markAsReviewed('${item.id}')" class="px-3 py-1 bg-green-100 text-green-800 rounded text-xs hover:bg-green-200">
+                                                Mark Reviewed
+                                            </button>
+                                        ` : ''}
+                                        <button onclick="removeFromQueue('${item.id}')" class="px-3 py-1 bg-red-100 text-red-800 rounded text-xs hover:bg-red-200">
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading queue:', error);
+                document.getElementById('queueContent').innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-red-600">Error loading queue. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Global functions for queue actions
+        window.markAsReviewed = async (queueItemId) => {
+            try {
+                await markAsReviewed(queueItemId);
+                await loadQueue();
+            } catch (error) {
+                console.error('Error marking as reviewed:', error);
+                alert('Error updating item. Please try again.');
+            }
+        };
+
+        window.removeFromQueue = async (queueItemId) => {
+            if (!confirm('Remove this item from your queue?')) return;
+            
+            try {
+                await removeFromQueue(queueItemId);
+                await loadQueue();
+            } catch (error) {
+                console.error('Error removing from queue:', error);
+                alert('Error removing item. Please try again.');
+            }
+        };
+    </script>
+</body>
+</html>
