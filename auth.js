@@ -410,5 +410,3 @@ auth.onAuthStateChanged((user) => {
     updateSignedOutUI();
   }
 });
-  }
-});
