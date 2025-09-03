@@ -132,7 +132,7 @@ class ForestDiscovery {
     });
 
     // Observe the loading indicator
-    const loadingIndicator = document.getElementById('loadingIndicator');
+    const loadingIndicator = document.getElementById('loadingState');
     if (loadingIndicator) {
       observer.observe(loadingIndicator);
     }
@@ -316,7 +316,7 @@ class ForestDiscovery {
   }
 
   renderBooks(books) {
-    const feed = document.getElementById('forestFeed');
+    const feed = document.getElementById('booksGrid');
     if (!feed) return;
 
     books.forEach(book => {
@@ -506,14 +506,14 @@ class ForestDiscovery {
     this.hasMoreBooks = true;
     this.books = [];
     
-    const feed = document.getElementById('forestFeed');
+    const feed = document.getElementById('booksGrid');
     if (feed) feed.innerHTML = '';
     
     this.loadMoreBooks();
   }
 
   showLoading(show) {
-    const indicator = document.getElementById('loadingIndicator');
+    const indicator = document.getElementById('loadingState');
     if (indicator) {
       if (show) {
         indicator.classList.remove('hidden');

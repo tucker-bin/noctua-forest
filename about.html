@@ -23,12 +23,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-0ZWN1Z3DYQ');
+      
+      // Load Google Analytics with error handling
+      const loadGoogleAnalytics = () => {
+        const script = document.createElement('script');
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ';
+        script.onerror = () => {
+          // Silently handle blocked analytics
+          console.debug('Analytics unavailable');
+        };
+        document.head.appendChild(script);
+        
+        gtag('js', new Date());
+        gtag('config', 'G-0ZWN1Z3DYQ');
+      };
+      
+      // Initialize analytics after page load
+      window.addEventListener('load', loadGoogleAnalytics);
     </script>
     <style>
         body {
@@ -82,7 +97,11 @@
             <!-- Our Story Section -->
             <section class="bg-forest-card text-white rounded-2xl p-8 shadow-sm">
                 <h2 class="text-2xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">Our Story</h2>
-                <p class="text-lg text-gray-100">We believe exceptional storytelling deserves discovery. Noctua Forest began as a platform for authors to share their manuscripts and for readers to uncover narratives that challenge, inspire, and entertain.</p>
+                <p class="text-lg text-gray-100 mb-4">Noctua Forest emerged from a simple belief: exceptional storytelling deserves discovery. The platform was founded to bridge the gap between talented authors seeking engaged readers and thoughtful readers searching for narratives that challenge, inspire, and entertain.</p>
+                
+                <p class="text-lg text-gray-100 mb-4">The team recognized that traditional publishing often overlooks innovative voices and unique perspectives. They built Noctua Forest as a curated space where quality rises above quantity, where meaningful connections form between creators and their audience, and where every story has the potential to find its perfect reader.</p>
+                
+                <p class="text-lg text-gray-100">Today, Noctua Forest continues to evolve as a community-driven platform that celebrates the power of authentic storytelling. The platform remains committed to fostering genuine connections between authors and readers while maintaining the highest standards for narrative excellence and community engagement.</p>
             </section>
 
             <!-- Values Section -->
@@ -130,7 +149,7 @@
                     </a>
                     <a href="https://bsky.app/profile/noctuaforest.bsky.social" target="_blank" rel="noopener" class="flex items-center justify-center space-x-2 p-3 rounded-lg bg-[#4A5450] text-white hover:opacity-90 transition duration-300">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.018-.276.037-.415.056-2.67.297-5.568-.628-6.383-3.364C.378 9.418 0 4.458 0 3.768c0-.688.139-1.86.902-2.203C1.561 1.266 2.566.944 5.202 2.805c2.752 1.942 5.711 5.881 6.798 7.995zm0 0c1.087-2.114 4.046-6.053 6.798-7.995C21.434.944 22.439 1.266 23.098 1.565c.763.343.902 1.515.902 2.203 0 .69-.378 5.65-.624 6.479-.815 2.736-3.713 3.66-6.383 3.364-.136-.02-.275-.039-.415-.056.138.018.276.037.415.056 2.67.297 5.568-.628 6.383-3.364.246-.829.624-5.789.624-6.479 0-.688-.139-1.86-.902-2.203-.659-.299-1.664-.621-4.3 1.24-2.752 1.942-5.711 5.881-6.798 7.995z"/>
+                            <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
                         </svg>
                         <span>Bluesky</span>
                     </a>
