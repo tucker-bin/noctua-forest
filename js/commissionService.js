@@ -185,3 +185,36 @@ export async function getMonthlySalesStats(userId) {
         return null;
     }
 }
+
+/**
+ * Get comprehensive earnings data for dashboard
+ */
+export async function getCommissionEarningsSummary(userId) {
+    try {
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
+        
+        // Get monthly earnings
+        const monthlyEarnings = await getCommissionEarnings(userId, monthStart, now);
+        
+        // Get 30-day earnings
+        const last30DaysEarnings = await getCommissionEarnings(userId, thirtyDaysAgo, now);
+        
+        // Get lifetime earnings (from beginning of time)
+        const lifetimeEarnings = await getCommissionEarnings(userId, new Date(0), now);
+        
+        return {
+            monthly: monthlyEarnings.toFixed(2),
+            last30Days: last30DaysEarnings.toFixed(2),
+            lifetime: lifetimeEarnings.toFixed(2)
+        };
+    } catch (err) {
+        console.error('Error getting commission earnings:', err);
+        return {
+            monthly: '0.00',
+            last30Days: '0.00',
+            lifetime: '0.00'
+        };
+    }
+}

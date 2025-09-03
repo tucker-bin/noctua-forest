@@ -284,3 +284,24 @@ export async function getListAnalytics(listId, days = 30) {
         };
     }
 }
+
+/**
+ * Get analytics for user dashboard
+ */
+export async function getAnalyticsForUser(userId) {
+    try {
+        const analytics = await getCuratorAnalytics(userId, 30);
+        
+        // Transform data for dashboard display
+        return analytics.topLists.map(list => ({
+            listId: list.listId,
+            listName: `List ${list.listId.slice(0, 8)}...`, // TODO: Get actual list name
+            views: list.views,
+            saves: 0, // TODO: Calculate from list saves
+            ctr: '0%' // TODO: Calculate from clicks/views
+        }));
+    } catch (error) {
+        console.error('Error getting analytics for user:', error);
+        return [];
+    }
+}

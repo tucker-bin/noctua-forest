@@ -304,3 +304,51 @@ export async function getReviewsForBook(bookId) {
     return [];
   }
 }
+
+/**
+ * Get recent reviews for a user
+ */
+export async function getRecentReviews(userId, limit = 5) {
+  try {
+    const reviewsRef = collection(db, 'reviews');
+    const q = query(
+      reviewsRef,
+      where('authorId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(limit)
+    );
+
+    const snapshot = await getDocs(q);
+    const reviews = [];
+    
+    for (const doc of snapshot.docs) {
+      const review = doc.data();
+      // Get book title
+      try {
+        const bookDoc = await getDoc(doc(db, 'books', review.bookId));
+        const bookData = bookDoc.exists() ? bookDoc.data() : {};
+        reviews.push({
+          id: doc.id,
+          bookId: review.bookId,
+          bookTitle: bookData.title || 'Unknown Book',
+          rating: review.interestLevel || 0,
+          createdAt: review.createdAt
+        });
+      } catch (err) {
+        console.error('Error getting book data:', err);
+        reviews.push({
+          id: doc.id,
+          bookId: review.bookId,
+          bookTitle: 'Unknown Book',
+          rating: review.interestLevel || 0,
+          createdAt: review.createdAt
+        });
+      }
+    }
+
+    return reviews;
+  } catch (err) {
+    console.error('Error getting recent reviews:', err);
+    return [];
+  }
+}
