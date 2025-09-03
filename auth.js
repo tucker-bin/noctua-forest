@@ -7,6 +7,7 @@ import { getUserLists, createList } from './js/readingListService.js';
 import { getCommissionEarningsSummary } from './js/commissionService.js';
 import { getAnalyticsForUser } from './js/analyticsService.js';
 import { getRecentReviews } from './js/reviewService.js';
+import { getSimilarBooks } from './js/recommendationService.js';
 
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
@@ -39,6 +40,8 @@ const earnings30d = document.getElementById('earnings-30d');
 const earningsLifetime = document.getElementById('earnings-lifetime');
 const analyticsContainer = document.getElementById('analytics-container');
 const recentActivityContainer = document.getElementById('recent-activity-container');
+const savedBooksContainer = document.getElementById('saved-books-container');
+const recommendationsContainer = document.getElementById('recommendations-container');
 
 // Show error message
 function showError(message) {
@@ -164,9 +167,13 @@ async function loadDashboardData(userId) {
     const status = userData.applicationStatus || 'not_applied';
     updateCuratorStatus(status);
     
-    // Load reading lists
+    // Load saved books and lists
+    await loadSavedBooks(userId);
     await loadReadingLists(userId);
     
+    // Load recommendations
+    await loadRecommendations(userId);
+
     // Load earnings data
     await loadEarningsData(userId);
     
@@ -317,6 +324,71 @@ async function loadAnalyticsData(userId) {
   } catch (error) {
     console.error('Error loading analytics:', error);
     analyticsContainer.innerHTML = '<p class="text-red-400">Error loading analytics</p>';
+  }
+}
+
+// Load saved books (books user reviewed or saved in lists)
+async function loadSavedBooks(userId) {
+  try {
+    if (!savedBooksContainer) return;
+    // Gather books from user's lists
+    const lists = await getUserLists(userId);
+    const bookMap = new Map();
+    lists.forEach(list => {
+      (list.books || []).forEach(b => {
+        if (!bookMap.has(b.id)) bookMap.set(b.id, b);
+      });
+    });
+
+    const books = Array.from(bookMap.values()).slice(0, 8);
+    if (books.length === 0) {
+      savedBooksContainer.innerHTML = '<p class="col-span-full text-white/60 text-center">No saved books yet. Create a list to get started.</p>';
+      return;
+    }
+
+    savedBooksContainer.innerHTML = books.map(b => `
+      <a href="book.html?id=${b.id}" class="block group bg-[#3A4440] rounded-lg overflow-hidden hover:bg-[#3F4A46] transition-colors">
+        <div class="aspect-[3/4] bg-[#2F3835] overflow-hidden">
+          ${b.coverUrl ? `<img src="${b.coverUrl}" alt="${b.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">` : ''}
+        </div>
+        <div class="p-3">
+          <h3 class="text-sm font-medium line-clamp-2">${b.title || 'Untitled'}</h3>
+          ${b.author ? `<p class="text-xs text-white/60 mt-1">${b.author}</p>` : ''}
+        </div>
+      </a>
+    `).join('');
+  } catch (error) {
+    console.error('Error loading saved books:', error);
+    savedBooksContainer.innerHTML = '<p class="col-span-full text-red-400 text-center">Failed to load saved books.</p>';
+  }
+}
+
+// Load simple recommendations based on last reviewed book's moods/genres
+async function loadRecommendations(userId) {
+  try {
+    if (!recommendationsContainer) return;
+    // Use recent reviews to seed recs
+    const reviews = await getRecentReviews(userId, 1);
+    if (!reviews || reviews.length === 0) {
+      return;
+    }
+    const seed = reviews[0];
+    const recs = await getSimilarBooks(seed.bookId, { limit: 8 });
+    if (!recs || recs.length === 0) return;
+
+    recommendationsContainer.innerHTML = recs.map(b => `
+      <a href="book.html?id=${b.id}" class="block group bg-[#3A4440] rounded-lg overflow-hidden hover:bg-[#3F4A46] transition-colors">
+        <div class="aspect-[3/4] bg-[#2F3835] overflow-hidden">
+          ${b.coverUrl ? `<img src="${b.coverUrl}" alt="${b.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">` : ''}
+        </div>
+        <div class="p-3">
+          <h3 class="text-sm font-medium line-clamp-2">${b.title || 'Untitled'}</h3>
+          ${b.author ? `<p class="text-xs text-white/60 mt-1">${b.author}</p>` : ''}
+        </div>
+      </a>
+    `).join('');
+  } catch (error) {
+    console.error('Error loading recommendations:', error);
   }
 }
 
