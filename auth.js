@@ -29,7 +29,7 @@ const currentForestName = document.getElementById('current-forest-name');
 // Dashboard Elements
 const listsContainer = document.getElementById('lists-container');
 const accountTier = document.getElementById('account-tier');
-const sessionUsage = document.getElementById('session-usage');
+
 const curatorStatus = document.getElementById('curator-status');
 const applyCuratorBtn = document.getElementById('apply-curator-btn');
 const createListBtn = document.getElementById('create-list-btn');
@@ -352,38 +352,150 @@ async function loadRecentActivity(userId) {
 
 // List management functions
 async function createNewList() {
-  const name = prompt('Enter list name:');
-  if (!name) return;
+  showCreateListModal();
+}
+
+async function editList(listId) {
+  showEditListModal(listId);
+}
+
+async function deleteList(listId) {
+  showDeleteConfirmModal(listId);
+}
+
+async function shareList(listId) {
+  showShareModal(listId);
+}
+
+// Modal functions
+function showCreateListModal() {
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+  modal.innerHTML = `
+    <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+      <h3 class="text-xl font-bold text-white mb-4">Create New List</h3>
+      <input type="text" id="list-name-input" placeholder="Enter list name" 
+        class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent mb-4">
+      <div class="flex gap-3 justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">
+          Cancel
+        </button>
+        <button onclick="confirmCreateList()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
+          Create List
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('list-name-input').focus();
+}
+
+function showEditListModal(listId) {
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+  modal.innerHTML = `
+    <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+      <h3 class="text-xl font-bold text-white mb-4">Edit List</h3>
+      <p class="text-white/80 mb-4">Edit functionality coming soon!</p>
+      <div class="flex justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
+          OK
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function showDeleteConfirmModal(listId) {
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+  modal.innerHTML = `
+    <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+      <h3 class="text-xl font-bold text-white mb-4">Delete List</h3>
+      <p class="text-white/80 mb-4">Are you sure you want to delete this list? This action cannot be undone.</p>
+      <div class="flex gap-3 justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">
+          Cancel
+        </button>
+        <button onclick="confirmDeleteList('${listId}')" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-medium transition-colors">
+          Delete
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function showShareModal(listId) {
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+  modal.innerHTML = `
+    <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+      <h3 class="text-xl font-bold text-white mb-4">Share List</h3>
+      <p class="text-white/80 mb-4">Share functionality coming soon!</p>
+      <div class="flex justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
+          OK
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function closeModal() {
+  const modal = document.querySelector('.fixed.inset-0.bg-black\\/50');
+  if (modal) {
+    modal.remove();
+  }
+}
+
+async function confirmCreateList() {
+  const nameInput = document.getElementById('list-name-input');
+  const name = nameInput.value.trim();
+  
+  if (!name) {
+    nameInput.focus();
+    return;
+  }
   
   try {
     await createList(auth.currentUser.uid, name);
     await loadReadingLists(auth.currentUser.uid);
+    closeModal();
   } catch (error) {
     console.error('Error creating list:', error);
-    alert('Failed to create list. Please try again.');
+    showErrorModal('Failed to create list. Please try again.');
   }
 }
 
-async function editList(listId) {
-  // TODO: Implement inline editing modal
-  alert('Edit functionality coming soon!');
-}
-
-async function deleteList(listId) {
-  if (!confirm('Are you sure you want to delete this list?')) return;
-  
+async function confirmDeleteList(listId) {
   try {
     // TODO: Implement delete functionality
-    alert('Delete functionality coming soon!');
+    closeModal();
+    showErrorModal('Delete functionality coming soon!');
   } catch (error) {
     console.error('Error deleting list:', error);
-    alert('Failed to delete list. Please try again.');
+    showErrorModal('Failed to delete list. Please try again.');
   }
 }
 
-async function shareList(listId) {
-  // TODO: Implement share functionality
-  alert('Share functionality coming soon!');
+function showErrorModal(message) {
+  const modal = document.createElement('div');
+  modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+  modal.innerHTML = `
+    <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+      <h3 class="text-xl font-bold text-white mb-4">Error</h3>
+      <p class="text-white/80 mb-4">${message}</p>
+      <div class="flex justify-end">
+        <button onclick="closeModal()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
+          OK
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
 }
 
 // Make functions global for onclick handlers
@@ -409,4 +521,5 @@ auth.onAuthStateChanged((user) => {
   } else {
     updateSignedOutUI();
   }
+});
 });
