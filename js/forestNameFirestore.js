@@ -4,20 +4,12 @@ import {
     collection, doc, getDoc, setDoc, getDocs, 
     query, where, updateDoc, deleteDoc, writeBatch, serverTimestamp 
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-import { generateUniqueName, initializeUsedNames } from './forestNameService.js';
+import { generateForestNameForUser } from './forestNameService.js';
 
 const FOREST_NAMES_COLLECTION = 'forestNames';
 const USERS_COLLECTION = 'users';
 
-/**
- * Initialize the Forest Name service with existing names from Firestore
- * @returns {Promise<void>}
- */
-export async function initializeFromFirestore() {
-    const snapshot = await getDocs(collection(db, FOREST_NAMES_COLLECTION));
-    const existingNames = new Set(snapshot.docs.map(doc => doc.data().name));
-    initializeUsedNames(existingNames);
-}
+// Removed initializeFromFirestore - no longer needed
 
 /**
  * Get a user's forest name
@@ -42,8 +34,8 @@ export async function assignNewForestName(userId) {
         throw new Error('User already has a forest name');
     }
 
-    // Generate new unique name
-    const newName = generateUniqueName();
+    // Generate new unique name using the service
+    const newName = await generateForestNameForUser(userId);
     if (!newName) {
         throw new Error('Could not generate unique forest name');
     }

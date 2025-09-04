@@ -918,6 +918,15 @@
         function amazonSearch(){ const q=encodeURIComponent(`${b.title||''} ${b.author||''}`); const r=getRef(); return `https://amazon.com/s?k=${q}&tag=noctuaforest-20${r?`&ref=${encodeURIComponent(r)}`:''}`; }
         // Bookshop links removed by product decision
 
+        // Build purchase link candidates
+        const candidates = [];
+        const amazonHrefFinal = (typeof amazonHref !== 'undefined' && amazonHref) ? amazonHref : '';
+        if (amazonHrefFinal) {
+          candidates.push({ label: 'Buy on Amazon', href: withAmazonTag(amazonHrefFinal) });
+        }
+        // Search fallback
+        candidates.push({ label: 'Search on Amazon', href: amazonSearch() });
+
         // Deduplicate by label then href
         const seen = new Set();
         const chosen = [];
