@@ -343,8 +343,6 @@
             };
           }
         } catch (_) {}
-        const asin = extractASIN(amazonUrl);
-        if (!asin) throw new Error('Invalid Amazon URL');
         const res = await fetch(`/api/pa/items?asin=${encodeURIComponent(asin)}`);
         if (!res.ok) throw new Error('Failed to fetch book data');
         const d = await res.json();
