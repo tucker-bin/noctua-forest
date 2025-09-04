@@ -92,7 +92,7 @@ class ForestDiscovery {
 
   setupEventListeners() {
     // Search input with debouncing
-    const searchInput = document.getElementById('search');
+    const searchInput = document.getElementById('searchInput');
     let searchTimeout;
     searchInput?.addEventListener('input', (e) => {
       clearTimeout(searchTimeout);
@@ -104,7 +104,7 @@ class ForestDiscovery {
 
     // Filter selects
     // Map UI IDs to internal filter keys for robustness
-    const idToFilterKey = { language: 'language', region: 'region', sortSelect: 'sort' };
+    const idToFilterKey = { languageFilter: 'language', regionFilter: 'region', sortSelect: 'sort' };
     Object.entries(idToFilterKey).forEach(([id, key]) => {
       const select = document.getElementById(id);
       select?.addEventListener('change', (e) => {
@@ -267,19 +267,9 @@ class ForestDiscovery {
           popularity: data.popularity || 0,
           averageRating: data.averageRating || 0,
           reviewCount: data.reviewCount || 0,
-          copyFormat: data.copyFormat || '',
           createdAt: data.createdAt?.toDate?.() || new Date()
         };
       });
-      
-      // Apply copy format filter if specified
-      if (filters.copyFormat && filters.copyFormat !== '') {
-        const filteredBooks = books.filter(book => {
-          if (!book.copyFormat) return true; // Include books without format data
-          return book.copyFormat === filters.copyFormat;
-        });
-        return filteredBooks;
-      }
       
       // Apply search filter client-side for now
       if (filters.search && filters.search.trim() !== '') {
