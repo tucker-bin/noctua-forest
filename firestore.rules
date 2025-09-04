@@ -27,7 +27,10 @@ service cloud.firestore {
     // Public books
     match /books/{bookId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
+      // Allow signed-in users to create books they authored via reviews flow
+      allow create: if isSignedIn() && request.resource.data.createdBy == request.auth.uid;
+      // Restrict modifications to admins (content curation)
+      allow update, delete: if isAdmin();
     }
 
     // Submissions (unpublished)
@@ -43,8 +46,15 @@ service cloud.firestore {
     // Reviews
     match /reviews/{reviewId} {
       allow read: if isAdmin() || isSignedIn();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+      // Support either userId or authorId field for compatibility
+      allow create: if isSignedIn() && (
+        request.resource.data.userId == request.auth.uid ||
+        request.resource.data.authorId == request.auth.uid
+      );
+      allow update, delete: if isAdmin() || (isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.authorId == request.auth.uid
+      ));
     }
 
     // Reading list items (legacy)
