@@ -27,8 +27,8 @@ service cloud.firestore {
     // Public books
     match /books/{bookId} {
       allow read: if true;
-      // Allow signed-in users to create books they authored via reviews flow
-      allow create: if isSignedIn() && request.resource.data.createdBy == request.auth.uid;
+      // Allow any signed-in user to propose/create a book record (review flow)
+      allow create: if isSignedIn();
       // Restrict modifications to admins (content curation)
       allow update, delete: if isAdmin();
     }
@@ -46,11 +46,8 @@ service cloud.firestore {
     // Reviews
     match /reviews/{reviewId} {
       allow read: if isAdmin() || isSignedIn();
-      // Support either userId or authorId field for compatibility
-      allow create: if isSignedIn() && (
-        request.resource.data.userId == request.auth.uid ||
-        request.resource.data.authorId == request.auth.uid
-      );
+      // Allow any signed-in user to create their review. Verify ownership on update/delete.
+      allow create: if isSignedIn();
       allow update, delete: if isAdmin() || (isSignedIn() && (
         resource.data.userId == request.auth.uid ||
         resource.data.authorId == request.auth.uid
