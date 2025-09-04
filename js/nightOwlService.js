@@ -45,7 +45,7 @@ export async function getNightOwlSalesStats(userId) {
         return {
             monthlySalesCount: 0,
             totalSalesCount: 0,
-            commissionRate: 0.015, // Default 1.5%
+            commissionRate: 0.01, // Default 1%
             currentMonth: new Date().toLocaleString('default', { month: 'long', year: 'numeric' })
         };
     }
@@ -55,9 +55,10 @@ export async function getNightOwlSalesStats(userId) {
  * Get commission rate based on monthly sales volume
  */
 function getCommissionRate(monthlySalesCount) {
-    if (monthlySalesCount >= 100) return 0.03; // 3% for 100+ books/month
-    if (monthlySalesCount >= 15) return 0.0225; // 2.25% for 15+ books/month
-    return 0.015; // 1.5% base rate
+    if (monthlySalesCount >= 100) return 0.035; // 3.5% for 100+ books/month
+    if (monthlySalesCount >= 15) return 0.03; // 3% for 15+ books/month
+    if (monthlySalesCount >= 3) return 0.02; // 2% for 3+ books/month
+    return 0.01; // 1% base rate
 }
 
 /**

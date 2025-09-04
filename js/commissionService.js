@@ -6,16 +6,20 @@ const SALES_COLLECTION = 'sales';
 
 // Commission tiers based on monthly sales volume
 const COMMISSION_TIERS = {
-    BASE: {
-        rate: 0.015,      // 1.5%
+    TIER_1: {
+        rate: 0.01,       // 1%
         threshold: 0
     },
-    INTERMEDIATE: {
-        rate: 0.0225,     // 2.25%
+    TIER_2: {
+        rate: 0.02,       // 2%
+        threshold: 3
+    },
+    TIER_3: {
+        rate: 0.03,       // 3%
         threshold: 15
     },
-    ADVANCED: {
-        rate: 0.03,       // 3%
+    TIER_4: {
+        rate: 0.035,      // 3.5%
         threshold: 100
     }
 };
@@ -40,15 +44,17 @@ export async function getCommissionRate(userId) {
         const monthlySales = salesSnap.size;
 
         // Determine tier based on sales volume
-        if (monthlySales >= COMMISSION_TIERS.ADVANCED.threshold) {
-            return COMMISSION_TIERS.ADVANCED.rate;
-        } else if (monthlySales >= COMMISSION_TIERS.INTERMEDIATE.threshold) {
-            return COMMISSION_TIERS.INTERMEDIATE.rate;
+        if (monthlySales >= COMMISSION_TIERS.TIER_4.threshold) {
+            return COMMISSION_TIERS.TIER_4.rate;
+        } else if (monthlySales >= COMMISSION_TIERS.TIER_3.threshold) {
+            return COMMISSION_TIERS.TIER_3.rate;
+        } else if (monthlySales >= COMMISSION_TIERS.TIER_2.threshold) {
+            return COMMISSION_TIERS.TIER_2.rate;
         }
-        return COMMISSION_TIERS.BASE.rate;
+        return COMMISSION_TIERS.TIER_1.rate;
     } catch (err) {
         console.error('Error getting commission rate:', err);
-        return COMMISSION_TIERS.BASE.rate; // Default to base rate on error
+        return COMMISSION_TIERS.TIER_1.rate; // Default to tier 1 rate on error
     }
 }
 
