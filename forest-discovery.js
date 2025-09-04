@@ -69,6 +69,7 @@ function extractSemanticTags(text) {
 // Forest Discovery System - Infinite Scroll & Filtering
 class ForestDiscovery {
   constructor() {
+    console.log('ForestDiscovery: Constructor called');
     this.filters = {
       search: '',
       language: '',
@@ -84,6 +85,7 @@ class ForestDiscovery {
     
     this.init();
     this.loadUserPreferences();
+    console.log('ForestDiscovery: Constructor completed');
   }
 
   init() {
@@ -274,9 +276,11 @@ class ForestDiscovery {
   }
 
   async loadInitialBooks() {
+    console.log('ForestDiscovery: Loading initial books...');
     this.currentPage = 1;
     this.books = [];
     await this.loadMoreBooks();
+    console.log('ForestDiscovery: Initial books loaded, count:', this.books.length);
   }
 
   async loadMoreBooks() {
@@ -309,9 +313,12 @@ class ForestDiscovery {
   async fetchBooks(page, filters) {
     if (this.isLoading) return [];
     
+    console.log('ForestDiscovery: Fetching books, page:', page, 'filters:', filters);
+    
     try {
       // Build Firestore query
       let booksQuery = collection(db, 'books');
+      console.log('ForestDiscovery: Created books collection query');
       
       // Apply filters (align with books schema)
       if (filters.language && filters.language !== '') {
@@ -791,7 +798,24 @@ function viewBook(bookId) {
   window.location.href = `book.html?id=${bookId}`;
 }
 
+// Make ForestDiscovery available globally
+window.ForestDiscovery = ForestDiscovery;
+
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('Forest Discovery: DOM loaded, initializing...');
+  console.log('Available Firebase functions:', {
+    db: !!window.db,
+    collection: !!window.collection,
+    query: !!window.query,
+    getDocs: !!window.getDocs
+  });
+  
+  if (!window.db) {
+    console.error('Forest Discovery: Firebase db not available!');
+    return;
+  }
+  
   window.forestDiscovery = new ForestDiscovery();
+  console.log('Forest Discovery: Initialized successfully');
 });
