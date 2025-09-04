@@ -16,6 +16,9 @@ class GlobalFooter {
     const footer = document.createElement('footer');
     footer.id = 'global-footer';
     footer.className = 'bg-forest-card text-white mt-16 border-t border-forest-accent/20';
+    // Helper for Google Translate website mode
+    const gt = (lang) => `https://translate.google.com/?sl=en&tl=${lang}&op=websites&u=${encodeURIComponent(window.location.href)}`;
+
     footer.innerHTML = `
       <div class="container mx-auto px-6 py-12">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -35,27 +38,27 @@ class GlobalFooter {
             <div class="mt-4">
               <div class="text-sm text-forest-light/60 mb-2">Translate this page:</div>
               <div class="flex flex-wrap gap-2">
-                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=es', '_blank')" 
+                <button onclick="window.open('${'`'}${'${gt(\'es\')}' + '`'}', '_blank', 'noopener')" 
                         class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
                   Español
                 </button>
-                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=fr', '_blank')" 
+                <button onclick="window.open('${'`'}${'${gt(\'fr\')}' + '`'}', '_blank', 'noopener')" 
                         class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
                   Français
                 </button>
-                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=de', '_blank')" 
+                <button onclick="window.open('${'`'}${'${gt(\'de\')}' + '`'}', '_blank', 'noopener')" 
                         class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
                   Deutsch
                 </button>
-                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=zh', '_blank')" 
+                <button onclick="window.open('${'`'}${'${gt(\'zh\')}' + '`'}', '_blank', 'noopener')" 
                         class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
                   中文
                 </button>
-                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=ja', '_blank')" 
+                <button onclick="window.open('${'`'}${'${gt(\'ja\')}' + '`'}', '_blank', 'noopener')" 
                         class="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-full transition-colors">
                   日本語
                 </button>
-                <button onclick="window.open('https://translate.google.com/translate?u=' + encodeURIComponent(window.location.href) + '&sl=en&tl=auto', '_blank')" 
+                <button onclick="window.open('${'`'}${'${gt(\'auto\')}' + '`'}', '_blank', 'noopener')" 
                         class="text-xs bg-forest-accent hover:bg-[#E0751C] text-white px-3 py-1 rounded-full transition-colors">
                   More Languages →
                 </button>

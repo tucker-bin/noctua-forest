@@ -529,18 +529,25 @@ function showShareModal(link) {
   modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
   modal.innerHTML = `
     <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
-      <h3 class="text-xl font-bold text-white mb-4">Share List</h3>
-      <div class="space-y-3 mb-4">
+      <h3 class="text-xl font-bold text-white mb-2">Share this list</h3>
+      <p class="text-white/80 text-sm mb-4">Send the link or share via your apps.</p>
+
+      <label for="share-link" class="block text-xs text-white/70 mb-2">Link to share</label>
+      <div class="flex items-stretch gap-2 mb-4">
         <input id="share-link" type="text" readonly value="${link}"
-          class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none">
-        <div class="flex gap-3 flex-wrap">
-          <button onclick="shareCopyLink()" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">Copy Link</button>
-          <button onclick="shareNative()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">Share</button>
-          <a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}" class="px-4 py-2 border border-white/20 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors">Post on X</a>
-          <a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}" class="px-4 py-2 border border-white/20 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors">Share on Facebook</a>
+          class="flex-1 px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none">
+        <button id="copy-btn" onclick="shareCopyLink('copy-btn')" class="px-4 py-3 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap">Copy</button>
+      </div>
+
+      <div class="space-y-2">
+        <button onclick="shareNative()" class="w-full px-4 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-lg text-sm font-medium transition-colors">Share via apps</button>
+        <div class="grid grid-cols-2 gap-2">
+          <a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}" class="w-full px-4 py-3 border border-white/20 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors text-center">Post on X</a>
+          <a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}" class="w-full px-4 py-3 border border-white/20 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors text-center">Facebook</a>
         </div>
       </div>
-      <div class="flex justify-end">
+
+      <div class="flex justify-end mt-5">
         <button onclick="closeModal()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">Done</button>
       </div>
     </div>
@@ -610,11 +617,25 @@ window.shareList = shareList;
 window.confirmCreateList = confirmCreateList;
 window.closeModal = closeModal;
 window.confirmDeleteList = confirmDeleteList;
-window.shareCopyLink = function(){
+window.shareCopyLink = function(buttonId){
   const input = document.getElementById('share-link');
   if (!input) return;
-  input.select();
-  document.execCommand('copy');
+  try {
+    navigator.clipboard?.writeText(input.value) || document.execCommand('copy');
+  } catch (_) {
+    input.select();
+    document.execCommand('copy');
+  }
+  const btn = buttonId ? document.getElementById(buttonId) : null;
+  if (btn) {
+    const original = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('bg-green-600');
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove('bg-green-600');
+    }, 1400);
+  }
 }
 window.shareNative = function(){
   const input = document.getElementById('share-link');

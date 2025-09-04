@@ -756,7 +756,7 @@
             }
           } catch (_) {}
 
-          showSubmissionModal({ title: data.title });
+          showSubmissionModal({ title: data.title, bookId: bookRef.id });
         } catch (error) {
           console.error('Submission failed:', error);
           alert('Failed to submit review. Please try again.');
@@ -764,10 +764,11 @@
       });
 
       // Modal controller for submission
-      window.showSubmissionModal = ({ title }) => {
+      window.showSubmissionModal = ({ title, bookId }) => {
         const modal = document.getElementById('submissionModal');
         const desc = document.getElementById('submissionModalDesc');
         const submitAnother = document.getElementById('modalSubmitAnother');
+        const viewPage = document.getElementById('modalViewDashboard');
         if (!modal) return;
         if (title) desc.textContent = `"${title}" was received. Your review will appear shortly.`;
 
@@ -777,6 +778,12 @@
           try { document.getElementById('submissionForm').reset(); } catch (_) {}
           window.scrollTo({ top: 0, behavior: 'smooth' });
         };
+
+        // View book page (redirect). Reuse existing dashboard button slot for now
+        if (viewPage) {
+          viewPage.textContent = 'View Book Page';
+          if (bookId) viewPage.href = `book.html?id=${bookId}`;
+        }
 
         // Show modal
         modal.classList.remove('hidden');
