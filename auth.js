@@ -155,16 +155,17 @@ async function handleSignOut() {
 // Load comprehensive dashboard data
 async function loadDashboardData(userId) {
   try {
+    if (!auth.currentUser || auth.currentUser.uid !== userId) return;
     // Load user profile data
     const userDoc = await getDoc(doc(db, 'users', userId));
     const userData = userDoc.exists() ? userDoc.data() : {};
     
     // Update account tier
-    const tier = userData.applicationStatus === 'approved' ? 'Curator Plus' : 'Free';
+    const tier = userData && userData.applicationStatus === 'approved' ? 'Curator Plus' : 'Free';
     accountTier.textContent = tier;
     
     // Update curator status
-    const status = userData.applicationStatus || 'not_applied';
+    const status = (userData && userData.applicationStatus) || 'not_applied';
     updateCuratorStatus(status);
     
     // Load saved books and lists
@@ -174,11 +175,20 @@ async function loadDashboardData(userId) {
     // Load recommendations
     await loadRecommendations(userId);
 
-    // Load earnings data
-    await loadEarningsData(userId);
-    
-    // Load analytics
-    await loadAnalyticsData(userId);
+    // Curator-only sections
+    const isCurator = (userData && userData.applicationStatus === 'approved');
+    if (isCurator) {
+      await loadEarningsData(userId);
+      await loadAnalyticsData(userId);
+    } else {
+      // Soft clear curator-only containers
+      earningsMonth && (earningsMonth.textContent = '$0.00');
+      earnings30d && (earnings30d.textContent = '$0.00');
+      earningsLifetime && (earningsLifetime.textContent = '$0.00');
+      analyticsContainer && (analyticsContainer.innerHTML = `
+        <div class="text-center py-8"><p class="text-white/60">Analytics unlock with Curator Plus.</p></div>
+      `);
+    }
     
     // Load recent activity
     await loadRecentActivity(userId);
@@ -534,7 +544,7 @@ async function confirmCreateList() {
     nameInput.focus();
     return;
   }
-  
+
   try {
     await createList(auth.currentUser.uid, name);
     await loadReadingLists(auth.currentUser.uid);

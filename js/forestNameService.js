@@ -29,17 +29,14 @@ function generateForestName() {
 /**
  * Check if a Forest Name is available
  */
+let hasWarnedNameCheck = false;
 async function isNameAvailable(name) {
-  try {
-    const usersRef = collection(db, 'users');
-    const q = query(usersRef, where('forestName', '==', name));
-    const snapshot = await getDocs(q);
-    return snapshot.empty;
-  } catch (err) {
-    console.error('Error checking name availability:', err);
-    // If rules block querying other users, default to available and rely on randomness
-    return true;
+  // Avoid cross-user reads; assume available and rely on randomness
+  if (!hasWarnedNameCheck) {
+    console.warn('Skipping cross-user name availability check to comply with rules.');
+    hasWarnedNameCheck = true;
   }
+  return true;
 }
 
 /**
@@ -59,7 +56,7 @@ async function generateUniqueName() {
 
   // If we couldn't find a unique name, add a random number
   const baseForestName = generateForestName();
-  const randomNum = Math.floor(Math.random() * 1000);
+  const randomNum = Math.floor(1000 + Math.random() * 9000); // 4 digits
   return `${baseForestName}${randomNum}`;
 }
 
@@ -68,20 +65,11 @@ async function generateUniqueName() {
  */
 export async function setForestName(userId, forestName) {
   try {
-    // Check if name is available (unless it's their current name)
-    const userDoc = await getDoc(doc(db, 'users', userId));
-    const currentName = userDoc.exists() ? userDoc.data().forestName : null;
-    
-    if (forestName !== currentName && !(await isNameAvailable(forestName))) {
-      throw new Error('This Forest Name is already taken');
-    }
-
-    // Update user document
+    // Directly set; rely on randomness to avoid collision and rules to restrict writes to own doc
     await setDoc(doc(db, 'users', userId), {
       forestName,
       updatedAt: new Date()
     }, { merge: true });
-
     return forestName;
   } catch (err) {
     console.error('Error setting Forest Name:', err);
