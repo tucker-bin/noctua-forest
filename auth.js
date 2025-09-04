@@ -190,9 +190,12 @@ async function loadDashboardData(userId) {
 
 // Update curator status display
 function updateCuratorStatus(status) {
+  // If curator UI is not present on this page, do nothing
+  if (!curatorStatus || !applyCuratorBtn) return;
+
   const statusElement = curatorStatus;
   const applyBtn = applyCuratorBtn;
-  
+
   switch (status) {
     case 'approved':
       statusElement.textContent = 'Approved';
@@ -593,5 +596,4 @@ auth.onAuthStateChanged((user) => {
   } else {
     updateSignedOutUI();
   }
-});
 });
