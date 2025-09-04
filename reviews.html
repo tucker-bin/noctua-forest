@@ -319,7 +319,7 @@
       import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
       import { collection, addDoc, serverTimestamp, doc, getDoc, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
       import showAlphaPopup from './components/AlphaPopup.js';
-      import { searchBooks, extractASIN } from './js/bookSearchService.js';
+      import { searchBooks, extractASIN, extractISBN } from './js/bookSearchService.js';
       import { validateReview, analyzeReviewForAI } from './js/reviewValidationService.js';
       import { submitReview } from './js/reviewService.js';
 
@@ -327,6 +327,22 @@
 
       // Minimal inlined helpers to avoid external module parse issues
       async function fetchBookMetadata(amazonUrl) {
+        const asin = extractASIN(amazonUrl);
+        if (!asin) throw new Error('Invalid Amazon URL');
+        // Quick existing-book check via books collection (lightweight)
+        try {
+          const existing = await searchBooks({ asin });
+          if (existing.found) {
+            return {
+              asin,
+              title: existing.book.title,
+              author: existing.book.author || 'Unknown',
+              coverUrl: existing.book.coverUrl || '',
+              description: existing.book.description || '',
+              isbn: existing.book.isbn || ''
+            };
+          }
+        } catch (_) {}
         const asin = extractASIN(amazonUrl);
         if (!asin) throw new Error('Invalid Amazon URL');
         const res = await fetch(`/api/pa/items?asin=${encodeURIComponent(asin)}`);
@@ -750,8 +766,24 @@
             }
           }
 
-          // Fetch final metadata
-          const metadata = await fetchBookMetadata(data.amazonUrl);
+          // Fetch final metadata with graceful fallback
+          let metadata;
+          try {
+            metadata = await fetchBookMetadata(data.amazonUrl);
+          } catch (_) {
+            metadata = {
+              asin: extractASIN(data.amazonUrl) || '',
+              isbn: extractISBN(data.amazonUrl) || '',
+              title: (data.title || '').trim(),
+              author: (data.author || '').trim(),
+              coverUrl: '',
+              description: '',
+              publisher: '',
+              publicationDate: '',
+              pageCount: null,
+              categories: []
+            };
+          }
           
           // Check for duplicates by ISBN
           if (metadata.isbn) {
