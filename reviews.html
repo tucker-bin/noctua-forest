@@ -1447,8 +1447,12 @@
           categories: metadata.categories || [],
           status: 'active',
           createdBy: auth.currentUser.uid,
+          userId: auth.currentUser.uid,
           createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
+          publishedAt: serverTimestamp(),
+          views: 0,
+          popularity: 0
         };
 
         const bookRef = await addDoc(collection(db, 'books'), bookPayload);
