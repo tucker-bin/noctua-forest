@@ -984,7 +984,7 @@
           const d = JSON.parse(existing);
           const form = document.getElementById('submissionForm');
           if (form) {
-            ['amazonUrl','title','author','review'].forEach(k=>{ if (d[k]) { const el=document.getElementById(k); if (el) el.value=d[k]; }});
+            ['amazonUrl','title','author','review','primaryLanguage','authorRegion','publicationYear','blurb'].forEach(k=>{ if (d[k]) { const el=document.getElementById(k); if (el) el.value=d[k]; }});
             if (d.copyFormat) { const cf=document.getElementById('copyFormat'); if (cf) cf.value=d.copyFormat; }
             (d.moods||[]).forEach(v=>{ const cb=form.querySelector(`input[name="moods[]"][value="${v}"]`); if (cb) cb.checked=true; });
             (d.contentWarnings||[]).forEach(v=>{ const cb=form.querySelector(`input[name="contentWarnings[]"][value="${v}"]`); if (cb) cb.checked=true; });
