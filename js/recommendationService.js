@@ -11,15 +11,13 @@ const REVIEWS_COLLECTION = 'reviews';
 export async function getSimilarBooks(bookId, { moods = [], genres = [], limit: resultLimit = 4 } = {}) {
     try {
         // Get the source book's details
-        const sourceBookQuery = query(
-            collection(db, BOOKS_COLLECTION),
-            where('id', '==', bookId)
-        );
-        const sourceBookSnap = await getDocs(sourceBookQuery);
-        if (sourceBookSnap.empty) {
+        // Load source book by document ID
+        const sourceRef = (await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js')).doc(db, BOOKS_COLLECTION, String(bookId));
+        const sourceSnap = await (await import('https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js')).getDoc(sourceRef);
+        if (!sourceSnap.exists()) {
             throw new Error('Source book not found');
         }
-        const sourceBook = sourceBookSnap.docs[0].data();
+        const sourceBook = sourceSnap.data();
 
         // If no moods/genres provided, use the source book's
         if (moods.length === 0) {
@@ -70,7 +68,7 @@ export async function getSimilarBooks(bookId, { moods = [], genres = [], limit: 
             const book = doc.data();
             
             // Skip the source book
-            if (book.id === bookId) {
+            if ((book.id || '') === String(bookId)) {
                 return;
             }
             

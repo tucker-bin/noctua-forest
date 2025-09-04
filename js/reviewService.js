@@ -335,14 +335,14 @@ export async function getRecentReviews(userId, maxCount = 5) {
     const snapshot = await getDocs(q);
     const reviews = [];
     
-    for (const doc of snapshot.docs) {
-      const review = doc.data();
+    for (const docSnap of snapshot.docs) {
+      const review = docSnap.data();
       // Get book title
       try {
-        const bookDoc = await getDoc(doc(db, 'books', review.bookId));
+        const bookDoc = await getDoc(doc(db, 'books', String(review.bookId)));
         const bookData = bookDoc.exists() ? bookDoc.data() : {};
         reviews.push({
-          id: doc.id,
+          id: docSnap.id,
           bookId: review.bookId,
           bookTitle: bookData.title || 'Unknown Book',
           rating: review.interestLevel || 0,
@@ -351,7 +351,7 @@ export async function getRecentReviews(userId, maxCount = 5) {
       } catch (err) {
         console.error('Error getting book data:', err);
         reviews.push({
-          id: doc.id,
+          id: docSnap.id,
           bookId: review.bookId,
           bookTitle: 'Unknown Book',
           rating: review.interestLevel || 0,
