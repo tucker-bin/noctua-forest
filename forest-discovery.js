@@ -195,17 +195,17 @@ class ForestDiscovery {
       // Build Firestore query
       let booksQuery = collection(db, 'books');
       
-      // Apply filters
+      // Apply filters (align with books schema)
       if (filters.language && filters.language !== '') {
-        booksQuery = query(booksQuery, where('language', '==', filters.language));
+        booksQuery = query(booksQuery, where('primaryLanguage', '==', filters.language));
       }
       
       if (filters.region && filters.region !== '') {
-        booksQuery = query(booksQuery, where('region', '==', filters.region));
+        booksQuery = query(booksQuery, where('authorRegion', '==', filters.region));
       }
       
-      // Apply sorting
-      let sortField = 'createdAt';
+      // Apply sorting — use publishedAt for recency
+      let sortField = 'publishedAt';
       let sortDirection = 'desc';
       
       switch (filters.sort) {
@@ -214,13 +214,13 @@ class ForestDiscovery {
           sortDirection = 'desc';
           break;
         case 'recent': // 'Newest' in UI
-          sortField = 'createdAt';
+          sortField = 'publishedAt';
           sortDirection = 'desc';
           break;
         // No ratings in product — remove/ignore legacy option
         case 'random':
           // For random, we'll shuffle client-side after fetching
-          sortField = 'createdAt';
+          sortField = 'publishedAt';
           sortDirection = 'desc';
           break;
       }
@@ -260,14 +260,16 @@ class ForestDiscovery {
           title: data.title || '',
           author: data.author || '',
           coverUrl: data.coverUrl || '',
-          language: data.language || 'en',
-          region: data.region || '',
-          year: data.publicationDate ? new Date(data.publicationDate).getFullYear() : null,
-          tags: data.categories || [],
+          language: data.primaryLanguage || data.language || 'en',
+          region: data.authorRegion || data.region || '',
+          year: typeof data.publicationYear === 'number' ? data.publicationYear : null,
+          tags: Array.isArray(data.categories) ? data.categories : (typeof data.authorTags === 'string' && data.authorTags.trim() ? data.authorTags.split(',').map(t => t.trim()).filter(Boolean) : []),
           popularity: data.popularity || 0,
+          rating: data.averageRating || 0,
           averageRating: data.averageRating || 0,
           reviewCount: data.reviewCount || 0,
-          createdAt: data.createdAt?.toDate?.() || new Date()
+          createdAt: data.publishedAt?.toDate?.() || data.createdAt?.toDate?.() || new Date(),
+          blurb: data.blurb || ''
         };
       });
       
