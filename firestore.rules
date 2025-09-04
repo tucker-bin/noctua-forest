@@ -49,14 +49,14 @@ service cloud.firestore {
 
     // Reading list items (legacy)
     match /readingList/{itemId} {
-      allow read, create, update, delete: if isSignedIn() &&
-        (request.resource.data.userId == request.auth.uid || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
 
     // Reading lists (new structure)
     match /readingLists/{listId} {
-      allow read, create, update, delete: if isSignedIn() &&
-        (request.resource.data.userId == request.auth.uid || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
 
     // List shares
