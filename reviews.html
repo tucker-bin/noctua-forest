@@ -84,8 +84,8 @@
                 <p class="text-lg text-[#4A5450]/80">Your reviews power our recommendation engine and help build meaningful reading lists</p>
             </div>
 
-            <!-- How It Works -->
-            <div class="grid md:grid-cols-3 gap-8">
+            <!-- How It Works (hidden on mobile) -->
+            <div class="hidden md:grid md:grid-cols-3 gap-8" aria-hidden="true">
                 <div class="bg-[#4A5450] rounded-xl p-6 text-white">
                     <div class="text-forest-accent text-2xl font-bold mb-4">1</div>
                     <h2 class="text-lg font-semibold mb-2">Write Authentic Reviews</h2>
@@ -319,12 +319,40 @@
       import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
       import { collection, addDoc, serverTimestamp, doc, getDoc, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
       import showAlphaPopup from './components/AlphaPopup.js';
-      import { fetchBookMetadata, fillFormWithMetadata } from './js/amazonService.js';
       import { searchBooks, extractASIN } from './js/bookSearchService.js';
       import { validateReview, analyzeReviewForAI } from './js/reviewValidationService.js';
       import { submitReview } from './js/reviewService.js';
 
       const auth = getAuth(app);
+
+      // Minimal inlined helpers to avoid external module parse issues
+      async function fetchBookMetadata(amazonUrl) {
+        const asin = extractASIN(amazonUrl);
+        if (!asin) throw new Error('Invalid Amazon URL');
+        const res = await fetch(`/api/pa/items?asin=${encodeURIComponent(asin)}`);
+        if (!res.ok) throw new Error('Failed to fetch book data');
+        const d = await res.json();
+        if (!d || !d.title) throw new Error('Invalid book data received');
+        return {
+          asin,
+          title: d.title,
+          author: d.author || 'Unknown',
+          coverUrl: d.imageUrl || '',
+          description: d.description || '',
+          publisher: d.publisher || '',
+          publicationDate: d.publicationDate || '',
+          pageCount: d.pageCount || null,
+          categories: d.categories || []
+        };
+      }
+
+      function fillFormWithMetadata(metadata) {
+        const fields = { title: metadata.title || '', author: metadata.author || '', blurb: metadata.description || '' };
+        Object.entries(fields).forEach(([id, value]) => {
+          const el = document.getElementById(id);
+          if (el) el.value = value;
+        });
+      }
 
       // Show alpha popup on first visit
       showAlphaPopup();
