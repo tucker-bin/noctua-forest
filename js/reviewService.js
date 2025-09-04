@@ -237,9 +237,16 @@ export function getMoodColor(mood) {
  */
 export async function submitReview(reviewData) {
   try {
-    // Validate reading verification
-    if (!reviewData.hasReadBook || !reviewData.authenticReview || !reviewData.noAI) {
-      throw new Error('Reading verification required. You must confirm you have read the book and written an authentic review.');
+    // Store verification flags but don't block submission
+    const verificationFlags = {
+      hasReadBook: !!reviewData.hasReadBook,
+      authenticReview: !!reviewData.authenticReview,
+      noAI: !!reviewData.noAI
+    };
+    
+    // Log warning if verification is incomplete but don't block
+    if (!verificationFlags.hasReadBook || !verificationFlags.authenticReview || !verificationFlags.noAI) {
+      console.warn('Review submitted with incomplete verification:', verificationFlags);
     }
 
     // Generate random Forest name for this review
@@ -260,10 +267,10 @@ export async function submitReview(reviewData) {
       unhelpfulCount: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      // Verification flags
-      verifiedRead: true,
-      verifiedAuthentic: true,
-      verifiedNoAI: true
+      // Verification flags (stored but not blocking)
+      verifiedRead: verificationFlags.hasReadBook,
+      verifiedAuthentic: verificationFlags.authenticReview,
+      verifiedNoAI: verificationFlags.noAI
     };
 
     try {

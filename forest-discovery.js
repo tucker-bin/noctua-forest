@@ -156,7 +156,7 @@ class ForestDiscovery {
   }
 
   async loadInitialBooks() {
-    this.currentPage = 0;
+    this.currentPage = 1;
     this.books = [];
     await this.loadMoreBooks();
   }
@@ -343,7 +343,7 @@ class ForestDiscovery {
 
         // Emulate pagination
         const pageSize = 12;
-        const start = (page - 1) * pageSize;
+        const start = Math.max(0, (page - 1) * pageSize);
         const slice = sorted.slice(start, start + pageSize);
         // Track lastDoc best-effort
         this.lastDoc = baseSnap.docs[Math.min(start + pageSize - 1, baseSnap.docs.length - 1)] || null;
