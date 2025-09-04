@@ -12,7 +12,7 @@ function coverForLocal(book){
 }
 
 async function loadBook() {
-  const id = parseInt(getQueryParam('id') || '0', 10);
+  const id = getQueryParam('id');
 
   try {
     if (id) {

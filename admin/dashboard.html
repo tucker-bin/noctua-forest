@@ -117,6 +117,20 @@
                 </table>
             </div>
         </div>
+
+        <!-- Maintenance Tools -->
+        <div class="bg-forest-card rounded-xl p-8 mb-12">
+            <div class="flex items-center mb-6">
+                <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v16h16M4 8h12" />
+                </svg>
+                <h2 class="text-2xl font-bold text-white">Maintenance</h2>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="backfillPublishedAtBtn" class="px-6 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg">Backfill publishedAt on books</button>
+                <p class="text-sm text-white/80">Sets missing publishedAt to createdAt or now.</p>
+            </div>
+        </div>
         <!-- Review Book Submissions -->
         <div class="bg-forest-card rounded-xl p-8 mb-8">
             <div class="flex items-center mb-6">
@@ -213,10 +227,12 @@
             onSnapshot,
             doc,
             getDoc,
+            getDocs,
             setDoc,
             updateDoc,
             deleteDoc,
-            serverTimestamp
+            serverTimestamp,
+            writeBatch
         } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
         import { app as firebaseApp, db as firebaseDb } from '../firebase-config.js';
 
@@ -341,6 +357,10 @@
             fetchAffiliateEvents();
             // refresh every 60s
             setInterval(fetchAffiliateEvents, 60000);
+
+            // Wire up maintenance tools
+            const backfillBtn = document.getElementById('backfillPublishedAtBtn');
+            if (backfillBtn) backfillBtn.addEventListener('click', () => window.backfillPublishedAt());
         });
 
         // Signout handler (same pattern as user dashboard)
@@ -576,6 +596,36 @@
                 });
             });
         }
+
+        // Maintenance: Backfill publishedAt for existing books
+        window.backfillPublishedAt = async () => {
+            if (!confirm('Backfill publishedAt on books missing it? This will write timestamps.')) return;
+            try {
+                const snap = await getDocs(query(collection(db, 'books')));
+                let batch = writeBatch(db);
+                let ops = 0;
+                let updated = 0;
+                snap.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    if (!data.publishedAt) {
+                        const ref = doc(db, 'books', docSnap.id);
+                        const useCreatedAt = (data.createdAt && typeof data.createdAt.toDate === 'function');
+                        batch.update(ref, { publishedAt: useCreatedAt ? data.createdAt : serverTimestamp() });
+                        ops++; updated++;
+                        if (ops >= 450) {
+                            batch.commit();
+                            batch = writeBatch(db);
+                            ops = 0;
+                        }
+                    }
+                });
+                if (ops > 0) await batch.commit();
+                alert(`Backfill complete. Updated ${updated} book(s).`);
+            } catch (e) {
+                console.error('Backfill failed', e);
+                alert('Backfill failed. See console for details.');
+            }
+        };
 
         // Approve submission -> publish book pipeline
         window.approveSubmission = async (submissionId) => {

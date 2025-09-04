@@ -302,7 +302,56 @@ class ForestDiscovery {
       
     } catch (error) {
       console.error('Error fetching books from Firestore:', error);
-      return [];
+      // Fallback: fetch without where/order to avoid index issues, then filter client-side
+      try {
+        const baseSnap = await getDocs(query(collection(db, 'books'), limit(50)));
+        const docs = baseSnap.docs || [];
+        const books = docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            title: data.title || '',
+            author: data.author || '',
+            coverUrl: data.coverUrl || '',
+            language: data.primaryLanguage || data.language || 'en',
+            region: data.authorRegion || data.region || '',
+            year: typeof data.publicationYear === 'number' ? data.publicationYear : null,
+            tags: Array.isArray(data.categories) ? data.categories : (typeof data.authorTags === 'string' && data.authorTags.trim() ? data.authorTags.split(',').map(t => t.trim()).filter(Boolean) : []),
+            popularity: data.popularity || 0,
+            rating: data.averageRating || 0,
+            averageRating: data.averageRating || 0,
+            reviewCount: data.reviewCount || 0,
+            createdAt: data.publishedAt?.toDate?.() || data.createdAt?.toDate?.() || new Date(),
+            blurb: data.blurb || ''
+          };
+        });
+
+        // Client-side filters
+        const filtered = books.filter(b => {
+          if (filters.language && b.language !== filters.language) return false;
+          if (filters.region && b.region !== filters.region) return false;
+          return true;
+        });
+
+        // Sort client-side
+        let sorted = filtered;
+        if (filters.sort === 'popular') {
+          sorted = [...filtered].sort((a,b) => (b.popularity||0) - (a.popularity||0));
+        } else {
+          sorted = [...filtered].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
+
+        // Emulate pagination
+        const pageSize = 12;
+        const start = (page - 1) * pageSize;
+        const slice = sorted.slice(start, start + pageSize);
+        // Track lastDoc best-effort
+        this.lastDoc = baseSnap.docs[Math.min(start + pageSize - 1, baseSnap.docs.length - 1)] || null;
+        return slice;
+      } catch (fallbackErr) {
+        console.error('Fallback fetch also failed:', fallbackErr);
+        return [];
+      }
     }
   }
 
