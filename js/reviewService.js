@@ -252,6 +252,7 @@ export async function submitReview(reviewData) {
       bookId: reviewData.bookId,
       text: reviewData.text,
       authorId: reviewData.authorId,
+      userId: reviewData.authorId,
       authorForestName: forestName, // Random name per review
       authorAvatarUrl: reviewData.authorAvatarUrl,
       moods: reviewData.moods || [],
