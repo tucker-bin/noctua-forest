@@ -1,8 +1,9 @@
-# Noctua Forest — Curated Book Discovery Platform
+# Noctua Forest — Authentic Book Discovery
 
-This repository contains the public website for Noctua Forest, a curated book discovery platform with Google Analytics integration.
+Noctua Forest helps readers discover books through authentic, community‑written reviews. The mission is simple: make it easy to find the right book for the moment—by mood, pace, and purpose—without hype.
 
-Audience: Authors across all genres seeking engaged readers and readers who value thoughtful storytelling. The platform facilitates manuscript submissions, quality curation, and author-reader connections.
+- For readers: explore “The Forest” feed, search semantically, and follow themes that feel natural.
+- For curators: write concise, real reviews; organize them into shareable lists; earn commissions as your recommendations help others.
 
 Website structure
 - `welcome.html`: landing page with CTAs to The Forest and submission
@@ -14,6 +15,11 @@ Website structure
 - `styles.css`: typography and layout
 - Assets: images, icons, logo
 
+Search (MVP)
+- Lightweight intent parser (audience, tone, pace, domain, goal)
+- Client‑side reranking: simple scorer for small catalogs; hybrid cosine+signals for larger
+- Runtime‑tunable weights via `window.FOREST_WEIGHTS` (see `SEMANTIC-SEARCH-GUIDE.md`)
+
 Tooling (production)
 - Hosting: Google Cloud Run (containerized static site)
 - CI/CD: Cloud Build trigger on push to `main` using `cloudbuild.yaml`
@@ -21,10 +27,9 @@ Tooling (production)
 - Container: `Dockerfile`, `.dockerignore`, `.gcloudignore`
 
 Operational notes
-- Premium review service ($14.99) integrates with Stripe Payment Links for book submissions
-- Newsletter, book submissions, and contributor applications save to Firebase Firestore collections
-- Community features include book discovery, genre filtering, author submissions, and contributor applications
-- Contributors can link Medium profiles and submit articles via document upload
+- Reviews are free and publish immediately; moderation is reactive
+- Lists are shareable and stream‑ready (QR codes). Curator Plus adds analytics and theming
+- Firestore stores books, reviews, and lists; client renders cards and insights per book
 - Accessibility: semantic headings, high‑contrast palette, responsive images, mobile optimization
 
 Local preview
@@ -38,4 +43,5 @@ Deployment
 4. Push to `main` → Cloud Build builds and deploys to Cloud Run.
 
 Contact
-- For partnerships, manuscript submissions, and platform questions, email support@noctuaforest.com
+- For questions and partnerships: support@noctuaforest.com
+- Guides: `SEMANTIC-SEARCH-GUIDE.md` for search tuning

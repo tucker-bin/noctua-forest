@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share Your Review - Noctua Forest</title>
@@ -146,8 +146,8 @@
             }
         }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navigation -->
     <script src="components/Navigation.js"></script>
     
@@ -156,8 +156,8 @@
         <div class="container">
             <h1>Share Your Review</h1>
             <p>Help other readers discover great books through your authentic perspective</p>
-        </div>
-    </header>
+            </div>
+        </header>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -168,19 +168,19 @@
                     <!-- Chat Messages Container -->
                     <div id="chatMessages" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
                         <!-- Messages will be added dynamically -->
-                    </div>
-                    
+            </div>
+
                     <!-- Current Input -->
                     <div id="chatInput" class="space-y-4">
                         <div id="currentQuestion" class="chat-message bot">
-                            <div class="flex items-start space-x-3">
+                        <div class="flex items-start space-x-3">
                                 <div class="w-8 h-8 bg-forest-accent rounded-full flex items-center justify-center text-sm">🦉</div>
                                 <div class="bg-[#5A6560] rounded-lg p-4 text-white max-w-md">
                                     Hi! What book would you like to share with The Forest?
-                                </div>
-                            </div>
                         </div>
-                        
+                    </div>
+                </div>
+
                         <div class="flex space-x-3">
                             <input 
                                 id="userInput" 
@@ -194,10 +194,10 @@
                                 type="button" 
                                 class="px-4 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg transition-colors">
                                 Send
-                            </button>
-                        </div>
+                                </button>
                     </div>
-                    
+                </div>
+
                     <!-- Hidden form fields for final submission -->
                     <div id="hiddenFields" class="hidden">
                         <input type="hidden" name="title" id="hiddenTitle">
@@ -210,8 +210,8 @@
                         <input type="hidden" name="audience" id="hiddenAudience">
                         <input type="hidden" name="contentWarnings" id="hiddenWarnings">
                         <input type="hidden" name="amazonUrl" id="hiddenAmazonUrl">
-                    </div>
-                    
+                </div>
+
                     <!-- Submit button (appears at end) -->
                     <button 
                         id="finalSubmit" 
@@ -221,9 +221,9 @@
                     </button>
                     
                     <div id="submissionStatus" class="mt-3 text-sm text-gray-200"></div>
+                    </div>
                 </div>
             </div>
-        </div>
     </main>
 
     <!-- Firebase Configuration -->
@@ -358,7 +358,7 @@
             } else {
               this.showFinalSubmit();
             }
-          } else {
+        } else {
             // Show error and ask again
             this.addChatMessage('bot', result.message);
           }

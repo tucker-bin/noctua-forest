@@ -24,9 +24,39 @@
 /* Base styles */
 body {
   font-family: var(--font-body);
-  background-color: var(--color-forest-deep);
+  background-color: #fbebcc; /* match welcome */
   color: var(--color-forest-text);
   line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Ensure main content expands and footer sticks to bottom */
+main {
+  flex: 1;
+}
+
+/* Responsive container to match welcome.html */
+.container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container { max-width: 640px; padding-left: 1.5rem; padding-right: 1.5rem; }
+}
+@media (min-width: 768px) {
+  .container { max-width: 768px; }
+}
+@media (min-width: 1024px) {
+  .container { max-width: 1024px; }
+}
+@media (min-width: 1280px) {
+  .container { max-width: 1280px; }
 }
 
 /* Typography */

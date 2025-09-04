@@ -29,9 +29,8 @@
     <link rel="stylesheet" href="assets/base-styles.css">
     <link rel="stylesheet" href="assets/nav.css">
 </head>
-<body class="bg-forest-light">
-    <!-- Navigation -->
-    <script type="module" src="components/Navigation.js"></script>
+<body class="text-gray-800">
+    <!-- Navigation handled inline below -->
     
     <!-- Header -->
     <header class="header">
@@ -58,59 +57,56 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero bg-[#3A4440] text-white py-20">
-        <div class="container">
-            <div class="text-center mb-12">
-                <h1 class="text-5xl md:text-6xl font-bold mb-6">The Forest</h1>
-                <p class="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto">
-                    Discover books through authentic Night Owl reviews
-                </p>
-            </div>
-            
-            <!-- Search and Filters -->
-            <div class="max-w-4xl mx-auto mb-12">
-                <div class="flex flex-col md:flex-row gap-4 mb-6">
-                    <div class="flex-1">
-                        <input type="text" id="searchInput" placeholder="Search books or authors..." 
-                               class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-forest-accent focus:border-transparent text-lg">
-                    </div>
-                    <div class="flex gap-3">
-                        <select id="languageFilter" class="px-4 py-4 rounded-xl bg-[#3A4440] hover:bg-[#4A5450] border border-[#4A5450] text-white focus:outline-none focus:ring-2 focus:ring-forest-accent">
-                            <option value="">All Languages</option>
-                            <option value="en">English</option>
-                            <option value="es">Spanish</option>
-                            <option value="fr">French</option>
-                            <option value="de">German</option>
-                            <option value="it">Italian</option>
-                            <option value="pt">Portuguese</option>
-                            <option value="ru">Russian</option>
-                            <option value="ja">Japanese</option>
-                            <option value="ko">Korean</option>
-                            <option value="zh">Chinese</option>
-                            <option value="ar">Arabic</option>
-                            <option value="he">Hebrew</option>
-                            <option value="hi">Hindi</option>
-                        </select>
-                        <select id="regionFilter" class="px-4 py-4 rounded-xl bg-[#3A4440] hover:bg-[#4A5450] border border-[#4A5450] text-white focus:outline-none focus:ring-2 focus:ring-forest-accent">
-                            <option value="">All Regions</option>
-                            <option value="north-america">North America</option>
-                            <option value="europe">Europe</option>
-                            <option value="asia">Asia</option>
-                            <option value="africa">Africa</option>
-                            <option value="south-america">South America</option>
-                            <option value="oceania">Oceania</option>
-                            <option value="middle-east">Middle East</option>
-                        </select>
+    <!-- Removed duplicate hero section to avoid double headers -->
+
+    <!-- Main Content -->
+    <main>
+        <section class="bg-[#3A4440] text-white">
+            <div class="container py-12 md:py-16">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl md:text-5xl font-bold">The Forest</h1>
+                    <p class="text-white/80 mt-2">Discover books through authentic Night Owl reviews</p>
+                </div>
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex flex-col md:flex-row gap-4 mb-6">
+                        <div class="flex-1">
+                            <input type="text" id="searchInput" placeholder="Search books or authors..." 
+                                   class="w-full px-6 py-4 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-forest-accent focus:border-transparent text-lg">
+                        </div>
+                        <div class="flex gap-3 justify-center md:justify-start">
+                            <select id="languageFilter" class="px-4 py-4 rounded-xl bg-[#3A4440] hover:bg-[#4A5450] border border-[#4A5450] text-white focus:outline-none focus:ring-2 focus:ring-forest-accent">
+                                <option value="">All Languages</option>
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="it">Italian</option>
+                                <option value="pt">Portuguese</option>
+                                <option value="ru">Russian</option>
+                                <option value="ja">Japanese</option>
+                                <option value="ko">Korean</option>
+                                <option value="zh">Chinese</option>
+                                <option value="ar">Arabic</option>
+                                <option value="he">Hebrew</option>
+                                <option value="hi">Hindi</option>
+                            </select>
+                            <select id="regionFilter" class="px-4 py-4 rounded-xl bg-[#3A4440] hover:bg-[#4A5450] border border-[#4A5450] text-white focus:outline-none focus:ring-2 focus:ring-forest-accent">
+                                <option value="">All Regions</option>
+                                <option value="north-america">North America</option>
+                                <option value="europe">Europe</option>
+                                <option value="asia">Asia</option>
+                                <option value="africa">Africa</option>
+                                <option value="south-america">South America</option>
+                                <option value="oceania">Oceania</option>
+                                <option value="middle-east">Middle East</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Main Content -->
-    <main class="py-12">
-        <div class="container">
+        <div class="container py-10">
             <!-- Books Section -->
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-bold text-forest-text">Discover Books</h2>
@@ -173,39 +169,8 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer bg-[#3A4440] text-white py-12">
-        <div class="container">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <div class="flex items-center mb-4">
-                        <img src="images/logo.png" alt="Noctua Forest" class="w-8 h-8 mr-3">
-                        <span class="text-xl font-bold">Noctua Forest</span>
-                    </div>
-                    <p class="text-white/70">Discover books through authentic reviews from the Night Owl community.</p>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Community</h4>
-                    <ul class="space-y-2">
-                        <li><a href="forest.html" class="text-white/70 hover:text-white transition-colors">The Forest</a></li>
-                        <li><a href="reviews.html" class="text-white/70 hover:text-white transition-colors">Write a Review</a></li>
-                        <li><a href="lists.html" class="text-white/70 hover:text-white transition-colors">Curator Lists</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Support</h4>
-                    <ul class="space-y-2">
-                        <li><a href="help.html" class="text-white/70 hover:text-white transition-colors">Help Center</a></li>
-                        <li><a href="contact.html" class="text-white/70 hover:text-white transition-colors">Contact Us</a></li>
-                        <li><a href="about.html" class="text-white/70 hover:text-white transition-colors">About</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-white/20 mt-8 pt-8 text-center text-white/70">
-                <p>&copy; 2024 Noctua Forest. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <!-- Footer is globally injected by assets/footer.js; keep placeholder for sticky layout -->
+    <footer class="mt-auto"></footer>
 
     <!-- Firebase -->
     <script type="module">
@@ -270,7 +235,45 @@
         // Forest Discovery will be initialized by the module itself
     </script>
 
-    <script type="module" src="forest-discovery.js"></script>
+    <script type="module">
+        // Wait for Firebase to be available, then load forest-discovery
+        function initializeForestDiscovery() {
+            console.log('initializeForestDiscovery called');
+            console.log('Firebase availability:', {
+                db: !!window.db,
+                app: !!window.app,
+                collection: !!window.collection
+            });
+            
+            if (window.db && window.app && window.collection) {
+                console.log('Firebase is ready, loading forest-discovery.js...');
+                import('./forest-discovery.js').then(() => {
+                    console.log('Forest Discovery module loaded successfully');
+                }).catch(err => {
+                    console.error('Failed to load forest-discovery.js:', err);
+                    // Show error to user
+                    document.getElementById('booksGrid').innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+                                <h3 class="text-lg font-semibold text-red-800 mb-2">Script Loading Error</h3>
+                                <p class="text-red-600 mb-4">Failed to load Forest Discovery script: ${err.message}</p>
+                                <button onclick="location.reload()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                    Reload Page
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                console.log('Firebase not ready yet, retrying in 100ms...');
+                setTimeout(initializeForestDiscovery, 100);
+            }
+        }
+        
+        // Start initialization after a short delay to ensure Firebase is ready
+        console.log('Setting up Forest Discovery initialization...');
+        setTimeout(initializeForestDiscovery, 200);
+    </script>
     
     <script>
         // Mobile menu toggle with contrast-friendly styles

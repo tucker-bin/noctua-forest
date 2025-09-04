@@ -65,6 +65,193 @@ function extractSemanticTags(text) {
   return tags;
 }
 
+// Configurable weights for hybrid scoring (can be overridden via window.FOREST_WEIGHTS)
+const DEFAULT_WEIGHTS = { cosine: 0.6, tagOverlap: 0.2, popularity: 0.2 };
+
+function getWeights() {
+  try {
+    if (window && window.FOREST_WEIGHTS) {
+      return { ...DEFAULT_WEIGHTS, ...window.FOREST_WEIGHTS };
+    }
+  } catch (_) {}
+  return DEFAULT_WEIGHTS;
+}
+
+// Minimal hierarchical tag dictionaries for intent parsing
+const INTENT_DICTIONARY = {
+  audience: ['kids', 'children', 'teens', 'students', 'beginners', 'founders', 'developers', 'physicians', 'doctors', 'nurses', 'teachers', 'parents'],
+  tone: ['technical', 'academic', 'practical', 'hands-on', 'light-hearted', 'humorous', 'serious', 'inspirational'],
+  pace: ['fast', 'quick', 'short', 'breezy', 'deep', 'comprehensive', 'in-depth', 'slow'],
+  domain: ['health', 'medicine', 'nutrition', 'finance', 'investing', 'history', 'tech', 'software', 'design', 'psychology', 'productivity', 'business', 'leadership'],
+  goal: ['learn', 'study', 'revise', 'relax', 'entertain', 'diet', 'lose weight', 'build', 'ship', 'launch']
+};
+
+function normalize(text) {
+  return (text || '').toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, ' ').replace(/\s+/g, ' ').trim();
+}
+
+// Lightweight rule-based intent parser → facets
+function parseIntent(query) {
+  const q = normalize(query);
+  const facets = { audience: [], tone: [], pace: [], domain: [], goal: [], tokens: [] };
+  if (!q) return facets;
+  Object.entries(INTENT_DICTIONARY).forEach(([key, list]) => {
+    list.forEach(word => {
+      const pattern = new RegExp(`(^|\\s)${word.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}(\\s|$)`);
+      if (pattern.test(q)) facets[key].push(word);
+    });
+  });
+  facets.tokens = q.split(' ').filter(Boolean);
+  return facets;
+}
+
+// Build semanticText per book
+function buildSemanticText(book) {
+  const parts = [
+    book.title,
+    book.author,
+    (book.blurb || ''),
+    (book.tags || []).join(' '),
+    (book.authorTags || []).join(' '),
+    (book.primaryLanguage || ''),
+    (book.authorRegion || '')
+  ];
+  return normalize(parts.join(' '));
+}
+
+// Lazy-load USE model; fallback gracefully
+let __useModel = null;
+async function ensureUSELoaded() {
+  if (__useModel) return __useModel;
+  try {
+    // Load TFJS first
+    await import('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0/dist/tf.min.js');
+    // Load Universal Sentence Encoder (ESM build)
+    const use = await import('https://cdn.jsdelivr.net/npm/@tensorflow-models/universal-sentence-encoder@1.3.3/dist/universal-sentence-encoder.esm.js');
+    __useModel = await use.load();
+    return __useModel;
+  } catch (err) {
+    console.warn('USE failed to load, will fallback to rule-based scoring', err);
+    return null;
+  }
+}
+
+const embeddingCache = new Map();
+async function embedText(text) {
+  const key = text;
+  if (embeddingCache.has(key)) return embeddingCache.get(key);
+  const model = await ensureUSELoaded();
+  if (!model) return null;
+  const emb = await model.embed([text]);
+  const arr = await emb.array();
+  emb.dispose();
+  const vec = arr[0];
+  embeddingCache.set(key, vec);
+  return vec;
+}
+
+function cosine(a, b) {
+  if (!a || !b || a.length !== b.length) return 0;
+  let dot = 0, na = 0, nb = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    na += a[i] * a[i];
+    nb += b[i] * b[i];
+  }
+  if (na === 0 || nb === 0) return 0;
+  return dot / (Math.sqrt(na) * Math.sqrt(nb));
+}
+
+function computeTagOverlapScore(book, facets) {
+  const tags = new Set([...(book.tags || []), ...(book.authorTags || [])].map(normalize));
+  const sought = new Set([...facets.audience, ...facets.tone, ...facets.pace, ...facets.domain, ...facets.goal].map(normalize));
+  if (tags.size === 0 || sought.size === 0) return 0;
+  let hit = 0;
+  sought.forEach(t => { if (tags.has(t)) hit++; });
+  const denom = Math.max(1, Math.min(tags.size, sought.size));
+  return Math.min(1, hit / denom);
+}
+
+function popularityScore(book) {
+  const rc = Number(book.reviewCount || 0);
+  // Smooth log scale 0..1
+  return Math.max(0, Math.min(1, Math.log10(1 + rc) / 2));
+}
+
+async function hybridRerank(books, query) {
+  const weights = getWeights();
+  const facets = parseIntent(query);
+  const qText = normalize(query);
+  let qEmb = null;
+  try {
+    qEmb = await embedText(qText);
+  } catch (_) {}
+  
+  const scored = [];
+  for (const book of books) {
+    const semanticText = book.semanticText || buildSemanticText(book);
+    let cos = 0;
+    if (qEmb) {
+      try {
+        const bEmb = await embedText(semanticText);
+        cos = cosine(qEmb, bEmb);
+      } catch (_) { cos = 0; }
+    }
+    const overlap = computeTagOverlapScore(book, facets);
+    const pop = popularityScore(book);
+    const score = (weights.cosine * cos) + (weights.tagOverlap * overlap) + (weights.popularity * pop);
+    scored.push({ book, score });
+  }
+  scored.sort((a, b) => b.score - a.score);
+  return scored.map(s => s.book);
+}
+
+// Lightweight rule-based reranker for small catalogs or no embeddings
+const SIMPLE_WEIGHTS = { phrase: 0.45, tokens: 0.25, overlap: 0.15, popularity: 0.1, recency: 0.05 };
+function daysAgo(date) {
+  const d = (date instanceof Date) ? date : new Date(date);
+  const ms = Date.now() - (d?.getTime?.() || Date.now());
+  return Math.max(0, ms / (1000 * 60 * 60 * 24));
+}
+function recencyScore(createdAt) {
+  const da = daysAgo(createdAt || new Date());
+  // 0..1, decays after ~90 days
+  return Math.max(0, Math.min(1, 1 - (da / 90)));
+}
+function simpleRerank(books, query) {
+  const q = normalize(query);
+  if (!q) return books;
+  const tokens = q.split(' ').filter(Boolean);
+  const scored = books.map(book => {
+    const st = book.semanticText || buildSemanticText(book);
+    const title = normalize(book.title || '');
+    const blurb = normalize(book.blurb || '');
+    // phrase match boost
+    let phrase = 0;
+    if (title.includes(q)) phrase += 1;
+    if (blurb.includes(q)) phrase += 0.5;
+    if (st.includes(q)) phrase += 0.25;
+    phrase = Math.min(1, phrase);
+    // token overlap
+    let tokenHits = 0;
+    tokens.forEach(t => { if (st.includes(t)) tokenHits++; });
+    const tokenScore = tokens.length ? (tokenHits / tokens.length) : 0;
+    // tag overlap via intent facets
+    const overlap = computeTagOverlapScore(book, parseIntent(q));
+    const pop = popularityScore(book);
+    const rec = recencyScore(book.createdAt);
+    const score =
+      SIMPLE_WEIGHTS.phrase * phrase +
+      SIMPLE_WEIGHTS.tokens * tokenScore +
+      SIMPLE_WEIGHTS.overlap * overlap +
+      SIMPLE_WEIGHTS.popularity * pop +
+      SIMPLE_WEIGHTS.recency * rec;
+    return { book, score };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.map(s => s.book);
+}
+
 // Forest Discovery System - Infinite Scroll & Filtering
 class ForestDiscovery {
   constructor() {
@@ -81,6 +268,7 @@ class ForestDiscovery {
     this.hasMoreBooks = true;
     this.isLoading = false;
     this.lastDoc = null;
+    this.lastSearchQuery = '';
     
     this.init();
     this.loadUserPreferences();
@@ -121,14 +309,14 @@ class ForestDiscovery {
     // Search input
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
-      let searchTimeout;
+    let searchTimeout;
       searchInput.addEventListener('input', (e) => {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-          this.filters.search = e.target.value;
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        this.filters.search = e.target.value;
           this.loadInitialBooks();
-        }, 300);
-      });
+      }, 300);
+    });
     }
 
     // Language filter
@@ -162,7 +350,7 @@ class ForestDiscovery {
     const loadMoreBtn = document.getElementById('loadMoreBtn');
     if (loadMoreBtn) {
       loadMoreBtn.addEventListener('click', () => {
-        this.loadMoreBooks();
+          this.loadMoreBooks();
       });
     }
   }
@@ -189,6 +377,8 @@ class ForestDiscovery {
     console.log('ForestDiscovery: Loading initial books...');
     this.currentPage = 1;
     this.books = [];
+    this.lastDoc = null;
+    this.hasMoreBooks = true;
     await this.loadMoreBooks();
     console.log('ForestDiscovery: Initial books loaded, count:', this.books.length);
   }
@@ -198,7 +388,7 @@ class ForestDiscovery {
     
     this.isLoading = true;
     this.showLoading(true);
-    
+
     try {
       const newBooks = await this.fetchBooks(this.currentPage, this.filters);
       
@@ -215,7 +405,17 @@ class ForestDiscovery {
       this.updateEmptyState();
     } catch (error) {
       console.error('Error loading books:', error);
-      this.showError('Failed to load books. Please try again.');
+      console.error('Error details:', {
+        code: error.code,
+        message: error.message,
+        stack: error.stack
+      });
+      
+      if (error.code === 'failed-precondition') {
+        this.showError('Database index required. Please contact support.');
+      } else {
+        this.showError('Failed to load books. Please try again.');
+      }
     } finally {
       this.isLoading = false;
       this.showLoading(false);
@@ -226,30 +426,24 @@ class ForestDiscovery {
     if (this.isLoading) return [];
     
     console.log('ForestDiscovery: Fetching books, page:', page, 'filters:', filters);
+    this.lastSearchQuery = (filters && filters.search) ? String(filters.search) : '';
     
     try {
-      // Build Firestore query
       let booksQuery = collection(db, 'books');
-      console.log('ForestDiscovery: Created books collection query');
+      const pageSize = 12;
       
-      // Apply filters (align with books schema)
-      if (filters.language && filters.language !== '') {
+      const hasLanguage = !!(filters.language && filters.language !== '');
+      const hasRegion = !!(filters.region && filters.region !== '');
+      if (hasLanguage) {
         booksQuery = query(booksQuery, where('primaryLanguage', '==', filters.language));
       }
-      
-      if (filters.region && filters.region !== '') {
+      if (hasRegion) {
         booksQuery = query(booksQuery, where('authorRegion', '==', filters.region));
       }
       
-      // Apply sorting
-      let sortField = 'createdAt';
+      let sortField = 'publishedAt';
       let sortOrder = 'desc';
-      
       switch (filters.sort) {
-        case 'recent':
-          sortField = 'publishedAt';
-          sortOrder = 'desc';
-          break;
         case 'popular':
           sortField = 'reviewCount';
           sortOrder = 'desc';
@@ -258,28 +452,33 @@ class ForestDiscovery {
           sortField = 'title';
           sortOrder = 'asc';
           break;
+        case 'recent':
+        default:
+          sortField = 'publishedAt';
+          sortOrder = 'desc';
+      }
+      if ((hasLanguage || hasRegion) && sortField === 'publishedAt') {
+          sortField = 'createdAt';
+        sortOrder = 'desc';
       }
       
-      booksQuery = query(booksQuery, orderBy(sortField, sortOrder));
-      
-      // Apply pagination
-      const pageSize = 12;
-      booksQuery = query(booksQuery, limit(pageSize));
-      
+      booksQuery = query(booksQuery, orderBy(sortField, sortOrder), limit(pageSize));
       if (this.lastDoc && page > 1) {
         booksQuery = query(booksQuery, startAfter(this.lastDoc));
       }
       
-      console.log('ForestDiscovery: Executing Firestore query...');
       const booksSnap = await getDocs(booksQuery);
-      console.log('ForestDiscovery: Query executed, got', booksSnap.docs.length, 'documents');
-      
-      // Update lastDoc for pagination
+      if (booksSnap.docs.length === 0 && page === 1) {
+        this.showEmptyState();
+        return [];
+      }
       if (booksSnap.docs.length > 0) {
         this.lastDoc = booksSnap.docs[booksSnap.docs.length - 1];
+        this.hasMoreBooks = booksSnap.docs.length === pageSize;
+      } else {
+        this.hasMoreBooks = false;
       }
       
-      // Map documents to book objects
       const books = booksSnap.docs.map(doc => {
         const data = doc.data();
         return {
@@ -293,84 +492,29 @@ class ForestDiscovery {
           publicationYear: data.publicationYear || null,
           authorTags: data.authorTags || [],
           blurb: data.blurb || '',
-          rating: data.averageRating || 0,
           createdAt: data.publishedAt || data.createdAt || new Date()
         };
       });
       
-      // Apply semantic search if search query exists
       if (filters.search && filters.search.trim()) {
-        console.log('ForestDiscovery: Applying semantic search for:', filters.search);
-        return this.semanticSearch(books, filters.search.trim());
+        // If catalog is small (< 30) or model not yet loaded, use simple reranker
+        const useSimple = books.length < 30;
+        if (useSimple) {
+          return simpleRerank(books, filters.search.trim());
+        }
+        // Hybrid rerank with embeddings + tag/popularity; fallback to simple
+        try {
+          const reranked = await hybridRerank(books, filters.search.trim());
+          return reranked;
+        } catch (e) {
+          console.warn('Hybrid rerank failed, using simple rerank', e);
+          return simpleRerank(books, filters.search.trim());
+        }
       }
-      
-      console.log('ForestDiscovery: Returning', books.length, 'books');
       return books;
-      
     } catch (error) {
       console.error('ForestDiscovery: Firestore query failed:', error);
-      
-      // Fallback: fetch limited books and filter client-side
-      console.log('ForestDiscovery: Using fallback client-side filtering');
-      try {
-        const fallbackQuery = query(collection(db, 'books'), limit(50));
-        const fallbackSnap = await getDocs(fallbackQuery);
-        
-        let fallbackBooks = fallbackSnap.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            title: data.title || 'Untitled',
-            author: data.author || 'Unknown Author',
-            coverUrl: data.coverUrl || '/images/placeholder-book.jpg',
-            averageRating: data.averageRating || 0,
-            reviewCount: data.reviewCount || 0,
-            primaryLanguage: data.primaryLanguage || 'en',
-            authorRegion: data.authorRegion || 'unknown',
-            publicationYear: data.publicationYear || null,
-            authorTags: data.authorTags || [],
-            blurb: data.blurb || '',
-            rating: data.averageRating || 0,
-            createdAt: data.publishedAt || data.createdAt || new Date()
-          };
-        });
-        
-        // Client-side filtering
-        if (filters.language) {
-          fallbackBooks = fallbackBooks.filter(book => book.primaryLanguage === filters.language);
-        }
-        
-        if (filters.region) {
-          fallbackBooks = fallbackBooks.filter(book => book.authorRegion === filters.region);
-        }
-        
-        // Client-side sorting
-        switch (filters.sort) {
-          case 'recent':
-            fallbackBooks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            break;
-          case 'popular':
-            fallbackBooks.sort((a, b) => b.reviewCount - a.reviewCount);
-            break;
-          case 'rating':
-            fallbackBooks.sort((a, b) => b.rating - a.rating);
-            break;
-          case 'title':
-            fallbackBooks.sort((a, b) => a.title.localeCompare(b.title));
-            break;
-        }
-        
-        // Apply pagination
-        const pageSize = 12;
-        const start = Math.max(0, (page - 1) * pageSize);
-        const end = start + pageSize;
-        
-        return fallbackBooks.slice(start, end);
-        
-      } catch (fallbackError) {
-        console.error('ForestDiscovery: Fallback also failed:', fallbackError);
-        return [];
-      }
+      return [];
     }
   }
 
@@ -448,7 +592,7 @@ class ForestDiscovery {
     card.onclick = () => viewBook(book.id);
     
     const wordCloud = this.generateWordCloud(book);
-    
+    const whyChips = this.buildWhyChips(book, this.lastSearchQuery);
     card.innerHTML = `
       <div class="aspect-[3/4] bg-gray-200 overflow-hidden">
         <img src="${book.coverUrl}" alt="${book.title}" class="w-full h-full object-cover">
@@ -461,19 +605,35 @@ class ForestDiscovery {
         <div class="mb-3 text-sm">
           ${wordCloud}
         </div>
+        ${whyChips}
         
         <div class="flex items-center justify-between">
           <div class="flex items-center">
             <span class="text-sm text-forest-text-muted">${book.reviewCount} reviews</span>
-          </div>
+            </div>
           <div class="text-xs text-forest-text-muted">
             ${this.formatRegion(book.authorRegion)}
           </div>
+            </div>
         </div>
-      </div>
     `;
     
     return card;
+  }
+
+  buildWhyChips(book, query) {
+    const q = normalize(query || '');
+    if (!q) return '';
+    const facets = parseIntent(q);
+    const show = [];
+    if (facets.audience.length) show.push(`for ${facets.audience[0]}`);
+    if (facets.tone.length) show.push(facets.tone[0]);
+    if (facets.pace.length) show.push(facets.pace[0]);
+    if (facets.domain.length) show.push(facets.domain[0]);
+    if (facets.goal.length) show.push(facets.goal[0]);
+    const chips = show.slice(0, 3).map(txt => `<span class="inline-block text-xs bg-gray-100 text-forest-text px-2 py-1 rounded mr-2 mb-2">${txt}</span>`);
+    if (!chips.length) return '';
+    return `<div class="mb-3">${chips.join('')}</div>`;
   }
 
   generateWordCloud(book) {
@@ -575,9 +735,9 @@ class ForestDiscovery {
     const loadingIndicator = document.getElementById('loadingIndicator');
     if (!loadingIndicator) return;
     
-    if (show) {
+      if (show) {
       loadingIndicator.classList.remove('hidden');
-    } else {
+      } else {
       loadingIndicator.classList.add('hidden');
     }
   }
@@ -595,6 +755,15 @@ function viewBook(bookId) {
 
 // Make ForestDiscovery available globally
 window.ForestDiscovery = ForestDiscovery;
+
+// Add showEmptyState method to ForestDiscovery prototype
+ForestDiscovery.prototype.showEmptyState = function() {
+  const booksGrid = document.getElementById('booksGrid');
+  const emptyState = document.getElementById('emptyState');
+  
+  if (booksGrid) booksGrid.style.display = 'none';
+  if (emptyState) emptyState.style.display = 'block';
+};
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
@@ -617,6 +786,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
   
+  try {
   window.forestDiscovery = new ForestDiscovery();
-  console.log('Forest Discovery: Initialized successfully');
+    console.log('Forest Discovery: Initialized successfully');
+  } catch (error) {
+    console.error('Forest Discovery: Failed to initialize:', error);
+  }
 });

@@ -131,6 +131,68 @@
                 <p class="text-sm text-white/80">Sets missing publishedAt to createdAt or now.</p>
             </div>
         </div>
+
+        <!-- Reading Lists (Quick Manage) -->
+        <div class="bg-forest-card rounded-xl p-8 mb-12">
+            <div class="flex items-center mb-6">
+                <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10" />
+                </svg>
+                <h2 class="text-2xl font-bold text-white">Reading Lists</h2>
+            </div>
+
+            <!-- Quick Create -->
+            <div class="bg-[#3A4440] rounded-lg p-4 mb-6">
+                <div class="grid md:grid-cols-3 gap-3">
+                    <input id="newListName" class="px-4 py-2 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white" placeholder="List name (e.g., Weekend Reads)">
+                    <input id="newListDesc" class="px-4 py-2 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white" placeholder="Optional description">
+                    <button id="createListBtn" class="px-4 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg">Create List</button>
+                </div>
+            </div>
+
+            <!-- Lists Table (drag to reorder) -->
+            <div class="overflow-auto bg-forest-secondary rounded-lg">
+                <table class="min-w-full text-left text-sm text-white/90">
+                    <thead class="bg-[#3A4440] text-white">
+                        <tr>
+                            <th class="px-4 py-2 w-8">#</th>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Books</th>
+                            <th class="px-4 py-2">Views</th>
+                            <th class="px-4 py-2">Clicks</th>
+                            <th class="px-4 py-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listsTable"></tbody>
+                </table>
+            </div>
+            <div class="text-white/70 text-xs mt-2">Tip: drag rows to reorder (saves automatically).</div>
+        </div>
+
+        <!-- Search Weights & Why Preview -->
+        <div class="bg-forest-card rounded-xl p-8 mb-12">
+            <div class="flex items-center mb-6">
+                <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                <h2 class="text-2xl font-bold text-white">Search Weights & Preview</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6 mb-6 text-white">
+                <div class="bg-forest-secondary rounded-lg p-4">
+                    <h3 class="text-sm font-semibold mb-2">Hybrid Weights</h3>
+                    <div id="weightsView" class="text-white/90 text-sm"></div>
+                </div>
+                <div class="md:col-span-2 bg-forest-secondary rounded-lg p-4">
+                    <h3 class="text-sm font-semibold mb-2">Why Chips Preview</h3>
+                    <div class="flex gap-2 mb-3">
+                        <input id="previewQuery" class="flex-1 px-4 py-2 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white" placeholder="Type a query (e.g., fast technical intros for beginners)">
+                        <button id="previewBtn" class="px-4 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg">Preview</button>
+                    </div>
+                    <div id="whyPreview" class="min-h-[42px]"></div>
+                </div>
+            </div>
+            <div class="text-white/70 text-xs">Weights are read-only here. Admin editing can be added later via Firestore config.</div>
+        </div>
         <!-- Review Book Submissions -->
         <div class="bg-forest-card rounded-xl p-8 mb-8">
             <div class="flex items-center mb-6">
@@ -361,6 +423,11 @@
             // Wire up maintenance tools
             const backfillBtn = document.getElementById('backfillPublishedAtBtn');
             if (backfillBtn) backfillBtn.addEventListener('click', () => window.backfillPublishedAt());
+
+            // Load and manage lists
+            try { await loadLists(user.uid); } catch (e) { console.warn('loadLists failed', e); }
+            wireListQuickCreate(user.uid);
+            initWeightsPreview();
         });
 
         // Signout handler (same pattern as user dashboard)
@@ -786,6 +853,100 @@
             previewModal.classList.remove('flex');
             currentSubmissionId = null;
         };
+    </script>
+    <script>
+      // Lists quick-manage (client-only minimal UI)
+      async function loadLists(userId){
+        try{
+          const { getUserListsSummary } = await import('../js/readingListService.js');
+          const lists = await getUserListsSummary(userId);
+          const tbody = document.getElementById('listsTable');
+          if (!tbody) return;
+          tbody.innerHTML = '';
+          (lists || []).forEach((l, idx) => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('draggable','true');
+            tr.dataset.id = l.id;
+            tr.innerHTML = `
+              <td class="px-4 py-2 cursor-move">${idx+1}</td>
+              <td class="px-4 py-2">${l.name || 'Untitled'}</td>
+              <td class="px-4 py-2">${(l.books||[]).length}</td>
+              <td class="px-4 py-2">${l.views||0}</td>
+              <td class="px-4 py-2">${l.clicks||0}</td>
+              <td class="px-4 py-2">
+                <a class="underline mr-3" target="_blank" href="../lists.html?id=${l.shareId || l.id}">Open</a>
+              </td>`;
+            tbody.appendChild(tr);
+          });
+          enableReorder(tbody, userId);
+        }catch(e){ console.warn(e); }
+      }
+
+      function enableReorder(tbody, userId){
+        let dragging = null;
+        tbody.querySelectorAll('tr').forEach(row => {
+          row.addEventListener('dragstart', ()=> dragging = row);
+          row.addEventListener('dragover', (e)=>{ e.preventDefault(); const after = e.target.closest('tr'); if(after && after!==dragging){ tbody.insertBefore(dragging, after); }});
+          row.addEventListener('drop', async ()=>{ await persistOrder(tbody, userId); });
+        });
+      }
+
+      async function persistOrder(tbody, userId){
+        try{
+          const order = Array.from(tbody.querySelectorAll('tr')).map((tr, i)=>({ id: tr.dataset.id, index: i }));
+          const { saveListOrder } = await import('../js/readingListService.js');
+          await saveListOrder(userId, order);
+        }catch(e){ console.warn('save order failed', e); }
+      }
+
+      function wireListQuickCreate(userId){
+        const btn = document.getElementById('createListBtn');
+        if (!btn) return;
+        btn.addEventListener('click', async ()=>{
+          try{
+            const name = document.getElementById('newListName').value.trim();
+            const description = document.getElementById('newListDesc').value.trim();
+            if (!name) { alert('Enter a list name'); return; }
+            const { createList } = await import('../js/readingListService.js');
+            await createList(userId, { name, description });
+            document.getElementById('newListName').value = '';
+            document.getElementById('newListDesc').value = '';
+            await loadLists(userId);
+          }catch(e){ console.error(e); alert('Failed to create list'); }
+        });
+      }
+
+      // Weights preview + Why chips
+      function initWeightsPreview(){
+        const el = document.getElementById('weightsView');
+        if (el){
+          const w = (window.FOREST_WEIGHTS || { cosine:0.6, tagOverlap:0.2, popularity:0.2 });
+          el.textContent = `cosine: ${w.cosine ?? 0.6}, tagOverlap: ${w.tagOverlap ?? 0.2}, popularity: ${w.popularity ?? 0.2}`;
+        }
+        const btn = document.getElementById('previewBtn');
+        if (!btn) return;
+        btn.addEventListener('click', ()=>{
+          const q = document.getElementById('previewQuery').value || '';
+          // reuse client parser from Forest (minimal duplicate)
+          const chips = buildWhyFromQuery(q);
+          document.getElementById('whyPreview').innerHTML = chips || '<span class="text-white/70 text-sm">No facets detected.</span>';
+        });
+      }
+      function buildWhyFromQuery(q){
+        const dict = {
+          audience:['kids','children','teens','students','beginners','founders','developers','physicians','doctors','nurses','teachers','parents'],
+          tone:['technical','academic','practical','hands-on','light-hearted','humorous','serious','inspirational'],
+          pace:['fast','quick','short','breezy','deep','comprehensive','in-depth','slow'],
+          domain:['health','medicine','nutrition','finance','investing','history','tech','software','design','psychology','productivity','business','leadership'],
+          goal:['learn','study','revise','relax','entertain','diet','lose weight','build','ship','launch']
+        };
+        const n = (q||'').toLowerCase();
+        const facets = { audience:[], tone:[], pace:[], domain:[], goal:[] };
+        Object.entries(dict).forEach(([k,list])=>{ list.forEach(w=>{ if(new RegExp(`(^|\\s)${w}(\\s|$)`).test(n)) facets[k].push(w); }); });
+        const show=[]; if(facets.audience[0]) show.push(`for ${facets.audience[0]}`); if(facets.tone[0]) show.push(facets.tone[0]); if(facets.pace[0]) show.push(facets.pace[0]); if(facets.domain[0]) show.push(facets.domain[0]); if(facets.goal[0]) show.push(facets.goal[0]);
+        if (!show.length) return '';
+        return `<div>${show.slice(0,3).map(t=>`<span class=\"inline-block text-xs bg-gray-100 text-forest-text px-2 py-1 rounded mr-2 mb-2\">${t}</span>`).join('')}</div>`;
+      }
     </script>
     
     <!-- Global Footer with Google Translate -->
