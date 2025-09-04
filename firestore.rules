@@ -33,7 +33,7 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
     }
 
-    // Submissions (unpublished)
+    // Submissions (unpublished) — allow create for signed-in users as fallback queue
     match /submissions/{submissionId} {
       allow create: if isSignedIn();
       // owners can read their own; admins can list/read all

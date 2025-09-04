@@ -269,12 +269,27 @@ export async function submitReview(reviewData) {
       verifiedNoAI: true
     };
 
-    const docRef = await addDoc(collection(db, 'reviews'), review);
-    
-    return {
-      id: docRef.id,
-      ...review
-    };
+    try {
+      const docRef = await addDoc(collection(db, 'reviews'), review);
+      return { id: docRef.id, ...review };
+    } catch (err) {
+      // Fallback to submissions queue if direct review write is blocked by rules
+      try {
+        const sub = {
+          type: 'review',
+          userId: reviewData.authorId,
+          bookId: reviewData.bookId,
+          reviewText: reviewData.text,
+          payload: review,
+          status: 'pending',
+          createdAt: serverTimestamp()
+        };
+        const subRef = await addDoc(collection(db, 'submissions'), sub);
+        return { id: subRef.id, ...review, status: 'pending' };
+      } catch (e2) {
+        throw err; // rethrow original if fallback also fails
+      }
+    }
   } catch (err) {
     console.error('Error submitting review:', err);
     throw err;
