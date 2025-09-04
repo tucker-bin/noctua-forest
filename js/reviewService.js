@@ -313,7 +313,8 @@ export async function getRecentReviews(userId, maxCount = 5) {
     const reviewsRef = collection(db, 'reviews');
     const q = query(
       reviewsRef,
-      where('authorId', '==', userId),
+      // Align with rules: some deployments use 'userId' on review doc
+      where('userId', '==', userId),
       orderBy('createdAt', 'desc'),
       limit(maxCount)
     );

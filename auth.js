@@ -81,6 +81,10 @@ async function updateSignedInUI(user) {
   }
 
   // Load dashboard data
+  try {
+    // Ensure Firestore sees the latest auth state
+    await auth.currentUser?.getIdToken(true);
+  } catch {}
   await loadDashboardData(user.uid);
 }
 

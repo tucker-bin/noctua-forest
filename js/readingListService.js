@@ -42,6 +42,7 @@ export async function createList(userId, name = "Wish List", description = "") {
  * @returns {Promise<Array>} Array of list objects
  */
 export async function getUserLists(userId) {
+    // Ensure we only read the caller's lists; rules require resource.data.userId == auth.uid
     const q = query(
         collection(db, LISTS_COLLECTION),
         where('userId', '==', userId),
