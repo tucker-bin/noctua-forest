@@ -66,9 +66,10 @@ export async function getSimilarBooks(bookId, { moods = [], genres = [], limit: 
 
         booksSnap.forEach(doc => {
             const book = doc.data();
+            const currentBookId = doc.id;
             
             // Skip the source book
-            if ((book.id || '') === String(bookId)) {
+            if (currentBookId === String(bookId)) {
                 return;
             }
             
@@ -111,8 +112,12 @@ export async function getMoreFromAuthor(authorName, excludeBookId, { limit: resu
 
         booksSnap.forEach(doc => {
             const data = doc.data();
-            if (data.id !== excludeBookId) {
-                books.push(data);
+            const currentBookId = doc.id;
+            if (currentBookId !== String(excludeBookId)) {
+                books.push({
+                    ...data,
+                    id: currentBookId
+                });
             }
         });
 

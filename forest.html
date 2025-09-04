@@ -151,7 +151,31 @@
     <script type="module">
         import { app, db } from './firebase-config.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { 
+            collection, 
+            query, 
+            where, 
+            orderBy, 
+            limit, 
+            startAfter, 
+            getDocs,
+            doc, 
+            getDoc 
+        } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+        // Make Firebase functions available globally for forest-discovery.js
+        window.db = db;
+        window.getAuth = getAuth;
+        window.onAuthStateChanged = onAuthStateChanged;
+        window.collection = collection;
+        window.query = query;
+        window.where = where;
+        window.orderBy = orderBy;
+        window.limit = limit;
+        window.startAfter = startAfter;
+        window.getDocs = getDocs;
+        window.doc = doc;
+        window.getDoc = getDoc;
 
         const membershipAuth = getAuth(app);
         

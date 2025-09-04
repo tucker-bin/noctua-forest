@@ -1,18 +1,7 @@
-import { app, db } from './firebase-config.js';
-import { 
-  collection, 
-  query, 
-  where, 
-  orderBy, 
-  limit, 
-  startAfter, 
-  getDocs,
-  doc,
-  getDoc
-} from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+// Firebase imports will be handled by the HTML page
+// This file expects db, getAuth, onAuthStateChanged, collection, query, where, orderBy, limit, startAfter, getDocs, doc, getDoc to be available globally
 
-  // Helper function to truncate text with fade effect
+// Helper function to truncate text with fade effect
 function truncateText(text, maxLength = 200) {
   if (text.length <= maxLength) {
     return text;
@@ -538,8 +527,9 @@ class ForestDiscovery {
             <h3 class="text-2xl font-bold text-white mb-2" style="font-family: 'Poppins', sans-serif;">${book.title}</h3>
             <p class="text-md text-gray-300 mb-4" aria-label="Author">By ${book.author}</p>
             <div class="relative mb-4">
-                <p class="text-forest-light leading-relaxed" aria-label="Book description">${truncatedBlurb}</p>
-                ${truncatedBlurb.endsWith('...') ? '<div class="absolute bottom-0 right-0 bg-gradient-to-l from-[#3A4F3C] to-transparent w-8 h-6" aria-hidden="true"></div>' : ''}
+                <div class="word-cloud" aria-label="Book insights from reviews">
+                    ${this.generateWordCloud(book)}
+                </div>
             </div>
             <div class="flex flex-wrap gap-2 mb-4" role="list" aria-label="Book genres">
                 ${book.tags.slice(0, 2).map(tag => `
@@ -596,6 +586,49 @@ class ForestDiscovery {
       'middle-east': 'Middle East'
     };
     return regionMap[region] || region;
+  }
+
+  generateWordCloud(book) {
+    // Generate word cloud from book data
+    const words = [];
+    
+    // Add semantic tags from book content
+    const bookContent = [
+      book.title,
+      book.author,
+      book.blurb || '',
+      ...(book.tags || [])
+    ].join(' ').toLowerCase();
+    
+    const semanticTags = extractSemanticTags(bookContent);
+    
+    // Add common book themes
+    const themes = ['story', 'character', 'plot', 'writing', 'ending', 'beginning', 'journey', 'discovery'];
+    themes.forEach(theme => {
+      if (bookContent.includes(theme)) {
+        words.push(theme);
+      }
+    });
+    
+    // Add semantic tags
+    words.push(...semanticTags);
+    
+    // Add some default words if none found
+    if (words.length === 0) {
+      words.push('engaging', 'thoughtful', 'compelling');
+    }
+    
+    // Create word cloud HTML
+    const wordCloud = words.slice(0, 8).map((word, index) => {
+      const sizes = ['text-xs', 'text-sm', 'text-base', 'text-lg'];
+      const colors = ['text-blue-300', 'text-green-300', 'text-yellow-300', 'text-purple-300', 'text-pink-300'];
+      const size = sizes[index % sizes.length];
+      const color = colors[index % colors.length];
+      
+      return `<span class="${size} ${color} font-medium mr-2 mb-1 inline-block">${word}</span>`;
+    }).join('');
+    
+    return wordCloud || '<span class="text-sm text-gray-400">No insights available</span>';
   }
 
   updateActiveFilters() {
