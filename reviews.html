@@ -746,6 +746,7 @@
                         class="btn-primary w-full md:w-auto">
                         Submit Review
                     </button>
+                    <div id="submissionStatus" class="mt-3 text-sm text-gray-200"></div>
                     <p id="submissionSuccess" class="hidden mt-4 text-green-400">Thank you! Your review was received.</p>
                 </div>
             </form>
@@ -810,9 +811,38 @@
           }
         } catch (_) {}
         const res = await fetch(`/api/pa/items?asin=${encodeURIComponent(asin)}`);
-        if (!res.ok) throw new Error('Failed to fetch book data');
+        if (!res.ok) {
+          // Fallback: return basic data if API is unavailable
+          console.warn('Book metadata API unavailable, using minimal data');
+          return {
+            asin,
+            title: '',
+            author: '',
+            coverUrl: '',
+            description: '',
+            publisher: '',
+            publicationDate: '',
+            pageCount: null,
+            categories: [],
+            isbn: ''
+          };
+        }
         const d = await res.json();
-        if (!d || !d.title) throw new Error('Invalid book data received');
+        if (!d || !d.title) {
+          console.warn('Invalid book data received, using minimal data');
+          return {
+            asin,
+            title: '',
+            author: '',
+            coverUrl: '',
+            description: '',
+            publisher: '',
+            publicationDate: '',
+            pageCount: null,
+            categories: [],
+            isbn: ''
+          };
+        }
         return {
           asin,
           title: d.title,
@@ -1252,121 +1282,170 @@
       // Track submission state to prevent beforeunload during submission
       let isSubmitting = false;
       
+      // Diagnostic helpers
+      function updateStatus(msg, level = 'info') {
+        const el = document.getElementById('submissionStatus');
+        if (!el) return;
+        const colors = { info: '#E0E2DB', warn: '#E0E2DB', error: '#FCA5A5', success: '#A7F3D0' };
+        el.style.color = colors[level] || colors.info;
+        el.textContent = msg;
+      }
+      function log(step, data) {
+        try { console.log(`[submit] ${step}`, data || ''); } catch (_) {}
+      }
+      window.addEventListener('error', (e) => updateStatus(`Error: ${e.message}`, 'error'));
+      window.addEventListener('unhandledrejection', (e) => updateStatus(`Error: ${e.reason?.message || e.reason}`, 'error'));
+      
       document.getElementById('submissionForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (isSubmitting) return; // Prevent double submission
-        
+        if (isSubmitting) { log('duplicate-submit'); return; }
+
         isSubmitting = true;
         const form = e.target;
-        let data = Object.fromEntries(new FormData(form));
-
-        // Get selected moods
-        const moods = Array.from(form.querySelectorAll('input[name="moods[]"]:checked'))
-          .map(input => input.value);
-        data.moods = moods;
-
-        // Get selected content warnings
-        const warnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked'))
-          .map(input => input.value);
-        data.contentWarnings = warnings;
-        // Optional copy format
-        data.copyFormat = (form.querySelector('#copyFormat')?.value || '').trim();
-
-        // Store verification flags but don't block submission
-        const verificationFlags = {
-          hasReadBook: !!data.hasReadBook,
-          authenticReview: !!data.authenticReview,
-          noAI: !!data.noAI
-        };
-        
-        // Log warning if verification is incomplete but don't block
-        if (!verificationFlags.hasReadBook || !verificationFlags.authenticReview || !verificationFlags.noAI) {
-          console.warn('Review submitted with incomplete verification:', verificationFlags);
-        }
-
-        // Ensure authentication
-        if (!auth.currentUser) {
-          sessionStorage.setItem('savedFormData', JSON.stringify({ type: 'bookReview', data }));
-          alert('Please sign in to submit your review. Your form has been saved.');
-          window.location.href = 'account.html';
-          return;
-        }
-
-        // Store validation flags for moderation but don't block submission
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalBtn = submitBtn?.textContent;
         try {
-          const history = await getUserHistory(auth.currentUser.uid);
-          const validation = validateReview({
-            text: data.review,
-            hasReadBook: verificationFlags.hasReadBook,
-            authenticReview: verificationFlags.authenticReview,
-            noAI: verificationFlags.noAI
-          }, history);
-          
-          // Log validation results but don't block
-          if (!validation.isValid) {
-            console.warn('Review validation issues:', validation.issues);
-          }
-          if (validation.requiresModeration) {
-            console.warn('Review flagged for moderation:', validation.riskLevel);
-          }
-        } catch (err) {
-          console.error('Validation error:', err);
-          // Don't block submission on validation errors
-        }
+          submitBtn && (submitBtn.disabled = true, submitBtn.textContent = 'Submitting...');
+          updateStatus('Submitting...');
 
-        try {
-          // Final duplicate check before submission
+          const data = Object.fromEntries(new FormData(form));
+          log('form-data', data);
+
+          // collect arrays
+          data.moods = Array.from(form.querySelectorAll('input[name="moods[]"]:checked')).map(i => i.value);
+          data.contentWarnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked')).map(i => i.value);
+          data.copyFormat = (form.querySelector('#copyFormat')?.value || '').trim();
+
+          // auth check
+          if (!auth.currentUser) {
+            updateStatus('Please sign in to submit. Your draft was saved.', 'warn');
+            sessionStorage.setItem('savedFormData', JSON.stringify({ type: 'bookReview', data }));
+            window.location.href = 'account.html';
+            return;
+          }
+          log('auth-user', auth.currentUser.uid);
+
+          // non-blocking validation (kept quiet)
+          try {
+            const history = await getUserHistory(auth.currentUser.uid);
+            const v = validateReview({
+              text: data.review,
+              hasReadBook: !!data.hasReadBook,
+              authenticReview: !!data.authenticReview,
+              noAI: !!data.noAI
+            }, history);
+            log('validation', v);
+          } catch (ve) { log('validation-error', ve); }
+
+          // metadata + duplicate checks
+          updateStatus('Checking for duplicates...');
           const asin = extractASIN(data.amazonUrl);
           if (asin) {
-            const result = await searchBooks({ asin });
-            if (result.found) {
-              window.location.href = `book.html?id=${result.book.id}#review`;
-              return;
-            }
+            const r = await searchBooks({ asin });
+            log('dup-asin', r);
+            if (r.found) { window.location.href = `book.html?id=${r.book.id}#review`; return; }
           }
-
-          // Fetch final metadata with graceful fallback
           let metadata;
           try {
             metadata = await fetchBookMetadata(data.amazonUrl);
-          } catch (_) {
-            metadata = {
-              asin: extractASIN(data.amazonUrl) || '',
-              isbn: extractISBN(data.amazonUrl) || '',
-              title: (data.title || '').trim(),
-              author: (data.author || '').trim(),
-              coverUrl: '',
-              description: '',
-              publisher: '',
-              publicationDate: '',
-              pageCount: null,
-              categories: []
-            };
+          } catch {
+            metadata = { asin: extractASIN(data.amazonUrl) || '', isbn: extractISBN(data.amazonUrl) || '' };
           }
-          
-          // Check for duplicates by ISBN
           if (metadata.isbn) {
-            const result = await searchBooks({ isbn: metadata.isbn });
-            if (result.found) {
-              window.location.href = `book.html?id=${result.book.id}#review`;
-              return;
-            }
+            const r = await searchBooks({ isbn: metadata.isbn });
+            log('dup-isbn', r);
+            if (r.found) { window.location.href = `book.html?id=${r.book.id}#review`; return; }
           }
+          const r2 = await searchBooks({ title: data.title, author: data.author });
+          log('dup-title-author', r2);
+          if (r2.found && !window.forceCreateNew) { showDuplicateBookModal(r2.book, data); return; }
+          window.forceCreateNew = false; // Reset flag
 
-          // Check for duplicates by title/author
-          const result = await searchBooks({ title: data.title, author: data.author });
-          if (result.found) {
-            showDuplicateBookModal(result.book, data);
+          // create book
+          updateStatus('Creating book...');
+          const bookPayload = {
+            title: data.title,
+            author: data.author,
+            amazonUrl: data.amazonUrl,
+            asin: metadata.asin || extractASIN(data.amazonUrl) || '',
+            isbn: metadata.isbn || '',
+            coverUrl: currentCoverData?.coverUrl || metadata.coverUrl || '',
+            publisher: metadata.publisher || '',
+            publicationDate: metadata.publicationDate || '',
+            pageCount: metadata.pageCount || null,
+            categories: metadata.categories || [],
+            primaryLanguage: data.primaryLanguage || 'en',
+            authorRegion: data.authorRegion || 'Other',
+            publicationYear: parseInt(data.publicationYear) || new Date().getFullYear(),
+            blurb: data.blurb || '',
+            status: 'active',
+            createdBy: auth.currentUser.uid,
+            userId: auth.currentUser.uid,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            publishedAt: serverTimestamp(),
+            views: 0,
+            popularity: 0
+          };
+          log('book-payload', bookPayload);
+
+          let bookRef;
+          try {
+            bookRef = await addDoc(collection(db, 'books'), bookPayload);
+            log('book-created', bookRef.id);
+          } catch (err) {
+            log('book-write-error', { code: err.code, message: err.message });
+            updateStatus(`Could not create book: ${err.code || err.message}`, 'error');
             return;
           }
 
-          // Use the extracted function for new book creation
-          await submitNewBook();
-        } catch (error) {
-          console.error('Submission failed:', error);
-          alert('Failed to submit review. Please try again.');
+          // confirm write
+          try {
+            const snap = await getDoc(doc(db, 'books', bookRef.id));
+            if (!snap.exists()) {
+              updateStatus('Book creation did not persist. Please try again.', 'error');
+              log('book-not-found-after-create', bookRef.id);
+              return;
+            }
+          } catch (err) {
+            log('book-readback-error', err);
+          }
+
+          // create review
+          updateStatus('Saving review...');
+          try {
+            const createdReview = await submitReview({
+              bookId: bookRef.id,
+              text: data.review,
+              authorId: auth.currentUser.uid,
+              authorAvatarUrl: auth.currentUser.photoURL || '',
+              moods: data.moods || [],
+              contentWarnings: data.contentWarnings || [],
+              copyFormat: data.copyFormat || '',
+              readingPace: data.readingPace || '3',
+              recommendFor: data.recommendFor || '',
+              hasReadBook: !!data.hasReadBook,
+              authenticReview: !!data.authenticReview,
+              noAI: !!data.noAI
+            });
+            log('review-created', createdReview?.id);
+          } catch (err) {
+            log('review-write-error', { code: err.code, message: err.message });
+            updateStatus(`Could not save review: ${err.code || err.message}`, 'error');
+            return;
+          }
+
+          // success
+          try { localStorage.removeItem(DRAFT_KEY); } catch {}
+          dirty = false;
+          updateStatus('Success. Redirecting to The Forest...', 'success');
+          showSubmissionModal({ title: data.title, bookId: bookRef.id });
+        } catch (err) {
+          log('fatal-submit-error', { message: err.message, stack: err.stack, code: err.code });
+          updateStatus(`Submit failed: ${err.message || 'Unknown error'}`, 'error');
         } finally {
-          isSubmitting = false; // Reset submission state
+          isSubmitting = false;
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalBtn; }
         }
       });
 
@@ -1459,8 +1538,9 @@
         // Create new book anyway
         createNew.onclick = () => {
           modal.classList.add('hidden');
-          // Continue with original submission flow
-          submitNewBook();
+          // Force creation by bypassing duplicate checks
+          window.forceCreateNew = true;
+          document.getElementById('submissionForm').dispatchEvent(new Event('submit'));
         };
         
         // Show modal
@@ -1468,95 +1548,6 @@
         modal.classList.add('flex');
       }
 
-      // Extract the book creation logic into a separate function
-      async function submitNewBook() {
-        try {
-          const form = document.getElementById('submissionForm');
-          let data = Object.fromEntries(new FormData(form));
-
-          // Get selected moods and warnings
-          const moods = Array.from(form.querySelectorAll('input[name="moods[]"]:checked')).map(input => input.value);
-          const warnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked')).map(input => input.value);
-          data.moods = moods;
-          data.contentWarnings = warnings;
-          data.copyFormat = (form.querySelector('input[name="copyFormat"]:checked')?.value || '').trim();
-          data.readingPace = (form.querySelector('#readingPace')?.value || '3');
-          data.recommendFor = (form.querySelector('#recommendFor')?.value || '').trim();
-
-        // Fetch final metadata with graceful fallback
-        let metadata;
-        try {
-          metadata = await fetchBookMetadata(data.amazonUrl);
-        } catch (_) {
-          metadata = {
-            asin: extractASIN(data.amazonUrl) || '',
-            isbn: extractISBN(data.amazonUrl) || '',
-            title: (data.title || '').trim(),
-            author: (data.author || '').trim(),
-            coverUrl: '',
-            description: '',
-            publisher: '',
-            publicationDate: '',
-            pageCount: null,
-            categories: []
-          };
-        }
-
-        // Prepare and create book document
-        const bookPayload = {
-          title: data.title,
-          author: data.author,
-          amazonUrl: data.amazonUrl,
-          asin: metadata.asin || extractASIN(data.amazonUrl) || '',
-          isbn: metadata.isbn || '',
-          coverUrl: currentCoverData?.coverUrl || metadata.coverUrl || '',
-          publisher: metadata.publisher || '',
-          publicationDate: metadata.publicationDate || '',
-          pageCount: metadata.pageCount || null,
-          categories: metadata.categories || [],
-          primaryLanguage: data.primaryLanguage || 'en',
-          authorRegion: data.authorRegion || 'Other',
-          publicationYear: parseInt(data.publicationYear) || new Date().getFullYear(),
-          blurb: data.blurb || '',
-          status: 'active',
-          createdBy: auth.currentUser.uid,
-          userId: auth.currentUser.uid,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-          publishedAt: serverTimestamp(),
-          views: 0,
-          popularity: 0
-        };
-
-        const bookRef = await addDoc(collection(db, 'books'), bookPayload);
-
-        // Submit the review
-        const createdReview = await submitReview({
-          bookId: bookRef.id,
-          text: data.review,
-          authorId: auth.currentUser.uid,
-          authorAvatarUrl: auth.currentUser.photoURL || '',
-          moods: data.moods || [],
-          contentWarnings: data.contentWarnings || [],
-          copyFormat: data.copyFormat || '',
-          readingPace: data.readingPace || '3',
-          recommendFor: data.recommendFor || '',
-          hasReadBook: !!data.hasReadBook,
-          authenticReview: !!data.authenticReview,
-          noAI: !!data.noAI
-        });
-
-          // Clear draft and dirty state
-          try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
-          dirty = false;
-
-          showSubmissionModal({ title: data.title, bookId: bookRef.id });
-        } catch (error) {
-          console.error('Failed to submit new book:', error);
-          alert('Failed to submit review. Please try again.');
-          throw error; // Re-throw to be caught by the main handler
-        }
-      }
 
       // Restore form data if returning from signup
       const savedFormData = sessionStorage.getItem('savedFormData');
