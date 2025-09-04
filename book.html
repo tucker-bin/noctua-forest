@@ -236,7 +236,11 @@
               <p id="author" class="text-lg text-white/90"></p>
 
             </div>
-            <!-- Description removed by product decision -->
+            
+            <!-- Reader Insights Section -->
+            <div id="reviewInsights" class="mb-6">
+              <!-- Insights will be loaded dynamically -->
+            </div>
 
             <div class="space-y-2 text-sm text-white/80 mb-6" role="list" aria-label="Book details">
               <div role="listitem"><span class="font-semibold text-white">Language:</span> <span id="primaryLanguage"></span></div>
@@ -1222,7 +1226,10 @@
       // Migration check (unchanged)
       try { const hasComments = !(await isCommentsEmpty()); if (hasComments){ const stats = await migrateAllComments(); } } catch(_) {}
 
-      onAuthStateChanged(auth, (user) => { if (user) { showReviewForm(); } else { showSignInPrompt(); } });
+      onAuthStateChanged(auth, (user) => { 
+        // User authentication state changed - just update UI, don't auto-redirect
+        console.log('Auth state changed:', user ? 'signed in' : 'signed out');
+      });
 
       // Build base query and sorting
       let orderField = 'createdAt';

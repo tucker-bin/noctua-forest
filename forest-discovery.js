@@ -12,7 +12,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
 
-// Helper function to truncate text with fade effect
+  // Helper function to truncate text with fade effect
 function truncateText(text, maxLength = 200) {
   if (text.length <= maxLength) {
     return text;
@@ -28,6 +28,53 @@ function truncateText(text, maxLength = 200) {
   }
   
   return text.substring(0, truncateAt) + '...';
+}
+
+// Semantic search patterns for emotional and situational connections
+const semanticPatterns = {
+  // Emotional states
+  emotions: {
+    'sad': ['sad', 'depressed', 'melancholy', 'heartbroken', 'grief', 'loss', 'tearful'],
+    'happy': ['happy', 'joyful', 'uplifting', 'cheerful', 'inspiring', 'hopeful', 'positive'],
+    'angry': ['angry', 'furious', 'rage', 'outraged', 'frustrated', 'irritated'],
+    'scared': ['scared', 'frightened', 'terrified', 'anxious', 'worried', 'nervous'],
+    'excited': ['excited', 'thrilled', 'energized', 'pumped', 'enthusiastic'],
+    'calm': ['calm', 'peaceful', 'serene', 'relaxed', 'tranquil', 'zen']
+  },
+  
+  // Life situations
+  situations: {
+    'breakup': ['breakup', 'divorce', 'heartbreak', 'relationship', 'love', 'dating'],
+    'career': ['career', 'job', 'work', 'professional', 'business', 'success'],
+    'family': ['family', 'parent', 'child', 'mother', 'father', 'sibling'],
+    'travel': ['travel', 'journey', 'adventure', 'explore', 'vacation', 'trip'],
+    'health': ['health', 'illness', 'recovery', 'medical', 'wellness', 'fitness'],
+    'education': ['school', 'college', 'university', 'learning', 'student', 'education']
+  },
+  
+  // Reading preferences
+  preferences: {
+    'quick': ['quick', 'fast', 'short', 'breezy', 'light', 'easy'],
+    'deep': ['deep', 'complex', 'thoughtful', 'philosophical', 'intellectual'],
+    'escapist': ['escape', 'fantasy', 'adventure', 'magical', 'otherworldly'],
+    'realistic': ['realistic', 'contemporary', 'modern', 'real-life', 'authentic']
+  }
+};
+
+// Extract semantic tags from text
+function extractSemanticTags(text) {
+  const tags = [];
+  const lowerText = text.toLowerCase();
+  
+  Object.entries(semanticPatterns).forEach(([category, patterns]) => {
+    Object.entries(patterns).forEach(([tag, keywords]) => {
+      if (keywords.some(keyword => lowerText.includes(keyword))) {
+        tags.push(tag);
+      }
+    });
+  });
+  
+  return tags;
 }
 
 // Forest Discovery System - Infinite Scroll & Filtering
@@ -88,6 +135,88 @@ class ForestDiscovery {
     } catch (error) {
       console.warn('Could not initialize preferences loading:', error);
     }
+  }
+
+  // Semantic search that matches emotional and situational connections
+  semanticSearch(books, query) {
+    const searchTerms = query.toLowerCase().split(/\s+/);
+    const queryTags = extractSemanticTags(query);
+    
+    return books.filter(book => {
+      let score = 0;
+      
+      // Direct text matches (title, author)
+      const titleMatch = book.title.toLowerCase().includes(query.toLowerCase());
+      const authorMatch = book.author.toLowerCase().includes(query.toLowerCase());
+      
+      if (titleMatch) score += 10;
+      if (authorMatch) score += 8;
+      
+      // Semantic tag matching
+      if (queryTags.length > 0) {
+        // Check if book has reviews with matching semantic tags
+        const bookContent = [
+          book.title,
+          book.author,
+          book.blurb || '',
+          ...(book.tags || [])
+        ].join(' ').toLowerCase();
+        
+        const bookTags = extractSemanticTags(bookContent);
+        const matchingTags = queryTags.filter(tag => bookTags.includes(tag));
+        score += matchingTags.length * 5;
+      }
+      
+      // Keyword matching in book content
+      searchTerms.forEach(term => {
+        if (book.title.toLowerCase().includes(term)) score += 3;
+        if (book.author.toLowerCase().includes(term)) score += 2;
+        if (book.blurb && book.blurb.toLowerCase().includes(term)) score += 2;
+        if (book.tags && book.tags.some(tag => tag.toLowerCase().includes(term))) score += 1;
+      });
+      
+      // Boost score for books with more reviews (community validation)
+      if (book.reviewCount > 0) {
+        score += Math.min(book.reviewCount * 0.5, 5);
+      }
+      
+      return score > 0;
+    }).sort((a, b) => {
+      // Sort by semantic relevance score
+      const scoreA = this.calculateSemanticScore(a, query, queryTags);
+      const scoreB = this.calculateSemanticScore(b, query, queryTags);
+      return scoreB - scoreA;
+    });
+  }
+  
+  calculateSemanticScore(book, query, queryTags) {
+    let score = 0;
+    const queryLower = query.toLowerCase();
+    
+    // Direct matches
+    if (book.title.toLowerCase().includes(queryLower)) score += 10;
+    if (book.author.toLowerCase().includes(queryLower)) score += 8;
+    
+    // Semantic tag matches
+    if (queryTags.length > 0) {
+      const bookContent = [
+        book.title,
+        book.author,
+        book.blurb || '',
+        ...(book.tags || [])
+      ].join(' ').toLowerCase();
+      
+      const bookTags = extractSemanticTags(bookContent);
+      const matchingTags = queryTags.filter(tag => bookTags.includes(tag));
+      score += matchingTags.length * 5;
+    }
+    
+    // Community validation
+    if (book.reviewCount > 0) {
+      score += Math.min(book.reviewCount * 0.5, 5);
+    }
+    
+    return score;
   }
 
   setupEventListeners() {
@@ -273,15 +402,9 @@ class ForestDiscovery {
         };
       });
       
-      // Apply search filter client-side for now
+      // Apply semantic search filter
       if (filters.search && filters.search.trim() !== '') {
-        const searchTerm = filters.search.toLowerCase().trim();
-        return books.filter(book => {
-          const inTitle = book.title.toLowerCase().includes(searchTerm);
-          const inAuthor = book.author.toLowerCase().includes(searchTerm);
-          const inTags = book.tags.some(tag => tag.toLowerCase().includes(searchTerm));
-          return inTitle || inAuthor || inTags;
-        });
+        return this.semanticSearch(books, filters.search.trim());
       }
       
       // Apply excluded keywords filtering from user preferences

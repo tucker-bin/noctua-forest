@@ -1,0 +1,1379 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Book Reviews — Noctua Forest</title>
+    <meta name="description" content="Share your reading experiences with the community. Write authentic reviews, add mood tags, and help others discover great books." />
+    <meta property="og:title" content="Write Book Reviews — Noctua Forest">
+    <meta property="og:description" content="Share authentic book reviews and help build our recommendation engine. Join the Night Owl community.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <link rel="canonical" href="https://noctuaforest.com/reviews.html">
+    <link rel="stylesheet" href="assets/tailwind.css">
+    <link rel="stylesheet" href="assets/base-styles.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+
+    <link rel="stylesheet" href="assets/nav.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-0ZWN1Z3DYQ');
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: #fbebcc;
+            color: #2D3748;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Mobile-first responsive container */
+        .mobile-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .mobile-container {
+                max-width: 42rem;
+                padding: 0 1.5rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-container {
+                max-width: 48rem;
+                padding: 0 2rem;
+            }
+        }
+        
+        /* Enhanced slider styling for mobile */
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #7A8580;
+            border-radius: 12px;
+            outline: none;
+            height: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #F58220;
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(245, 130, 32, 0.4);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #F58220;
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-moz-range-thumb:active {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(245, 130, 32, 0.4);
+        }
+        
+        /* Enhanced card interactions for mobile */
+        .mood-card, .format-card {
+            transition: all 0.2s ease;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mood-card:active, .format-card:active {
+            transform: scale(0.98);
+        }
+        
+        @media (hover: hover) {
+            .mood-card:hover, .format-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            }
+        }
+        
+        .mood-card.selected, .format-card.selected {
+            border-color: #F58220 !important;
+            background-color: rgba(245, 130, 32, 0.15) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(245, 130, 32, 0.3);
+        }
+        
+        /* Mobile-optimized progress indicator */
+        .progress-container {
+            position: relative;
+            margin: 1.5rem 0;
+        }
+        
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #F58220, #FF9F40);
+            border-radius: 4px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Mobile-optimized form inputs */
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid #7A8580;
+            background: #3A4440;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #F58220;
+            box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-input::placeholder {
+            color: #9CA3AF;
+            opacity: 1;
+        }
+        
+        /* Mobile-optimized textarea */
+        .form-textarea {
+            min-height: 120px;
+            max-height: 300px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        
+        /* Enhanced mobile modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 50;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 28rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* Mobile-optimized buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #F58220, #E67615);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Mobile-optimized content warnings grid */
+        .content-warnings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        @media (min-width: 640px) {
+            .content-warnings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .content-warnings-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .warning-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background: #5A6560;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            min-height: 48px;
+        }
+        
+        .warning-checkbox:active {
+            background: #6A7570;
+        }
+        
+        .warning-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            accent-color: #F58220;
+        }
+        
+        .warning-checkbox.selected {
+            background: #6A7570;
+            border: 2px solid #F58220;
+        }
+        
+        /* Mobile-optimized hero section */
+        .hero-section {
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        .hero-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        @media (min-width: 640px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+        }
+        
+        /* Loading states */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #F58220;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Touch-friendly spacing */
+        .touch-spacing {
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .touch-spacing {
+                margin-bottom: 2rem;
+            }
+        }
+        
+        /* Improved validation feedback */
+        .validation-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .validation-feedback.success {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .validation-feedback.warning {
+            border-color: #F59E0B;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .validation-feedback.error {
+            border-color: #EF4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+    </style>
+  </head>
+  <body>
+    <a href="#nav" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to navigation</a>
+    <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to main content</a>
+
+    <!-- Main Container -->
+    <div class="mobile-container py-4">
+        <!-- Header/Navigation -->
+        <header class="flex justify-between items-center mb-8">
+            <a href="welcome.html" class="flex items-center space-x-3">
+                <img src="images/logo.png" alt="Noctua Forest Logo" width="40" height="40" decoding="async" class="w-10 h-10">
+                <span class="text-xl md:text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+            </a>
+            <nav id="nav" class="hidden md:flex items-center space-x-6 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
+                <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium">The Forest</a>
+                <a href="reviews.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium">Write a Review</a>
+                <a href="help.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium">Help</a>
+                <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium">About</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                     <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+                <a href="account.html" class="hover:text-forest-accent transition-colors duration-300 nav-link" aria-label="Account">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </a>
+            </div>
+        </header>
+        <div id="navOverlay" class="nav-overlay"></div>
+        
+        <!-- Breadcrumb Navigation -->
+        <nav class="mb-6" aria-label="Breadcrumb">
+            <ol class="breadcrumb flex items-center space-x-2 text-sm">
+                <li><a href="welcome.html" class="hover:text-forest-accent transition-colors">Home</a></li>
+                <li><span class="mx-2">/</span></li>
+                <li class="breadcrumb-current" aria-current="page">Reviews</li>
+            </ol>
+        </nav>
+
+    <main id="main">
+        <article class="space-y-8 md:space-y-16">
+            <!-- Hero Section -->
+            <div class="hero-section">
+                <h1 class="hero-title text-[#3A4440]" style="font-family: 'Poppins', sans-serif;">Share Your Reading Experience</h1>
+                <p class="text-lg md:text-xl mb-4 text-[#4A5450]">Help others discover great books through your authentic reviews</p>
+                <p class="text-base md:text-lg text-[#4A5450]/80">Your reviews power our recommendation engine and help build meaningful reading lists</p>
+            </div>
+
+            <!-- How It Works (hidden on mobile) -->
+            <div class="hidden md:grid md:grid-cols-3 gap-8" aria-hidden="true">
+                <div class="bg-[#4A5450] rounded-xl p-6 text-white">
+                    <div class="text-forest-accent text-2xl font-bold mb-4">1</div>
+                    <h2 class="text-lg font-semibold mb-2">Write Authentic Reviews</h2>
+                    <p class="text-white/80">Share your genuine reading experience with mood tags and content warnings</p>
+                </div>
+                <div class="bg-[#4A5450] rounded-xl p-6 text-white">
+                    <div class="text-forest-accent text-2xl font-bold mb-4">2</div>
+                    <h2 class="text-lg font-semibold mb-2">Build Reading Lists</h2>
+                    <p class="text-white/80">Create curated lists of books you've actually read and loved</p>
+                </div>
+                <div class="bg-[#4A5450] rounded-xl p-6 text-white">
+                    <div class="text-forest-accent text-2xl font-bold mb-4">3</div>
+                    <h2 class="text-lg font-semibold mb-2">Earn While Sharing</h2>
+                    <p class="text-white/80">Get commissions when readers discover books through your authentic recommendations</p>
+                </div>
+            </div>
+
+            <!-- Enhanced Progress Indicator -->
+            <div class="progress-container">
+                <div class="progress-labels text-[#4A5450]">
+                    <span>Book Details</span>
+                    <span>Experience</span>
+                    <span>Submit</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progressBar" class="progress-bar-fill" style="width: 33%"></div>
+                </div>
+            </div>
+
+            <!-- Conversational Review Interface -->
+            <div id="reviewChat" class="bg-[#4A5450] rounded-xl p-4 md:p-8 text-white">
+                <!-- Chat Messages Container -->
+                <div id="chatMessages" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                    <!-- Messages will be added dynamically -->
+                </div>
+                
+                <!-- Current Input -->
+                <div id="chatInput" class="space-y-4">
+                    <div id="currentQuestion" class="chat-message bot">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-forest-accent rounded-full flex items-center justify-center text-sm">🦉</div>
+                            <div class="bg-[#5A6560] rounded-lg p-4 text-white max-w-md">
+                                Hi! What book would you like to share with The Forest?
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <input 
+                            id="userInput" 
+                            type="text" 
+                            placeholder="Book title or Amazon link..."
+                            class="flex-1 form-input"
+                            autocomplete="off"
+                        >
+                        <button 
+                            id="sendButton" 
+                            type="button" 
+                            class="px-4 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg transition-colors">
+                            Send
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Hidden form fields for final submission -->
+                <div id="hiddenFields" class="hidden">
+                    <input type="hidden" name="title" id="hiddenTitle">
+                    <input type="hidden" name="author" id="hiddenAuthor">
+                    <input type="hidden" name="primaryLanguage" id="hiddenLanguage">
+                    <input type="hidden" name="authorRegion" id="hiddenRegion">
+                    <input type="hidden" name="publicationYear" id="hiddenYear">
+                    <input type="hidden" name="reviewText" id="hiddenReview">
+                    <input type="hidden" name="motivation" id="hiddenMotivation">
+                    <input type="hidden" name="audience" id="hiddenAudience">
+                    <input type="hidden" name="contentWarnings" id="hiddenWarnings">
+                    <input type="hidden" name="amazonUrl" id="hiddenAmazonUrl">
+                </div>
+                
+                <!-- Submit button (appears at end) -->
+                <button 
+                    id="finalSubmit" 
+                    type="submit" 
+                    class="hidden w-full mt-6 btn-primary">
+                    Publish Your Review
+                </button>
+                
+                <div id="submissionStatus" class="mt-3 text-sm text-gray-200"></div>
+            </div>
+
+            <!-- Submission Modal -->
+            <div id="submissionModal" class="hidden fixed inset-0 bg-black/60 items-center justify-center">
+                <div class="bg-white rounded-xl w-full max-w-md mx-4 p-6">
+                    <h3 class="text-xl font-bold mb-2 text-[#4A5450]">Thanks for your review!</h3>
+                    <p id="submissionModalDesc" class="text-gray-700 mb-4">Your authentic review will appear on the book's page shortly.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="modalSubmitAnother" class="px-4 py-2 bg-[#F58220] hover:bg-[#E67615] text-white rounded-md">Review More</button>
+                        <a id="modalViewDashboard" href="dashboard.html" class="px-4 py-2 text-center bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-md">Dashboard</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Duplicate Book Modal -->
+            <div id="duplicateBookModal" class="hidden fixed inset-0 bg-black/60 items-center justify-center">
+                <div class="bg-white rounded-xl w-full max-w-lg mx-4 p-6">
+                    <h3 class="text-xl font-bold mb-2 text-[#4A5450]">Book Already Exists</h3>
+                    <p class="text-gray-700 mb-4">We found a similar book in The Forest. You can add your review to the existing book page.</p>
+                    <div id="duplicateBookInfo" class="bg-gray-50 rounded-lg p-4 mb-4">
+                        <h4 class="font-semibold text-gray-800" id="duplicateBookTitle"></h4>
+                        <p class="text-gray-600" id="duplicateBookAuthor"></p>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button id="modalAddToExisting" class="px-4 py-2 bg-[#F58220] hover:bg-[#E67615] text-white rounded-md">Add My Review</button>
+                        <button id="modalCreateNew" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-md">Create New Book</button>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </main>
+
+    <script type="module">
+      import { app, db } from './firebase-config.js';
+      import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+      import { collection, addDoc, serverTimestamp, doc, getDoc, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+      import showAlphaPopup from './components/AlphaPopup.js';
+      import { searchBooks, extractASIN, extractISBN } from './js/bookSearchService.js';
+      import { validateReview, analyzeReviewForAI } from './js/reviewValidationService.js';
+      import { submitReview } from './js/reviewService.js';
+
+      const auth = getAuth(app);
+
+      // Minimal inlined helpers to avoid external module parse issues
+      async function fetchBookMetadata(amazonUrl) {
+        const asin = extractASIN(amazonUrl);
+        if (!asin) throw new Error('Invalid Amazon URL');
+        // Quick existing-book check via books collection (lightweight)
+        try {
+          const existing = await searchBooks({ asin });
+          if (existing.found) {
+            return {
+              asin,
+              title: existing.book.title,
+              author: existing.book.author || 'Unknown',
+              coverUrl: existing.book.coverUrl || '',
+              description: existing.book.description || '',
+              isbn: existing.book.isbn || ''
+            };
+          }
+        } catch (_) {}
+        const res = await fetch(`/api/pa/items?asin=${encodeURIComponent(asin)}`);
+        if (!res.ok) {
+          // Fallback: return basic data if API is unavailable
+          console.warn('Book metadata API unavailable, using minimal data');
+          return {
+            asin,
+            title: '',
+            author: '',
+            coverUrl: '',
+            description: '',
+            publisher: '',
+            publicationDate: '',
+            pageCount: null,
+            categories: [],
+            isbn: ''
+          };
+        }
+        const d = await res.json();
+        if (!d || !d.title) {
+          console.warn('Invalid book data received, using minimal data');
+          return {
+            asin,
+            title: '',
+            author: '',
+            coverUrl: '',
+            description: '',
+            publisher: '',
+            publicationDate: '',
+            pageCount: null,
+            categories: [],
+            isbn: ''
+          };
+        }
+        return {
+          asin,
+          title: d.title,
+          author: d.author || 'Unknown',
+          coverUrl: d.imageUrl || '',
+          description: d.description || '',
+          publisher: d.publisher || '',
+          publicationDate: d.publicationDate || '',
+          pageCount: d.pageCount || null,
+          categories: d.categories || []
+        };
+      }
+
+      function fillFormWithMetadata(metadata) {
+        const fields = { title: metadata.title || '', author: metadata.author || '', blurb: metadata.description || '' };
+        Object.entries(fields).forEach(([id, value]) => {
+          const el = document.getElementById(id);
+          if (el) el.value = value;
+        });
+      }
+
+      // Show alpha popup on first visit
+      showAlphaPopup();
+
+      // Card-based selection handlers
+      // Conversational Review Interface
+      class ConversationalReview {
+        constructor() {
+          this.currentStep = 0;
+          this.responses = {};
+          this.bookData = {};
+          this.isSubmitting = false;
+          
+          this.questions = [
+            {
+              id: 'book_input',
+              question: "Hi! What book would you like to share with The Forest?",
+              placeholder: "Book title or Amazon link...",
+              processor: this.processBookInput.bind(this),
+              required: true
+            },
+            {
+              id: 'motivation', 
+              question: (data) => `Great choice! What drew you to "${data.title}"?`,
+              placeholder: "e.g., friend recommended it, love the author, needed escapism...",
+              processor: this.processMotivation.bind(this),
+              required: true
+            },
+            {
+              id: 'review',
+              question: "How did it make you feel? What did you think?",
+              placeholder: "Share your honest thoughts...",
+              type: 'textarea',
+              processor: this.processReview.bind(this),
+              required: true
+            },
+            {
+              id: 'audience',
+              question: "Who else would connect with this book?",
+              placeholder: "e.g., anyone going through change, parents of teens, history lovers...",
+              processor: this.processAudience.bind(this),
+              required: false
+            },
+            {
+              id: 'warnings',
+              question: "Any content warnings others should know about?",
+              placeholder: "e.g., violence, difficult themes... or just say 'none'",
+              processor: this.processWarnings.bind(this),
+              required: false
+            }
+          ];
+          
+          this.init();
+        }
+
+        init() {
+          this.setupEventListeners();
+          this.showCurrentQuestion();
+        }
+
+        setupEventListeners() {
+          const userInput = document.getElementById('userInput');
+          const sendButton = document.getElementById('sendButton');
+          const finalSubmit = document.getElementById('finalSubmit');
+
+          // Send button click
+          sendButton.addEventListener('click', () => this.handleUserInput());
+          
+          // Enter key in input
+          userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              this.handleUserInput();
+            }
+          });
+
+          // Final submit
+          finalSubmit.addEventListener('click', () => this.submitReview());
+        }
+
+        async handleUserInput() {
+          const userInput = document.getElementById('userInput');
+          const input = userInput.value.trim();
+          
+          if (!input) return;
+
+          // Add user message to chat
+          this.addChatMessage('user', input);
+          userInput.value = '';
+
+          // Process the input
+          const currentQuestion = this.questions[this.currentStep];
+          const result = await currentQuestion.processor(input);
+          
+          if (result.success) {
+            this.responses[currentQuestion.id] = input;
+            this.currentStep++;
+            
+            if (this.currentStep < this.questions.length) {
+              this.showCurrentQuestion();
+            } else {
+              this.showFinalSubmit();
+            }
+          } else {
+            // Show error and ask again
+            this.addChatMessage('bot', result.message);
+          }
+        }
+
+        async processBookInput(input) {
+          // Try Amazon URL first
+          if (input.includes('amazon.com') || input.includes('amzn.to')) {
+            try {
+              const metadata = await this.fetchBookMetadata(input);
+              this.bookData = metadata;
+              
+              // Populate hidden fields
+              document.getElementById('hiddenTitle').value = metadata.title;
+              document.getElementById('hiddenAuthor').value = metadata.author;
+              document.getElementById('hiddenYear').value = this.extractYear(metadata.publicationDate);
+              document.getElementById('hiddenAmazonUrl').value = input;
+              
+              return {
+                message: `Found it! "${metadata.title}" by ${metadata.author} (${metadata.publicationDate})`,
+                success: true
+              };
+            } catch (error) {
+              return {
+                message: "Couldn't fetch from that link. What's the book title?",
+                success: false
+              };
+            }
+          } else {
+            // Manual title entry
+            this.bookData.title = input;
+            document.getElementById('hiddenTitle').value = input;
+            return {
+              message: `"${input}" - got it! Who's the author?`,
+              success: true,
+              followUp: 'author'
+            };
+          }
+        }
+        
+        processMotivation(input) {
+          this.responses.motivation = input;
+          document.getElementById('hiddenMotivation').value = input;
+          return { success: true };
+        }
+        
+        processReview(input) {
+          this.responses.review = input;
+          document.getElementById('hiddenReview').value = input;
+          return { success: true };
+        }
+        
+        processAudience(input) {
+          this.responses.audience = input;
+          document.getElementById('hiddenAudience').value = input;
+          return { success: true };
+        }
+        
+        processWarnings(input) {
+          this.responses.warnings = input;
+          document.getElementById('hiddenWarnings').value = input;
+          return { success: true };
+        }
+
+        showCurrentQuestion() {
+          const currentQuestion = this.questions[this.currentStep];
+          const questionText = typeof currentQuestion.question === 'function' 
+            ? currentQuestion.question(this.bookData) 
+            : currentQuestion.question;
+          
+          this.addChatMessage('bot', questionText);
+          
+          const userInput = document.getElementById('userInput');
+          userInput.placeholder = currentQuestion.placeholder;
+        }
+
+        showFinalSubmit() {
+          this.addChatMessage('bot', "Perfect! Ready to publish your review to The Forest?");
+          document.getElementById('finalSubmit').classList.remove('hidden');
+        }
+
+        addChatMessage(sender, message) {
+          const chatMessages = document.getElementById('chatMessages');
+          const messageDiv = document.createElement('div');
+          messageDiv.className = `chat-message ${sender}`;
+          
+          if (sender === 'bot') {
+            messageDiv.innerHTML = `
+              <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-forest-accent rounded-full flex items-center justify-center text-sm">🦉</div>
+                <div class="bg-[#5A6560] rounded-lg p-4 text-white max-w-md">
+                  ${message}
+                </div>
+              </div>
+            `;
+          } else {
+            messageDiv.innerHTML = `
+              <div class="flex items-start space-x-3 justify-end">
+                <div class="bg-forest-accent rounded-lg p-4 text-white max-w-md">
+                  ${message}
+                </div>
+                <div class="w-8 h-8 bg-[#5A6560] rounded-full flex items-center justify-center text-sm">👤</div>
+              </div>
+            `;
+          }
+          
+          chatMessages.appendChild(messageDiv);
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async fetchBookMetadata(url) {
+          // Import the Amazon service
+          const { fetchBookMetadata } = await import('./js/amazonService.js');
+          return await fetchBookMetadata(url);
+        }
+
+        extractYear(dateString) {
+          if (!dateString) return new Date().getFullYear();
+          const year = new Date(dateString).getFullYear();
+          return isNaN(year) ? new Date().getFullYear() : year;
+        }
+
+        async submitReview() {
+          if (this.isSubmitting) return;
+          this.isSubmitting = true;
+
+          const finalSubmit = document.getElementById('finalSubmit');
+          const originalText = finalSubmit.textContent;
+          finalSubmit.textContent = 'Publishing...';
+          finalSubmit.disabled = true;
+
+          try {
+            // Create book payload
+            const bookPayload = {
+              title: this.bookData.title,
+              author: this.bookData.author || 'Unknown Author',
+              primaryLanguage: 'en', // Default for now
+              authorRegion: 'Unknown', // Default for now
+              publicationYear: this.extractYear(this.bookData.publicationDate),
+              publishedAt: new Date(),
+              views: 0,
+              popularity: 0,
+              userId: auth.currentUser.uid
+            };
+
+            // Create review payload
+            const reviewPayload = {
+              bookId: '', // Will be set after book creation
+              text: this.responses.review,
+              authorId: auth.currentUser.uid,
+              authorAvatarUrl: auth.currentUser.photoURL || '',
+              motivation: this.responses.motivation,
+              audience: this.responses.audience,
+              contentWarnings: this.responses.warnings,
+              hasReadBook: true,
+              authenticReview: true,
+              noAI: true
+            };
+
+            // Submit using existing review service
+            const { submitReview } = await import('./js/reviewService.js');
+            const result = await submitReview({ ...bookPayload, ...reviewPayload });
+            
+            // Redirect to book page
+            window.location.href = `book.html?id=${result.bookId}`;
+
+          } catch (error) {
+            console.error('Submission error:', error);
+            this.addChatMessage('bot', `Sorry, there was an error: ${error.message}. Please try again.`);
+          } finally {
+            this.isSubmitting = false;
+            finalSubmit.textContent = originalText;
+            finalSubmit.disabled = false;
+          }
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        // Initialize conversational review interface
+        const conversationalReview = new ConversationalReview();
+      });
+
+      // Import required services
+      import { fetchBookMetadata, extractASIN } from './js/amazonService.js';
+      import { submitReview } from './js/reviewService.js';
+
+      // Draft autosave every 5s and on unload
+      const DRAFT_KEY = 'nf_review_draft_v1';
+      function saveDraft() {
+        try {
+          const form = document.getElementById('submissionForm');
+          if (!form) return;
+          const data = Object.fromEntries(new FormData(form));
+          data.moods = Array.from(form.querySelectorAll('input[name="moods[]"]:checked')).map(i=>i.value);
+          data.contentWarnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked')).map(i=>i.value);
+          data.copyFormat = (form.querySelector('#copyFormat')?.value || '').trim();
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+        } catch (_) {}
+      }
+      let autosaveTimer = setInterval(saveDraft, 5000);
+      window.addEventListener('beforeunload', saveDraft);
+
+      // Restore draft if present (and no savedFormData takeover)
+      try {
+        const existing = localStorage.getItem(DRAFT_KEY);
+        if (existing && !sessionStorage.getItem('savedFormData')) {
+          const d = JSON.parse(existing);
+          const form = document.getElementById('submissionForm');
+          if (form) {
+            ['amazonUrl','title','author','review','primaryLanguage','authorRegion','publicationYear','blurb'].forEach(k=>{ if (d[k]) { const el=document.getElementById(k); if (el) el.value=d[k]; }});
+            if (d.copyFormat) { const cf=document.getElementById('copyFormat'); if (cf) cf.value=d.copyFormat; }
+            (d.moods||[]).forEach(v=>{ const cb=form.querySelector(`input[name="moods[]"][value="${v}"]`); if (cb) cb.checked=true; });
+            (d.contentWarnings||[]).forEach(v=>{ const cb=form.querySelector(`input[name="contentWarnings[]"][value="${v}"]`); if (cb) cb.checked=true; });
+          }
+        }
+      } catch (_) {}
+
+      // Unsaved changes guard
+      let dirty = false;
+      document.getElementById('submissionForm').addEventListener('input', () => { dirty = true; });
+      window.addEventListener('beforeunload', (e) => {
+        if (dirty && !isSubmitting) { 
+          e.preventDefault(); 
+          e.returnValue = ''; 
+        }
+      });
+
+      function updateValidationFeedback(analysis) {
+        const icon = document.getElementById('validationIcon');
+        const title = document.getElementById('validationTitle');
+        const message = document.getElementById('validationMessage');
+        const details = document.getElementById('validationDetails');
+        
+        // Clear previous content
+        icon.innerHTML = '';
+        title.textContent = '';
+        message.textContent = '';
+        details.innerHTML = '';
+        
+        if (analysis.isLikelyAI) {
+          // High risk - show warning
+          icon.innerHTML = '⚠️';
+          title.textContent = 'AI Detection Alert';
+          title.className = 'font-medium text-sm text-red-400';
+          message.textContent = 'Your review appears to contain AI-generated content patterns.';
+          message.className = 'text-xs mt-1 text-red-300';
+          
+          // Show specific issues
+          if (analysis.reasons.length > 0) {
+            analysis.reasons.forEach(reason => {
+              const reasonDiv = document.createElement('div');
+              reasonDiv.className = 'text-red-300';
+              reasonDiv.textContent = `• ${reason}`;
+              details.appendChild(reasonDiv);
+            });
+          }
+          
+          validationFeedback.className = 'mt-3 p-3 rounded-lg border border-red-500 bg-red-900/20 transition-all duration-300';
+        } else if (analysis.confidence > 0.3) {
+          // Medium risk - show caution
+          icon.innerHTML = '💡';
+          title.textContent = 'Content Quality Tips';
+          title.className = 'font-medium text-sm text-yellow-400';
+          message.textContent = 'Consider making your review more personal and specific.';
+          message.className = 'text-xs mt-1 text-yellow-300';
+          
+          // Show suggestions
+          if (analysis.reasons.length > 0) {
+            analysis.reasons.forEach(reason => {
+              const reasonDiv = document.createElement('div');
+              reasonDiv.className = 'text-yellow-300';
+              reasonDiv.textContent = `• ${reason}`;
+              details.appendChild(reasonDiv);
+            });
+          }
+          
+          validationFeedback.className = 'mt-3 p-3 rounded-lg border border-yellow-500 bg-yellow-900/20 transition-all duration-300';
+        } else {
+          // Low risk - show positive feedback
+          icon.innerHTML = '✅';
+          title.textContent = 'Great Review!';
+          title.className = 'font-medium text-sm text-green-400';
+          message.textContent = 'Your review looks authentic and personal.';
+          message.className = 'text-xs mt-1 text-green-300';
+          
+          validationFeedback.className = 'mt-3 p-3 rounded-lg border border-green-500 bg-green-900/20 transition-all duration-300';
+        }
+        
+        validationFeedback.classList.remove('hidden');
+      }
+
+      async function getUserHistory(userId) {
+        try {
+          const reviewsRef = query(collection(db, 'reviews'), where('authorId', '==', userId), orderBy('createdAt', 'desc'), limit(10));
+          const snap = await getDocs(reviewsRef);
+          const reviews = snap.docs.map(d => ({ createdAt: d.data().createdAt?.toMillis?.() || Date.now(), text: d.data().text || '' }));
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          const createdAt = userDoc.exists() && userDoc.data().createdAt?.toMillis ? userDoc.data().createdAt.toMillis() : Date.now() - 7*24*60*60*1000;
+          return { reviews, accountAge: createdAt, reviewCount: reviews.length };
+        } catch (_) {
+          return { reviews: [], accountAge: Date.now() - 7*24*60*60*1000, reviewCount: 0 };
+        }
+      }
+
+      // Handle Amazon URL input
+      const amazonUrlInput = document.getElementById('amazonUrl');
+      let lastUrl = '';
+      let fetchTimeout;
+
+      amazonUrlInput.addEventListener('input', (e) => {
+        const url = e.target.value.trim();
+        if (url === lastUrl) return;
+        lastUrl = url;
+
+        // Clear any pending fetch
+        if (fetchTimeout) clearTimeout(fetchTimeout);
+
+        // Wait for user to stop typing
+        fetchTimeout = setTimeout(async () => {
+          if (!url) return;
+          
+          try {
+            const loadingMsg = document.createElement('p');
+            loadingMsg.id = 'fetchingMetadata';
+            loadingMsg.className = 'text-sm text-gray-300 mt-1';
+            loadingMsg.textContent = 'Fetching book details...';
+            amazonUrlInput.parentNode.appendChild(loadingMsg);
+
+            // First check if we already have this book
+            const asin = extractASIN(url);
+            if (asin) {
+              const result = await searchBooks({ asin });
+              if (result.found) {
+                loadingMsg.className = 'text-sm text-yellow-400 mt-1';
+                loadingMsg.textContent = 'Book already exists in The Forest. You can still create a new entry if this is a different edition.';
+                // Don't redirect - let user decide
+                return;
+              }
+            }
+
+            // If not found, fetch from Amazon
+            const metadata = await fetchBookMetadata(url);
+            
+            // Check for duplicates by ISBN
+            if (metadata.isbn) {
+              const result = await searchBooks({ isbn: metadata.isbn });
+              if (result.found) {
+                loadingMsg.className = 'text-sm text-yellow-400 mt-1';
+                loadingMsg.textContent = 'Book already exists in The Forest. You can still create a new entry if this is a different edition.';
+                // Don't redirect - let user decide
+                return;
+              }
+            }
+
+            // Fill form if no duplicates found
+            fillFormWithMetadata(metadata);
+            
+            // Check for cover and show confirmation UI
+            await checkAndShowCover(metadata);
+            
+            loadingMsg.textContent = 'Book details loaded!';
+            setTimeout(() => loadingMsg.remove(), 3000);
+          } catch (err) {
+            const errorMsg = document.getElementById('fetchingMetadata');
+            if (errorMsg) {
+              errorMsg.className = 'text-sm text-red-400 mt-1';
+              errorMsg.textContent = err.message;
+              setTimeout(() => errorMsg.remove(), 5000);
+            }
+          }
+        }, 1000);
+      });
+
+      // Cover handling functions
+      let currentCoverData = null;
+
+      async function checkAndShowCover(metadata) {
+        const coverConfirmation = document.getElementById('coverConfirmation');
+        const coverPreview = document.getElementById('coverPreview');
+        const coverStatus = document.getElementById('coverStatus');
+        
+        if (!coverConfirmation) return;
+
+        // Show the cover confirmation section
+        coverConfirmation.classList.remove('hidden');
+
+        // If we already have a cover from Amazon, show it
+        if (metadata.coverUrl) {
+          coverPreview.src = metadata.coverUrl;
+          coverPreview.style.display = 'block';
+          coverStatus.textContent = 'Cover found from Amazon';
+          currentCoverData = { coverUrl: metadata.coverUrl, source: 'amazon' };
+          return;
+        }
+
+        // Try to find a cover via our API
+        try {
+          coverStatus.textContent = 'Searching for book cover...';
+          
+          const params = new URLSearchParams();
+          if (metadata.isbn) params.append('isbn', metadata.isbn);
+          if (metadata.title) params.append('title', metadata.title);
+          if (metadata.author) params.append('author', metadata.author);
+
+          const response = await fetch(`/api/covers?${params}`);
+          const result = await response.json();
+
+          if (result.found && result.coverUrl) {
+            coverPreview.src = result.coverUrl;
+            coverPreview.style.display = 'block';
+            coverStatus.textContent = `Cover found via ${result.source === 'openlibrary_isbn' ? 'Open Library (ISBN)' : 'Open Library (search)'}`;
+            currentCoverData = result;
+          } else {
+            coverStatus.textContent = 'No cover found - book will use placeholder';
+            currentCoverData = { coverUrl: '', source: 'none' };
+          }
+        } catch (error) {
+          console.error('Cover fetch error:', error);
+          coverStatus.textContent = 'Error finding cover - book will use placeholder';
+          currentCoverData = { coverUrl: '', source: 'error' };
+        }
+      }
+
+      // Change cover button handler
+      document.getElementById('changeCoverBtn')?.addEventListener('click', async () => {
+        const title = document.getElementById('title')?.value;
+        const author = document.getElementById('author')?.value;
+        
+        if (!title) {
+          alert('Please enter a book title first');
+          return;
+        }
+
+        const coverStatus = document.getElementById('coverStatus');
+        coverStatus.textContent = 'Searching for alternative covers...';
+
+        try {
+          // Try different search strategies
+          const strategies = [
+            { title, author },
+            { title: title.split(' ').slice(0, 3).join(' '), author }, // Shorter title
+            { title, author: author?.split(' ')[0] } // First name only
+          ];
+
+          for (const strategy of strategies) {
+            const params = new URLSearchParams();
+            if (strategy.title) params.append('title', strategy.title);
+            if (strategy.author) params.append('author', strategy.author);
+
+            const response = await fetch(`/api/covers?${params}`);
+            const result = await response.json();
+
+            if (result.found && result.coverUrl && result.coverUrl !== currentCoverData?.coverUrl) {
+              const coverPreview = document.getElementById('coverPreview');
+              coverPreview.src = result.coverUrl;
+              coverPreview.style.display = 'block';
+              coverStatus.textContent = `Alternative cover found via ${result.source === 'openlibrary_isbn' ? 'Open Library (ISBN)' : 'Open Library (search)'}`;
+              currentCoverData = result;
+              return;
+            }
+          }
+
+          coverStatus.textContent = 'No alternative covers found';
+        } catch (error) {
+          console.error('Cover change error:', error);
+          coverStatus.textContent = 'Error searching for alternative covers';
+        }
+      });
+
+      // Initialize form handler
+      // Track submission state to prevent beforeunload during submission
+      let isSubmitting = false;
+      
+      // Diagnostic helpers
+      function updateStatus(msg, level = 'info') {
+        const el = document.getElementById('submissionStatus');
+        if (!el) return;
+        const colors = { info: '#E0E2DB', warn: '#E0E2DB', error: '#FCA5A5', success: '#A7F3D0' };
+        el.style.color = colors[level] || colors.info;
+        el.textContent = msg;
+      }
+      function log(step, data) {
+        try { console.log(`[submit] ${step}`, data || ''); } catch (_) {}
+      }
+      window.addEventListener('error', (e) => updateStatus(`Error: ${e.message}`, 'error'));
+      window.addEventListener('unhandledrejection', (e) => updateStatus(`Error: ${e.reason?.message || e.reason}`, 'error'));
+      
+      document.getElementById('submissionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (isSubmitting) { log('duplicate-submit'); return; }
+
+        isSubmitting = true;
+        const form = e.target;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalBtn = submitBtn?.textContent;
+        
+        try {
+          submitBtn && (submitBtn.disabled = true, submitBtn.textContent = 'Submitting...');
+          updateStatus('Submitting...');
+
+          // 1. Collect form data
+          const data = Object.fromEntries(new FormData(form));
+          data.moods = Array.from(form.querySelectorAll('input[name="moods[]"]:checked')).map(i => i.value);
+          data.contentWarnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked')).map(i => i.value);
+          data.copyFormat = (form.querySelector('#copyFormat')?.value || '').trim();
+          log('form-data', data);
+
+          // 2. Check authentication
+          if (!auth.currentUser) {
+            updateStatus('Please sign in to submit. Your draft was saved.', 'warn');
+            sessionStorage.setItem('savedFormData', JSON.stringify({ type: 'bookReview', data }));
+            setTimeout(() => window.location.href = 'account.html', 1000);
+            return;
+          }
+          log('auth-user', auth.currentUser.uid);
+
+          // 3. Basic validation (required fields only)
+          if (!data.title?.trim() || !data.author?.trim() || !data.review?.trim()) {
+            updateStatus('Please fill in title, author, and review fields.', 'error');
+            return;
+          }
+
+          // 4. Create book directly (no redirecting duplicate checks)
+          updateStatus('Creating book...');
+          const bookPayload = {
+            title: data.title.trim(),
+            author: data.author.trim(),
+            amazonUrl: data.amazonUrl || '',
+            asin: data.amazonUrl ? extractASIN(data.amazonUrl) || '' : '',
+            isbn: '',
+            coverUrl: currentCoverData?.coverUrl || '',
+            publisher: '',
+            publicationDate: '',
+            pageCount: null,
+            categories: [],
+            primaryLanguage: data.primaryLanguage || 'en',
+            authorRegion: data.authorRegion || 'Other',
+            publicationYear: parseInt(data.publicationYear) || new Date().getFullYear(),
+            blurb: data.blurb?.trim() || '',
+            status: 'active',
+            createdBy: auth.currentUser.uid,
+            userId: auth.currentUser.uid,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            publishedAt: serverTimestamp(),
+            views: 0,
+            popularity: 0
+          };
+          log('book-payload', bookPayload);
+
+          const bookRef = await addDoc(collection(db, 'books'), bookPayload);
+          log('book-created', bookRef.id);
+
+          // 5. Create review
+          updateStatus('Saving review...');
+          const reviewPayload = {
+            bookId: bookRef.id,
+            text: data.review.trim(),
+            authorId: auth.currentUser.uid,
+            authorAvatarUrl: auth.currentUser.photoURL || '',
+            moods: data.moods || [],
+            contentWarnings: data.contentWarnings || [],
+            copyFormat: data.copyFormat || '',
+            readingPace: data.readingPace || '3',
+            recommendFor: data.recommendFor || '',
+            hasReadBook: !!data.hasReadBook,
+            authenticReview: !!data.authenticReview,
+            noAI: !!data.noAI
+          };
+          
+          const createdReview = await submitReview(reviewPayload);
+          log('review-created', createdReview?.id);
+
+          // 6. Clean up and redirect immediately
+          try { localStorage.removeItem(DRAFT_KEY); } catch {}
+          dirty = false;
+          updateStatus('Success! Opening your book page...', 'success');
+          
+          // Immediate redirect to the created book page
+          window.location.href = `book.html?id=${bookRef.id}`;
+
+        } catch (err) {
+          log('submit-error', { message: err.message, stack: err.stack, code: err.code });
+          updateStatus(`Submission failed: ${err.message || 'Unknown error'}. Please try again.`, 'error');
+        } finally {
+          isSubmitting = false;
+          if (submitBtn) { 
+            submitBtn.disabled = false; 
+            submitBtn.textContent = originalBtn; 
+          }
+        }
+      });
+
+
+
+
+      // Restore form data if returning from signup
+      const savedFormData = sessionStorage.getItem('savedFormData');
+      if (savedFormData) {
+        const { type, data } = JSON.parse(savedFormData);
+        if (type === 'bookReview') {
+          Object.entries(data).forEach(([key, value]) => {
+            const input = document.getElementById(key);
+            if (input) {
+              if (input.type === 'checkbox') {
+                input.checked = value === 'on' || value === true;
+              } else {
+                input.value = value;
+              }
+            }
+          });
+          // Clear saved data
+          sessionStorage.removeItem('savedFormData');
+        }
+      }
+    </script>
+
+    <!-- Global Footer with Google Translate -->
+    <script src="assets/footer.js"></script>
+    
+    <script src="assets/nav.js"></script>
+  </body>
+</html>

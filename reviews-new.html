@@ -132,62 +132,6 @@
             margin-bottom: 1.5rem;
         }
         
-        /* Chat-specific styling */
-        .chat-message {
-            margin-bottom: 1rem;
-            animation: fadeInUp 0.3s ease-out;
-        }
-        
-        .chat-message.bot .flex {
-            justify-content: flex-start;
-        }
-        
-        .chat-message.user .flex {
-            justify-content: flex-end;
-        }
-        
-        .chat-message .bg-forest-accent {
-            background-color: #F58220;
-        }
-        
-        .chat-message .bg-forest-accent:hover {
-            background-color: #E6731A;
-        }
-        
-        #chatMessages {
-            scrollbar-width: thin;
-            scrollbar-color: #7A8580 #4A5450;
-        }
-        
-        #chatMessages::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        #chatMessages::-webkit-scrollbar-track {
-            background: #4A5450;
-            border-radius: 3px;
-        }
-        
-        #chatMessages::-webkit-scrollbar-thumb {
-            background: #7A8580;
-            border-radius: 3px;
-        }
-        
-        #chatMessages::-webkit-scrollbar-thumb:hover {
-            background: #8A9590;
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -199,10 +143,6 @@
             
             .container {
                 padding: 0 0.5rem;
-            }
-            
-            .chat-message .max-w-md {
-                max-width: 100%;
             }
         }
     </style>
