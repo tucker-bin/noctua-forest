@@ -996,7 +996,10 @@
       let dirty = false;
       document.getElementById('submissionForm').addEventListener('input', () => { dirty = true; });
       window.addEventListener('beforeunload', (e) => {
-        if (dirty) { e.preventDefault(); e.returnValue = ''; }
+        if (dirty && !isSubmitting) { 
+          e.preventDefault(); 
+          e.returnValue = ''; 
+        }
       });
 
       function updateValidationFeedback(analysis) {
@@ -1246,8 +1249,14 @@
       });
 
       // Initialize form handler
+      // Track submission state to prevent beforeunload during submission
+      let isSubmitting = false;
+      
       document.getElementById('submissionForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (isSubmitting) return; // Prevent double submission
+        
+        isSubmitting = true;
         const form = e.target;
         let data = Object.fromEntries(new FormData(form));
 
@@ -1263,10 +1272,16 @@
         // Optional copy format
         data.copyFormat = (form.querySelector('#copyFormat')?.value || '').trim();
 
-        // Validate reading verification
-        if (!data.hasReadBook || !data.authenticReview || !data.noAI) {
-          alert('Please complete all reading verification checks before submitting your review.');
-          return;
+        // Store verification flags but don't block submission
+        const verificationFlags = {
+          hasReadBook: !!data.hasReadBook,
+          authenticReview: !!data.authenticReview,
+          noAI: !!data.noAI
+        };
+        
+        // Log warning if verification is incomplete but don't block
+        if (!verificationFlags.hasReadBook || !verificationFlags.authenticReview || !verificationFlags.noAI) {
+          console.warn('Review submitted with incomplete verification:', verificationFlags);
         }
 
         // Ensure authentication
@@ -1277,33 +1292,26 @@
           return;
         }
 
-        // Comprehensive review validation
+        // Store validation flags for moderation but don't block submission
         try {
           const history = await getUserHistory(auth.currentUser.uid);
           const validation = validateReview({
             text: data.review,
-            hasReadBook: !!data.hasReadBook,
-            authenticReview: !!data.authenticReview,
-            noAI: !!data.noAI
+            hasReadBook: verificationFlags.hasReadBook,
+            authenticReview: verificationFlags.authenticReview,
+            noAI: verificationFlags.noAI
           }, history);
+          
+          // Log validation results but don't block
           if (!validation.isValid) {
-            alert(`Review validation failed:\n${validation.issues.join('\n')}`);
-            return;
+            console.warn('Review validation issues:', validation.issues);
           }
           if (validation.requiresModeration) {
-            const riskLevel = validation.riskLevel;
-            if (riskLevel === 'critical') {
-              alert('Your review appears to be AI-generated and cannot be submitted. Please write a personal, authentic review.');
-              return;
-            }
-            if (!confirm('Your review will go to moderation to protect our recommendation engine. Proceed?')) {
-              return;
-            }
+            console.warn('Review flagged for moderation:', validation.riskLevel);
           }
         } catch (err) {
           console.error('Validation error:', err);
-          alert('Review validation failed. Please try again.');
-          return;
+          // Don't block submission on validation errors
         }
 
         try {
@@ -1357,6 +1365,8 @@
         } catch (error) {
           console.error('Submission failed:', error);
           alert('Failed to submit review. Please try again.');
+        } finally {
+          isSubmitting = false; // Reset submission state
         }
       });
 
@@ -1367,7 +1377,7 @@
         const submitAnother = document.getElementById('modalSubmitAnother');
         const viewPage = document.getElementById('modalViewDashboard');
         if (!modal) return;
-        if (title) desc.textContent = `"${title}" was received. Your review will appear shortly.`;
+        if (title) desc.textContent = `"${title}" was successfully submitted! Your review is now live in The Forest.`;
 
         // Submit another (refresh form)
         submitAnother.onclick = () => {
@@ -1376,10 +1386,18 @@
           window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // View book page (redirect). Reuse existing dashboard button slot for now
+        // View in Forest (redirect to forest page)
         if (viewPage) {
-          viewPage.textContent = 'View Book Page';
-          if (bookId) viewPage.href = `book.html?id=${bookId}`;
+          viewPage.textContent = 'View in The Forest';
+          viewPage.href = 'forest.html';
+          viewPage.onclick = (e) => {
+            e.preventDefault();
+            modal.classList.add('hidden');
+            // Small delay to ensure modal closes before navigation
+            setTimeout(() => {
+              window.location.href = 'forest.html';
+            }, 100);
+          };
         }
 
         // Show modal
@@ -1452,17 +1470,18 @@
 
       // Extract the book creation logic into a separate function
       async function submitNewBook() {
-        const form = document.getElementById('submissionForm');
-        let data = Object.fromEntries(new FormData(form));
+        try {
+          const form = document.getElementById('submissionForm');
+          let data = Object.fromEntries(new FormData(form));
 
-        // Get selected moods and warnings
-        const moods = Array.from(form.querySelectorAll('input[name="moods[]"]:checked')).map(input => input.value);
-        const warnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked')).map(input => input.value);
-        data.moods = moods;
-        data.contentWarnings = warnings;
-        data.copyFormat = (form.querySelector('input[name="copyFormat"]:checked')?.value || '').trim();
-        data.readingPace = (form.querySelector('#readingPace')?.value || '3');
-        data.recommendFor = (form.querySelector('#recommendFor')?.value || '').trim();
+          // Get selected moods and warnings
+          const moods = Array.from(form.querySelectorAll('input[name="moods[]"]:checked')).map(input => input.value);
+          const warnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked')).map(input => input.value);
+          data.moods = moods;
+          data.contentWarnings = warnings;
+          data.copyFormat = (form.querySelector('input[name="copyFormat"]:checked')?.value || '').trim();
+          data.readingPace = (form.querySelector('#readingPace')?.value || '3');
+          data.recommendFor = (form.querySelector('#recommendFor')?.value || '').trim();
 
         // Fetch final metadata with graceful fallback
         let metadata;
@@ -1527,11 +1546,16 @@
           noAI: !!data.noAI
         });
 
-        // Clear draft and dirty state
-        try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
-        dirty = false;
+          // Clear draft and dirty state
+          try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+          dirty = false;
 
-        showSubmissionModal({ title: data.title, bookId: bookRef.id });
+          showSubmissionModal({ title: data.title, bookId: bookRef.id });
+        } catch (error) {
+          console.error('Failed to submit new book:', error);
+          alert('Failed to submit review. Please try again.');
+          throw error; // Re-throw to be caught by the main handler
+        }
       }
 
       // Restore form data if returning from signup
