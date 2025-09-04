@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Payouts — Noctua Forest</title>
+    <link rel="stylesheet" href="../assets/tailwind.css">
+    <link rel="stylesheet" href="../assets/base-styles.css">
+  </head>
+  <body class="bg-[#fbebcc] text-[#2D3748]">
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color:#3A4440;">Payouts Queue</h1>
+        <a href="./dashboard.html" class="text-forest-card hover:text-forest-accent">Back to Admin</a>
+      </div>
+
+      <div class="bg-white rounded-xl shadow border border-[#E5E7EB] p-4">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="font-semibold text-[#3A4440]">Pending Statements</h2>
+            <p class="text-sm text-[#6B7280]">Locked statements above the minimum payout threshold.</p>
+          </div>
+          <button id="refreshBtn" class="px-3 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded">Refresh</button>
+        </div>
+        <div id="queue" class="space-y-3"></div>
+      </div>
+    </main>
+
+    <script type="module">
+      import { app, db } from '../firebase-config.js';
+      import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+      import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+      const auth = getAuth(app);
+      const queueEl = document.getElementById('queue');
+      const refreshBtn = document.getElementById('refreshBtn');
+
+      async function ensureAdmin(){
+        return new Promise((resolve) => {
+          auth.onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = '../account.html'; return; }
+            try {
+              const u = await getDoc(doc(db, 'users', user.uid));
+              if (!u.exists() || !u.data().isAdmin) { window.location.href = './dashboard.html'; return; }
+              resolve(user);
+            } catch (_) { window.location.href = './dashboard.html'; }
+          });
+        });
+      }
+
+      await ensureAdmin();
+
+      async function loadQueue(){
+        queueEl.innerHTML = '<div class="text-[#6B7280]">Loading…</div>';
+        try {
+          const res = await fetch('/api/payouts/queue');
+          const data = await res.json();
+          const items = Array.isArray(data.queue) ? data.queue : [];
+          if (!items.length){
+            queueEl.innerHTML = '<div class="text-[#6B7280]">No statements pending payout.</div>';
+            return;
+          }
+          queueEl.innerHTML = '';
+          items.forEach(it => {
+            const card = document.createElement('div');
+            card.className = 'border border-[#E5E7EB] rounded-lg p-4 flex items-center justify-between';
+            const start = it.periodStart? new Date(it.periodStart._seconds? it.periodStart._seconds*1000 : it.periodStart) : null;
+            const end = it.periodEnd? new Date(it.periodEnd._seconds? it.periodEnd._seconds*1000 : it.periodEnd) : null;
+            card.innerHTML = `
+              <div>
+                <div class="text-sm text-[#6B7280]">User: <span class="font-mono">${it.uid}</span></div>
+                <div class="text-sm text-[#6B7280]">Period: ${start ? start.toLocaleDateString() : '—'} - ${end ? end.toLocaleDateString() : '—'}</div>
+                <div class="text-sm text-[#6B7280]">Earnings: <span class="font-semibold">$${Number(it.earnings||0).toFixed(2)}</span></div>
+              </div>
+              <div class="flex gap-2">
+                <button class="pay px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded">Pay</button>
+                <a class="px-3 py-2 border border-[#E5E7EB] rounded text-[#374151] hover:bg-[#F3F4F6]" target="_blank" href="../account.html">User</a>
+              </div>`;
+            card.querySelector('.pay').onclick = async (e) => {
+              const btn = e.currentTarget; btn.disabled = true; const prev = btn.textContent; btn.textContent = 'Paying…';
+              try {
+                const r = await fetch('/api/payouts/pay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: it.uid, statementId: it.statementId }) });
+                const j = await r.json();
+                if (!r.ok) throw new Error(j.error||'failed');
+                btn.textContent = 'Paid';
+                setTimeout(loadQueue, 800);
+              } catch (err) {
+                btn.disabled = false; btn.textContent = prev; alert('Failed to pay: ' + err.message);
+              }
+            };
+            queueEl.appendChild(card);
+          });
+        } catch (err) {
+          queueEl.innerHTML = '<div class="text-red-600">Failed to load queue.</div>';
+        }
+      }
+
+      refreshBtn.addEventListener('click', loadQueue);
+      loadQueue();
+    </script>
+  </body>
+  </html>
+
+

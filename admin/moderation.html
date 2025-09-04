@@ -16,7 +16,7 @@
     <script type="module">
       import { app, db } from '../firebase-config.js';
       import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-      import { collection, query, where, orderBy, limit, getDocs, doc, deleteDoc, setDoc, serverTimestamp, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+      import { collection, query, where, orderBy, limit, getDocs, doc, deleteDoc, setDoc, serverTimestamp, getDoc, updateDoc, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
       const auth = getAuth(app);
       const queueEl = document.getElementById('queue');
@@ -60,6 +60,7 @@
                 <div class="text-sm text-[#6B7280]">Author: ${item.authorId || '—'}</div>
                 <div class="text-sm text-[#6B7280]">Risk: <span class="font-semibold">${item.riskLevel}</span> (AI ${Math.round((item.aiConfidence||0)*100)}%, Behavior ${Math.round((item.behaviorConfidence||0)*100)}%)</div>
                 <div class="text-sm text-[#6B7280]">Reasons: ${(item.reasons||[]).join(', ') || '—'}</div>
+                <div class="mt-2"><a class="text-blue-600 hover:text-blue-800 text-sm" target="_blank" href="../book.html?id=${item.bookId || ''}">View in context</a></div>
               </div>
               <div class="flex gap-2">
                 <button class="approve px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded">Approve</button>
@@ -72,7 +73,15 @@
             const other = card.querySelector('.remove');
             btn.disabled = true; other.disabled = true;
             const prev = btn.textContent; btn.textContent = 'Approving...';
+            try {
+              if (item.reviewId) {
+                await updateDoc(doc(db, 'reviews', item.reviewId), { status: 'published', lastUpdated: serverTimestamp() });
+              }
+            } catch (_) {}
             await setDoc(doc(db, 'flagged_content', docSnap.id), { status: 'approved', moderatedAt: serverTimestamp() }, { merge: true });
+            try {
+              await addDoc(collection(db, 'moderation_logs'), { action: 'approve', reviewId: item.reviewId || null, moderatorId: (auth.currentUser||{}).uid || '', reasons: item.reasons||[], at: serverTimestamp() });
+            } catch(_){}
             await loadQueue();
           };
           card.querySelector('.remove').onclick = async (e) => {
@@ -81,9 +90,12 @@
             btn.disabled = true; other.disabled = true;
             const prev = btn.textContent; btn.textContent = 'Removing...';
             try {
-              if (item.reviewId) await deleteDoc(doc(db, 'reviews', item.reviewId));
+              if (item.reviewId) await updateDoc(doc(db, 'reviews', item.reviewId), { status: 'removed', lastUpdated: serverTimestamp() });
             } catch(_) {}
             await setDoc(doc(db, 'flagged_content', docSnap.id), { status: 'removed', moderatedAt: serverTimestamp() }, { merge: true });
+            try {
+              await addDoc(collection(db, 'moderation_logs'), { action: 'remove', reviewId: item.reviewId || null, moderatorId: (auth.currentUser||{}).uid || '', reasons: item.reasons||[], at: serverTimestamp() });
+            } catch(_){}
             await loadQueue();
           };
           queueEl.appendChild(card);

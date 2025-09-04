@@ -306,7 +306,7 @@
                     <h3 class="text-xl font-bold mb-2 text-[#4A5450]">Thanks for your review!</h3>
                     <p id="submissionModalDesc" class="text-gray-700 mb-4">Your authentic review will appear on the book's page shortly.</p>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button id="modalSubmitAnother" class="px-4 py-2 bg-[#F58220] hover:bg-[#E67615] text-white rounded-md">Review Another</button>
+                        <button id="modalSubmitAnother" class="px-4 py-2 bg-[#F58220] hover:bg-[#E67615] text-white rounded-md">Review More</button>
                         <a id="modalViewDashboard" href="dashboard.html" class="px-4 py-2 text-center bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-md">Dashboard</a>
                     </div>
                 </div>
@@ -364,6 +364,44 @@
           const analysis = analyzeReviewForAI(text);
           updateValidationFeedback(analysis);
         }, 1000);
+      });
+
+      // Draft autosave every 5s and on unload
+      const DRAFT_KEY = 'nf_review_draft_v1';
+      function saveDraft() {
+        try {
+          const form = document.getElementById('submissionForm');
+          if (!form) return;
+          const data = Object.fromEntries(new FormData(form));
+          data.moods = Array.from(form.querySelectorAll('input[name="moods[]"]:checked')).map(i=>i.value);
+          data.contentWarnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked')).map(i=>i.value);
+          data.copyFormat = (form.querySelector('#copyFormat')?.value || '').trim();
+          localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+        } catch (_) {}
+      }
+      let autosaveTimer = setInterval(saveDraft, 5000);
+      window.addEventListener('beforeunload', saveDraft);
+
+      // Restore draft if present (and no savedFormData takeover)
+      try {
+        const existing = localStorage.getItem(DRAFT_KEY);
+        if (existing && !sessionStorage.getItem('savedFormData')) {
+          const d = JSON.parse(existing);
+          const form = document.getElementById('submissionForm');
+          if (form) {
+            ['amazonUrl','title','author','review'].forEach(k=>{ if (d[k]) { const el=document.getElementById(k); if (el) el.value=d[k]; }});
+            if (d.copyFormat) { const cf=document.getElementById('copyFormat'); if (cf) cf.value=d.copyFormat; }
+            (d.moods||[]).forEach(v=>{ const cb=form.querySelector(`input[name="moods[]"][value="${v}"]`); if (cb) cb.checked=true; });
+            (d.contentWarnings||[]).forEach(v=>{ const cb=form.querySelector(`input[name="contentWarnings[]"][value="${v}"]`); if (cb) cb.checked=true; });
+          }
+        }
+      } catch (_) {}
+
+      // Unsaved changes guard
+      let dirty = false;
+      document.getElementById('submissionForm').addEventListener('input', () => { dirty = true; });
+      window.addEventListener('beforeunload', (e) => {
+        if (dirty) { e.preventDefault(); e.returnValue = ''; }
       });
 
       function updateValidationFeedback(analysis) {
@@ -755,6 +793,10 @@
               });
             }
           } catch (_) {}
+
+          // Clear draft and dirty state
+          try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+          dirty = false;
 
           showSubmissionModal({ title: data.title, bookId: bookRef.id });
         } catch (error) {

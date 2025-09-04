@@ -86,6 +86,52 @@ async function updateSignedInUI(user) {
     await auth.currentUser?.getIdToken(true);
   } catch {}
   await loadDashboardData(user.uid);
+  // Check payouts status
+  try {
+    const res = await fetch(`/api/payouts/connect/status?userId=${encodeURIComponent(user.uid)}`);
+    const status = await res.json();
+    const payoutStatusEl = document.getElementById('payoutStatus');
+    const setupBtn = document.getElementById('setupPayoutsBtn');
+    const manageLink = document.getElementById('managePayoutsLink');
+    const requestBtn = document.getElementById('requestPayoutBtn');
+    if (payoutStatusEl && setupBtn && manageLink) {
+      if (status.connected && status.payoutsEnabled) {
+        payoutStatusEl.textContent = 'Payouts are enabled on your account.';
+        setupBtn.classList.add('hidden');
+        manageLink.classList.remove('hidden');
+        manageLink.href = 'https://connect.stripe.com/express_login';
+        if (requestBtn) requestBtn.classList.remove('hidden');
+      } else {
+        payoutStatusEl.textContent = 'Set up payouts to receive your earnings.';
+        setupBtn.classList.remove('hidden');
+        manageLink.classList.add('hidden');
+        if (requestBtn) requestBtn.classList.add('hidden');
+        setupBtn.onclick = async () => {
+          try {
+            const resp = await fetch('/api/payouts/connect/onboard', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: auth.currentUser.uid, email: auth.currentUser.email })
+            });
+            const data = await resp.json();
+            if (data?.url) {
+              window.location.href = data.url;
+            }
+          } catch (_) {}
+        };
+      }
+    }
+    // Load payout history
+    try {
+      const r = await fetch(`/api/payouts/history?userId=${encodeURIComponent(user.uid)}`);
+      const j = await r.json();
+      const hist = document.getElementById('payoutsHistory');
+      if (hist) {
+        if (j?.payouts?.length) {
+          hist.innerHTML = j.payouts.map(p => `<div class=\"flex items-center justify-between\"><span>${new Date(p.createdAt?._seconds? p.createdAt._seconds*1000 : (p.createdAt || Date.now())).toLocaleDateString()}</span><span>${p.status || 'processing'}</span><span>$${(p.amount||0).toFixed ? (p.amount||0).toFixed(2) : p.amount}</span></div>`).join('');
+        }
+      }
+    } catch (_) {}
+  } catch (_) {}
 }
 
 // Update UI for signed out user

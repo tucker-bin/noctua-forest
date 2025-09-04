@@ -635,6 +635,217 @@ app.get('/healthz', (req, res) => {
   res.status(200).send('OK');
 });
 
+// Stripe Connect: create onboarding link for a user (Express account)
+app.post('/api/payouts/connect/onboard', express.json(), async (req, res) => {
+  try {
+    const { userId, email, country } = req.body || {};
+    if (!userId || !email) return res.status(400).json({ error: 'userId and email required' });
+
+    // Initialize Firebase Admin
+    const admin = require('firebase-admin');
+    if (!admin.apps.length) {
+      try {
+        admin.initializeApp({ credential: admin.credential.applicationDefault() });
+      } catch (_) {
+        const serviceAccount = require('../firebase-service-account.json');
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+      }
+    }
+    const db = admin.firestore();
+
+    // Read or create Connect account
+    const userRef = db.collection('users').doc(userId);
+    const snap = await userRef.get();
+    const connect = snap.exists ? (snap.data().connect || {}) : {};
+    let accountId = connect.accountId;
+    if (!accountId) {
+      const acct = await stripe.accounts.create({
+        type: 'express',
+        country: (country || 'US').toUpperCase(),
+        email,
+        capabilities: { transfers: { requested: true } }
+      });
+      accountId = acct.id;
+      await userRef.set({ connect: { accountId, payoutsEnabled: !!acct.payouts_enabled } }, { merge: true });
+    }
+
+    const origin = `${req.protocol}://${req.get('host')}`;
+    const refresh_url = `${origin}/account.html?payouts=refresh`;
+    const return_url = `${origin}/account.html?payouts=return`;
+    const link = await stripe.accountLinks.create({
+      account: accountId,
+      refresh_url,
+      return_url,
+      type: 'account_onboarding'
+    });
+    res.json({ url: link.url });
+  } catch (err) {
+    console.error('connect onboard error', err);
+    res.status(500).json({ error: 'Failed to create onboarding link' });
+  }
+});
+
+// Stripe Connect: check account status
+app.get('/api/payouts/connect/status', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) return res.status(400).json({ error: 'userId required' });
+
+    const admin = require('firebase-admin');
+    if (!admin.apps.length) {
+      try {
+        admin.initializeApp({ credential: admin.credential.applicationDefault() });
+      } catch (_) {
+        const serviceAccount = require('../firebase-service-account.json');
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+      }
+    }
+    const db = admin.firestore();
+    const userRef = db.collection('users').doc(userId);
+    const snap = await userRef.get();
+    const connect = snap.exists ? (snap.data().connect || {}) : {};
+    if (!connect.accountId) return res.json({ connected: false, payoutsEnabled: false });
+
+    const acct = await stripe.accounts.retrieve(connect.accountId);
+    const payoutsEnabled = !!acct.payouts_enabled;
+    await userRef.set({ connect: { accountId: connect.accountId, payoutsEnabled } }, { merge: true });
+    res.json({ connected: true, payoutsEnabled, requirements: acct.requirements });
+  } catch (err) {
+    console.error('connect status error', err);
+    res.status(500).json({ error: 'Failed to fetch status' });
+  }
+});
+
+// List recent payouts (mocked from Firestore payouts collection)
+app.get('/api/payouts/history', async (req, res) => {
+  try {
+    const { userId } = req.query;
+    if (!userId) return res.status(400).json({ error: 'userId required' });
+    const admin = require('firebase-admin');
+    if (!admin.apps.length) {
+      try { admin.initializeApp({ credential: admin.credential.applicationDefault() }); } catch (_) {
+        const serviceAccount = require('../firebase-service-account.json');
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+      }
+    }
+    const db = admin.firestore();
+    const snap = await db.collection('payouts').where('uid','==', userId).orderBy('createdAt','desc').limit(10).get();
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    res.json({ ok: true, payouts: list });
+  } catch (err) {
+    res.json({ ok: true, payouts: [] });
+  }
+});
+
+// Roll up a user's earnings into a monthly statement (admin-triggered)
+app.post('/api/payouts/statements/rollup', express.json(), async (req, res) => {
+  try {
+    const { userId, periodStart, periodEnd } = req.body || {};
+    if (!userId) return res.status(400).json({ error: 'userId required' });
+    const admin = require('firebase-admin');
+    if (!admin.apps.length) {
+      try { admin.initializeApp({ credential: admin.credential.applicationDefault() }); } catch (_) {
+        const serviceAccount = require('../firebase-service-account.json');
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+      }
+    }
+    const db = admin.firestore();
+    const start = periodStart ? new Date(periodStart) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const end = periodEnd ? new Date(periodEnd) : new Date();
+    const salesSnap = await db.collection('sales')
+      .where('referrerId','==', userId)
+      .where('createdAt','>=', start)
+      .where('createdAt','<=', end)
+      .where('status','==','completed')
+      .get();
+    let gross = 0; let earnings = 0; let count = 0;
+    salesSnap.forEach(s => {
+      const d = s.data();
+      const amt = Number(d.amount || 0);
+      const rate = Number(d.commissionRate || 0.015);
+      gross += amt; earnings += amt * rate; count++;
+    });
+    const monthKey = `${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}`;
+    const stmtRef = db.collection('earnings').doc(userId).collection('statements').doc(monthKey);
+    await stmtRef.set({
+      periodStart: start,
+      periodEnd: end,
+      salesCount: count,
+      grossSales: Number(gross.toFixed(2)),
+      earnings: Number(earnings.toFixed(2)),
+      status: 'locked',
+      updatedAt: new Date()
+    }, { merge: true });
+    res.json({ ok: true, id: stmtRef.id });
+  } catch (err) {
+    console.error('rollup error', err);
+    res.status(500).json({ error: 'failed' });
+  }
+});
+
+// Payout queue (statements above threshold)
+app.get('/api/payouts/queue', async (req, res) => {
+  try {
+    const admin = require('firebase-admin');
+    if (!admin.apps.length) {
+      try { admin.initializeApp({ credential: admin.credential.applicationDefault() }); } catch (_) {
+        const serviceAccount = require('../firebase-service-account.json');
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+      }
+    }
+    const db = admin.firestore();
+    const usersSnap = await db.collection('users').get();
+    const queue = [];
+    for (const userDoc of usersSnap.docs) {
+      const uid = userDoc.id;
+      const stmts = await db.collection('earnings').doc(uid).collection('statements').where('status','==','locked').get();
+      stmts.forEach(s => {
+        const d = s.data();
+        if (Number(d.earnings || 0) >= 10) {
+          queue.push({ uid, statementId: s.id, earnings: d.earnings, periodStart: d.periodStart, periodEnd: d.periodEnd });
+        }
+      });
+    }
+    res.json({ ok: true, queue });
+  } catch (err) {
+    res.json({ ok: true, queue: [] });
+  }
+});
+
+// Pay a statement (creates payout record; Stripe transfer optional)
+app.post('/api/payouts/pay', express.json(), async (req, res) => {
+  try {
+    const { userId, statementId } = req.body || {};
+    if (!userId || !statementId) return res.status(400).json({ error: 'userId and statementId required' });
+    const admin = require('firebase-admin');
+    if (!admin.apps.length) {
+      try { admin.initializeApp({ credential: admin.credential.applicationDefault() }); } catch (_) {
+        const serviceAccount = require('../firebase-service-account.json');
+        admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+      }
+    }
+    const db = admin.firestore();
+    const stmtRef = db.collection('earnings').doc(userId).collection('statements').doc(statementId);
+    const stmt = await stmtRef.get();
+    if (!stmt.exists) return res.status(404).json({ error: 'statement not found' });
+    const amount = Number(stmt.data().earnings || 0);
+
+    // Create payout record (manual transfer by finance or future automation)
+    const payoutRef = await db.collection('payouts').add({
+      uid: userId,
+      amount: Number(amount.toFixed(2)),
+      statementId,
+      status: 'scheduled',
+      createdAt: new Date()
+    });
+    await stmtRef.set({ status: 'paid', paidAt: new Date(), payoutId: payoutRef.id }, { merge: true });
+    res.json({ ok: true, payoutId: payoutRef.id });
+  } catch (err) {
+    console.error('pay error', err);
+    res.status(500).json({ error: 'failed' });
+  }
+});
+
 // Webhook event handlers
 const handleCheckoutCompleted = async (session) => {
   console.log('Checkout completed:', session.id);

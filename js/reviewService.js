@@ -257,6 +257,7 @@ export async function submitReview(reviewData) {
       moods: reviewData.moods || [],
       contentWarnings: reviewData.contentWarnings || [],
       copyFormat: reviewData.copyFormat || null,
+      status: reviewData.status || 'published',
       helpfulCount: 0,
       unhelpfulCount: 0,
       createdAt: serverTimestamp(),
