@@ -42,18 +42,19 @@ export async function createList(userId, name = "Wish List", description = "") {
  * @returns {Promise<Array>} Array of list objects
  */
 export async function getUserLists(userId) {
-    // Ensure we only read the caller's lists; rules require resource.data.userId == auth.uid
+    // Read only caller's lists; sort client-side to avoid composite index requirement
     const q = query(
         collection(db, LISTS_COLLECTION),
-        where('userId', '==', userId),
-        orderBy('updatedAt', 'desc')
+        where('userId', '==', userId)
     );
-    
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-    }));
+    const lists = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    // Sort by updatedAt desc (fallback to createdAt)
+    return lists.sort((a, b) => {
+        const ad = (a.updatedAt?.toDate?.() || a.updatedAt || a.createdAt?.toDate?.() || a.createdAt || 0);
+        const bd = (b.updatedAt?.toDate?.() || b.updatedAt || b.createdAt?.toDate?.() || b.createdAt || 0);
+        return new Date(bd) - new Date(ad);
+    });
 }
 
 /**
@@ -360,4 +361,47 @@ export async function getActiveListsCount(bookId) {
     const q = query(collection(db, LIST_ATTRIBUTIONS_COLLECTION), where('bookId', '==', bookId));
     const snap = await getDocs(q);
     return snap.size;
+}
+
+/**
+ * Record attribution when a user saves a book from a shared list
+ * @param {string} sourceListId - The curator list where the save originated
+ * @param {string} curatorId - The curator (owner) of the source list
+ * @param {string} bookId - The saved book ID
+ * @param {string} saverId - The user who saved the book
+ * @param {string} targetListId - The user's destination list ID
+ */
+export async function recordAttribution(sourceListId, curatorId, bookId, saverId, targetListId) {
+    try {
+        const attributionId = `${sourceListId}_${bookId}_${saverId}`;
+        await setDoc(doc(db, LIST_ATTRIBUTIONS_COLLECTION, attributionId), {
+            sourceListId,
+            curatorId,
+            bookId,
+            saverId,
+            targetListId,
+            createdAt: serverTimestamp()
+        }, { merge: true });
+    } catch (err) {
+        console.error('Error recording attribution:', err);
+    }
+}
+
+/**
+ * Get recent attributions for a curator (private view)
+ * @param {string} curatorId
+ * @param {number} maxCount
+ */
+export async function getAttributionsForCurator(curatorId, maxCount = 20) {
+    try {
+        const q = query(collection(db, LIST_ATTRIBUTIONS_COLLECTION), where('curatorId', '==', curatorId));
+        const snap = await getDocs(q);
+        const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        return items
+            .sort((a, b) => new Date(b.createdAt?.toDate?.() || b.createdAt || 0) - new Date(a.createdAt?.toDate?.() || a.createdAt || 0))
+            .slice(0, maxCount);
+    } catch (err) {
+        console.error('Error fetching curator attributions:', err);
+        return [];
+    }
 }

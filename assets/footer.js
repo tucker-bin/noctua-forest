@@ -69,7 +69,7 @@ class GlobalFooter {
             <ul class="space-y-2 text-sm">
               <li><a href="forest.html" class="text-forest-light/80 hover:text-forest-accent transition-colors">Discover Books</a></li>
               <li><a href="reviews.html" class="text-forest-light/80 hover:text-forest-accent transition-colors">Write a Review</a></li>
-              <li><a href="lists.html" class="text-forest-light/80 hover:text-forest-accent transition-colors">Reading Lists</a></li>
+              <li><a href="list.html" class="text-forest-light/80 hover:text-forest-accent transition-colors">Reading Lists</a></li>
               <li><a href="about.html" class="text-forest-light/80 hover:text-forest-accent transition-colors">About</a></li>
             </ul>
           </div>
@@ -124,7 +124,7 @@ class GlobalFooter {
 // Auto-initialize footer on pages that should have it
 const shouldShowFooter = () => {
   const currentPath = window.location.pathname;
-  const footerPages = ['/', '/welcome.html', '/forest.html', '/book.html', '/about.html', '/contact.html', '/privacy.html', '/terms.html', '/review-policy.html', '/content-policy.html'];
+  const footerPages = ['/', '/welcome.html', '/forest.html', '/book.html', '/list.html', '/about.html', '/contact.html', '/privacy.html', '/terms.html', '/review-policy.html', '/content-policy.html'];
   
   return footerPages.some(page => 
     currentPath === page || 

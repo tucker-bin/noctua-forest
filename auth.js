@@ -3,7 +3,7 @@ import { app, db } from './firebase-config.js';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { getForestName, generateForestNameForUser } from './js/forestNameService.js';
-import { getUserLists, createList } from './js/readingListService.js';
+import { getUserLists, createList, shareList as createShare } from './js/readingListService.js';
 import { getCommissionEarningsSummary } from './js/commissionService.js';
 import { getAnalyticsForUser } from './js/analyticsService.js';
 import { getRecentReviews } from './js/reviewService.js';
@@ -453,7 +453,15 @@ async function deleteList(listId) {
 }
 
 async function shareList(listId) {
-  showShareModal(listId);
+  try {
+    const uid = auth.currentUser?.uid;
+    const shareId = await createShare(listId, uid || '');
+    const link = `${window.location.origin}/list.html?${shareId ? `share=${shareId}` : `id=${listId}`}`;
+    showShareModal(link);
+  } catch (err) {
+    console.error('Error creating share link:', err);
+    showErrorModal('Unable to create share link right now.');
+  }
 }
 
 // Modal functions
@@ -516,17 +524,24 @@ function showDeleteConfirmModal(listId) {
   document.body.appendChild(modal);
 }
 
-function showShareModal(listId) {
+function showShareModal(link) {
   const modal = document.createElement('div');
   modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
   modal.innerHTML = `
     <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
       <h3 class="text-xl font-bold text-white mb-4">Share List</h3>
-      <p class="text-white/80 mb-4">Share functionality coming soon!</p>
+      <div class="space-y-3 mb-4">
+        <input id="share-link" type="text" readonly value="${link}"
+          class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none">
+        <div class="flex gap-3 flex-wrap">
+          <button onclick="shareCopyLink()" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">Copy Link</button>
+          <button onclick="shareNative()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">Share</button>
+          <a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}" class="px-4 py-2 border border-white/20 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors">Post on X</a>
+          <a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}" class="px-4 py-2 border border-white/20 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors">Share on Facebook</a>
+        </div>
+      </div>
       <div class="flex justify-end">
-        <button onclick="closeModal()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
-          OK
-        </button>
+        <button onclick="closeModal()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">Done</button>
       </div>
     </div>
   `;
@@ -595,6 +610,21 @@ window.shareList = shareList;
 window.confirmCreateList = confirmCreateList;
 window.closeModal = closeModal;
 window.confirmDeleteList = confirmDeleteList;
+window.shareCopyLink = function(){
+  const input = document.getElementById('share-link');
+  if (!input) return;
+  input.select();
+  document.execCommand('copy');
+}
+window.shareNative = function(){
+  const input = document.getElementById('share-link');
+  const url = input ? input.value : window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: 'Noctua Forest List', url }).catch(()=>{});
+  } else {
+    window.open(url, '_blank');
+  }
+}
 
 // Event listeners
 emailSigninBtn.addEventListener('click', handleEmailSignIn);

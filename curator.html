@@ -57,6 +57,12 @@
                 </div>
             </section>
 
+            <!-- Private: Recent Attributions (no public counts) -->
+            <section id="attributionsSection" class="mb-8 hidden">
+                <h2 class="text-2xl font-semibold mb-6 text-[#4A5450]">Recent Saves From Your Lists</h2>
+                <div id="attributionsList" class="bg-white rounded-xl p-6 divide-y divide-gray-200"></div>
+            </section>
+
             <!-- Social Links -->
             <section id="socialSection" class="bg-white rounded-xl p-8 mb-8">
                 <h2 class="text-2xl font-semibold mb-4 text-[#4A5450]">Connect</h2>
@@ -92,8 +98,9 @@
 
     <script type="module">
         import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
         import { db } from './firebase-config.js';
-        import { getSharedList } from './js/readingListService.js';
+        import { getSharedList, getAttributionsForCurator } from './js/readingListService.js';
 
         // Get curator ID from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
@@ -153,6 +160,31 @@
                     document.getElementById('socialSection').style.display = 'none';
                 }
                 
+                // Private attributions (only if viewing own page)
+                try {
+                    const auth = getAuth();
+                    const currentUid = auth.currentUser?.uid;
+                    if (currentUid && currentUid === curatorId) {
+                        const atts = await getAttributionsForCurator(curatorId, 25);
+                        const section = document.getElementById('attributionsSection');
+                        const listEl = document.getElementById('attributionsList');
+                        if (atts.length > 0) {
+                            section.classList.remove('hidden');
+                            listEl.innerHTML = atts.map(a => `
+                              <div class="py-3 flex items-center justify-between">
+                                <div class="text-[#4A5450]">
+                                  <div class="font-medium">Book saved from your list</div>
+                                  <div class="text-sm opacity-80">Book: ${a.bookId} · Saved by: ${a.saverId}</div>
+                                </div>
+                                <a href="list.html?id=${a.sourceListId}" class="text-forest-accent hover:underline text-sm">View list</a>
+                              </div>
+                            `).join('');
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Attributions not shown:', e);
+                }
+
                 // Show content
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('curatorContent').classList.remove('hidden');
@@ -194,7 +226,7 @@
                             ${coverHtml}
                             <h3 class="font-semibold text-[#4A5450] mb-2">${list.name}</h3>
                             <p class="text-sm text-gray-600 mb-3">${list.books?.length || 0} books</p>
-                            <a href="lists.html?id=${listId}" class="inline-block w-full text-center px-4 py-2 bg-forest-accent text-white rounded-lg hover:bg-[#E0751C] transition duration-300">
+                            <a href="list.html?id=${listId}" class="inline-block w-full text-center px-4 py-2 bg-forest-accent text-white rounded-lg hover:bg-[#E0751C] transition duration-300">
                                 View List
                             </a>
                         `;

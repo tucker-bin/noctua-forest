@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading List — Noctua Forest</title>
+    <meta name="description" content="Discover curated reading lists on Noctua Forest." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Reading List — Noctua Forest" />
+    <meta property="og:description" content="Discover curated reading lists on Noctua Forest." />
+    <meta property="og:image" content="images/logo.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="stylesheet" href="assets/tailwind.css">
+    <link rel="stylesheet" href="assets/base-styles.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="assets/nav.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#fbebcc]">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <header class="flex justify-between items-center mb-8">
+            <a href="welcome.html" class="flex items-center space-x-3">
+                <img src="images/logo.png" alt="Noctua Forest Logo" width="40" height="40" decoding="async" class="w-10 h-10">
+                <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+            </a>
+            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
+                <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">The Forest</a>
+                <a href="reviews.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Write a Review</a>
+                <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">About</a>
+            </nav>
+            <div class="flex items-center space-x-8">
+                <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                    <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+                <a href="account.html" class="hover:text-forest-accent transition-colors duration-300 nav-link" aria-label="Account">
+                    <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                </a>
+            </div>
+        </header>
+        <div id="navOverlay" class="nav-overlay"></div>
+
+        <main class="max-w-4xl mx-auto">
+            <div id="loading" class="text-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-4 border-forest-accent border-t-transparent mx-auto mb-4"></div>
+                <p class="text-lg text-[#4A5450]">Loading reading list...</p>
+            </div>
+
+            <div id="listContent" class="hidden">
+                <div class="bg-forest-card rounded-xl overflow-hidden mb-8">
+                    <div id="coverCollage" class="grid grid-cols-2 md:grid-cols-4 gap-0.5 aspect-[4/1]"></div>
+                </div>
+
+                <div class="bg-forest-card rounded-xl p-8 mb-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h1 id="listName" class="text-3xl font-bold text-white mb-2" style="font-family: 'Poppins', sans-serif;"></h1>
+                            <p id="listDescription" class="text-white/80"></p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button id="cloneList" class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 transition-opacity flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                                Clone List
+                            </button>
+                            <button id="shareList" class="px-4 py-2 bg-[#3A4440] text-white rounded-full hover:opacity-90 transition-opacity">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684z" /></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="booksGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                </div>
+            </div>
+
+            <div id="error" class="hidden text-center py-12">
+                <svg class="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <h2 class="text-xl font-bold text-[#4A5450] mb-2">List Not Found</h2>
+                <p class="text-[#4A5450]/80">This reading list may have been deleted or the link is incorrect.</p>
+                <a href="forest.html" class="inline-block mt-6 px-6 py-3 bg-forest-accent text-white rounded-full hover:opacity-90">Explore The Forest</a>
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/nav.js"></script>
+    <script type="module">
+        import { app } from './firebase-config.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+        import { getSharedList, getUserLists, addBookToList, recordAttribution } from './js/readingListService.js';
+        import { trackListView, trackBookClick } from './js/analyticsService.js';
+
+        const auth = getAuth(app);
+        const shareId = new URLSearchParams(window.location.search).get('id');
+        if (!shareId) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+            throw new Error('No share ID provided');
+        }
+
+        async function loadList(){
+          try{
+            const list = await getSharedList(shareId);
+            if (!list) throw new Error('List not found');
+
+            document.title = `${list.name} — Noctua Forest`;
+            document.getElementById('listName').textContent = list.name;
+            document.getElementById('listDescription').textContent = list.description || '';
+
+            // Update social meta dynamically (best-effort for client-side rendering)
+            try {
+              const setMeta = (sel, content) => { const el = document.querySelector(sel); if (el) el.setAttribute('content', content); };
+              setMeta('meta[property="og:title"]', `${list.name} — Noctua Forest`);
+              setMeta('meta[name="description"]', list.description || 'Discover curated reading lists on Noctua Forest.');
+              setMeta('meta[property="og:description"]', list.description || 'Discover curated reading lists on Noctua Forest.');
+              const firstCover = (list.books && list.books[0]?.coverUrl) ? list.books[0].coverUrl : 'images/logo.png';
+              setMeta('meta[property="og:image"]', firstCover);
+            } catch {}
+
+            const collage = document.getElementById('coverCollage');
+            const books = list.books || [];
+            collage.innerHTML = books.slice(0, 4).map(b => `
+              <div class="aspect-square"><img src="${b.coverUrl || 'images/placeholder.jpg'}" alt="${b.title}" class="w-full h-full object-cover" loading="lazy" decoding="async"></div>
+            `).join('');
+
+            const grid = document.getElementById('booksGrid');
+            grid.innerHTML = books.map(book => `
+              <div class="group">
+                <div class="aspect-[2/3] rounded-lg overflow-hidden mb-2 relative">
+                  <img src="${book.coverUrl || 'images/placeholder.jpg'}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async">
+                  <button data-book='${JSON.stringify(book).replace(/'/g, '&apos;')}' class="save-button absolute bottom-2 right-2 px-3 py-1 rounded-full text-xs bg-forest-accent text-white hover:opacity-90">Save</button>
+                </div>
+                <a href="book.html?id=${book.id}&ref=${list.creatorId || ''}&src=${shareId}" class="book-link" data-book-id="${book.id}">
+                  <h3 class="font-medium text-white group-hover:text-forest-accent transition-colors duration-300">${book.title}</h3>
+                  <p class="text-sm text-white/60">${book.author || ''}</p>
+                </a>
+              </div>
+            `).join('');
+
+            // Inject JSON-LD ItemList schema (SEO)
+            try {
+              const itemListElement = books.map((b, i) => ({
+                "@type": "ListItem",
+                "position": i + 1,
+                "item": {
+                  "@type": "Book",
+                  "name": b.title,
+                  ...(b.author ? { "author": { "@type": "Person", "name": b.author } } : {}),
+                  ...(b.coverUrl ? { "image": b.coverUrl } : {}),
+                  "url": `${location.origin}/book.html?id=${b.id}`
+                }
+              }));
+              const schema = {
+                "@context": "https://schema.org",
+                "@type": "ItemList",
+                "name": list.name,
+                ...(list.description ? { "description": list.description } : {}),
+                "itemListElement": itemListElement
+              };
+              let script = document.getElementById('listSchema');
+              if (!script) {
+                script = document.createElement('script');
+                script.type = 'application/ld+json';
+                script.id = 'listSchema';
+                document.head.appendChild(script);
+              }
+              script.textContent = JSON.stringify(schema);
+            } catch {}
+
+            try { if (list.id && (list.curatorId || list.creatorId)) trackListView(list.id, (list.curatorId || list.creatorId), 'share'); } catch {}
+
+            grid.addEventListener('click', (e) => {
+              const link = e.target.closest('a.book-link');
+              if (!link) return;
+              const bookId = link.getAttribute('data-book-id');
+              try { trackBookClick(list.id, bookId, (list.curatorId || list.creatorId), 'list'); } catch {}
+            });
+
+            grid.querySelectorAll('.save-button').forEach(btn => {
+              btn.addEventListener('click', async (e) => {
+                if (!auth.currentUser) { window.location.href = 'account.html'; return; }
+                const book = JSON.parse(e.currentTarget.getAttribute('data-book').replace(/&apos;/g, "'"));
+                try {
+                  const lists = await getUserLists(auth.currentUser.uid);
+                  if (!lists || lists.length === 0) { alert('Create a list first from your dashboard.'); return; }
+                  const modal = document.createElement('div');
+                  modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+                  modal.innerHTML = `
+                    <div class=\"bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4\">\n                      <h3 class=\"text-xl font-bold text-white mb-4\">Save to My Lists</h3>\n                      <label class=\"block text-sm text-white/90 mb-2\">Choose a list</label>\n                      <select id=\"list-picker\" class=\"w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white mb-4\">\n                        ${lists.map(l => `<option value=\"${l.id}\">${l.name}</option>`).join('')}\n                      </select>\n                      <div class=\"flex gap-3 justify-end\">\n                        <button id=\"cancel-save\" class=\"px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm\">Cancel</button>\n                        <button id=\"confirm-save\" class=\"px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm\">Save</button>\n                      </div>\n                    </div>`;
+                  document.body.appendChild(modal);
+                  modal.querySelector('#cancel-save').addEventListener('click',()=>modal.remove());
+                  modal.querySelector('#confirm-save').addEventListener('click', async ()=>{
+                    const listId = modal.querySelector('#list-picker').value;
+                    try{
+                      await addBookToList(listId, book);
+                      if (list && (list.curatorId || list.creatorId)) {
+                        await recordAttribution(list.id || shareId, (list.curatorId || list.creatorId), book.id, auth.currentUser.uid, listId);
+                      }
+                      modal.remove();
+                    }catch(err){
+                      console.error('Save failed:', err);
+                      alert('Could not save to list. You may need to review this book first.');
+                    }
+                  });
+                } catch (err) {
+                  console.error('Failed to load lists:', err);
+                  alert('Could not load your lists.');
+                }
+              });
+            });
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('listContent').classList.remove('hidden');
+          } catch(err) {
+            console.error('Failed to load list:', err);
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+          }
+        }
+
+        loadList();
+    </script>
+
+    <script defer src="assets/footer.js"></script>
+</body>
+</html>

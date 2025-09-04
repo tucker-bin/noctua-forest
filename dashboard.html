@@ -989,7 +989,7 @@
             window.shareList = async (listId) => {
                 try {
                     const shareId = await shareList(listId);
-                    const shareLink = `${window.location.origin}/lists.html?id=${shareId}`;
+                    const shareLink = `${window.location.origin}/list.html?id=${shareId}`;
                     document.getElementById('shareLink').value = shareLink;
                     
                     // Show QR code

@@ -152,13 +152,12 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
     <script src="assets/nav.js"></script>
     <script type="module">
         import { app, db } from './firebase-config.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-        import { getSharedList, cloneList } from './js/readingListService.js';
+        import { getSharedList, cloneList, getUserLists, addBookToList, recordAttribution } from './js/readingListService.js';
+        import { trackListView, trackBookClick } from './js/analyticsService.js';
 
         const auth = getAuth(app);
         const shareId = new URLSearchParams(window.location.search).get('id');
@@ -203,17 +202,27 @@
                 // Create books grid
                 const grid = document.getElementById('booksGrid');
                 grid.innerHTML = books.map(book => `
-                    <a href="book.html?id=${book.id}&ref=${list.creatorId || ''}" class="group">
-                        <div class="aspect-[2/3] rounded-lg overflow-hidden mb-2">
+                    <div class="group">
+                        <div class="aspect-[2/3] rounded-lg overflow-hidden mb-2 relative">
                             <img src="${book.coverUrl || 'images/placeholder.jpg'}" 
                                 alt="${book.title}" 
                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                loading="lazy">
+                                loading="lazy" decoding="async">
+                            <button data-book='${JSON.stringify(book).replace(/'/g, '&apos;')}' class="save-button absolute bottom-2 right-2 px-3 py-1 rounded-full text-xs bg-forest-accent text-white hover:opacity-90">Save</button>
                         </div>
-                        <h3 class="font-medium text-white group-hover:text-forest-accent transition-colors duration-300">${book.title}</h3>
-                        <p class="text-sm text-white/60">${book.author}</p>
-                    </a>
+                        <a href="book.html?id=${book.id}&ref=${list.creatorId || ''}&src=${shareId}" class="book-link" data-book-id="${book.id}">
+                          <h3 class="font-medium text-white group-hover:text-forest-accent transition-colors duration-300">${book.title}</h3>
+                          <p class="text-sm text-white/60">${book.author}</p>
+                        </a>
+                    </div>
                 `).join('');
+
+                // Track list view (non-blocking)
+                try {
+                  if (list.id && (list.curatorId || list.creatorId)) {
+                    trackListView(list.id, (list.curatorId || list.creatorId), 'share');
+                  }
+                } catch {}
 
                 // Check if user is curator/admin
                 let isCuratorOrAdmin = false;
@@ -340,14 +349,19 @@
                     shareModal.classList.remove('hidden');
                     shareModal.classList.add('flex');
 
-                    // Generate QR code
+                    // Generate QR code (lazy import)
                     const qrCode = document.getElementById('qrCode');
                     qrCode.innerHTML = '';
-                    new QRCode(qrCode, {
-                        text: shareUrl.toString(),
-                        width: 128,
-                        height: 128
-                    });
+                    try {
+                        const mod = await import('https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js');
+                        mod.default.toCanvas(document.createElement('canvas'), shareUrl.toString(), { width: 128 }, (err, canvas)=>{
+                          if (!err) {
+                            const wrap = document.createElement('div');
+                            wrap.appendChild(canvas);
+                            qrCode.appendChild(wrap);
+                          }
+                        });
+                    } catch {}
                 });
 
                 closeShare.addEventListener('click', () => {
@@ -369,6 +383,66 @@
 
                 shareFacebook.addEventListener('click', () => {
                     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareLink.value)}`);
+                });
+
+                // Track book clicks via event delegation
+                grid.addEventListener('click', (e) => {
+                  const link = e.target.closest('a.book-link');
+                  if (!link) return;
+                  const bookId = link.getAttribute('data-book-id');
+                  try { trackBookClick(list.id, bookId, (list.curatorId || list.creatorId), 'list'); } catch {}
+                });
+
+                // Save to My Lists: show modal with user's lists
+                grid.querySelectorAll('.save-button').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        if (!auth.currentUser) {
+                            window.location.href = 'account.html';
+                            return;
+                        }
+                        const book = JSON.parse(e.currentTarget.getAttribute('data-book').replace(/&apos;/g, "'"));
+                        try {
+                            const lists = await getUserLists(auth.currentUser.uid);
+                            if (!lists || lists.length === 0) {
+                                alert('Create a list first from your dashboard.');
+                                return;
+                            }
+                            // Build and show picker modal
+                            const modal = document.createElement('div');
+                            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+                            modal.innerHTML = `
+                              <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+                                <h3 class="text-xl font-bold text-white mb-4">Save to My Lists</h3>
+                                <label class="block text-sm text-white/90 mb-2">Choose a list</label>
+                                <select id="list-picker" class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white mb-4">
+                                  ${lists.map(l => `<option value="${l.id}">${l.name}</option>`).join('')}
+                                </select>
+                                <div class="flex gap-3 justify-end">
+                                  <button id="cancel-save" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm">Cancel</button>
+                                  <button id="confirm-save" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm">Save</button>
+                                </div>
+                              </div>`;
+                            document.body.appendChild(modal);
+                            modal.querySelector('#cancel-save').addEventListener('click',()=>modal.remove());
+                            modal.querySelector('#confirm-save').addEventListener('click', async ()=>{
+                              const listId = modal.querySelector('#list-picker').value;
+                              try{
+                                await addBookToList(listId, book);
+                                // Record attribution to curator/source list when applicable
+                                if (list && (list.curatorId || list.creatorId)) {
+                                  await recordAttribution(list.id || shareId, (list.curatorId || list.creatorId), book.id, auth.currentUser.uid, listId);
+                                }
+                                modal.remove();
+                              }catch(err){
+                                console.error('Save failed:', err);
+                                alert('Could not save to list. You may need to review this book first.');
+                              }
+                            });
+                        } catch (err) {
+                            console.error('Failed to load lists:', err);
+                            alert('Could not load your lists.');
+                        }
+                    });
                 });
 
             } catch (err) {

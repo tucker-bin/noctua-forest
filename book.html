@@ -15,7 +15,9 @@
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="https://noctuaforest.com/book.html">
+  <link rel="preload" href="assets/tailwind.css" as="style">
   <link rel="stylesheet" href="assets/tailwind.css">
+  <link rel="preload" href="assets/base-styles.css" as="style">
   <link rel="stylesheet" href="assets/base-styles.css">
   <link rel="stylesheet" href="assets/nav.css">
   <link rel="stylesheet" href="assets/base-styles.css">
@@ -47,7 +49,7 @@
   <script src="assets/cookie-consent.js"></script>
   
   <!-- Global Footer with Google Translate -->
-  <script src="assets/footer.js"></script>
+  <script defer src="assets/footer.js"></script>
   
   <!-- Book Schema Markup (will be populated by JavaScript) -->
   <script type="application/ld+json" id="bookSchema">
@@ -224,7 +226,9 @@
               class="w-full rounded-lg shadow loading-img" 
               alt="Book cover" 
               role="img" 
-              aria-labelledby="title" />
+              aria-labelledby="title"
+              decoding="async"
+              fetchpriority="high" />
           </div>
           <div>
             <h1 id="title" class="text-3xl font-bold mb-2 text-white" style="font-family: 'Poppins', sans-serif;"></h1>
@@ -571,6 +575,7 @@
     import { validateReview, flagContent } from './js/moderationService.js';
     import { getSimilarBooks, getMoreFromAuthor, getFrequentlyListedTogether } from './js/recommendationService.js';
     import { reportReview } from './js/reportingService.js';
+    import { trackBookClick } from './js/analyticsService.js';
 
     const auth = getAuth(app);
 
@@ -581,6 +586,7 @@
 
     // Persist referral code from URL
     const ref = getParam('ref');
+    const src = getParam('src'); // source list id (optional)
     if (ref) {
         try {
             sessionStorage.setItem('nf_ref', ref);
@@ -598,6 +604,22 @@
     const listForm = document.getElementById('listForm');
     const cancelListBtn = document.getElementById('cancelList');
     let currentBook = null;
+    let sourceListId = src || sessionStorage.getItem('nf_src') || null;
+    if (src) { try { sessionStorage.setItem('nf_src', src); } catch (e) {} }
+
+    // Track purchase clicks (attribution funnel)
+    const purchaseLink = document.getElementById('purchaseLink');
+    const purchaseLink2 = document.getElementById('purchaseLink2');
+    function handlePurchaseClick(){
+      try {
+        const curator = ref || sessionStorage.getItem('nf_ref');
+        if (curator) {
+          trackBookClick(sourceListId || 'direct', (currentBook?.id || getParam('id')), curator, 'book');
+        }
+      } catch {}
+    }
+    purchaseLink?.addEventListener('click', handlePurchaseClick, { once: false });
+    purchaseLink2?.addEventListener('click', handlePurchaseClick, { once: false });
 
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
@@ -673,6 +695,10 @@
             // Add current book
             if (currentBook) {
                 await addBookToList(listId, currentBook);
+                const curator = ref || sessionStorage.getItem('nf_ref');
+                if (sourceListId && curator && auth.currentUser) {
+                  try { await recordAttribution(sourceListId, curator, currentBook.id, auth.currentUser.uid, listId); } catch {}
+                }
                 const msg = document.getElementById('actionMsg');
                 msg.textContent = `Added to "${name}"`;
                 msg.classList.remove('hidden');
@@ -691,6 +717,10 @@
     window.addToExistingList = async (listId) => {
         try {
             await addBookToList(listId, currentBook);
+            const curator = ref || sessionStorage.getItem('nf_ref');
+            if (sourceListId && curator && auth.currentUser) {
+              try { await recordAttribution(sourceListId, curator, currentBook.id, auth.currentUser.uid, listId); } catch {}
+            }
             const list = await getList(listId);
             const msg = document.getElementById('actionMsg');
             msg.textContent = `Added to "${list.name}"`;

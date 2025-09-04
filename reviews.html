@@ -259,6 +259,22 @@
                     </div>
                 </div>
 
+                <!-- Cover Confirmation Section -->
+                <div id="coverConfirmation" class="hidden space-y-4">
+                    <div class="space-y-2">
+                        <label class="block font-medium text-white mb-2">Book Cover</label>
+                        <div class="flex items-start space-x-4">
+                            <img id="coverPreview" src="" alt="Book cover" class="w-24 h-36 object-cover rounded-lg border border-[#7A8580]" style="display: none;">
+                            <div class="flex-1">
+                                <p id="coverStatus" class="text-sm text-gray-300 mb-2">Checking for book cover...</p>
+                                <button type="button" id="changeCoverBtn" class="px-4 py-2 bg-[#3A4440] hover:bg-[#4A5450] text-white rounded-md text-sm transition-colors duration-200">
+                                    Change Cover
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="bg-[#5A6560] rounded-lg p-4 border border-[#7A8580]">
                     <p class="font-bold mb-2">Reading Verification</p>
                     <label class="flex items-center mb-2">
@@ -483,6 +499,10 @@
 
             // Fill form if no duplicates found
             fillFormWithMetadata(metadata);
+            
+            // Check for cover and show confirmation UI
+            await checkAndShowCover(metadata);
+            
             loadingMsg.textContent = 'Book details loaded!';
             setTimeout(() => loadingMsg.remove(), 3000);
           } catch (err) {
@@ -494,6 +514,102 @@
             }
           }
         }, 1000);
+      });
+
+      // Cover handling functions
+      let currentCoverData = null;
+
+      async function checkAndShowCover(metadata) {
+        const coverConfirmation = document.getElementById('coverConfirmation');
+        const coverPreview = document.getElementById('coverPreview');
+        const coverStatus = document.getElementById('coverStatus');
+        
+        if (!coverConfirmation) return;
+
+        // Show the cover confirmation section
+        coverConfirmation.classList.remove('hidden');
+
+        // If we already have a cover from Amazon, show it
+        if (metadata.coverUrl) {
+          coverPreview.src = metadata.coverUrl;
+          coverPreview.style.display = 'block';
+          coverStatus.textContent = 'Cover found from Amazon';
+          currentCoverData = { coverUrl: metadata.coverUrl, source: 'amazon' };
+          return;
+        }
+
+        // Try to find a cover via our API
+        try {
+          coverStatus.textContent = 'Searching for book cover...';
+          
+          const params = new URLSearchParams();
+          if (metadata.isbn) params.append('isbn', metadata.isbn);
+          if (metadata.title) params.append('title', metadata.title);
+          if (metadata.author) params.append('author', metadata.author);
+
+          const response = await fetch(`/api/covers?${params}`);
+          const result = await response.json();
+
+          if (result.found && result.coverUrl) {
+            coverPreview.src = result.coverUrl;
+            coverPreview.style.display = 'block';
+            coverStatus.textContent = `Cover found via ${result.source === 'openlibrary_isbn' ? 'Open Library (ISBN)' : 'Open Library (search)'}`;
+            currentCoverData = result;
+          } else {
+            coverStatus.textContent = 'No cover found - book will use placeholder';
+            currentCoverData = { coverUrl: '', source: 'none' };
+          }
+        } catch (error) {
+          console.error('Cover fetch error:', error);
+          coverStatus.textContent = 'Error finding cover - book will use placeholder';
+          currentCoverData = { coverUrl: '', source: 'error' };
+        }
+      }
+
+      // Change cover button handler
+      document.getElementById('changeCoverBtn')?.addEventListener('click', async () => {
+        const title = document.getElementById('title')?.value;
+        const author = document.getElementById('author')?.value;
+        
+        if (!title) {
+          alert('Please enter a book title first');
+          return;
+        }
+
+        const coverStatus = document.getElementById('coverStatus');
+        coverStatus.textContent = 'Searching for alternative covers...';
+
+        try {
+          // Try different search strategies
+          const strategies = [
+            { title, author },
+            { title: title.split(' ').slice(0, 3).join(' '), author }, // Shorter title
+            { title, author: author?.split(' ')[0] } // First name only
+          ];
+
+          for (const strategy of strategies) {
+            const params = new URLSearchParams();
+            if (strategy.title) params.append('title', strategy.title);
+            if (strategy.author) params.append('author', strategy.author);
+
+            const response = await fetch(`/api/covers?${params}`);
+            const result = await response.json();
+
+            if (result.found && result.coverUrl && result.coverUrl !== currentCoverData?.coverUrl) {
+              const coverPreview = document.getElementById('coverPreview');
+              coverPreview.src = result.coverUrl;
+              coverPreview.style.display = 'block';
+              coverStatus.textContent = `Alternative cover found via ${result.source === 'openlibrary_isbn' ? 'Open Library (ISBN)' : 'Open Library (search)'}`;
+              currentCoverData = result;
+              return;
+            }
+          }
+
+          coverStatus.textContent = 'No alternative covers found';
+        } catch (error) {
+          console.error('Cover change error:', error);
+          coverStatus.textContent = 'Error searching for alternative covers';
+        }
       });
 
       // Initialize form handler
@@ -596,7 +712,7 @@
             amazonUrl: data.amazonUrl,
             asin: metadata.asin || asin || '',
             isbn: metadata.isbn || '',
-            coverUrl: metadata.coverUrl || '',
+            coverUrl: currentCoverData?.coverUrl || metadata.coverUrl || '',
             publisher: metadata.publisher || '',
             publicationDate: metadata.publicationDate || '',
             pageCount: metadata.pageCount || null,

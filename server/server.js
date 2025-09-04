@@ -315,29 +315,174 @@ app.get('/api/pa/items', async (req, res) => {
     return res.status(400).json({ error: 'ASIN required' });
   }
 
-  // Check cache first
   const cached = paCache.get(asin);
-  if (cached) {
-    return res.json(cached);
-  }
+  if (cached) return res.json(cached);
 
   try {
-    // TODO: Replace with actual PA API call
-    // For now, return a placeholder that matches our schema
-    const mockData = {
-      asin,
-      title: 'Book Title',
-      author: 'Author Name',
-      imageUrl: `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.L.jpg`,
-      detailPageUrl: `https://www.amazon.com/dp/${asin}?tag=noctuaforest-20`
+    // Environment variables must be configured externally
+    const PA_HOST = process.env.PA_API_HOST || 'webservices.amazon.com';
+    const REGION = process.env.PA_API_REGION || 'us-east-1';
+    const MARKETPLACE = process.env.PA_API_MARKETPLACE || 'www.amazon.com';
+    const PARTNER_TAG = process.env.PA_PARTNER_TAG || 'noctuaforest-20';
+    const ACCESS_KEY = process.env.PA_ACCESS_KEY_ID;
+    const SECRET_KEY = process.env.PA_SECRET_ACCESS_KEY;
+
+    if (!ACCESS_KEY || !SECRET_KEY) {
+      // Fail closed to mock to avoid breaking pages, but warn in logs
+      console.warn('[PA-API] Missing credentials; returning best-effort image URL');
+      const fallback = {
+        asin,
+        title: '',
+        author: '',
+        imageUrl: `https://${MARKETPLACE}/images/P/${asin}.01.L.jpg`,
+        detailPageUrl: `https://${MARKETPLACE}/dp/${asin}?tag=${PARTNER_TAG}`
+      };
+      paCache.set(asin, fallback);
+      return res.json(fallback);
+    }
+
+    // Build PA-API v5 request payload
+    const body = JSON.stringify({
+      PartnerTag: PARTNER_TAG,
+      PartnerType: 'Associates',
+      Marketplace: MARKETPLACE,
+      ItemIds: [asin],
+      Resources: [
+        'ItemInfo.Title',
+        'ItemInfo.ByLineInfo',
+        'Images.Primary.Large',
+        'DetailPageURL'
+      ]
+    });
+
+    // Sign the request (AWS Signature v4)
+    const crypto = require('crypto');
+    const method = 'POST';
+    const service = 'ProductAdvertisingAPI';
+    const host = PA_HOST;
+    const pathname = '/paapi5/getitems';
+    const amzdate = new Date().toISOString().replace(/[:-]|
+/g, '').slice(0, 15) + 'Z';
+    const datestamp = amzdate.slice(0, 8);
+    const canonicalHeaders = `content-encoding:amz-1.0\ncontent-type:application/json; charset=utf-8\nhost:${host}\nx-amz-date:${amzdate}\n`;
+    const signedHeaders = 'content-encoding;content-type;host;x-amz-date';
+    const payloadHash = crypto.createHash('sha256').update(body).digest('hex');
+    const canonicalRequest = [
+      method,
+      pathname,
+      '',
+      canonicalHeaders,
+      signedHeaders,
+      payloadHash
+    ].join('\n');
+
+    const algorithm = 'AWS4-HMAC-SHA256';
+    const credentialScope = `${datestamp}/${REGION}/${service}/aws4_request`;
+    const stringToSign = [
+      algorithm,
+      amzdate,
+      credentialScope,
+      crypto.createHash('sha256').update(canonicalRequest).digest('hex')
+    ].join('\n');
+
+    function hmac(key, str) { return crypto.createHmac('sha256', key).update(str).digest(); }
+    const kDate = hmac('AWS4' + SECRET_KEY, datestamp);
+    const kRegion = hmac(kDate, REGION);
+    const kService = hmac(kRegion, service);
+    const kSigning = hmac(kService, 'aws4_request');
+    const signature = crypto.createHmac('sha256', kSigning).update(stringToSign).digest('hex');
+
+    const headers = {
+      'content-encoding': 'amz-1.0',
+      'content-type': 'application/json; charset=utf-8',
+      'x-amz-date': amzdate,
+      'host': host,
+      'Authorization': `${algorithm} Credential=${ACCESS_KEY}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`
     };
 
-    // Cache the result
-    paCache.set(asin, mockData);
-    res.json(mockData);
+    const response = await fetch(`https://${host}${pathname}`, { method, headers, body });
+    if (!response.ok) throw new Error(`PA-API HTTP ${response.status}`);
+    const json = await response.json();
+
+    const item = json.ItemsResult?.Items?.[0];
+    const title = item?.ItemInfo?.Title?.DisplayValue || '';
+    const author = item?.ItemInfo?.ByLineInfo?.Contributors?.[0]?.Name || '';
+    const imageUrl = item?.Images?.Primary?.Large?.URL || `https://${MARKETPLACE}/images/P/${asin}.01.L.jpg`;
+    const detailPageUrl = (item?.DetailPageURL || `https://${MARKETPLACE}/dp/${asin}`) + (PARTNER_TAG ? (item?.DetailPageURL?.includes('tag=') ? '' : `?tag=${PARTNER_TAG}`) : '');
+
+    const result = { asin, title, author, imageUrl, detailPageUrl };
+    paCache.set(asin, result);
+    res.json(result);
   } catch (error) {
     console.error('PA API error:', error);
     res.status(500).json({ error: 'Failed to fetch product data' });
+  }
+});
+
+// Cover fallback endpoint with Open Library
+app.get('/api/covers', async (req, res) => {
+  const { isbn, title, author } = req.query;
+  
+  if (!isbn && !title) {
+    return res.status(400).json({ error: 'ISBN or title required' });
+  }
+
+  const cacheKey = `cover:${isbn || `${title}:${author}`}`;
+  const cached = paCache.get(cacheKey);
+  if (cached) return res.json(cached);
+
+  try {
+    let coverUrl = null;
+    let source = null;
+
+    // Try Open Library by ISBN first
+    if (isbn) {
+      const cleanIsbn = isbn.replace(/[^0-9X]/g, '');
+      if (cleanIsbn.length === 10 || cleanIsbn.length === 13) {
+        // Try different sizes: L (large), M (medium), S (small)
+        const sizes = ['L', 'M', 'S'];
+        for (const size of sizes) {
+          const testUrl = `https://covers.openlibrary.org/b/isbn/${cleanIsbn}-${size}.jpg`;
+          try {
+            const response = await fetch(testUrl, { method: 'HEAD' });
+            if (response.ok) {
+              coverUrl = testUrl;
+              source = 'openlibrary_isbn';
+              break;
+            }
+          } catch (e) {
+            // Continue to next size
+          }
+        }
+      }
+    }
+
+    // If no ISBN cover found, try title/author search
+    if (!coverUrl && title) {
+      try {
+        const searchQuery = encodeURIComponent(`${title} ${author || ''}`.trim());
+        const searchUrl = `https://openlibrary.org/search.json?title=${searchQuery}&limit=1`;
+        const searchResponse = await fetch(searchUrl);
+        
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          const work = searchData.docs?.[0];
+          if (work?.cover_i) {
+            coverUrl = `https://covers.openlibrary.org/b/id/${work.cover_i}-L.jpg`;
+            source = 'openlibrary_search';
+          }
+        }
+      } catch (e) {
+        console.warn('Open Library search failed:', e.message);
+      }
+    }
+
+    const result = { coverUrl, source, found: !!coverUrl };
+    paCache.set(cacheKey, result, 43200); // 12h cache
+    res.json(result);
+  } catch (error) {
+    console.error('Cover API error:', error);
+    res.status(500).json({ error: 'Failed to fetch cover' });
   }
 });
 

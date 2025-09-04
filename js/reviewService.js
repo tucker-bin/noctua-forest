@@ -311,12 +311,10 @@ export async function getReviewsForBook(bookId) {
 export async function getRecentReviews(userId, maxCount = 5) {
   try {
     const reviewsRef = collection(db, 'reviews');
+    // Avoid composite index requirement by removing orderBy and sorting client-side
     const q = query(
       reviewsRef,
-      // Align with rules: some deployments use 'userId' on review doc
-      where('userId', '==', userId),
-      orderBy('createdAt', 'desc'),
-      limit(maxCount)
+      where('userId', '==', userId)
     );
 
     const snapshot = await getDocs(q);
@@ -347,7 +345,10 @@ export async function getRecentReviews(userId, maxCount = 5) {
       }
     }
 
-    return reviews;
+    // Sort by createdAt desc and cap to maxCount
+    return reviews
+      .sort((a, b) => new Date(b.createdAt?.toDate?.() || b.createdAt || 0) - new Date(a.createdAt?.toDate?.() || a.createdAt || 0))
+      .slice(0, maxCount);
   } catch (err) {
     console.error('Error getting recent reviews:', err);
     return [];
