@@ -37,7 +37,8 @@ async function isNameAvailable(name) {
     return snapshot.empty;
   } catch (err) {
     console.error('Error checking name availability:', err);
-    return false;
+    // If rules block querying other users, default to available and rely on randomness
+    return true;
   }
 }
 

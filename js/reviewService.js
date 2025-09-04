@@ -308,14 +308,14 @@ export async function getReviewsForBook(bookId) {
 /**
  * Get recent reviews for a user
  */
-export async function getRecentReviews(userId, limit = 5) {
+export async function getRecentReviews(userId, maxCount = 5) {
   try {
     const reviewsRef = collection(db, 'reviews');
     const q = query(
       reviewsRef,
       where('authorId', '==', userId),
       orderBy('createdAt', 'desc'),
-      limit(limit)
+      limit(maxCount)
     );
 
     const snapshot = await getDocs(q);

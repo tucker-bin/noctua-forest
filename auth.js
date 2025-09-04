@@ -578,6 +578,9 @@ window.createNewList = createNewList;
 window.editList = editList;
 window.deleteList = deleteList;
 window.shareList = shareList;
+window.confirmCreateList = confirmCreateList;
+window.closeModal = closeModal;
+window.confirmDeleteList = confirmDeleteList;
 
 // Event listeners
 emailSigninBtn.addEventListener('click', handleEmailSignIn);
