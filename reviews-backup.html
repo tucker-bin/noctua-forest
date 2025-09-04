@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Share Your Review - Noctua Forest</title>
@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ" onerror="console.warn('Google Analytics failed to load')"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -132,6 +132,62 @@
             margin-bottom: 1.5rem;
         }
         
+        /* Chat-specific styling */
+        .chat-message {
+            margin-bottom: 1rem;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        .chat-message.bot .flex {
+            justify-content: flex-start;
+        }
+        
+        .chat-message.user .flex {
+            justify-content: flex-end;
+        }
+        
+        .chat-message .bg-forest-accent {
+            background-color: #F58220;
+        }
+        
+        .chat-message .bg-forest-accent:hover {
+            background-color: #E6731A;
+        }
+        
+        #chatMessages {
+            scrollbar-width: thin;
+            scrollbar-color: #7A8580 #4A5450;
+        }
+        
+        #chatMessages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #chatMessages::-webkit-scrollbar-track {
+            background: #4A5450;
+            border-radius: 3px;
+        }
+        
+        #chatMessages::-webkit-scrollbar-thumb {
+            background: #7A8580;
+            border-radius: 3px;
+        }
+        
+        #chatMessages::-webkit-scrollbar-thumb:hover {
+            background: #8A9590;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -144,20 +200,24 @@
             .container {
                 padding: 0 0.5rem;
             }
+            
+            .chat-message .max-w-md {
+                max-width: 100%;
+            }
         }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Navigation -->
-    <script src="components/Navigation.js"></script>
+    <script type="module" src="components/Navigation.js"></script>
     
     <!-- Header -->
     <header class="header">
         <div class="container">
             <h1>Share Your Review</h1>
             <p>Help other readers discover great books through your authentic perspective</p>
-        </div>
-    </header>
+            </div>
+        </header>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -168,19 +228,19 @@
                     <!-- Chat Messages Container -->
                     <div id="chatMessages" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
                         <!-- Messages will be added dynamically -->
-                    </div>
-                    
+            </div>
+
                     <!-- Current Input -->
                     <div id="chatInput" class="space-y-4">
                         <div id="currentQuestion" class="chat-message bot">
-                            <div class="flex items-start space-x-3">
+                        <div class="flex items-start space-x-3">
                                 <div class="w-8 h-8 bg-forest-accent rounded-full flex items-center justify-center text-sm">🦉</div>
                                 <div class="bg-[#5A6560] rounded-lg p-4 text-white max-w-md">
                                     Hi! What book would you like to share with The Forest?
-                                </div>
-                            </div>
                         </div>
-                        
+                    </div>
+                </div>
+
                         <div class="flex space-x-3">
                             <input 
                                 id="userInput" 
@@ -194,10 +254,10 @@
                                 type="button" 
                                 class="px-4 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg transition-colors">
                                 Send
-                            </button>
-                        </div>
+                                </button>
                     </div>
-                    
+                </div>
+
                     <!-- Hidden form fields for final submission -->
                     <div id="hiddenFields" class="hidden">
                         <input type="hidden" name="title" id="hiddenTitle">
@@ -210,8 +270,8 @@
                         <input type="hidden" name="audience" id="hiddenAudience">
                         <input type="hidden" name="contentWarnings" id="hiddenWarnings">
                         <input type="hidden" name="amazonUrl" id="hiddenAmazonUrl">
-                    </div>
-                    
+                </div>
+
                     <!-- Submit button (appears at end) -->
                     <button 
                         id="finalSubmit" 
@@ -221,30 +281,18 @@
                     </button>
                     
                     <div id="submissionStatus" class="mt-3 text-sm text-gray-200"></div>
+                    </div>
                 </div>
             </div>
-        </div>
     </main>
 
     <!-- Firebase Configuration -->
     <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+      import { app, db } from './firebase-config.js';
       import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-      import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-      
-      const firebaseConfig = {
-        apiKey: "AIzaSyBQZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQ",
-        authDomain: "noctua-forest.firebaseapp.com",
-        projectId: "noctua-forest",
-        storageBucket: "noctua-forest.appspot.com",
-        messagingSenderId: "123456789012",
-        appId: "1:123456789012:web:abcdefghijklmnopqrstuvwxyz"
-      };
-      
-      const app = initializeApp(firebaseConfig);
+
       const auth = getAuth(app);
-      const db = getFirestore(app);
-      
+
       // Make auth and db available globally
       window.auth = auth;
       window.db = db;
@@ -358,7 +406,7 @@
             } else {
               this.showFinalSubmit();
             }
-          } else {
+        } else {
             // Show error and ask again
             this.addChatMessage('bot', result.message);
           }

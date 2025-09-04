@@ -1,5 +1,5 @@
 // Firebase imports will be handled by the HTML page
-// This file expects db, getAuth, onAuthStateChanged, collection, query, where, orderBy, limit, startAfter, getDocs, doc, getDoc to be available globally
+// This file expects db, getAuth, onAuthStateChanged, collection, query, where, orderBy, limit, startAfter, getDocs, doc, getDoc, app to be available globally
 
 // Helper function to truncate text with fade effect
 function truncateText(text, maxLength = 200) {
@@ -8,27 +8,26 @@ function truncateText(text, maxLength = 200) {
   }
   
   // Find the last space before maxLength to avoid cutting words
-  let truncateAt = maxLength;
-  for (let i = maxLength; i >= maxLength - 20; i--) {
-    if (text[i] === ' ') {
-      truncateAt = i;
-      break;
-    }
+  const truncated = text.substring(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  
+  if (lastSpace > maxLength * 0.8) {
+    return text.substring(0, lastSpace) + '...';
   }
   
-  return text.substring(0, truncateAt) + '...';
+  return truncated + '...';
 }
 
-// Semantic search patterns for emotional and situational connections
+// Semantic search patterns for emotional and situational matching
 const semanticPatterns = {
   // Emotional states
   emotions: {
-    'sad': ['sad', 'depressed', 'melancholy', 'heartbroken', 'grief', 'loss', 'tearful'],
-    'happy': ['happy', 'joyful', 'uplifting', 'cheerful', 'inspiring', 'hopeful', 'positive'],
-    'angry': ['angry', 'furious', 'rage', 'outraged', 'frustrated', 'irritated'],
-    'scared': ['scared', 'frightened', 'terrified', 'anxious', 'worried', 'nervous'],
-    'excited': ['excited', 'thrilled', 'energized', 'pumped', 'enthusiastic'],
-    'calm': ['calm', 'peaceful', 'serene', 'relaxed', 'tranquil', 'zen']
+    'uplifting': ['uplifting', 'inspiring', 'motivating', 'hopeful', 'positive', 'encouraging'],
+    'melancholic': ['sad', 'melancholic', 'nostalgic', 'bittersweet', 'emotional', 'touching'],
+    'thrilling': ['thrilling', 'exciting', 'adrenaline', 'suspenseful', 'gripping', 'intense'],
+    'peaceful': ['peaceful', 'calm', 'serene', 'tranquil', 'meditative', 'zen'],
+    'romantic': ['romantic', 'love', 'passionate', 'intimate', 'heartwarming', 'sweet'],
+    'dark': ['dark', 'gritty', 'disturbing', 'unsettling', 'bleak', 'harsh']
   },
   
   // Life situations
@@ -96,7 +95,7 @@ class ForestDiscovery {
 
   async loadUserPreferences() {
     try {
-      const auth = getAuth();
+      const auth = getAuth(window.app);
       onAuthStateChanged(auth, async (user) => {
         if (!user) return;
         
@@ -104,173 +103,84 @@ class ForestDiscovery {
           const userDoc = await getDoc(doc(db, 'users', user.uid));
           if (userDoc.exists()) {
             const data = userDoc.data();
-            this.preferences = data.preferences || { excludedKeywords: [], genres: [] };
-            
-            // Apply default filters from preferences
-            if (this.preferences.language) {
-              this.filters.language = this.preferences.language;
-              const langSelect = document.getElementById('language');
-              if (langSelect) langSelect.value = this.preferences.language;
-            }
-            
-            // Apply excluded keywords filtering
-            if (this.preferences.excludedKeywords && this.preferences.excludedKeywords.length > 0) {
-              this.updateActiveFilters();
-              this.resetAndReload();
-            }
+            this.preferences = {
+              excludedKeywords: data.excludedKeywords || [],
+              genres: data.preferredGenres || []
+            };
           }
         } catch (error) {
-          console.warn('Could not load user preferences:', error);
+          console.error('Error loading user preferences:', error);
         }
       });
     } catch (error) {
-      console.warn('Could not initialize preferences loading:', error);
+      console.error('Error setting up user preferences:', error);
     }
-  }
-
-  // Semantic search that matches emotional and situational connections
-  semanticSearch(books, query) {
-    const searchTerms = query.toLowerCase().split(/\s+/);
-    const queryTags = extractSemanticTags(query);
-    
-    return books.filter(book => {
-      let score = 0;
-      
-      // Direct text matches (title, author)
-      const titleMatch = book.title.toLowerCase().includes(query.toLowerCase());
-      const authorMatch = book.author.toLowerCase().includes(query.toLowerCase());
-      
-      if (titleMatch) score += 10;
-      if (authorMatch) score += 8;
-      
-      // Semantic tag matching
-      if (queryTags.length > 0) {
-        // Check if book has reviews with matching semantic tags
-        const bookContent = [
-          book.title,
-          book.author,
-          book.blurb || '',
-          ...(book.tags || [])
-        ].join(' ').toLowerCase();
-        
-        const bookTags = extractSemanticTags(bookContent);
-        const matchingTags = queryTags.filter(tag => bookTags.includes(tag));
-        score += matchingTags.length * 5;
-      }
-      
-      // Keyword matching in book content
-      searchTerms.forEach(term => {
-        if (book.title.toLowerCase().includes(term)) score += 3;
-        if (book.author.toLowerCase().includes(term)) score += 2;
-        if (book.blurb && book.blurb.toLowerCase().includes(term)) score += 2;
-        if (book.tags && book.tags.some(tag => tag.toLowerCase().includes(term))) score += 1;
-      });
-      
-      // Boost score for books with more reviews (community validation)
-      if (book.reviewCount > 0) {
-        score += Math.min(book.reviewCount * 0.5, 5);
-      }
-      
-      return score > 0;
-    }).sort((a, b) => {
-      // Sort by semantic relevance score
-      const scoreA = this.calculateSemanticScore(a, query, queryTags);
-      const scoreB = this.calculateSemanticScore(b, query, queryTags);
-      return scoreB - scoreA;
-    });
-  }
-  
-  calculateSemanticScore(book, query, queryTags) {
-    let score = 0;
-    const queryLower = query.toLowerCase();
-    
-    // Direct matches
-    if (book.title.toLowerCase().includes(queryLower)) score += 10;
-    if (book.author.toLowerCase().includes(queryLower)) score += 8;
-    
-    // Semantic tag matches
-    if (queryTags.length > 0) {
-      const bookContent = [
-        book.title,
-        book.author,
-        book.blurb || '',
-        ...(book.tags || [])
-      ].join(' ').toLowerCase();
-      
-      const bookTags = extractSemanticTags(bookContent);
-      const matchingTags = queryTags.filter(tag => bookTags.includes(tag));
-      score += matchingTags.length * 5;
-    }
-    
-    // Community validation
-    if (book.reviewCount > 0) {
-      score += Math.min(book.reviewCount * 0.5, 5);
-    }
-    
-    return score;
   }
 
   setupEventListeners() {
-    // Search input with debouncing
+    // Search input
     const searchInput = document.getElementById('searchInput');
-    let searchTimeout;
-    searchInput?.addEventListener('input', (e) => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(() => {
-        this.filters.search = e.target.value;
-        this.resetAndReload();
-      }, 300);
-    });
-
-    // Filter selects
-    // Map UI IDs to internal filter keys for robustness
-    const idToFilterKey = { languageFilter: 'language', regionFilter: 'region', sortSelect: 'sort' };
-    Object.entries(idToFilterKey).forEach(([id, key]) => {
-      const select = document.getElementById(id);
-      select?.addEventListener('change', (e) => {
-        this.filters[key] = e.target.value;
-        this.updateActiveFilters();
-        this.resetAndReload();
+    if (searchInput) {
+      let searchTimeout;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          this.filters.search = e.target.value;
+          this.loadInitialBooks();
+        }, 300);
       });
-    });
+    }
+
+    // Language filter
+    const languageFilter = document.getElementById('languageFilter');
+    if (languageFilter) {
+      languageFilter.addEventListener('change', (e) => {
+        this.filters.language = e.target.value;
+        this.loadInitialBooks();
+      });
+    }
+
+    // Region filter
+    const regionFilter = document.getElementById('regionFilter');
+    if (regionFilter) {
+      regionFilter.addEventListener('change', (e) => {
+        this.filters.region = e.target.value;
+        this.loadInitialBooks();
+      });
+    }
+
+    // Sort select
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+      sortSelect.addEventListener('change', (e) => {
+        this.filters.sort = e.target.value;
+        this.loadInitialBooks();
+      });
+    }
+
+    // Load more button
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        this.loadMoreBooks();
+      });
+    }
   }
 
   setupInfiniteScroll() {
-    // Safari compatibility: Check for IntersectionObserver support
-    if (!('IntersectionObserver' in window)) {
-      console.warn('IntersectionObserver not supported, using scroll fallback');
-      this.setupScrollFallback();
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !this.isLoading && this.hasMoreBooks) {
-          this.loadMoreBooks();
-        }
-      });
-    }, {
-      rootMargin: '200px'
-    });
-
-    // Observe the loading indicator
-    const loadingIndicator = document.getElementById('loadingState');
-    if (loadingIndicator) {
-      observer.observe(loadingIndicator);
-    }
-  }
-
-  // Fallback for browsers without IntersectionObserver
-  setupScrollFallback() {
+    let isLoading = false;
+    
     window.addEventListener('scroll', () => {
-      if (!this.isLoading && this.hasMoreBooks) {
-        const scrollHeight = document.documentElement.scrollHeight;
-        const scrollTop = document.documentElement.scrollTop;
-        const clientHeight = document.documentElement.clientHeight;
-        
-        if (scrollTop + clientHeight >= scrollHeight - 1000) {
-          this.loadMoreBooks();
-        }
+      if (isLoading) return;
+      
+      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+      const threshold = 100;
+      
+      if (scrollTop + clientHeight >= scrollHeight - threshold) {
+        isLoading = true;
+        this.loadMoreBooks().finally(() => {
+          isLoading = false;
+        });
       }
     });
   }
@@ -288,22 +198,24 @@ class ForestDiscovery {
     
     this.isLoading = true;
     this.showLoading(true);
-
+    
     try {
-      // Simulate API call with sample data for now
       const newBooks = await this.fetchBooks(this.currentPage, this.filters);
       
-      if (newBooks.length === 0) {
-        this.hasMoreBooks = false;
-        this.showNoResults(this.books.length === 0);
-      } else {
-        this.books.push(...newBooks);
-        this.renderBooks(newBooks);
+      if (newBooks.length > 0) {
+        this.books = [...this.books, ...newBooks];
         this.currentPage++;
+        this.renderBooks();
+        this.updateLoadMoreButton();
+      } else {
+        this.hasMoreBooks = false;
+        this.updateLoadMoreButton();
       }
+      
+      this.updateEmptyState();
     } catch (error) {
       console.error('Error loading books:', error);
-      this.showError();
+      this.showError('Failed to load books. Please try again.');
     } finally {
       this.isLoading = false;
       this.showLoading(false);
@@ -329,270 +241,239 @@ class ForestDiscovery {
         booksQuery = query(booksQuery, where('authorRegion', '==', filters.region));
       }
       
-      // Apply sorting — use publishedAt for recency
-      let sortField = 'publishedAt';
-      let sortDirection = 'desc';
+      // Apply sorting
+      let sortField = 'createdAt';
+      let sortOrder = 'desc';
       
       switch (filters.sort) {
+        case 'recent':
+          sortField = 'publishedAt';
+          sortOrder = 'desc';
+          break;
         case 'popular':
-          sortField = 'popularity';
-          sortDirection = 'desc';
+          sortField = 'reviewCount';
+          sortOrder = 'desc';
           break;
-        case 'recent': // 'Newest' in UI
-          sortField = 'publishedAt';
-          sortDirection = 'desc';
-          break;
-        // No ratings in product — remove/ignore legacy option
-        case 'random':
-          // For random, we'll shuffle client-side after fetching
-          sortField = 'publishedAt';
-          sortDirection = 'desc';
+        case 'title':
+          sortField = 'title';
+          sortOrder = 'asc';
           break;
       }
+      
+      booksQuery = query(booksQuery, orderBy(sortField, sortOrder));
       
       // Apply pagination
       const pageSize = 12;
-      let paginatedQuery = query(
-        booksQuery,
-        orderBy(sortField, sortDirection),
-        limit(pageSize)
-      );
+      booksQuery = query(booksQuery, limit(pageSize));
       
-      // If not first page, use cursor pagination
-      if (page > 1 && this.lastDoc) {
-        paginatedQuery = query(
-          booksQuery,
-          orderBy(sortField, sortDirection),
-          startAfter(this.lastDoc),
-          limit(pageSize)
-        );
+      if (this.lastDoc && page > 1) {
+        booksQuery = query(booksQuery, startAfter(this.lastDoc));
       }
       
-      const snapshot = await getDocs(paginatedQuery);
+      console.log('ForestDiscovery: Executing Firestore query...');
+      const booksSnap = await getDocs(booksQuery);
+      console.log('ForestDiscovery: Query executed, got', booksSnap.docs.length, 'documents');
       
-      if (snapshot.empty) {
-        return [];
+      // Update lastDoc for pagination
+      if (booksSnap.docs.length > 0) {
+        this.lastDoc = booksSnap.docs[booksSnap.docs.length - 1];
       }
       
-      // Store last document for next page
-      this.lastDoc = snapshot.docs[snapshot.docs.length - 1];
-      
-      // Convert to book objects
-      const books = snapshot.docs.map(doc => {
+      // Map documents to book objects
+      const books = booksSnap.docs.map(doc => {
         const data = doc.data();
         return {
           id: doc.id,
-          title: data.title || '',
-          author: data.author || '',
-          coverUrl: data.coverUrl || '',
-          language: data.primaryLanguage || data.language || 'en',
-          region: data.authorRegion || data.region || '',
-          year: typeof data.publicationYear === 'number' ? data.publicationYear : null,
-          tags: Array.isArray(data.categories) ? data.categories : (typeof data.authorTags === 'string' && data.authorTags.trim() ? data.authorTags.split(',').map(t => t.trim()).filter(Boolean) : []),
-          popularity: data.popularity || 0,
-          rating: data.averageRating || 0,
-          averageRating: data.averageRating || 0,
+          title: data.title || 'Untitled',
+          author: data.author || 'Unknown Author',
+          coverUrl: data.coverUrl || '/images/placeholder-book.jpg',
           reviewCount: data.reviewCount || 0,
-          createdAt: data.publishedAt?.toDate?.() || data.createdAt?.toDate?.() || new Date(),
-          blurb: data.blurb || ''
+          primaryLanguage: data.primaryLanguage || 'en',
+          authorRegion: data.authorRegion || 'unknown',
+          publicationYear: data.publicationYear || null,
+          authorTags: data.authorTags || [],
+          blurb: data.blurb || '',
+          rating: data.averageRating || 0,
+          createdAt: data.publishedAt || data.createdAt || new Date()
         };
       });
       
-      // Apply semantic search filter
-      if (filters.search && filters.search.trim() !== '') {
+      // Apply semantic search if search query exists
+      if (filters.search && filters.search.trim()) {
+        console.log('ForestDiscovery: Applying semantic search for:', filters.search);
         return this.semanticSearch(books, filters.search.trim());
       }
       
-      // Apply excluded keywords filtering from user preferences
-      if (this.preferences && Array.isArray(this.preferences.excludedKeywords) && this.preferences.excludedKeywords.length > 0) {
-        const excludedTerms = this.preferences.excludedKeywords.map(term => term.toLowerCase().trim()).filter(Boolean);
-        return books.filter(book => {
-          const bookText = `${book.title} ${book.author} ${book.tags.join(' ')}`.toLowerCase();
-          return !excludedTerms.some(term => bookText.includes(term));
-        });
-      }
-      
-      // Apply random sorting if requested
-      if (filters.sort === 'random') {
-        return this.shuffleArray([...books]);
-      }
-      
+      console.log('ForestDiscovery: Returning', books.length, 'books');
       return books;
       
     } catch (error) {
-      console.error('Error fetching books from Firestore:', error);
-      // Fallback: fetch without where/order to avoid index issues, then filter client-side
+      console.error('ForestDiscovery: Firestore query failed:', error);
+      
+      // Fallback: fetch limited books and filter client-side
+      console.log('ForestDiscovery: Using fallback client-side filtering');
       try {
-        const baseSnap = await getDocs(query(collection(db, 'books'), limit(50)));
-        const docs = baseSnap.docs || [];
-        const books = docs.map(doc => {
+        const fallbackQuery = query(collection(db, 'books'), limit(50));
+        const fallbackSnap = await getDocs(fallbackQuery);
+        
+        let fallbackBooks = fallbackSnap.docs.map(doc => {
           const data = doc.data();
           return {
             id: doc.id,
-            title: data.title || '',
-            author: data.author || '',
-            coverUrl: data.coverUrl || '',
-            language: data.primaryLanguage || data.language || 'en',
-            region: data.authorRegion || data.region || '',
-            year: typeof data.publicationYear === 'number' ? data.publicationYear : null,
-            tags: Array.isArray(data.categories) ? data.categories : (typeof data.authorTags === 'string' && data.authorTags.trim() ? data.authorTags.split(',').map(t => t.trim()).filter(Boolean) : []),
-            popularity: data.popularity || 0,
-            rating: data.averageRating || 0,
+            title: data.title || 'Untitled',
+            author: data.author || 'Unknown Author',
+            coverUrl: data.coverUrl || '/images/placeholder-book.jpg',
             averageRating: data.averageRating || 0,
             reviewCount: data.reviewCount || 0,
-            createdAt: data.publishedAt?.toDate?.() || data.createdAt?.toDate?.() || new Date(),
-            blurb: data.blurb || ''
+            primaryLanguage: data.primaryLanguage || 'en',
+            authorRegion: data.authorRegion || 'unknown',
+            publicationYear: data.publicationYear || null,
+            authorTags: data.authorTags || [],
+            blurb: data.blurb || '',
+            rating: data.averageRating || 0,
+            createdAt: data.publishedAt || data.createdAt || new Date()
           };
         });
-
-        // Client-side filters
-        const filtered = books.filter(b => {
-          if (filters.language && b.language !== filters.language) return false;
-          if (filters.region && b.region !== filters.region) return false;
-          return true;
-        });
-
-        // Sort client-side
-        let sorted = filtered;
-        if (filters.sort === 'popular') {
-          sorted = [...filtered].sort((a,b) => (b.popularity||0) - (a.popularity||0));
-        } else {
-          sorted = [...filtered].sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        
+        // Client-side filtering
+        if (filters.language) {
+          fallbackBooks = fallbackBooks.filter(book => book.primaryLanguage === filters.language);
         }
-
-        // Emulate pagination
+        
+        if (filters.region) {
+          fallbackBooks = fallbackBooks.filter(book => book.authorRegion === filters.region);
+        }
+        
+        // Client-side sorting
+        switch (filters.sort) {
+          case 'recent':
+            fallbackBooks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            break;
+          case 'popular':
+            fallbackBooks.sort((a, b) => b.reviewCount - a.reviewCount);
+            break;
+          case 'rating':
+            fallbackBooks.sort((a, b) => b.rating - a.rating);
+            break;
+          case 'title':
+            fallbackBooks.sort((a, b) => a.title.localeCompare(b.title));
+            break;
+        }
+        
+        // Apply pagination
         const pageSize = 12;
         const start = Math.max(0, (page - 1) * pageSize);
-        const slice = sorted.slice(start, start + pageSize);
-        // Track lastDoc best-effort
-        this.lastDoc = baseSnap.docs[Math.min(start + pageSize - 1, baseSnap.docs.length - 1)] || null;
-        return slice;
-      } catch (fallbackErr) {
-        console.error('Fallback fetch also failed:', fallbackErr);
+        const end = start + pageSize;
+        
+        return fallbackBooks.slice(start, end);
+        
+      } catch (fallbackError) {
+        console.error('ForestDiscovery: Fallback also failed:', fallbackError);
         return [];
       }
     }
   }
 
-  renderBooks(books) {
-    const feed = document.getElementById('booksGrid');
-    if (!feed) return;
-
-    books.forEach(book => {
-      const bookCard = this.createBookCard(book);
-      feed.appendChild(bookCard);
+  semanticSearch(books, query) {
+    console.log('ForestDiscovery: Starting semantic search for:', query);
+    
+    const queryTags = extractSemanticTags(query);
+    console.log('ForestDiscovery: Extracted query tags:', queryTags);
+    
+    const scoredBooks = books.map(book => {
+      const score = this.calculateSemanticScore(book, query, queryTags);
+      return { ...book, semanticScore: score };
     });
     
-    // Update screen reader status
-    this.updateSearchStatus(books.length);
-  }
-  
-  updateSearchStatus(count) {
-    const searchStatus = document.getElementById('searchStatus');
-    const resultsInfo = document.getElementById('resultsInfo');
+    // Sort by semantic score (highest first)
+    scoredBooks.sort((a, b) => b.semanticScore - a.semanticScore);
     
-    if (searchStatus) {
-      if (count === 0) {
-        searchStatus.textContent = 'No books found matching your criteria.';
-      } else {
-        searchStatus.textContent = `Found ${count} book${count === 1 ? '' : 's'} matching your search.`;
-      }
+    console.log('ForestDiscovery: Semantic search completed, returning', scoredBooks.length, 'books');
+    return scoredBooks;
+  }
+
+  calculateSemanticScore(book, query, queryTags) {
+    let score = 0;
+    const lowerQuery = query.toLowerCase();
+    
+    // Direct text matches (highest priority)
+    if (book.title.toLowerCase().includes(lowerQuery)) {
+      score += 100;
+    }
+    if (book.author.toLowerCase().includes(lowerQuery)) {
+      score += 80;
     }
     
-    if (resultsInfo) {
-      if (count > 0) {
-        resultsInfo.textContent = `Showing ${count} book${count === 1 ? '' : 's'}`;
-        resultsInfo.classList.remove('hidden');
-      } else {
-        resultsInfo.classList.add('hidden');
+    // Semantic tag matching
+    const bookContent = [book.title, book.author, book.blurb, ...(book.authorTags || [])].join(' ').toLowerCase();
+    const bookTags = extractSemanticTags(bookContent);
+    
+    queryTags.forEach(queryTag => {
+      if (bookTags.includes(queryTag)) {
+        score += 50;
       }
-    }
+    });
+    
+    // Keyword matching in book content
+    const queryWords = lowerQuery.split(' ').filter(word => word.length > 2);
+    queryWords.forEach(word => {
+      if (bookContent.includes(word)) {
+        score += 10;
+      }
+    });
+    
+    // Boost score for books with more reviews (community validation)
+    score += Math.min(book.reviewCount * 2, 20);
+    
+    return score;
   }
-  
-  updateLoadingStatus(isLoading) {
-    const loadingStatus = document.getElementById('loadingStatus');
-    if (loadingStatus) {
-      loadingStatus.textContent = isLoading ? 'Loading more books...' : '';
-    }
+
+  renderBooks() {
+    const booksGrid = document.getElementById('booksGrid');
+    if (!booksGrid) return;
+    
+    // Clear existing books
+    booksGrid.innerHTML = '';
+    
+    // Render each book
+    this.books.forEach(book => {
+      const bookCard = this.createBookCard(book);
+      booksGrid.appendChild(bookCard);
+    });
   }
 
   createBookCard(book) {
     const card = document.createElement('div');
-    card.className = 'bg-forest-card rounded-2xl overflow-hidden shadow-lg group transform hover:-translate-y-2 transition-transform duration-300 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:ring-offset-2 focus:ring-offset-[#3A4F3C]';
-    card.setAttribute('tabindex', '0');
-    card.setAttribute('role', 'button');
-    card.setAttribute('aria-label', `View details for ${book.title} by ${book.author}. Rating: ${book.rating} stars.`);
+    card.className = 'bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer';
+    card.onclick = () => viewBook(book.id);
     
-    const coverUrl = (window.coverFor ? window.coverFor(book) : (book.coverUrl || ''));
-    const truncatedBlurb = truncateText(book.blurb, 200);
+    const wordCloud = this.generateWordCloud(book);
     
     card.innerHTML = `
-        <div class="w-full bg-forest-secondary/30 flex items-center justify-center" style="aspect-ratio:3/4;">
-            <img src="${coverUrl}" alt="Cover image for ${book.title}" class="max-h-[85%] max-w-[85%] object-contain rounded shadow-sm" loading="lazy">
+      <div class="aspect-[3/4] bg-gray-200 overflow-hidden">
+        <img src="${book.coverUrl}" alt="${book.title}" class="w-full h-full object-cover">
+      </div>
+      <div class="p-4">
+        <h3 class="font-semibold text-lg text-forest-text mb-2 line-clamp-2">${book.title}</h3>
+        <p class="text-forest-text-muted mb-3">by ${book.author}</p>
+        
+        <!-- Word Cloud instead of description -->
+        <div class="mb-3 text-sm">
+          ${wordCloud}
         </div>
-        <div class="p-6">
-            <h3 class="text-2xl font-bold text-white mb-2" style="font-family: 'Poppins', sans-serif;">${book.title}</h3>
-            <p class="text-md text-gray-300 mb-4" aria-label="Author">By ${book.author}</p>
-            <div class="relative mb-4">
-                <div class="word-cloud" aria-label="Book insights from reviews">
-                    ${this.generateWordCloud(book)}
-                </div>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-4" role="list" aria-label="Book genres">
-                ${book.tags.slice(0, 2).map(tag => `
-                    <span class="bg-forest-secondary text-forest-light px-2 py-1 rounded-full text-xs" role="listitem">${tag}</span>
-                `).join('')}
-            </div>
-            <div class="flex items-center justify-between text-sm text-gray-400 mb-4">
-                <span class="text-forest-accent font-semibold" aria-label="Rating: ${book.rating} out of 5 stars">⭐ ${book.rating}</span>
-                <span aria-label="Publication year">${book.year}</span>
-                <span aria-label="Author region">${this.formatRegion(book.region)}</span>
-            </div>
-            <div class="flex flex-col gap-2">
-                <div class="flex gap-2">
-                    <a href="book.html?id=${book.id}" class="flex-1 text-center bg-forest-accent bg-forest-accent-hover text-white font-bold py-2 px-4 rounded-full transition-all duration-300 transform hover:scale-105" aria-label="View details for ${book.title}">
-                        View Details
-                    </a>
-                    <button onclick="addToReadingList('${book.id}', '${book.title.replace(/'/g, "\\'")}', '${book.author.replace(/'/g, "\\'")}', this)" class="bg-[#F58220] hover:bg-[#E0751C] text-white p-2 rounded-full transition-all duration-300 group" title="Add to Reading List" aria-label="Add ${book.title} to reading list">
-                        <svg class="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                        </svg>
-                    </button>
-                </div>
-                
-            </div>
+        
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <span class="text-sm text-forest-text-muted">${book.reviewCount} reviews</span>
+          </div>
+          <div class="text-xs text-forest-text-muted">
+            ${this.formatRegion(book.authorRegion)}
+          </div>
         </div>
+      </div>
     `;
     
-    // Add keyboard navigation support
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        window.location.href = `book.html?id=${book.id}`;
-      }
-    });
-    
-    // Add click handler for mouse users
-    card.addEventListener('click', (e) => {
-      // Don't trigger if clicking on the View Details link
-      if (e.target.tagName === 'A') return;
-      window.location.href = `book.html?id=${book.id}`;
-    });
-    
     return card;
-  }
-
-  formatRegion(region) {
-    const regionMap = {
-      'north-america': 'North America',
-      'south-america': 'South America',
-      'europe': 'Europe',
-      'africa': 'Africa',
-      'asia': 'Asia',
-      'oceania': 'Oceania',
-      'middle-east': 'Middle East'
-    };
-    return regionMap[region] || region;
   }
 
   generateWordCloud(book) {
@@ -618,182 +499,96 @@ class ForestDiscovery {
     });
     
     // Add semantic tags
-    words.push(...semanticTags);
+    semanticTags.forEach(tag => {
+      if (!words.includes(tag)) {
+        words.push(tag);
+      }
+    });
     
-    // Add some default words if none found
-    if (words.length === 0) {
-      words.push('engaging', 'thoughtful', 'compelling');
+    // Add author tags
+    if (book.authorTags && book.authorTags.length > 0) {
+      book.authorTags.slice(0, 3).forEach(tag => {
+        if (!words.includes(tag)) {
+          words.push(tag);
+        }
+      });
     }
     
-    // Create word cloud HTML
-    const wordCloud = words.slice(0, 8).map((word, index) => {
+    // Limit to 8 words max
+    const selectedWords = words.slice(0, 8);
+    
+    if (selectedWords.length === 0) {
+      return '<span class="text-forest-text-muted">No themes available</span>';
+    }
+    
+    // Generate word cloud HTML with varying sizes and colors
+    const wordCloud = selectedWords.map((word, index) => {
       const sizes = ['text-xs', 'text-sm', 'text-base', 'text-lg'];
-      const colors = ['text-blue-300', 'text-green-300', 'text-yellow-300', 'text-purple-300', 'text-pink-300'];
+      const colors = ['text-forest-text-muted', 'text-forest-text', 'text-forest-accent'];
+      
       const size = sizes[index % sizes.length];
       const color = colors[index % colors.length];
       
-      return `<span class="${size} ${color} font-medium mr-2 mb-1 inline-block">${word}</span>`;
+      return `<span class="${size} ${color} mr-2">${word}</span>`;
     }).join('');
     
-    return wordCloud || '<span class="text-sm text-gray-400">No insights available</span>';
+    return wordCloud;
   }
 
-  updateActiveFilters() {
-    const activeFiltersContainer = document.getElementById('activeFilters');
-    const filterTags = activeFiltersContainer?.querySelector('.filter-tags');
-    
-    if (!activeFiltersContainer || !filterTags) return;
 
-    filterTags.innerHTML = '';
-    let hasActiveFilters = false;
-
-    Object.entries(this.filters).forEach(([key, value]) => {
-      if (value && key !== 'sort') {
-        hasActiveFilters = true;
-        const tag = document.createElement('span');
-        tag.className = 'bg-forest-accent text-white px-3 py-1 rounded-full text-xs flex items-center gap-2';
-        tag.innerHTML = `
-          ${key}: ${value}
-          <button onclick="forestDiscovery.removeFilter('${key}')" class="hover:bg-white hover:bg-opacity-20 rounded-full w-4 h-4 flex items-center justify-center text-xs">×</button>
-        `;
-        filterTags.appendChild(tag);
-      }
-    });
-
-    if (hasActiveFilters) {
-      activeFiltersContainer.classList.remove('hidden');
-      activeFiltersContainer.classList.add('flex');
-    } else {
-      activeFiltersContainer.classList.add('hidden');
-      activeFiltersContainer.classList.remove('flex');
-    }
-  }
-
-  removeFilter(filterKey) {
-    this.filters[filterKey] = '';
-    
-    // Update the UI select
-    const select = document.getElementById(filterKey);
-    if (select) select.value = '';
-    
-    // Update search input
-    if (filterKey === 'search') {
-      const searchInput = document.getElementById('search');
-      if (searchInput) searchInput.value = '';
-    }
-
-    this.updateActiveFilters();
-    this.resetAndReload();
-  }
-
-  clearAllFilters() {
-    this.filters = {
-      search: '',
-      language: '',
-      region: '',
-      sort: 'recent'
+  formatRegion(region) {
+    const regionMap = {
+      'north-america': 'North America',
+      'europe': 'Europe',
+      'asia': 'Asia',
+      'africa': 'Africa',
+      'south-america': 'South America',
+      'oceania': 'Oceania',
+      'middle-east': 'Middle East'
     };
-
-    // Reset UI elements
-    const searchEl = document.getElementById('search');
-    if (searchEl) searchEl.value = '';
-    const langEl = document.getElementById('language');
-    if (langEl) langEl.value = '';
-    const regionEl = document.getElementById('region');
-    if (regionEl) regionEl.value = '';
-    const sortEl = document.getElementById('sortSelect') || document.getElementById('sort');
-    if (sortEl) sortEl.value = 'recent';
-
-    this.updateActiveFilters();
-    this.resetAndReload();
+    return regionMap[region] || region;
   }
 
-  resetAndReload() {
-    this.currentPage = 0;
-    this.hasMoreBooks = true;
-    this.books = [];
+  updateLoadMoreButton() {
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (!loadMoreBtn) return;
     
-    const feed = document.getElementById('booksGrid');
-    if (feed) feed.innerHTML = '';
+    if (this.hasMoreBooks && this.books.length > 0) {
+      loadMoreBtn.classList.remove('hidden');
+    } else {
+      loadMoreBtn.classList.add('hidden');
+    }
+  }
+
+  updateEmptyState() {
+    const emptyState = document.getElementById('emptyState');
+    if (!emptyState) return;
     
-    this.loadMoreBooks();
+    if (this.books.length === 0) {
+      emptyState.classList.remove('hidden');
+    } else {
+      emptyState.classList.add('hidden');
+    }
   }
 
   showLoading(show) {
-    const indicator = document.getElementById('loadingState');
-    if (indicator) {
-      if (show) {
-        indicator.classList.remove('hidden');
-      } else {
-        indicator.classList.add('hidden');
-      }
-    }
-  }
-
-  showNoResults(show) {
-    const noResults = document.getElementById('noResults');
-    if (noResults) {
-      if (show) {
-        noResults.classList.remove('hidden');
-      } else {
-        noResults.classList.add('hidden');
-      }
-    }
-  }
-
-  showError() {
-    // Could implement error state UI here
-    console.log('Error loading books');
-  }
-
-  shuffleArray(array) {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  }
-
-  // Affiliate link generation methods
-  getAmazonAffiliateLink(book) {
-    // Your Amazon Associates ID
-    const affiliateId = "noctuaforest-20";
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    if (!loadingIndicator) return;
     
-    // If book has Amazon URL from Firestore/submission, use it with your affiliate tag
-    if (book.amazonUrl) {
-        const url = new URL(book.amazonUrl);
-        url.searchParams.set('tag', affiliateId);
-        const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
-        if (ref) url.searchParams.set('ref', ref);
-        return url.toString();
+    if (show) {
+      loadingIndicator.classList.remove('hidden');
+    } else {
+      loadingIndicator.classList.add('hidden');
     }
-    
-    // If book has purchase link that's Amazon, add affiliate tag
-    if (book.purchaseLink && book.purchaseLink.includes('amazon.com')) {
-        const url = new URL(book.purchaseLink);
-        url.searchParams.set('tag', affiliateId);
-        const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
-        if (ref) url.searchParams.set('ref', ref);
-        return url.toString();
-    }
-    
-    // Otherwise, create search link with affiliate tag
-    const searchQuery = encodeURIComponent(`${book.title} ${book.author}`);
-    const ref = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('nf_ref') : '';
-    return `https://amazon.com/s?k=${searchQuery}&tag=${affiliateId}${ref?`&ref=${encodeURIComponent(ref)}`:''}`;
   }
 
-  // Bookshop affiliate links removed by product decision
-}
-
-// Global functions
-function clearAllFilters() {
-  if (window.forestDiscovery) {
-    window.forestDiscovery.clearAllFilters();
+  showError(message) {
+    console.error('ForestDiscovery Error:', message);
+    // You could show a toast notification here
   }
 }
 
+// Global function for book navigation
 function viewBook(bookId) {
   window.location.href = `book.html?id=${bookId}`;
 }
@@ -805,6 +600,7 @@ window.ForestDiscovery = ForestDiscovery;
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Forest Discovery: DOM loaded, initializing...');
   console.log('Available Firebase functions:', {
+    app: !!window.app,
     db: !!window.db,
     collection: !!window.collection,
     query: !!window.query,
@@ -813,6 +609,11 @@ document.addEventListener('DOMContentLoaded', () => {
   
   if (!window.db) {
     console.error('Forest Discovery: Firebase db not available!');
+    return;
+  }
+  
+  if (!window.app) {
+    console.error('Forest Discovery: Firebase app not available!');
     return;
   }
   
