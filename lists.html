@@ -210,7 +210,7 @@
                                 loading="lazy" decoding="async">
                             <button data-book='${JSON.stringify(book).replace(/'/g, '&apos;')}' class="save-button absolute bottom-2 right-2 px-3 py-1 rounded-full text-xs bg-forest-accent text-white hover:opacity-90">Save</button>
                         </div>
-                        <a href="book.html?id=${book.id}&ref=${list.creatorId || ''}&src=${shareId}" class="book-link" data-book-id="${book.id}">
+                        <a href="${book.id ? `book.html?id=${book.id}&ref=${list.creatorId || ''}&src=${shareId}` : '#'}" class="book-link" data-book-id="${book.id || ''}" ${!book.id ? 'aria-disabled="true"' : ''}>
                           <h3 class="font-medium text-white group-hover:text-forest-accent transition-colors duration-300">${book.title}</h3>
                           <p class="text-sm text-white/60">${book.author}</p>
                         </a>

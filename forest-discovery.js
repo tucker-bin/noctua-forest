@@ -481,6 +481,10 @@ class ForestDiscovery {
       
       const books = booksSnap.docs.map(doc => {
         const data = doc.data();
+        // Ensure required fields for data hygiene
+        if (!doc.id || !data.title || !data.author) {
+          console.warn('Book missing required fields:', { id: doc.id, title: data.title, author: data.author });
+        }
         return {
           id: doc.id,
           title: data.title || 'Untitled',
@@ -494,7 +498,7 @@ class ForestDiscovery {
           blurb: data.blurb || '',
           createdAt: data.publishedAt || data.createdAt || new Date()
         };
-      });
+      }).filter(book => book.id && book.title && book.author); // Filter out invalid books
       
       if (filters.search && filters.search.trim()) {
         // If catalog is small (< 30) or model not yet loaded, use simple reranker
@@ -589,7 +593,14 @@ class ForestDiscovery {
   createBookCard(book) {
     const card = document.createElement('div');
     card.className = 'bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer';
-    card.onclick = () => viewBook(book.id);
+    
+    // Guard against missing book.id to prevent book.html?id=undefined
+    if (book.id) {
+      card.onclick = () => viewBook(book.id);
+    } else {
+      card.className += ' pointer-events-none opacity-60';
+      console.warn('Book card missing ID:', book);
+    }
     
     const wordCloud = this.generateWordCloud(book);
     const whyChips = this.buildWhyChips(book, this.lastSearchQuery);

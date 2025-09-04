@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Noctua Forest">
   <meta name="theme-color" content="#4A5450">
@@ -1245,12 +1245,25 @@
       let unsubscribe = () => {};
       function subscribe(){
         unsubscribe();
-        const qy = query(
-          collection(db, 'reviews'),
-          where('bookId', '==', bookId),
-          orderBy(orderField, orderDir),
-          limit(50)
-        );
+        
+        // Try indexed query first, fallback if index missing
+        let qy;
+        try {
+          qy = query(
+            collection(db, 'reviews'),
+            where('bookId', '==', bookId),
+            orderBy(orderField, orderDir),
+            limit(50)
+          );
+        } catch (indexError) {
+          console.warn('Using fallback query due to missing index:', indexError);
+          qy = query(
+            collection(db, 'reviews'),
+            where('bookId', '==', bookId),
+            limit(50)
+          );
+        }
+        
         unsubscribe = onSnapshot(qy, async (snapshot) => {
           reviewList.innerHTML = '';
           if (snapshot.empty) {
@@ -1259,11 +1272,26 @@
             bottomCta?.classList.remove('hidden');
             return;
           }
+          
+          // If using fallback query (no orderBy), sort client-side
+          let reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          if (!qy._query.orderBy?.length) {
+            reviews.sort((a, b) => {
+              const aTime = a[orderField]?.toDate?.() || new Date(a[orderField]) || new Date(0);
+              const bTime = b[orderField]?.toDate?.() || new Date(b[orderField]) || new Date(0);
+              return orderDir === 'desc' ? bTime - aTime : aTime - bTime;
+            });
+          }
           reviewsEmpty.classList.add('hidden');
           const bottomCta = document.getElementById('bottomReviewCta');
           bottomCta?.classList.add('hidden');
-          const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-          for (const r of docs){ reviewList.appendChild(await renderReview(r)); }
+          
+          // Use sorted reviews if fallback was applied, otherwise use snapshot docs
+          const reviewsToRender = qy._query.orderBy?.length ? 
+            snapshot.docs.map(d => ({ id: d.id, ...d.data() })) : 
+            reviews;
+          
+          for (const r of reviewsToRender){ reviewList.appendChild(await renderReview(r)); }
         }, (error) => {
           console.error('Error loading reviews:', error);
           reviewList.innerHTML = '<p class="text-white/60 text-center py-4">Unable to load reviews. Please try again later.</p>';
@@ -1358,10 +1386,14 @@
 
     onAuthStateChanged(auth, ()=>{}); // establish auth; no redirect required
     const bookId = getParam('id');
-    if (bookId) {
-      loadBook();
-      setupReviews(bookId);
+    if (!bookId) {
+      // Guard against book.html?id=undefined or missing id
+      console.error('No book ID provided, redirecting to Forest');
+      window.location.replace('forest.html');
+      return;
     }
+    loadBook();
+    setupReviews(bookId);
   </script>
   <div id="navOverlay" class="nav-overlay"></div>
   <script src="assets/nav.js"></script>
