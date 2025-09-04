@@ -32,6 +32,365 @@
             font-family: 'Noto Sans', sans-serif;
             background-color: #fbebcc;
             color: #2D3748;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Mobile-first responsive container */
+        .mobile-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        
+        @media (min-width: 640px) {
+            .mobile-container {
+                max-width: 42rem;
+                padding: 0 1.5rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .mobile-container {
+                max-width: 48rem;
+                padding: 0 2rem;
+            }
+        }
+        
+        /* Enhanced slider styling for mobile */
+        .slider {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #7A8580;
+            border-radius: 12px;
+            outline: none;
+            height: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #F58220;
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(245, 130, 32, 0.4);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #F58220;
+            cursor: pointer;
+            border: 3px solid #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .slider::-moz-range-thumb:active {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(245, 130, 32, 0.4);
+        }
+        
+        /* Enhanced card interactions for mobile */
+        .mood-card, .format-card {
+            transition: all 0.2s ease;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mood-card:active, .format-card:active {
+            transform: scale(0.98);
+        }
+        
+        @media (hover: hover) {
+            .mood-card:hover, .format-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            }
+        }
+        
+        .mood-card.selected, .format-card.selected {
+            border-color: #F58220 !important;
+            background-color: rgba(245, 130, 32, 0.15) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(245, 130, 32, 0.3);
+        }
+        
+        /* Mobile-optimized progress indicator */
+        .progress-container {
+            position: relative;
+            margin: 1.5rem 0;
+        }
+        
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #F58220, #FF9F40);
+            border-radius: 4px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Mobile-optimized form inputs */
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid #7A8580;
+            background: #3A4440;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #F58220;
+            box-shadow: 0 0 0 3px rgba(245, 130, 32, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-input::placeholder {
+            color: #9CA3AF;
+            opacity: 1;
+        }
+        
+        /* Mobile-optimized textarea */
+        .form-textarea {
+            min-height: 120px;
+            max-height: 300px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        
+        /* Enhanced mobile modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 50;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 28rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        /* Mobile-optimized buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #F58220, #E67615);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Mobile-optimized content warnings grid */
+        .content-warnings-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        @media (min-width: 640px) {
+            .content-warnings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .content-warnings-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        .warning-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background: #5A6560;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            min-height: 48px;
+        }
+        
+        .warning-checkbox:active {
+            background: #6A7570;
+        }
+        
+        .warning-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            accent-color: #F58220;
+        }
+        
+        /* Mobile-optimized hero section */
+        .hero-section {
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        .hero-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        @media (min-width: 640px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+        }
+        
+        /* Loading states */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #F58220;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Touch-friendly spacing */
+        .touch-spacing {
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .touch-spacing {
+                margin-bottom: 2rem;
+            }
+        }
+        
+        /* Improved validation feedback */
+        .validation-feedback {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .validation-feedback.success {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .validation-feedback.warning {
+            border-color: #F59E0B;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .validation-feedback.error {
+            border-color: #EF4444;
+            background: rgba(239, 68, 68, 0.1);
         }
     </style>
   </head>
@@ -40,20 +399,20 @@
     <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg">Skip to main content</a>
 
     <!-- Main Container -->
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mobile-container py-4">
         <!-- Header/Navigation -->
-        <header class="flex justify-between items-center mb-12">
+        <header class="flex justify-between items-center mb-8">
             <a href="welcome.html" class="flex items-center space-x-3">
                 <img src="images/logo.png" alt="Noctua Forest Logo" width="40" height="40" decoding="async" class="w-10 h-10">
-                <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+                <span class="text-xl md:text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
             </a>
-            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
-                <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">The Forest</a>
-                <a href="reviews.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Write a Review</a>
-                <a href="help.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Help</a>
-                <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">About</a>
+            <nav id="nav" class="hidden md:flex items-center space-x-6 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
+                <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium">The Forest</a>
+                <a href="reviews.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium">Write a Review</a>
+                <a href="help.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium">Help</a>
+                <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium">About</a>
             </nav>
-            <div class="flex items-center space-x-8">
+            <div class="flex items-center space-x-4">
                 <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
                      <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
@@ -67,7 +426,7 @@
         <div id="navOverlay" class="nav-overlay"></div>
         
         <!-- Breadcrumb Navigation -->
-        <nav class="max-w-5xl mx-auto px-4 mb-6" aria-label="Breadcrumb">
+        <nav class="mb-6" aria-label="Breadcrumb">
             <ol class="breadcrumb flex items-center space-x-2 text-sm">
                 <li><a href="welcome.html" class="hover:text-forest-accent transition-colors">Home</a></li>
                 <li><span class="mx-2">/</span></li>
@@ -75,13 +434,13 @@
             </ol>
         </nav>
 
-    <main id="main" class="max-w-4xl mx-auto px-4">
-        <article class="space-y-16">
+    <main id="main">
+        <article class="space-y-8 md:space-y-16">
             <!-- Hero Section -->
-            <div class="text-center">
-                <h1 class="text-4xl font-bold mb-6 text-[#3A4440]" style="font-family: 'Poppins', sans-serif;">Share Your Reading Experience</h1>
-                <p class="text-xl mb-4 text-[#4A5450]">Help others discover great books through your authentic reviews</p>
-                <p class="text-lg text-[#4A5450]/80">Your reviews power our recommendation engine and help build meaningful reading lists</p>
+            <div class="hero-section">
+                <h1 class="hero-title text-[#3A4440]" style="font-family: 'Poppins', sans-serif;">Share Your Reading Experience</h1>
+                <p class="text-lg md:text-xl mb-4 text-[#4A5450]">Help others discover great books through your authentic reviews</p>
+                <p class="text-base md:text-lg text-[#4A5450]/80">Your reviews power our recommendation engine and help build meaningful reading lists</p>
             </div>
 
             <!-- How It Works (hidden on mobile) -->
@@ -103,38 +462,49 @@
                 </div>
             </div>
 
+            <!-- Enhanced Progress Indicator -->
+            <div class="progress-container">
+                <div class="progress-labels text-[#4A5450]">
+                    <span>Book Details</span>
+                    <span>Experience</span>
+                    <span>Submit</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progressBar" class="progress-bar-fill" style="width: 33%"></div>
+                </div>
+            </div>
+
             <!-- Form -->
-            <form id="submissionForm" class="bg-[#4A5450] rounded-xl p-8 text-white space-y-6" novalidate>
-                <div class="space-y-2">
-                    <label for="amazonUrl" class="block font-medium text-white mb-1">Amazon Book Link</label>
+            <form id="submissionForm" class="bg-[#4A5450] rounded-xl p-4 md:p-8 text-white space-y-6" novalidate>
+                <div class="touch-spacing">
+                    <label for="amazonUrl" class="block font-medium text-white mb-2">Amazon Book Link</label>
                     <input id="amazonUrl" name="amazonUrl" type="url" required placeholder="https://amazon.com/dp/..."
-                        class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
-                    <p class="text-sm text-gray-300">We'll fetch the book details automatically</p>
+                        class="form-input" autocomplete="url" />
+                    <p class="text-sm text-gray-300 mt-2">We'll fetch the book details automatically</p>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="space-y-2">
-                        <label for="title" class="block font-medium text-white mb-1">Book Title</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div class="touch-spacing">
+                        <label for="title" class="block font-medium text-white mb-2">Book Title</label>
                         <input id="title" name="title" type="text" required placeholder="Book Title" 
-                            class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+                            class="form-input" autocomplete="off" />
                     </div>
-                    <div class="space-y-2">
-                        <label for="author" class="block font-medium text-white mb-1">Author Name</label>
+                    <div class="touch-spacing">
+                        <label for="author" class="block font-medium text-white mb-2">Author Name</label>
                         <input id="author" name="author" type="text" required placeholder="Author Name" 
-                            class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200" />
+                            class="form-input" autocomplete="off" />
                     </div>
                 </div>
 
-                <div class="space-y-2">
-                    <label for="review" class="block font-medium text-white mb-1">Your Review</label>
+                <div class="touch-spacing">
+                    <label for="review" class="block font-medium text-white mb-2">Your Review</label>
                     <textarea id="review" name="review" rows="5" required placeholder="Share your thoughts about this book..."
-                        class="w-full px-4 py-3 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-[#F58220] transition-colors duration-200 resize-y"
-                        style="min-height: 140px; max-height: 600px; overflow-y: auto;"></textarea>
-                    <p class="text-sm text-gray-300">What did you like? What stood out? Who would enjoy this book?</p>
+                        class="form-input form-textarea" autocomplete="off"></textarea>
+                    <p class="text-sm text-gray-300 mt-2">What did you like? What stood out? Who would enjoy this book?</p>
                     
                     <!-- Review Validation Feedback -->
-                    <div id="validationFeedback" class="hidden mt-3 p-3 rounded-lg border transition-all duration-300">
-                        <div class="flex items-start space-x-2">
+                    <div id="validationFeedback" class="validation-feedback hidden">
+                        <div class="flex items-start space-x-3">
                             <div id="validationIcon" class="flex-shrink-0 mt-0.5"></div>
                             <div class="flex-1">
                                 <div id="validationTitle" class="font-medium text-sm"></div>
@@ -145,128 +515,144 @@
                     </div>
                 </div>
 
-                <div class="grid md:grid-cols-3 gap-6">
-                  <div class="space-y-2">
-                    <label class="block font-medium text-white mb-1">How did you read it? (optional)</label>
-                    <select id="copyFormat" name="copyFormat" class="w-full px-4 py-2 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white">
-                      <option value="">Prefer not to say</option>
-                      <option value="print">Printed copy</option>
-                      <option value="ebook">E‑book</option>
-                      <option value="audiobook">Audiobook</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
+                <!-- Format Selection -->
+                <div class="touch-spacing">
+                    <label class="block font-medium text-white mb-4">How did you read it?</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <label class="format-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                            <input type="radio" name="copyFormat" value="print" class="hidden">
+                            <div class="text-3xl mb-2">📚</div>
+                            <div class="text-sm font-medium">Print</div>
+                        </label>
+                        <label class="format-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                            <input type="radio" name="copyFormat" value="ebook" class="hidden">
+                            <div class="text-3xl mb-2">📱</div>
+                            <div class="text-sm font-medium">E-book</div>
+                        </label>
+                        <label class="format-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                            <input type="radio" name="copyFormat" value="audiobook" class="hidden">
+                            <div class="text-3xl mb-2">🎧</div>
+                            <div class="text-sm font-medium">Audiobook</div>
+                        </label>
+                        <label class="format-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                            <input type="radio" name="copyFormat" value="other" class="hidden">
+                            <div class="text-3xl mb-2">❓</div>
+                            <div class="text-sm font-medium">Other</div>
+                        </label>
+                    </div>
                 </div>
 
                 <!-- Mood & Experience Section -->
                 <fieldset class="space-y-6">
-                    <legend class="text-lg font-bold mb-4">Reading Experience</legend>
+                    <legend class="text-lg font-bold mb-6">Reading Experience</legend>
                     
-                    <div class="space-y-4">
-                        <!-- Interest rating removed by product decision -->
-
-                        <div class="space-y-2">
-                            <label class="block font-medium text-white mb-2">What moods or feelings did this book evoke? (Select all that apply)</label>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="inspiring" class="mr-2">
-                                    <span>Inspiring</span>
+                    <div class="space-y-6">
+                        <!-- Mood Selection Cards -->
+                        <div class="touch-spacing">
+                            <label class="block font-medium text-white mb-4">How did this book make you feel?</label>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                <label class="mood-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                                    <input type="checkbox" name="moods[]" value="inspiring" class="hidden">
+                                    <div class="text-2xl mb-2">✨</div>
+                                    <div class="text-sm font-medium">Inspiring</div>
                                 </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="heartwarming" class="mr-2">
-                                    <span>Heartwarming</span>
+                                <label class="mood-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                                    <input type="checkbox" name="moods[]" value="mysterious" class="hidden">
+                                    <div class="text-2xl mb-2">🌙</div>
+                                    <div class="text-sm font-medium">Mysterious</div>
                                 </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="mysterious" class="mr-2">
-                                    <span>Mysterious</span>
+                                <label class="mood-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                                    <input type="checkbox" name="moods[]" value="emotional" class="hidden">
+                                    <div class="text-2xl mb-2">💝</div>
+                                    <div class="text-sm font-medium">Emotional</div>
                                 </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="suspenseful" class="mr-2">
-                                    <span>Suspenseful</span>
+                                <label class="mood-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                                    <input type="checkbox" name="moods[]" value="suspenseful" class="hidden">
+                                    <div class="text-2xl mb-2">⚡</div>
+                                    <div class="text-sm font-medium">Suspenseful</div>
                                 </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="funny" class="mr-2">
-                                    <span>Funny</span>
+                                <label class="mood-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                                    <input type="checkbox" name="moods[]" value="thoughtful" class="hidden">
+                                    <div class="text-2xl mb-2">🤔</div>
+                                    <div class="text-sm font-medium">Thoughtful</div>
                                 </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="dark" class="mr-2">
-                                    <span>Dark</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="thoughtful" class="mr-2">
-                                    <span>Thoughtful</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="adventurous" class="mr-2">
-                                    <span>Adventurous</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="romantic" class="mr-2">
-                                    <span>Romantic</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="emotional" class="mr-2">
-                                    <span>Emotional</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="informative" class="mr-2">
-                                    <span>Informative</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="checkbox" name="moods[]" value="relaxing" class="mr-2">
-                                    <span>Relaxing</span>
+                                <label class="mood-card cursor-pointer p-4 rounded-lg border-2 border-[#7A8580] bg-[#5A6560] text-center">
+                                    <input type="checkbox" name="moods[]" value="adventurous" class="hidden">
+                                    <div class="text-2xl mb-2">🗺️</div>
+                                    <div class="text-sm font-medium">Adventurous</div>
                                 </label>
                             </div>
+                        </div>
+
+                        <!-- Reading Pace -->
+                        <div class="touch-spacing">
+                            <label class="block font-medium text-white mb-4">How quickly did you read this?</label>
+                            <div class="relative">
+                                <input type="range" id="readingPace" name="readingPace" min="1" max="5" value="3" 
+                                    class="w-full slider">
+                                <div class="flex justify-between text-sm text-gray-300 mt-3">
+                                    <span>Slow burn</span>
+                                    <span>Steady pace</span>
+                                    <span>Devoured it</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recommendation Target -->
+                        <div class="touch-spacing">
+                            <label for="recommendFor" class="block font-medium text-white mb-2">Who would you recommend this to?</label>
+                            <input id="recommendFor" name="recommendFor" type="text" placeholder="e.g., fans of mystery novels, anyone going through a breakup, history buffs..."
+                                class="form-input" autocomplete="off" />
                         </div>
                     </div>
                 </fieldset>
 
-                <div class="space-y-2">
-                    <label for="contentWarnings" class="block font-medium text-white mb-1">Content Warnings</label>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <label class="flex items-center">
-                            <input type="checkbox" name="contentWarnings[]" value="violence" class="mr-2">
+                <div class="touch-spacing">
+                    <label for="contentWarnings" class="block font-medium text-white mb-4">Content Warnings</label>
+                    <div class="content-warnings-grid">
+                        <label class="warning-checkbox">
+                            <input type="checkbox" name="contentWarnings[]" value="violence">
                             <span>Violence</span>
                         </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" name="contentWarnings[]" value="sexual_content" class="mr-2">
+                        <label class="warning-checkbox">
+                            <input type="checkbox" name="contentWarnings[]" value="sexual_content">
                             <span>Sexual Content</span>
                         </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" name="contentWarnings[]" value="language" class="mr-2">
+                        <label class="warning-checkbox">
+                            <input type="checkbox" name="contentWarnings[]" value="language">
                             <span>Strong Language</span>
                         </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" name="contentWarnings[]" value="substance" class="mr-2">
+                        <label class="warning-checkbox">
+                            <input type="checkbox" name="contentWarnings[]" value="substance">
                             <span>Substance Use</span>
                         </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" name="contentWarnings[]" value="trauma" class="mr-2">
+                        <label class="warning-checkbox">
+                            <input type="checkbox" name="contentWarnings[]" value="trauma">
                             <span>Trauma</span>
                         </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" name="contentWarnings[]" value="self_harm" class="mr-2">
+                        <label class="warning-checkbox">
+                            <input type="checkbox" name="contentWarnings[]" value="self_harm">
                             <span>Self Harm</span>
                         </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" name="contentWarnings[]" value="eating" class="mr-2">
+                        <label class="warning-checkbox">
+                            <input type="checkbox" name="contentWarnings[]" value="eating">
                             <span>Eating Disorders</span>
                         </label>
-                        <label class="flex items-center">
-                            <input type="checkbox" name="contentWarnings[]" value="phobias" class="mr-2">
+                        <label class="warning-checkbox">
+                            <input type="checkbox" name="contentWarnings[]" value="phobias">
                             <span>Phobias</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- Cover Confirmation Section -->
-                <div id="coverConfirmation" class="hidden space-y-4">
-                    <div class="space-y-2">
-                        <label class="block font-medium text-white mb-2">Book Cover</label>
+                <div id="coverConfirmation" class="hidden touch-spacing">
+                    <div class="space-y-3">
+                        <label class="block font-medium text-white mb-3">Book Cover</label>
                         <div class="flex items-start space-x-4">
-                            <img id="coverPreview" src="" alt="Book cover" class="w-24 h-36 object-cover rounded-lg border border-[#7A8580]" style="display: none;">
+                            <img id="coverPreview" src="" alt="Book cover" class="w-20 h-28 md:w-24 md:h-36 object-cover rounded-lg border border-[#7A8580]" style="display: none;">
                             <div class="flex-1">
-                                <p id="coverStatus" class="text-sm text-gray-300 mb-2">Checking for book cover...</p>
+                                <p id="coverStatus" class="text-sm text-gray-300 mb-3">Checking for book cover...</p>
                                 <button type="button" id="changeCoverBtn" class="px-4 py-2 bg-[#3A4440] hover:bg-[#4A5450] text-white rounded-md text-sm transition-colors duration-200">
                                     Change Cover
                                 </button>
@@ -275,25 +661,27 @@
                     </div>
                 </div>
 
-                <div class="bg-[#5A6560] rounded-lg p-4 border border-[#7A8580]">
-                    <p class="font-bold mb-2">Reading Verification</p>
-                    <label class="flex items-center mb-2">
-                        <input type="checkbox" id="hasReadBook" name="hasReadBook" required class="mr-2">
-                        <span>I confirm that I have read this book</span>
-                    </label>
-                    <label class="flex items-center mb-2">
-                        <input type="checkbox" id="authenticReview" name="authenticReview" required class="mr-2">
-                        <span>This review is based on my genuine reading experience</span>
-                    </label>
-                    <label class="flex items-center">
-                        <input type="checkbox" id="noAI" name="noAI" required class="mr-2">
-                        <span>This review was written by me, not generated by AI</span>
-                    </label>
+                <div class="bg-[#5A6560] rounded-lg p-4 md:p-6 border border-[#7A8580] touch-spacing">
+                    <p class="font-bold mb-4 text-lg">Reading Verification</p>
+                    <div class="space-y-4">
+                        <label class="flex items-start">
+                            <input type="checkbox" id="hasReadBook" name="hasReadBook" required class="mt-1 mr-3 w-5 h-5 accent-[#F58220]">
+                            <span class="text-sm leading-relaxed">I confirm that I have read this book</span>
+                        </label>
+                        <label class="flex items-start">
+                            <input type="checkbox" id="authenticReview" name="authenticReview" required class="mt-1 mr-3 w-5 h-5 accent-[#F58220]">
+                            <span class="text-sm leading-relaxed">This review is based on my genuine reading experience</span>
+                        </label>
+                        <label class="flex items-start">
+                            <input type="checkbox" id="noAI" name="noAI" required class="mt-1 mr-3 w-5 h-5 accent-[#F58220]">
+                            <span class="text-sm leading-relaxed">This review was written by me, not generated by AI</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="mt-8">
                     <button type="submit" 
-                        class="w-full md:w-auto px-8 py-3 bg-[#F58220] hover:bg-[#E67615] text-white font-medium rounded-full transition duration-300">
+                        class="btn-primary w-full md:w-auto">
                         Submit Review
                     </button>
                     <p id="submissionSuccess" class="hidden mt-4 text-green-400">Thank you! Your review was received.</p>
@@ -386,6 +774,80 @@
 
       // Show alpha popup on first visit
       showAlphaPopup();
+
+      // Card-based selection handlers
+      document.addEventListener('DOMContentLoaded', function() {
+        // Mood card selection
+        document.querySelectorAll('.mood-card').forEach(card => {
+          card.addEventListener('click', function() {
+            const checkbox = this.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            this.classList.toggle('border-[#F58220]', checkbox.checked);
+            this.classList.toggle('bg-[#F58220]/20', checkbox.checked);
+          });
+        });
+
+        // Format card selection (radio buttons)
+        document.querySelectorAll('.format-card').forEach(card => {
+          card.addEventListener('click', function() {
+            // Clear all format cards
+            document.querySelectorAll('.format-card').forEach(c => {
+              c.classList.remove('border-[#F58220]', 'bg-[#F58220]/20');
+            });
+            // Select this card
+            this.classList.add('border-[#F58220]', 'bg-[#F58220]/20');
+            const radio = this.querySelector('input[type="radio"]');
+            radio.checked = true;
+          });
+        });
+
+        // Reading pace slider feedback
+        const paceSlider = document.getElementById('readingPace');
+        if (paceSlider) {
+          paceSlider.addEventListener('input', function() {
+            const value = this.value;
+            const labels = ['Slow burn', 'Took my time', 'Steady pace', 'Quick read', 'Devoured it'];
+            // You could add visual feedback here if desired
+          });
+        }
+
+        // Progress tracking
+        function updateProgress() {
+          const form = document.getElementById('submissionForm');
+          const progressBar = document.getElementById('progressBar');
+          if (!form || !progressBar) return;
+          
+          let completedSections = 0;
+          const totalSections = 3;
+          
+          // Check book details (title, author, review)
+          const title = form.querySelector('#title')?.value?.trim();
+          const author = form.querySelector('#author')?.value?.trim();
+          const review = form.querySelector('#review')?.value?.trim();
+          if (title && author && review) completedSections++;
+          
+          // Check experience section (moods or format selected)
+          const moodsSelected = form.querySelectorAll('input[name="moods[]"]:checked').length > 0;
+          const formatSelected = form.querySelector('input[name="copyFormat"]:checked');
+          if (moodsSelected || formatSelected) completedSections++;
+          
+          // Check verification checkboxes
+          const hasRead = form.querySelector('#hasReadBook')?.checked;
+          const authentic = form.querySelector('#authenticReview')?.checked;
+          const noAI = form.querySelector('#noAI')?.checked;
+          if (hasRead && authentic && noAI) completedSections++;
+          
+          const percentage = (completedSections / totalSections) * 100;
+          progressBar.style.width = `${Math.max(33, percentage)}%`;
+        }
+        
+        // Update progress on form changes
+        const form = document.getElementById('submissionForm');
+        if (form) {
+          form.addEventListener('input', updateProgress);
+          form.addEventListener('change', updateProgress);
+        }
+      });
 
       // Real-time review validation
       const reviewTextarea = document.getElementById('review');
@@ -883,6 +1345,8 @@
               moods: formData.moods || [],
               contentWarnings: formData.contentWarnings || [],
               copyFormat: formData.copyFormat || '',
+              readingPace: formData.readingPace || '3',
+              recommendFor: formData.recommendFor || '',
               hasReadBook: !!formData.hasReadBook,
               authenticReview: !!formData.authenticReview,
               noAI: !!formData.noAI
@@ -921,7 +1385,9 @@
         const warnings = Array.from(form.querySelectorAll('input[name="contentWarnings[]"]:checked')).map(input => input.value);
         data.moods = moods;
         data.contentWarnings = warnings;
-        data.copyFormat = (form.querySelector('#copyFormat')?.value || '').trim();
+        data.copyFormat = (form.querySelector('input[name="copyFormat"]:checked')?.value || '').trim();
+        data.readingPace = (form.querySelector('#readingPace')?.value || '3');
+        data.recommendFor = (form.querySelector('#recommendFor')?.value || '').trim();
 
         // Fetch final metadata with graceful fallback
         let metadata;
@@ -971,6 +1437,8 @@
           moods: data.moods || [],
           contentWarnings: data.contentWarnings || [],
           copyFormat: data.copyFormat || '',
+          readingPace: data.readingPace || '3',
+          recommendFor: data.recommendFor || '',
           hasReadBook: !!data.hasReadBook,
           authenticReview: !!data.authenticReview,
           noAI: !!data.noAI

@@ -45,9 +45,6 @@ export async function getSimilarBooks(bookId, { moods = [], genres = [], limit: 
 
         // Build query conditions
         const conditions = [];
-        
-        // Don't include the source book
-        conditions.push(where('id', '!=', bookId));
 
         // Match by moods (if any)
         if (moods.length > 0) {
@@ -63,9 +60,7 @@ export async function getSimilarBooks(bookId, { moods = [], genres = [], limit: 
         // Query books
         const booksQuery = query(
             collection(db, BOOKS_COLLECTION),
-            ...conditions,
-            orderBy('createdAt', 'desc'),
-            limit(resultLimit * 2) // Get extra to allow for mood filtering
+            ...conditions
         );
 
         const booksSnap = await getDocs(booksQuery);
@@ -73,6 +68,11 @@ export async function getSimilarBooks(bookId, { moods = [], genres = [], limit: 
 
         booksSnap.forEach(doc => {
             const book = doc.data();
+            
+            // Skip the source book
+            if (book.id === bookId) {
+                return;
+            }
             
             // Calculate mood match score
             let moodScore = 0;
