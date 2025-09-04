@@ -165,7 +165,7 @@ async function loadDashboardData(userId) {
     const userData = userDoc.exists() ? userDoc.data() : {};
     
     // Update account tier
-    const tier = userData && userData.applicationStatus === 'approved' ? 'Curator Plus' : 'Free';
+    const tier = userData && userData.subscription && userData.subscription.status === 'active' ? 'Curator Plus' : 'Free';
     accountTier.textContent = tier;
     
     // Update curator status
@@ -180,7 +180,7 @@ async function loadDashboardData(userId) {
     await loadRecommendations(userId);
 
     // Curator-only sections
-    const isCurator = (userData && userData.applicationStatus === 'approved');
+    const isCurator = (userData && userData.subscription && userData.subscription.status === 'active');
     if (isCurator) {
       await loadEarningsData(userId);
       await loadAnalyticsData(userId);

@@ -6,6 +6,8 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const NodeCache = require('node-cache');
 const fs = require('fs');
+const crypto = require('crypto');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // PA API cache (24h TTL, check every hour for expired items)
 const paCache = new NodeCache({ stdTTL: 86400, checkperiod: 3600 });
@@ -56,6 +58,9 @@ const PORT = process.env.PORT || 8080;
 // Static files - serve before other middleware
 const publicDir = path.join(__dirname, '..');
 app.use(express.static(publicDir, { extensions: ['html'] }));
+
+// Stripe webhook requires the raw body. Mount this BEFORE express.json.
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
 
 // Basic middleware
 app.use(express.json({ limit: '1mb' }));
@@ -331,7 +336,7 @@ app.get('/api/pa/items', async (req, res) => {
       // Fail closed to mock to avoid breaking pages, but warn in logs
       console.warn('[PA-API] Missing credentials; returning best-effort image URL');
       const fallback = {
-        asin,
+      asin,
         title: '',
         author: '',
         imageUrl: `https://${MARKETPLACE}/images/P/${asin}.01.L.jpg`,
@@ -361,8 +366,7 @@ app.get('/api/pa/items', async (req, res) => {
     const service = 'ProductAdvertisingAPI';
     const host = PA_HOST;
     const pathname = '/paapi5/getitems';
-    const amzdate = new Date().toISOString().replace(/[:-]|
-/g, '').slice(0, 15) + 'Z';
+    const amzdate = new Date().toISOString().replace(/[:-]|\.\d{3}/g, '').slice(0, 15) + 'Z';
     const datestamp = amzdate.slice(0, 8);
     const canonicalHeaders = `content-encoding:amz-1.0\ncontent-type:application/json; charset=utf-8\nhost:${host}\nx-amz-date:${amzdate}\n`;
     const signedHeaders = 'content-encoding;content-type;host;x-amz-date';
@@ -629,6 +633,218 @@ app.get('/test', (req, res) => {
 // Health check endpoint
 app.get('/healthz', (req, res) => {
   res.status(200).send('OK');
+});
+
+// Webhook event handlers
+const handleCheckoutCompleted = async (session) => {
+  console.log('Checkout completed:', session.id);
+  
+  const customerEmail = session.customer_details?.email;
+  const subscriptionId = session.subscription;
+  
+  if (!customerEmail) {
+    console.error('No customer email in checkout session');
+    return;
+  }
+
+  await updateUserSubscriptionStatus(customerEmail, {
+    subscriptionId,
+    status: 'active',
+    plan: 'curator_plus',
+    startDate: new Date(),
+    lastUpdated: new Date()
+  });
+};
+
+const handleSubscriptionCreated = async (subscription) => {
+  console.log('Subscription created:', subscription.id);
+  
+  const customerEmail = subscription.metadata?.email;
+  
+  if (!customerEmail) {
+    console.error('No customer email in subscription metadata');
+    return;
+  }
+
+  await updateUserSubscriptionStatus(customerEmail, {
+    subscriptionId: subscription.id,
+    status: subscription.status,
+    plan: 'curator_plus',
+    startDate: new Date(subscription.created * 1000),
+    lastUpdated: new Date()
+  });
+};
+
+const handleSubscriptionUpdated = async (subscription) => {
+  console.log('Subscription updated:', subscription.id);
+  
+  const customerEmail = subscription.metadata?.email;
+  
+  if (!customerEmail) {
+    console.error('No customer email in subscription metadata');
+    return;
+  }
+
+  await updateUserSubscriptionStatus(customerEmail, {
+    subscriptionId: subscription.id,
+    status: subscription.status,
+    plan: 'curator_plus',
+    startDate: new Date(subscription.created * 1000),
+    lastUpdated: new Date()
+  });
+};
+
+const handleSubscriptionDeleted = async (subscription) => {
+  console.log('Subscription deleted:', subscription.id);
+  
+  const customerEmail = subscription.metadata?.email;
+  
+  if (!customerEmail) {
+    console.error('No customer email in subscription metadata');
+    return;
+  }
+
+  await updateUserSubscriptionStatus(customerEmail, {
+    subscriptionId: subscription.id,
+    status: 'cancelled',
+    plan: 'curator_plus',
+    cancelledDate: new Date(),
+    lastUpdated: new Date()
+  });
+};
+
+const handlePaymentSucceeded = async (invoice) => {
+  console.log('Payment succeeded:', invoice.id);
+  
+  const subscriptionId = invoice.subscription;
+  if (!subscriptionId) return;
+
+  const customerEmail = invoice.customer_email;
+  if (customerEmail) {
+    await updateUserSubscriptionStatus(customerEmail, {
+      subscriptionId,
+      status: 'active',
+      lastPaymentDate: new Date(),
+      lastUpdated: new Date()
+    });
+  }
+};
+
+const handlePaymentFailed = async (invoice) => {
+  console.log('Payment failed:', invoice.id);
+  
+  const subscriptionId = invoice.subscription;
+  if (!subscriptionId) return;
+
+  const customerEmail = invoice.customer_email;
+  if (customerEmail) {
+    await updateUserSubscriptionStatus(customerEmail, {
+      subscriptionId,
+      status: 'past_due',
+      lastPaymentFailed: new Date(),
+      lastUpdated: new Date()
+    });
+  }
+};
+
+// Update user subscription status in Firestore
+const updateUserSubscriptionStatus = async (email, subscriptionData) => {
+  try {
+    // Import Firebase Admin SDK
+    const admin = require('firebase-admin');
+    
+    if (!admin.apps.length) {
+      // Initialize Firebase Admin (use ADC on Cloud Run; fall back to service account file locally)
+      try {
+        admin.initializeApp({
+          credential: admin.credential.applicationDefault()
+        });
+      } catch (_) {
+        try {
+          const serviceAccount = require('../firebase-service-account.json');
+          admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+        } catch (e) {
+          console.error('Failed to initialize Firebase Admin credentials', e.message);
+          throw e;
+        }
+      }
+    }
+
+    const db = admin.firestore();
+    
+    // Find user by email
+    const usersRef = db.collection('users');
+    const snapshot = await usersRef.where('email', '==', email).get();
+    
+    if (snapshot.empty) {
+      console.log('No user found with email:', email);
+      return;
+    }
+
+    // Update user document
+    const userDoc = snapshot.docs[0];
+    await userDoc.ref.update({
+      subscription: subscriptionData,
+      lastUpdated: new Date()
+    });
+
+    console.log('Updated subscription status for user:', email, subscriptionData.status);
+  } catch (error) {
+    console.error('Error updating user subscription status:', error);
+  }
+};
+
+// Stripe webhook endpoint (body already parsed as raw by the earlier middleware)
+app.post('/api/stripe/webhook', async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  
+  if (!endpointSecret) {
+    console.error('STRIPE_WEBHOOK_SECRET not configured');
+    return res.status(500).json({ error: 'Webhook secret not configured' });
+  }
+
+  let event;
+
+  try {
+    // Verify webhook signature
+    const payload = req.body; // Buffer provided by express.raw middleware
+    event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).json({ error: 'Invalid signature' });
+  }
+
+  try {
+    // Handle the event
+    switch (event.type) {
+      case 'checkout.session.completed':
+        await handleCheckoutCompleted(event.data.object);
+        break;
+      case 'customer.subscription.created':
+        await handleSubscriptionCreated(event.data.object);
+        break;
+      case 'customer.subscription.updated':
+        await handleSubscriptionUpdated(event.data.object);
+        break;
+      case 'customer.subscription.deleted':
+        await handleSubscriptionDeleted(event.data.object);
+        break;
+      case 'invoice.payment_succeeded':
+        await handlePaymentSucceeded(event.data.object);
+        break;
+      case 'invoice.payment_failed':
+        await handlePaymentFailed(event.data.object);
+        break;
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+    }
+
+    res.json({ received: true });
+  } catch (error) {
+    console.error('Webhook handler error:', error);
+    res.status(500).json({ error: 'Webhook handler failed' });
+  }
 });
 
 // SPA-like fallback to welcome.html
