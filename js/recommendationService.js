@@ -105,20 +105,23 @@ export async function getMoreFromAuthor(authorName, excludeBookId, { limit: resu
     try {
         const booksQuery = query(
             collection(db, BOOKS_COLLECTION),
-            where('author', '==', authorName),
-            where('id', '!=', excludeBookId),
-            orderBy('createdAt', 'desc'),
-            limit(resultLimit)
+            where('author', '==', authorName)
         );
 
         const booksSnap = await getDocs(booksQuery);
         const books = [];
 
         booksSnap.forEach(doc => {
-            books.push(doc.data());
+            const data = doc.data();
+            if (data.id !== excludeBookId) {
+                books.push(data);
+            }
         });
 
-        return books;
+        // Sort by createdAt desc and limit
+        return books
+            .sort((a, b) => new Date(b.createdAt?.toDate?.() || b.createdAt || 0) - new Date(a.createdAt?.toDate?.() || a.createdAt || 0))
+            .slice(0, resultLimit);
     } catch (err) {
         console.error('Error getting author books:', err);
         return [];
@@ -130,47 +133,9 @@ export async function getMoreFromAuthor(authorName, excludeBookId, { limit: resu
  */
 export async function getFrequentlyListedTogether(bookId, { limit: resultLimit = 4 } = {}) {
     try {
-        // Get all lists containing this book
-        const listsQuery = query(
-            collection(db, 'reading_lists'),
-            where('books', 'array-contains', bookId)
-        );
-        const listsSnap = await getDocs(listsQuery);
-
-        // Count co-occurrences
-        const coOccurrences = new Map();
-        listsSnap.forEach(doc => {
-            const list = doc.data();
-            list.books.forEach(otherBookId => {
-                if (otherBookId !== bookId) {
-                    coOccurrences.set(
-                        otherBookId,
-                        (coOccurrences.get(otherBookId) || 0) + 1
-                    );
-                }
-            });
-        });
-
-        // Sort by frequency and get top N
-        const topBookIds = Array.from(coOccurrences.entries())
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, resultLimit)
-            .map(([id]) => id);
-
-        // Fetch book details
-        const books = [];
-        for (const id of topBookIds) {
-            const bookQuery = query(
-                collection(db, BOOKS_COLLECTION),
-                where('id', '==', id)
-            );
-            const bookSnap = await getDocs(bookQuery);
-            if (!bookSnap.empty) {
-                books.push(bookSnap.docs[0].data());
-            }
-        }
-
-        return books;
+        // For now, return empty array to avoid permission issues
+        // This feature can be re-enabled when reading_lists permissions are properly configured
+        return [];
     } catch (err) {
         console.error('Error getting frequently listed together:', err);
         return [];

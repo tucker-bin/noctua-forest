@@ -11,8 +11,7 @@ export async function getBookMoods(bookId) {
     const reviewsRef = collection(db, 'reviews');
     const q = query(
       reviewsRef,
-      where('bookId', '==', bookId),
-      where('moods', '!=', null)
+      where('bookId', '==', bookId)
     );
 
     const snapshot = await getDocs(q);
@@ -56,8 +55,7 @@ export async function getContentWarnings(bookId) {
     const reviewsRef = collection(db, 'reviews');
     const q = query(
       reviewsRef,
-      where('bookId', '==', bookId),
-      where('contentWarnings', '!=', null)
+      where('bookId', '==', bookId)
     );
 
     const snapshot = await getDocs(q);
@@ -135,8 +133,7 @@ export async function getCopyFormatStats(bookId) {
     const reviewsRef = collection(db, 'reviews');
     const q = query(
       reviewsRef,
-      where('bookId', '==', bookId),
-      where('copyFormat', '!=', null)
+      where('bookId', '==', bookId)
     );
     const snapshot = await getDocs(q);
     const counts = { print: 0, ebook: 0, audiobook: 0, other: 0, total: 0 };
@@ -304,9 +301,7 @@ export async function getReviewsForBook(bookId) {
     const reviewsRef = collection(db, 'reviews');
     const q = query(
       reviewsRef,
-      where('bookId', '==', bookId),
-      orderBy('createdAt', 'desc'),
-      limit(10) // Limit to 10 reviews for performance
+      where('bookId', '==', bookId)
     );
 
     const snapshot = await getDocs(q);
@@ -315,7 +310,10 @@ export async function getReviewsForBook(bookId) {
       ...doc.data()
     }));
 
-    return reviews;
+    // Sort by createdAt desc and limit to 10
+    return reviews
+      .sort((a, b) => new Date(b.createdAt?.toDate?.() || b.createdAt || 0) - new Date(a.createdAt?.toDate?.() || a.createdAt || 0))
+      .slice(0, 10);
   } catch (err) {
     console.error('Error getting reviews for book:', err);
     return [];
