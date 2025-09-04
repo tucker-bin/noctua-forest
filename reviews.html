@@ -317,6 +317,11 @@
             accent-color: #F58220;
         }
         
+        .warning-checkbox.selected {
+            background: #6A7570;
+            border: 2px solid #F58220;
+        }
+        
         /* Mobile-optimized hero section */
         .hero-section {
             text-align: center;
@@ -588,12 +593,19 @@
                         <div class="touch-spacing">
                             <label class="block font-medium text-white mb-4">How quickly did you read this?</label>
                             <div class="relative">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm text-gray-300">Slow burn</span>
+                                    <span id="paceValue" class="text-lg font-semibold text-forest-accent">Steady pace</span>
+                                    <span class="text-sm text-gray-300">Devoured it</span>
+                                </div>
                                 <input type="range" id="readingPace" name="readingPace" min="1" max="5" value="3" 
                                     class="w-full slider">
-                                <div class="flex justify-between text-sm text-gray-300 mt-3">
-                                    <span>Slow burn</span>
-                                    <span>Steady pace</span>
-                                    <span>Devoured it</span>
+                                <div class="flex justify-between text-xs text-gray-400 mt-2">
+                                    <span>1</span>
+                                    <span>2</span>
+                                    <span>3</span>
+                                    <span>4</span>
+                                    <span>5</span>
                                 </div>
                             </div>
                         </div>
@@ -782,8 +794,7 @@
           card.addEventListener('click', function() {
             const checkbox = this.querySelector('input[type="checkbox"]');
             checkbox.checked = !checkbox.checked;
-            this.classList.toggle('border-[#F58220]', checkbox.checked);
-            this.classList.toggle('bg-[#F58220]/20', checkbox.checked);
+            this.classList.toggle('selected', checkbox.checked);
           });
         });
 
@@ -792,10 +803,10 @@
           card.addEventListener('click', function() {
             // Clear all format cards
             document.querySelectorAll('.format-card').forEach(c => {
-              c.classList.remove('border-[#F58220]', 'bg-[#F58220]/20');
+              c.classList.remove('selected');
             });
             // Select this card
-            this.classList.add('border-[#F58220]', 'bg-[#F58220]/20');
+            this.classList.add('selected');
             const radio = this.querySelector('input[type="radio"]');
             radio.checked = true;
           });
@@ -803,13 +814,27 @@
 
         // Reading pace slider feedback
         const paceSlider = document.getElementById('readingPace');
-        if (paceSlider) {
+        const paceValue = document.getElementById('paceValue');
+        if (paceSlider && paceValue) {
+          const labels = ['Slow burn', 'Took my time', 'Steady pace', 'Quick read', 'Devoured it'];
+          
           paceSlider.addEventListener('input', function() {
-            const value = this.value;
-            const labels = ['Slow burn', 'Took my time', 'Steady pace', 'Quick read', 'Devoured it'];
-            // You could add visual feedback here if desired
+            const value = parseInt(this.value);
+            paceValue.textContent = labels[value - 1];
           });
+          
+          // Set initial value
+          paceValue.textContent = labels[parseInt(paceSlider.value) - 1];
         }
+
+        // Content warning checkbox feedback
+        document.querySelectorAll('.warning-checkbox').forEach(checkbox => {
+          checkbox.addEventListener('click', function() {
+            const input = this.querySelector('input[type="checkbox"]');
+            input.checked = !input.checked;
+            this.classList.toggle('selected', input.checked);
+          });
+        });
 
         // Progress tracking
         function updateProgress() {
