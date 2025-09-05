@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="assets/nav.css">
     
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ" onerror="console.warn('Google Analytics failed to load')"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -146,7 +146,7 @@
                 <a href="help.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">Help</a>
                 <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">About</a>
             </nav>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-6">
                 <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
                     <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
@@ -180,7 +180,7 @@
                     <div id="chatInput" class="space-y-4">
                         <div id="currentQuestion" class="chat-message bot">
                         <div class="flex items-start space-x-3">
-                                <div class="w-8 h-8 bg-forest-accent rounded-full flex items-center justify-center text-sm">🦉</div>
+                                <div class="w-8 h-8 bg-gradient-to-br from-forest-accent to-orange-600 rounded-full flex items-center justify-center text-white text-xs font-bold">NF</div>
                                 <div class="bg-[#5A6560] rounded-lg p-4 text-white max-w-md">
                                     Hi! What book would you like to share with The Forest?
                         </div>
@@ -443,7 +443,7 @@
           if (sender === 'bot') {
             messageDiv.innerHTML = `
               <div class="flex items-start space-x-3">
-                <div class="w-8 h-8 bg-forest-accent rounded-full flex items-center justify-center text-sm">🦉</div>
+                <div class="w-8 h-8 bg-gradient-to-br from-forest-accent to-orange-600 rounded-full flex items-center justify-center text-white text-xs font-bold">NF</div>
                 <div class="bg-[#5A6560] rounded-lg p-4 text-white max-w-md">
                   ${message}
                 </div>
@@ -455,7 +455,7 @@
                 <div class="bg-forest-accent rounded-lg p-4 text-white max-w-md">
                   ${message}
                 </div>
-                <div class="w-8 h-8 bg-gradient-to-br from-forest-accent to-forest-primary rounded-full flex items-center justify-center text-white text-sm font-semibold">U</div>
+                <div class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center text-white text-xs font-bold">U</div>
               </div>
             `;
           }

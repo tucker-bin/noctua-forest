@@ -27,9 +27,9 @@
             if (!user) { window.location.href = '../account.html'; return; }
             try {
               const u = await getDoc(doc(db, 'users', user.uid));
-              if (!u.exists() || !u.data().isAdmin) { window.location.href = '../dashboard.html'; return; }
+              if (!u.exists() || !u.data().isAdmin) { window.location.href = '../admin/dashboard.html'; return; }
               resolve(user);
-            } catch (_) { window.location.href = '../dashboard.html'; }
+            } catch (_) { window.location.href = '../admin/dashboard.html'; }
           });
         });
       }

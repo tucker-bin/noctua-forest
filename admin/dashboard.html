@@ -472,6 +472,46 @@
                 document.body.appendChild(dashboardSwitcher);
             }
 
+            // Fetch curator events and update UI
+            async function fetchCuratorEvents() {
+                try {
+                    const res = await fetch('/api/admin/affiliate-events');
+                    const data = await res.json();
+                    if (!data?.ok) return;
+                    const events = Array.isArray(data.events) ? data.events : [];
+                    const table = document.getElementById('affTable');
+                    const last24h = Date.now() - 24*60*60*1000;
+                    const last7d = Date.now() - 7*24*60*60*1000;
+                    let c24 = 0, c7 = 0;
+                    table.innerHTML = '';
+                    events.forEach(ev => {
+                        const when = new Date(ev.t || ev.ts || Date.now());
+                        const tsMs = (typeof ev.t === 'number') ? ev.t : when.getTime();
+                        if (tsMs >= last24h) c24++;
+                        if (tsMs >= last7d) c7++;
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="px-4 py-2 whitespace-nowrap">${new Date(tsMs).toLocaleString()}</td>
+                            <td class="px-4 py-2">${(ev.r||'—')}</td>
+                            <td class="px-4 py-2">${(ev.vendor||'—')}</td>
+                            <td class="px-4 py-2">${(ev.bTitle||'—')}</td>
+                            <td class="px-4 py-2">${(ev.bAuthor||'—')}</td>
+                            <td class="px-4 py-2">${(ev.bId||'—')}</td>
+                            <td class="px-4 py-2 truncate max-w-[260px]">${(ev.ua||'').slice(0,120)}</td>
+                        `;
+                        table.appendChild(tr);
+                    });
+                    const totalEl = document.getElementById('affTotal');
+                    const d24El = document.getElementById('aff24h');
+                    const d7El = document.getElementById('aff7d');
+                    if (totalEl) totalEl.textContent = String(events.length);
+                    if (d24El) d24El.textContent = String(c24);
+                    if (d7El) d7El.textContent = String(c7);
+                } catch (e) {
+                    console.warn('affiliate events load failed', e);
+                }
+            }
+
             // Set up real-time listeners
             setupSubmissionsListener();
             setupReviewsListener();
@@ -625,46 +665,6 @@
                 });
             } catch (err) {
                 console.warn('Applications listener failed:', err);
-            }
-
-            // Fetch curator events and update UI
-            async function fetchCuratorEvents() {
-                try {
-                    const res = await fetch('/api/admin/affiliate-events');
-                    const data = await res.json();
-                    if (!data?.ok) return;
-                    const events = Array.isArray(data.events) ? data.events : [];
-                    const table = document.getElementById('affTable');
-                    const last24h = Date.now() - 24*60*60*1000;
-                    const last7d = Date.now() - 7*24*60*60*1000;
-                    let c24 = 0, c7 = 0;
-                    table.innerHTML = '';
-                    events.forEach(ev => {
-                        const when = new Date(ev.t || ev.ts || Date.now());
-                        const tsMs = (typeof ev.t === 'number') ? ev.t : when.getTime();
-                        if (tsMs >= last24h) c24++;
-                        if (tsMs >= last7d) c7++;
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                            <td class="px-4 py-2 whitespace-nowrap">${new Date(tsMs).toLocaleString()}</td>
-                            <td class="px-4 py-2">${(ev.r||'—')}</td>
-                            <td class="px-4 py-2">${(ev.vendor||'—')}</td>
-                            <td class="px-4 py-2">${(ev.bTitle||'—')}</td>
-                            <td class="px-4 py-2">${(ev.bAuthor||'—')}</td>
-                            <td class="px-4 py-2">${(ev.bId||'—')}</td>
-                            <td class="px-4 py-2 truncate max-w-[260px]">${(ev.ua||'').slice(0,120)}</td>
-                        `;
-                        table.appendChild(tr);
-                    });
-                    const totalEl = document.getElementById('affTotal');
-                    const d24El = document.getElementById('aff24h');
-                    const d7El = document.getElementById('aff7d');
-                    if (totalEl) totalEl.textContent = String(events.length);
-                    if (d24El) d24El.textContent = String(c24);
-                    if (d7El) d7El.textContent = String(c7);
-                } catch (e) {
-                    console.warn('affiliate events load failed', e);
-                }
             }
         })();
 
