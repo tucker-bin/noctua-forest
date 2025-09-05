@@ -255,6 +255,7 @@
       import { fetchBookMetadata, extractASIN } from './js/amazonService.js';
       import { addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
       import { generateRandomForestName } from './js/randomForestNameService.js';
+      import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
       
       class ConversationalReview {
         constructor() {
@@ -479,6 +480,14 @@
           finalSubmit.disabled = true;
 
           try {
+            // Get current user
+            const auth = getAuth();
+            const user = auth.currentUser;
+            
+            if (!user) {
+              throw new Error('User not authenticated');
+            }
+
             // Create book payload
             const bookPayload = {
               title: this.bookData.title,
@@ -489,15 +498,15 @@
               publishedAt: new Date(),
               views: 0,
               popularity: 0,
-              userId: window.auth.currentUser.uid
+              userId: user.uid
             };
 
             // Create review payload
             const reviewPayload = {
               bookId: '', // Will be set after book creation
               text: this.responses.review,
-              authorId: window.auth.currentUser.uid,
-              authorAvatarUrl: window.auth.currentUser.photoURL || '',
+              authorId: user.uid,
+              authorAvatarUrl: user.photoURL || '',
               motivation: this.responses.motivation,
               audience: this.responses.audience,
               contentWarnings: this.responses.warnings,
