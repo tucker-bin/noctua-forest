@@ -415,22 +415,33 @@
             });
           }
 
-          try {
-            const reviewDoc = {
-              ...reviewPayload,
-              bookId: bookIdCreated,
-              forestName: generateRandomForestName(),
-              createdAt: serverTimestamp(),
-              upvotes: 0,
-              downvotes: 0,
-            };
-            await addDoc(collection(db, 'reviews'), reviewDoc);
-          } catch (revErr) {
-            console.warn('[reviews] reviews write denied; queueing submission', revErr);
+          if (bookIdCreated) {
+            try {
+              const reviewDoc = {
+                ...reviewPayload,
+                bookId: bookIdCreated,
+                authorForestName: generateRandomForestName(),
+                createdAt: serverTimestamp(),
+                helpfulCount: 0,
+                unhelpfulCount: 0,
+              };
+              await addDoc(collection(db, 'reviews'), reviewDoc);
+            } catch (revErr) {
+              console.warn('[reviews] reviews write denied; queueing submission', revErr);
+              await addDoc(collection(db, 'submissions'), {
+                type: 'review',
+                status: 'pending',
+                payload: { ...reviewPayload, bookId: bookIdCreated },
+                createdAt: serverTimestamp(),
+                userId: user.uid,
+              });
+            }
+          } else {
+            // If book write failed, queue the review with missing bookId; admin auto-promotion will create book first
             await addDoc(collection(db, 'submissions'), {
               type: 'review',
               status: 'pending',
-              payload: { ...reviewPayload, bookId: bookIdCreated },
+              payload: { ...reviewPayload, bookId: null },
               createdAt: serverTimestamp(),
               userId: user.uid,
             });

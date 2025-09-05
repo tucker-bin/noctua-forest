@@ -1390,10 +1390,10 @@
       // Guard against book.html?id=undefined or missing id
       console.error('No book ID provided, redirecting to Forest');
       window.location.replace('forest.html');
-      return;
+    } else {
+      loadBook();
+      setupReviews(bookId);
     }
-    loadBook();
-    setupReviews(bookId);
   </script>
   <div id="navOverlay" class="nav-overlay"></div>
   <script src="assets/nav.js"></script>

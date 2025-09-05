@@ -329,17 +329,52 @@
     <script type="module">
       import { app, db } from './firebase-config.js';
       import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-      import showAlphaPopup from './components/AlphaPopup.js';
 
-      // Show alpha popup
-      showAlphaPopup();
+      // Minimal Alpha Popup (inline)
+      (function showAlphaPopupInline(){
+        try{
+          if (localStorage.getItem('nf.alpha.dismissed') === '1') return;
+          const bar = document.createElement('div');
+          bar.setAttribute('role','dialog');
+          bar.setAttribute('aria-label','Alpha notice');
+          bar.style.position = 'fixed';
+          bar.style.left = '50%';
+          bar.style.transform = 'translateX(-50%)';
+          bar.style.bottom = '16px';
+          bar.style.background = '#3A4440';
+          bar.style.color = '#E0E2DB';
+          bar.style.padding = '12px 16px';
+          bar.style.borderRadius = '12px';
+          bar.style.boxShadow = '0 10px 25px rgba(0,0,0,0.25)';
+          bar.style.zIndex = '10000';
+          bar.style.maxWidth = 'min(92vw, 560px)';
+          bar.style.fontSize = '14px';
+          bar.style.lineHeight = '1.35';
+          bar.style.display = 'flex';
+          bar.style.alignItems = 'center';
+          bar.style.gap = '12px';
+          const text = document.createElement('span');
+          text.textContent = 'Noctua Forest is evolving. Features may change during active development.';
+          const btn = document.createElement('button');
+          btn.textContent = 'OK';
+          btn.style.background = '#F58220';
+          btn.style.color = '#fff';
+          btn.style.border = 'none';
+          btn.style.borderRadius = '9999px';
+          btn.style.padding = '8px 12px';
+          btn.style.cursor = 'pointer';
+          btn.addEventListener('click', () => { localStorage.setItem('nf.alpha.dismissed','1'); bar.remove(); });
+          bar.appendChild(text);
+          bar.appendChild(btn);
+          (document.body || document.documentElement).appendChild(bar);
+        }catch(_){}
+      })();
 
 
 
       // Try to load curated books from Firestore for the carousel
       (async function loadCuratedReviews(){
         try{
-          const db = getFirestore(app);
           const q = query(collection(db, 'books'), orderBy('publishedAt','desc'), limit(12));
           const snap = await getDocs(q);
           const track = document.getElementById('reviewsCarousel');
