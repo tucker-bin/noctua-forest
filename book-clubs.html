@@ -384,6 +384,14 @@
         let currentUser = null;
         let userMembership = null;
         
+        // Global error handler for unhandled promise rejections
+        window.addEventListener('unhandledrejection', (event) => {
+            if (event.reason && event.reason.code === 'permission-denied') {
+                console.warn('Firebase permission denied:', event.reason.message);
+                event.preventDefault();
+            }
+        });
+        
         // Check authentication and membership status
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
@@ -411,6 +419,7 @@
             } catch (error) {
                 console.warn('Could not check membership status:', error);
                 userMembership = null;
+                // Don't show error to user for permission issues
             }
         }
 
@@ -473,7 +482,12 @@
                     });
                 }
             } catch (error) {
-                console.error('Error loading book clubs:', error);
+                console.warn('Error loading book clubs:', error);
+                // Show user-friendly message for permission issues
+                const bookClubsList = document.getElementById('book-clubs-list');
+                if (bookClubsList) {
+                    bookClubsList.innerHTML = '<div class="text-center py-8 text-white/80">Unable to load book clubs. Please check your permissions.</div>';
+                }
             }
         }
         
@@ -561,8 +575,12 @@
                 
                 alert('Book club created successfully!');
             } catch (error) {
-                console.error('Error creating book club:', error);
-                alert('Error creating book club. Please try again.');
+                console.warn('Error creating book club:', error);
+                if (error.code === 'permission-denied') {
+                    alert('You do not have permission to create book clubs. Please check your account status.');
+                } else {
+                    alert('Error creating book club. Please try again.');
+                }
             }
         });
     </script>

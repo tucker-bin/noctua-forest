@@ -917,8 +917,8 @@
       // Lists quick-manage (client-only minimal UI)
       async function loadLists(userId){
         try{
-          const { getUserListsSummary } = await import('../js/readingListService.js');
-          const lists = await getUserListsSummary(userId);
+          const { getUserLists } = await import('../js/readingListService.js');
+          const lists = await getUserLists(userId);
           const tbody = document.getElementById('listsTable');
           if (!tbody) return;
           tbody.innerHTML = '';
