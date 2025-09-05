@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ" onerror="console.warn('Google Analytics failed to load')"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -321,27 +321,35 @@
 
         async function checkMembershipAndUpdateUI(userId) {
             try {
-                const membershipQuery = query(collection(db, 'memberships'), where('userId', '==', userId));
-                const membershipSnapshot = await getDocs(membershipQuery);
-                
-                // Check admin status
-                const userDoc = await getDoc(doc(db, 'users', userId));
-                const isAdmin = userDoc.exists() && (userDoc.data()?.isAdmin === true || userDoc.data()?.admin === true);
-                
                 const bookClubsLink = document.getElementById('book-clubs-link');
-                
                 let hasAccess = false;
                 
-                if (!membershipSnapshot.empty) {
-                    const membership = membershipSnapshot.docs[0].data();
-                    if (membership.status === 'active') {
+                // Check admin status first (more reliable)
+                try {
+                    const userDoc = await getDoc(doc(db, 'users', userId));
+                    const isAdmin = userDoc.exists() && (userDoc.data()?.isAdmin === true || userDoc.data()?.admin === true);
+                    if (isAdmin) {
                         hasAccess = true;
                     }
+                } catch (adminError) {
+                    console.warn('Could not check admin status:', adminError);
                 }
                 
-                // Admins also have access
-                if (isAdmin) {
-                    hasAccess = true;
+                // Check membership status if not admin
+                if (!hasAccess) {
+                    try {
+                        const membershipQuery = query(collection(db, 'memberships'), where('userId', '==', userId));
+                        const membershipSnapshot = await getDocs(membershipQuery);
+                        
+                        if (!membershipSnapshot.empty) {
+                            const membership = membershipSnapshot.docs[0].data();
+                            if (membership.status === 'active') {
+                                hasAccess = true;
+                            }
+                        }
+                    } catch (membershipError) {
+                        console.warn('Could not check membership status:', membershipError);
+                    }
                 }
                 
                 if (hasAccess) {
@@ -352,9 +360,12 @@
                     bookClubsLink.classList.add('hidden');
                 }
             } catch (error) {
-                console.error('Error checking membership:', error);
+                console.error('Error checking access:', error);
                 // Hide Book Clubs link on error
-                document.getElementById('book-clubs-link').classList.add('hidden');
+                const bookClubsLink = document.getElementById('book-clubs-link');
+                if (bookClubsLink) {
+                    bookClubsLink.classList.add('hidden');
+                }
             }
         }
 

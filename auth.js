@@ -28,7 +28,7 @@ const emailDisplay = document.getElementById('email-display');
 const currentForestName = document.getElementById('current-forest-name');
 
 // Dashboard Elements
-const listsContainer = document.getElementById('lists-container');
+const listsContainer = document.getElementById('readingLists');
 const accountTier = document.getElementById('account-tier');
 
 const curatorStatus = document.getElementById('curator-status');
@@ -286,6 +286,11 @@ function updateCuratorStatus(status) {
 // Load reading lists with full management
 async function loadReadingLists(userId) {
   try {
+    if (!listsContainer) {
+      console.warn('Lists container not found, skipping list loading');
+      return;
+    }
+    
     const lists = await getUserLists(userId);
     if (lists.length === 0) {
       listsContainer.innerHTML = `
@@ -334,7 +339,9 @@ async function loadReadingLists(userId) {
     }
   } catch (err) {
     console.error('Error loading lists:', err);
-    listsContainer.innerHTML = '<p class="text-red-400">Error loading your lists. Please try again later.</p>';
+    if (listsContainer) {
+      listsContainer.innerHTML = '<p class="text-red-400">Error loading your lists. Please try again later.</p>';
+    }
   }
 }
 

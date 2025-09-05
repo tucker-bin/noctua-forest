@@ -409,7 +409,7 @@
                     userMembership = null;
                 }
             } catch (error) {
-                console.error('Error checking membership:', error);
+                console.warn('Could not check membership status:', error);
                 userMembership = null;
             }
         }
@@ -423,7 +423,7 @@
                 }
                 return false;
             } catch (error) {
-                console.error('Error checking admin status:', error);
+                console.warn('Could not check admin status:', error);
                 return false;
             }
         }
