@@ -295,10 +295,10 @@ export async function getAnalyticsForUser(userId) {
         // Transform data for dashboard display
         return analytics.topLists.map(list => ({
             listId: list.listId,
-            listName: `List ${list.listId.slice(0, 8)}...`, // TODO: Get actual list name
+            listName: list.name || `List ${list.listId.slice(0, 8)}...`,
             views: list.views,
-            saves: 0, // TODO: Calculate from list saves
-            ctr: '0%' // TODO: Calculate from clicks/views
+            saves: list.saves || 0,
+            ctr: list.views > 0 ? `${Math.round((list.clicks || 0) / list.views * 100)}%` : '0%'
         }));
     } catch (error) {
         console.error('Error getting analytics for user:', error);

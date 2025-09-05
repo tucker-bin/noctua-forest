@@ -3,7 +3,7 @@ import { app, db } from './firebase-config.js';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { getForestName, generateForestNameForUser } from './js/forestNameService.js';
-import { getUserLists, createList, shareList as createShare } from './js/readingListService.js';
+import { getUserLists, createList, shareList as createShare, deleteList } from './js/readingListService.js';
 import { getCommissionEarningsSummary } from './js/commissionService.js';
 import { getAnalyticsForUser } from './js/analyticsService.js';
 import { getRecentReviews } from './js/reviewService.js';
@@ -629,9 +629,10 @@ async function confirmCreateList() {
 
 async function confirmDeleteList(listId) {
   try {
-    // TODO: Implement delete functionality
+    await deleteList(listId);
     closeModal();
-    showErrorModal('Delete functionality coming soon!');
+    showSuccessModal('List deleted successfully!');
+    loadUserLists();
   } catch (error) {
     console.error('Error deleting list:', error);
     showErrorModal('Failed to delete list. Please try again.');

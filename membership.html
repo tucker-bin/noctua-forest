@@ -19,11 +19,23 @@
         <span class="text-2xl font-bold text-white" style="font-family: 'Poppins', sans-serif;">Noctua Forest</span>
       </a>
       <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
-        <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">The Forest</a>
-                        <a href="reviews.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">Write a Review</a>
-        <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0">About</a>
+        <a href="forest.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center text-white">The Forest</a>
+        <a href="reviews.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center text-white">Write a Review</a>
+        <a href="help.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center text-white">Help</a>
+        <a href="about.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center text-white">About</a>
       </nav>
+      <div class="flex items-center gap-2">
+        <button class="md:hidden text-white" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+        </button>
+        <a href="account.html" class="hover:text-forest-accent transition-colors duration-300 nav-link text-white" aria-label="Account">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </a>
+      </div>
     </header>
+    
+    <!-- Mobile Navigation Overlay -->
+    <div id="navOverlay" class="nav-overlay"></div>
 
     <main class="max-w-4xl mx-auto">
       <section class="bg-forest-card rounded-2xl p-8 md:p-10 text-white shadow">

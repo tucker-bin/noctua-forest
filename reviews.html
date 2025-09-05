@@ -15,6 +15,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Serif:wght@400;600;700&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
     
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/tailwind.css">
+    <link rel="stylesheet" href="assets/base-styles.css">
+    <link rel="stylesheet" href="assets/nav.css">
+    
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0ZWN1Z3DYQ"></script>
     <script>
@@ -37,26 +42,6 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 1rem;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #4A5450 0%, #3A4440 100%);
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0;
-            color: #E0E2DB;
-        }
-        
-        .header p {
-            font-size: 1.1rem;
-            margin: 0.5rem 0 0 0;
-            color: #B8BDB5;
         }
         
         .main-content {
@@ -149,20 +134,41 @@
   </head>
   <body>
     <!-- Navigation -->
-    <script src="components/Navigation.js"></script>
-    
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <h1>Share Your Review</h1>
-            <p>Help other readers discover great books through your authentic perspective</p>
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <header class="flex justify-between items-center mb-8">
+            <a href="welcome.html" class="flex items-center space-x-3">
+                <img src="images/logo.png" alt="Noctua Forest Logo" width="40" height="40" decoding="async" class="w-10 h-10">
+                <span class="text-2xl font-bold" style="font-family: 'Poppins', sans-serif; color: #4A5450;">Noctua Forest</span>
+            </a>
+            <nav id="nav" class="hidden md:flex items-center space-x-8 text-lg ml-auto" style="font-family: 'Noto Sans', sans-serif;">
+                <a href="forest.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">The Forest</a>
+                <a href="reviews.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">Write a Review</a>
+                <a href="help.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">Help</a>
+                <a href="about.html" class="hover:text-forest-accent transition-colors duration-300 font-medium block md:inline-block py-3 md:py-0 px-4 md:px-0 text-left md:text-center" style="color:#3A4440">About</a>
+            </nav>
+            <div class="flex items-center gap-2">
+                <button class="md:hidden" onclick="toggleMobileMenu()" aria-label="Toggle menu">
+                    <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+                <a href="account.html" class="hover:text-forest-accent transition-colors duration-300" aria-label="Account">
+                    <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                </a>
             </div>
         </header>
+    </div>
+    
+    <!-- Page Header -->
+    <div class="bg-gradient-to-r from-[#4A5450] to-[#3A4440] text-white py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-bold mb-4">Share Your Review</h1>
+            <p class="text-lg text-white/90">Help other readers discover great books through your authentic perspective</p>
+        </div>
+    </div>
 
     <!-- Main Content -->
-    <main class="main-content">
-        <div class="container">
-            <div class="form-container">
+    <main class="py-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-4xl mx-auto">
                 <!-- Conversational Review Interface -->
                 <div id="reviewChat" class="bg-[#4A5450] rounded-xl p-4 md:p-8 text-white">
                     <!-- Chat Messages Container -->
@@ -228,39 +234,27 @@
 
     <!-- Firebase Configuration -->
     <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+      import { app, db } from './firebase-config.js';
       import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-      import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
       
-      const firebaseConfig = {
-        apiKey: "AIzaSyBQZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQZQ",
-        authDomain: "noctua-forest.firebaseapp.com",
-        projectId: "noctua-forest",
-        storageBucket: "noctua-forest.appspot.com",
-        messagingSenderId: "123456789012",
-        appId: "1:123456789012:web:abcdefghijklmnopqrstuvwxyz"
-      };
-      
-      const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
-      const db = getFirestore(app);
       
       // Make auth and db available globally
       window.auth = auth;
       window.db = db;
       
-      // Check authentication status
+      // Check authentication status - but don't force redirect, allow anonymous reviews
       onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          window.location.href = 'welcome.html';
-        }
+        console.log('Auth state changed:', user ? 'signed in' : 'signed out');
+        // Allow both authenticated and anonymous users to write reviews
       });
     </script>
 
     <!-- Conversational Review Interface -->
     <script type="module">
       import { fetchBookMetadata, extractASIN } from './js/amazonService.js';
-      import { submitReview } from './js/reviewService.js';
+      import { addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+      import { generateRandomForestName } from './js/randomForestNameService.js';
       
       class ConversationalReview {
         constructor() {
@@ -460,7 +454,7 @@
                 <div class="bg-forest-accent rounded-lg p-4 text-white max-w-md">
                   ${message}
                 </div>
-                <div class="w-8 h-8 bg-[#5A6560] rounded-full flex items-center justify-center text-sm">👤</div>
+                <div class="w-8 h-8 bg-gradient-to-br from-forest-accent to-forest-primary rounded-full flex items-center justify-center text-white text-sm font-semibold">U</div>
               </div>
             `;
           }
@@ -512,11 +506,28 @@
               noAI: true
             };
 
-            // Submit using existing review service
-            const result = await submitReview({ ...bookPayload, ...reviewPayload });
+            // First, create the book
+            const bookRef = await addDoc(collection(db, 'books'), {
+              ...bookPayload,
+              coverUrl: this.bookData.coverUrl || '',
+              isbn: this.bookData.isbn || '',
+              asin: this.bookData.asin || '',
+              description: this.bookData.description || '',
+              createdAt: serverTimestamp()
+            });
+
+            // Then create the review with the book ID
+            const reviewRef = await addDoc(collection(db, 'reviews'), {
+              ...reviewPayload,
+              bookId: bookRef.id,
+              forestName: generateRandomForestName(),
+              createdAt: serverTimestamp(),
+              upvotes: 0,
+              downvotes: 0
+            });
             
             // Redirect to book page
-            window.location.href = `book.html?id=${result.bookId}`;
+            window.location.href = `book.html?id=${bookRef.id}`;
 
           } catch (error) {
             console.error('Submission error:', error);
@@ -538,6 +549,10 @@
     <!-- Global Footer with Google Translate -->
     <script src="assets/footer.js"></script>
     
+    <!-- Mobile Navigation Overlay -->
+    <div id="navOverlay" class="nav-overlay"></div>
+    
+    <!-- Mobile Navigation Script -->
     <script src="assets/nav.js"></script>
   </body>
 </html>
