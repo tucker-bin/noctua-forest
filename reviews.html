@@ -117,6 +117,18 @@
             margin-bottom: 1.5rem;
         }
         
+        /* Review form theming: lighter field bg + forest card container */
+        .nf-form-dark { background-color: var(--color-forest-card); color: var(--color-forest-light); }
+        .nf-form-dark label { color: var(--color-forest-light); }
+        .nf-form-dark input,
+        .nf-form-dark textarea {
+            background-color: var(--color-forest-light);
+            color: var(--color-forest-text);
+            border: 1px solid var(--color-forest-border);
+        }
+        .nf-form-dark input::placeholder,
+        .nf-form-dark textarea::placeholder { color: var(--color-forest-text-muted); }
+        
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2rem;
@@ -169,7 +181,7 @@
     <main class="py-12">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="max-w-2xl mx-auto">
-                <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="nf-form-dark rounded-xl shadow-lg p-8">
                     <form id="reviewForm" class="space-y-8">
                         <!-- Book Information -->
                         <section class="space-y-4">
@@ -204,7 +216,22 @@
                             <div>
                                 <label for="review" class="block text-sm font-medium text-forest-text mb-2">Your thoughts and feelings *</label>
                                 <textarea id="review" name="review" rows="6" required placeholder="Share your honest thoughts about the book…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent"></textarea>
-                    </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-forest-text mb-2">Moods & tags</label>
+                                <div id="moodChips" class="flex flex-wrap gap-2 mb-2"></div>
+                                <input id="moodInput" type="text" placeholder="Type a tag and press Enter…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
+                                <div class="mt-2 flex flex-wrap gap-2 text-sm">
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="inspiring">inspiring</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="heartwarming">heartwarming</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="mysterious">mysterious</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="suspenseful">suspenseful</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="funny">funny</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="thoughtful">thoughtful</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="adventurous">adventurous</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="romantic">romantic</button>
+                                </div>
+                            </div>
                             <div>
                                 <label for="audience" class="block text-sm font-medium text-forest-text mb-2">Who else would connect with this book?</label>
                                 <input id="audience" name="audience" type="text" placeholder="e.g., anyone going through change, parents of teens…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
@@ -212,7 +239,16 @@
                             <div>
                                 <label for="warnings" class="block text-sm font-medium text-forest-text mb-2">Content warnings (if any)</label>
                                 <input id="warnings" name="warnings" type="text" placeholder="e.g., violence, difficult themes…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
-                </div>
+                            </div>
+                            <div>
+                                <label for="copyFormat" class="block text-sm font-medium text-forest-text mb-2">How did you read it?</label>
+                                <select id="copyFormat" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
+                                    <option value="">Select format (optional)</option>
+                                    <option value="print">Printed copy</option>
+                                    <option value="ebook">E‑book</option>
+                                    <option value="audiobook">Audiobook</option>
+                                </select>
+                            </div>
                         </section>
 
                         <div>
@@ -253,6 +289,44 @@
 
       const form = document.getElementById('reviewForm');
       const amazonUrlInput = document.getElementById('amazonUrl');
+      const moodInput = document.getElementById('moodInput');
+      const moodChips = document.getElementById('moodChips');
+      let moodTags = [];
+
+      function renderChips(){
+        if (!moodChips) return;
+        moodChips.innerHTML = '';
+        moodTags.slice(0,12).forEach((t, idx) => {
+          const chip = document.createElement('span');
+          chip.className = 'px-2 py-1 rounded-full bg-[#3A4440] text-white text-xs flex items-center gap-2';
+          chip.textContent = t;
+          const x = document.createElement('button');
+          x.type = 'button';
+          x.className = 'text-white/70 hover:text-white';
+          x.textContent = '×';
+          x.onclick = () => { moodTags.splice(idx,1); renderChips(); };
+          chip.appendChild(x);
+          moodChips.appendChild(chip);
+        });
+      }
+
+      moodInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter'){
+          e.preventDefault();
+          const v = (moodInput.value || '').trim().toLowerCase();
+          if (!v) return;
+          if (!moodTags.includes(v)) moodTags.push(v);
+          moodInput.value = '';
+          renderChips();
+        }
+      });
+
+      document.querySelectorAll('[data-suggest]')?.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const v = btn.getAttribute('data-suggest');
+          if (v && !moodTags.includes(v)) { moodTags.push(v); renderChips(); }
+        });
+      });
 
       amazonUrlInput?.addEventListener('change', async (e) => {
         const url = e.target.value.trim();
@@ -281,6 +355,8 @@
         const audience = document.getElementById('audience').value.trim();
         const warnings = document.getElementById('warnings').value.trim();
         const amazonUrl = document.getElementById('amazonUrl').value.trim();
+        const copyFormatEl = document.getElementById('copyFormat');
+        const copyFormat = copyFormatEl ? copyFormatEl.value : '';
 
         if (!title || !author || !review || !motivation) { alert('Please complete required fields.'); return; }
 
@@ -303,7 +379,9 @@
           authorAvatarUrl: user.photoURL || '',
           motivation,
           audience,
-          contentWarnings: warnings,
+          contentWarnings: warnings ? warnings.split(',').map(s=>s.trim()).filter(Boolean) : [],
+          moods: moodTags,
+          copyFormat,
               hasReadBook: true,
               authenticReview: true,
           noAI: true,
