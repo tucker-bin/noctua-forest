@@ -432,7 +432,14 @@
             ]);
 
             // Resolve conservatively to avoid flipping legit admins
-            const isAdmin = (usersDocResult === true || claimsResult === true) || (usersDocResult === undefined || claimsResult === undefined);
+            let isAdmin = (usersDocResult === true || claimsResult === true) || (usersDocResult === undefined || claimsResult === undefined);
+            
+            // Hardcoded admin check as fallback
+            if (!isAdmin && user.email === 'tucker.apply@gmail.com') {
+                console.log('[admin-check] Hardcoded admin check: Admin user detected');
+                isAdmin = true;
+            }
+            
             // console.log('[admin-check] final decision isAdmin:', isAdmin);
             if (!isAdmin) {
                 window.location.href = '../dashboard.html';

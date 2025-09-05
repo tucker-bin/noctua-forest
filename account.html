@@ -318,6 +318,12 @@
             if (user) {
                 console.log('User authenticated:', user.email);
                 
+                // Prevent redirect loop - don't redirect if we're already on admin dashboard
+                if (window.location.pathname.includes('admin/dashboard.html')) {
+                    console.log('Already on admin dashboard, skipping redirect');
+                    return;
+                }
+                
                 // Check if user is admin first
                 const isAdmin = await checkAdminStatus(user.uid);
                 console.log('Admin check result:', isAdmin);

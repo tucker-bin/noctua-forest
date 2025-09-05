@@ -935,6 +935,12 @@
 
             // Check if admin (gracefully handle permission-denied)
             try {
+                // Prevent redirect loop - don't redirect if we're already on admin dashboard
+                if (window.location.pathname.includes('admin/dashboard.html')) {
+                    console.log('Already on admin dashboard, skipping redirect');
+                    return;
+                }
+                
                 // Hardcoded admin check for known admin users (fallback)
                 if (user.email === 'tucker.apply@gmail.com') {
                     console.log('Hardcoded admin check: Admin user detected, redirecting to admin dashboard');
