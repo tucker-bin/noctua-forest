@@ -938,10 +938,23 @@
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 const userData = userDoc.exists() ? userDoc.data() : {};
                 
-                if (userData.isAdmin) {
+                if (userData.isAdmin === true || userData.admin === true) {
+                    console.log('Admin detected via Firestore, redirecting to admin dashboard');
                     window.location.href = 'admin/dashboard.html';
                     return;
                 }
+                
+                // Fallback: Check Firebase Auth custom claims
+                const tokenResult = await user.getIdTokenResult();
+                if (tokenResult.claims?.admin === true || tokenResult.claims?.isAdmin === true) {
+                    console.log('Admin detected via custom claims, redirecting to admin dashboard');
+                    window.location.href = 'admin/dashboard.html';
+                    return;
+                }
+            } catch (adminError) {
+                console.warn('Could not check admin status:', adminError);
+                // Continue with regular user flow if admin check fails
+            }
                 
                 // Check Curator Plus membership status
                 const analyticsLocked = document.getElementById('analyticsLocked');

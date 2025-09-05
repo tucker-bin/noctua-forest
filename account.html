@@ -129,6 +129,9 @@
                     <a href="book-clubs.html" id="book-clubs-link" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors hidden">
                         Book Clubs
                     </a>
+                    <a href="admin/dashboard.html" id="admin-dashboard-link" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-medium transition-colors hidden">
+                        Admin Dashboard
+                    </a>
                     <a href="membership.html" class="px-4 py-2 border border-white/20 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors">
                         Upgrade to Curator Plus
                     </a>
@@ -313,23 +316,62 @@
         // Wait for auth state
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // Check if user is admin first
+                const isAdmin = await checkAdminStatus(user.uid);
+                if (isAdmin) {
+                    // Redirect admin users to admin dashboard
+                    window.location.href = 'admin/dashboard.html';
+                    return;
+                }
+                
                 await loadLists();
                 setupListManagement();
                 await checkMembershipAndUpdateUI(user.uid);
             }
         });
 
+        async function checkAdminStatus(userId) {
+            try {
+                // First try Firestore document
+                const userDoc = await getDoc(doc(db, 'users', userId));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    if (userData?.isAdmin === true || userData?.admin === true) {
+                        return true;
+                    }
+                }
+                
+                // Fallback: Check Firebase Auth custom claims
+                const user = auth.currentUser;
+                if (user) {
+                    const tokenResult = await user.getIdTokenResult();
+                    if (tokenResult.claims?.admin === true || tokenResult.claims?.isAdmin === true) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            } catch (error) {
+                console.warn('Could not check admin status:', error);
+                return false;
+            }
+        }
+
         async function checkMembershipAndUpdateUI(userId) {
             try {
                 const bookClubsLink = document.getElementById('book-clubs-link');
+                const adminDashboardLink = document.getElementById('admin-dashboard-link');
                 let hasAccess = false;
+                let isAdmin = false;
                 
                 // Check admin status first (more reliable)
                 try {
                     const userDoc = await getDoc(doc(db, 'users', userId));
-                    const isAdmin = userDoc.exists() && (userDoc.data()?.isAdmin === true || userDoc.data()?.admin === true);
+                    isAdmin = userDoc.exists() && (userDoc.data()?.isAdmin === true || userDoc.data()?.admin === true);
                     if (isAdmin) {
                         hasAccess = true;
+                        // Show admin dashboard link as fallback
+                        adminDashboardLink.classList.remove('hidden');
                     }
                 } catch (adminError) {
                     console.warn('Could not check admin status:', adminError);
@@ -359,13 +401,18 @@
                     // No access - hide Book Clubs link
                     bookClubsLink.classList.add('hidden');
                 }
+                
+                // Hide admin dashboard link if not admin
+                if (!isAdmin) {
+                    adminDashboardLink.classList.add('hidden');
+                }
             } catch (error) {
                 console.error('Error checking access:', error);
-                // Hide Book Clubs link on error
+                // Hide both links on error
                 const bookClubsLink = document.getElementById('book-clubs-link');
-                if (bookClubsLink) {
-                    bookClubsLink.classList.add('hidden');
-                }
+                const adminDashboardLink = document.getElementById('admin-dashboard-link');
+                if (bookClubsLink) bookClubsLink.classList.add('hidden');
+                if (adminDashboardLink) adminDashboardLink.classList.add('hidden');
             }
         }
 
