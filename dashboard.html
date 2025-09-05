@@ -356,8 +356,62 @@
                 </div>
             </div>
 
+            <!-- Analytics & Performance -->
+            <div class="bg-forest-card rounded-xl p-8 mb-8">
+                <div class="flex items-center mb-6">
+                    <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <h2 class="text-2xl font-bold text-white">Analytics & Performance</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-forest-secondary rounded-lg p-6">
+                        <div class="text-sm text-white/80">List Views</div>
+                        <div id="totalViews" class="text-3xl font-bold text-white">0</div>
+                    </div>
+                    <div class="bg-forest-secondary rounded-lg p-6">
+                        <div class="text-sm text-white/80">Book Clicks</div>
+                        <div id="totalClicks" class="text-3xl font-bold text-white">0</div>
+                    </div>
+                    <div class="bg-forest-accent rounded-lg p-6">
+                        <div class="text-sm text-white/80">Commission Earned</div>
+                        <div id="totalEarnings" class="text-3xl font-bold text-white">$0.00</div>
+                    </div>
+                    <div class="bg-forest-secondary rounded-lg p-6">
+                        <div class="text-sm text-white/80">CTR</div>
+                        <div id="clickThroughRate" class="text-3xl font-bold text-white">0%</div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-4">
+                    <button id="viewDetailedAnalytics" class="px-6 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg">
+                        View Detailed Analytics
+                    </button>
+                    <a href="account.html" class="px-6 py-2 bg-forest-secondary hover:bg-forest-primary text-white rounded-lg">
+                        Manage Lists
+                    </a>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-forest-card rounded-xl p-8 mb-8">
+                <div class="flex items-center mb-6">
+                    <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h2 class="text-2xl font-bold text-white">Recent Activity</h2>
+                </div>
+                <div id="recentActivity" class="space-y-4">
+                    <div class="text-center py-8">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-forest-accent mx-auto mb-4"></div>
+                        <p class="text-white/60">Loading your recent activity...</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Manage Your Reviews -->
-            <div class="bg-forest-card rounded-xl p-8">
+            <div class="bg-forest-card rounded-xl p-8 mb-8">
                 <div class="flex items-center mb-6">
                     <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />

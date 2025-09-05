@@ -69,11 +69,11 @@
                 <div class="bg-forest-accent text-white rounded-lg p-6">
                     <div class="flex items-center mb-2">
                         <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                         </svg>
-                        <h3 class="text-lg font-semibold">Pending Reviews</h3>
+                        <h3 class="text-lg font-semibold">System Health</h3>
                     </div>
-                    <p id="pendingReviewsCount" class="text-3xl font-bold">0</p>
+                    <p id="systemHealth" class="text-3xl font-bold text-green-400">Healthy</p>
                 </div>
             </div>
         </div>
@@ -133,41 +133,38 @@
             </div>
         </div>
 
-        <!-- Reading Lists (Quick Manage) -->
+        <!-- User Management -->
         <div class="bg-forest-card rounded-xl p-8 mb-12">
             <div class="flex items-center mb-6">
                 <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h10" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
-                <h2 class="text-2xl font-bold text-white">Reading Lists</h2>
+                <h2 class="text-2xl font-bold text-white">User Management</h2>
             </div>
-
-            <!-- Quick Create -->
-            <div class="bg-[#3A4440] rounded-lg p-4 mb-6">
-                <div class="grid md:grid-cols-3 gap-3">
-                    <input id="newListName" class="px-4 py-2 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white" placeholder="List name (e.g., Weekend Reads)">
-                    <input id="newListDesc" class="px-4 py-2 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white" placeholder="Optional description">
-                    <button id="createListBtn" class="px-4 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg">Create List</button>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="text-sm text-white/80">Total Users</div>
+                    <div id="totalUsers" class="text-3xl font-bold">0</div>
+                </div>
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="text-sm text-white/80">Active Today</div>
+                    <div id="activeUsers" class="text-3xl font-bold">0</div>
+                </div>
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="text-sm text-white/80">Curator Plus</div>
+                    <div id="curatorPlusUsers" class="text-3xl font-bold">0</div>
                 </div>
             </div>
-
-            <!-- Lists Table (drag to reorder) -->
-            <div class="overflow-auto bg-forest-secondary rounded-lg">
-                <table class="min-w-full text-left text-sm text-white/90">
-                    <thead class="bg-[#3A4440] text-white">
-                        <tr>
-                            <th class="px-4 py-2 w-8">#</th>
-                            <th class="px-4 py-2">Name</th>
-                            <th class="px-4 py-2">Books</th>
-                            <th class="px-4 py-2">Views</th>
-                            <th class="px-4 py-2">Clicks</th>
-                            <th class="px-4 py-2">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="listsTable"></tbody>
-                </table>
+            
+            <div class="flex gap-4">
+                <button id="viewAllUsers" class="px-6 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg">
+                    View All Users
+                </button>
+                <button id="manageMemberships" class="px-6 py-2 bg-forest-secondary hover:bg-forest-primary text-white rounded-lg">
+                    Manage Memberships
+                </button>
             </div>
-            <div class="text-white/70 text-xs mt-2">Tip: drag rows to reorder (saves automatically).</div>
         </div>
 
         <!-- Search Weights & Why Preview -->
@@ -194,6 +191,43 @@
             </div>
             <div class="text-white/70 text-xs">Weights are read-only here. Admin editing can be added later via Firestore config.</div>
         </div>
+        <!-- Review Moderation -->
+        <div class="bg-forest-card rounded-xl p-8 mb-12">
+            <div class="flex items-center mb-6">
+                <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h2 class="text-2xl font-bold text-white">Review Moderation</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="text-sm text-white/80">Pending Reviews</div>
+                    <div id="pendingReviewsCount" class="text-3xl font-bold">0</div>
+                </div>
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="text-sm text-white/80">Flagged Content</div>
+                    <div id="flaggedReviews" class="text-3xl font-bold">0</div>
+                </div>
+                <div class="bg-forest-secondary text-white rounded-lg p-6">
+                    <div class="text-sm text-white/80">Moderated Today</div>
+                    <div id="moderatedToday" class="text-3xl font-bold">0</div>
+                </div>
+            </div>
+            
+            <div class="flex gap-4">
+                <button id="moderateReviews" class="px-6 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg">
+                    Moderate Reviews
+                </button>
+                <button id="viewFlagged" class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">
+                    View Flagged Content
+                </button>
+                <a href="./moderation.html" class="px-6 py-2 bg-forest-secondary hover:bg-forest-primary text-white rounded-lg">
+                    Full Moderation Panel
+                </a>
+            </div>
+        </div>
+
         <!-- Review Book Submissions -->
         <div class="bg-forest-card rounded-xl p-8 mb-8">
             <div class="flex items-center mb-6">
