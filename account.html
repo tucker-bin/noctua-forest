@@ -126,6 +126,9 @@
                     <button id="create-list-btn" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">
                         Create List
                     </button>
+                    <a href="book-clubs.html" id="book-clubs-link" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors hidden">
+                        Book Clubs
+                    </a>
                     <a href="membership.html" class="px-4 py-2 border border-white/20 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors">
                         Upgrade to Curator Plus
                     </a>
@@ -302,7 +305,7 @@
         } from './js/readingListService.js';
         import { app, db } from './firebase-config.js';
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { doc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
         const auth = getAuth(app);
         let currentListId = null;
@@ -312,8 +315,48 @@
             if (user) {
                 await loadLists();
                 setupListManagement();
+                await checkMembershipAndUpdateUI(user.uid);
             }
         });
+
+        async function checkMembershipAndUpdateUI(userId) {
+            try {
+                const membershipQuery = query(collection(db, 'memberships'), where('userId', '==', userId));
+                const membershipSnapshot = await getDocs(membershipQuery);
+                
+                // Check admin status
+                const userDoc = await getDoc(doc(db, 'users', userId));
+                const isAdmin = userDoc.exists() && (userDoc.data()?.isAdmin === true || userDoc.data()?.admin === true);
+                
+                const bookClubsLink = document.getElementById('book-clubs-link');
+                
+                let hasAccess = false;
+                
+                if (!membershipSnapshot.empty) {
+                    const membership = membershipSnapshot.docs[0].data();
+                    if (membership.status === 'active') {
+                        hasAccess = true;
+                    }
+                }
+                
+                // Admins also have access
+                if (isAdmin) {
+                    hasAccess = true;
+                }
+                
+                if (hasAccess) {
+                    // User has Curator Plus or is admin - show Book Clubs link
+                    bookClubsLink.classList.remove('hidden');
+                } else {
+                    // No access - hide Book Clubs link
+                    bookClubsLink.classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Error checking membership:', error);
+                // Hide Book Clubs link on error
+                document.getElementById('book-clubs-link').classList.add('hidden');
+            }
+        }
 
         async function loadLists() {
             try {

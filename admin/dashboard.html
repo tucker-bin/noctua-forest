@@ -35,6 +35,7 @@
             </a>
             <nav class="flex items-center space-x-8">
                 <span id="adminEmail" class="text-forest-card"></span>
+                <a href="../book-clubs.html" class="text-forest-card hover:text-forest-accent">Book Clubs</a>
                 <a href="./email-logs.html" class="text-forest-card hover:text-forest-accent">Email Logs</a>
                 <button id="signout" class="text-forest-card hover:text-forest-accent">Sign Out</button>
             </nav>
@@ -77,13 +78,13 @@
             </div>
         </div>
 
-        <!-- Affiliate Clicks Overview -->
+        <!-- Curator Clicks Overview -->
         <div class="bg-forest-card rounded-xl p-8 mb-12">
             <div class="flex items-center mb-6">
                 <svg class="w-7 h-7 mr-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V3a1 1 0 112 0v8h8a1 1 0 110 2h-8v8a1 1 0 11-2 0v-8H3a1 1 0 110-2h8z" />
                 </svg>
-                <h2 class="text-2xl font-bold text-white">Affiliate Clicks</h2>
+                <h2 class="text-2xl font-bold text-white">Curator Clicks</h2>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                 <div class="bg-forest-secondary text-white rounded-lg p-6">
@@ -416,9 +417,9 @@
             // Set up real-time listeners
             setupSubmissionsListener();
             setupReviewsListener();
-            fetchAffiliateEvents();
+            fetchCuratorEvents();
             // refresh every 60s
-            setInterval(fetchAffiliateEvents, 60000);
+            setInterval(fetchCuratorEvents, 60000);
 
             // Wire up maintenance tools
             const backfillBtn = document.getElementById('backfillPublishedAtBtn');
@@ -568,8 +569,8 @@
                 console.warn('Applications listener failed:', err);
             }
 
-            // Fetch affiliate events and update UI
-            async function fetchAffiliateEvents() {
+            // Fetch curator events and update UI
+            async function fetchCuratorEvents() {
                 try {
                     const res = await fetch('/api/admin/affiliate-events');
                     const data = await res.json();
