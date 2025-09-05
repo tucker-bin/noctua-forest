@@ -168,65 +168,58 @@
     <!-- Main Content -->
     <main class="py-12">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="max-w-4xl mx-auto">
-                <!-- Conversational Review Interface -->
-                <div id="reviewChat" class="bg-[#4A5450] rounded-xl p-4 md:p-8 text-white">
-                    <!-- Chat Messages Container -->
-                    <div id="chatMessages" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
-                        <!-- Messages will be added dynamically -->
+            <div class="max-w-2xl mx-auto">
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <form id="reviewForm" class="space-y-8">
+                        <!-- Book Information -->
+                        <section class="space-y-4">
+                            <h2 class="text-2xl font-bold text-forest-text">Book Information</h2>
+                            <div>
+                                <label for="amazonUrl" class="block text-sm font-medium text-forest-text mb-2">Amazon URL (optional - auto‑fills)</label>
+                                <input id="amazonUrl" name="amazonUrl" type="url" placeholder="https://www.amazon.com/dp/…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="title" class="block text-sm font-medium text-forest-text mb-2">Book Title *</label>
+                                    <input id="title" name="title" type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
             </div>
-
-                    <!-- Current Input -->
-                    <div id="chatInput" class="space-y-4">
-                        <div id="currentQuestion" class="chat-message bot">
-                        <div class="flex items-start space-x-3">
-                                <div class="w-8 h-8 bg-gradient-to-br from-forest-accent to-orange-600 rounded-full flex items-center justify-center text-white text-xs font-bold">NF</div>
-                                <div class="bg-[#5A6560] rounded-lg p-4 text-white max-w-md">
-                                    Hi! What book would you like to share with The Forest?
+                                <div>
+                                    <label for="author" class="block text-sm font-medium text-forest-text mb-2">Author *</label>
+                                    <input id="author" name="author" type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                         </div>
                     </div>
+                            <div>
+                                <label for="blurb" class="block text-sm font-medium text-forest-text mb-2">Book Description (optional)</label>
+                                <textarea id="blurb" name="blurb" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent"></textarea>
                 </div>
+                        </section>
 
-                        <div class="flex space-x-3">
-                            <input 
-                                id="userInput" 
-                                type="text" 
-                                placeholder="Book title or Amazon link..."
-                                class="flex-1 form-input"
-                                autocomplete="off"
-                            >
-                            <button 
-                                id="sendButton" 
-                                type="button" 
-                                class="px-4 py-2 bg-forest-accent hover:bg-forest-accent-hover text-white rounded-lg transition-colors">
-                                Send
-                                </button>
+                        <!-- Review Content -->
+                        <section class="space-y-4">
+                            <h2 class="text-2xl font-bold text-forest-text">Your Review</h2>
+                            <div>
+                                <label for="motivation" class="block text-sm font-medium text-forest-text mb-2">What drew you to this book? *</label>
+                                <input id="motivation" name="motivation" type="text" required placeholder="e.g., friend recommendation, love the author, needed escapism…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
+                            </div>
+                            <div>
+                                <label for="review" class="block text-sm font-medium text-forest-text mb-2">Your thoughts and feelings *</label>
+                                <textarea id="review" name="review" rows="6" required placeholder="Share your honest thoughts about the book…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent"></textarea>
                     </div>
+                            <div>
+                                <label for="audience" class="block text-sm font-medium text-forest-text mb-2">Who else would connect with this book?</label>
+                                <input id="audience" name="audience" type="text" placeholder="e.g., anyone going through change, parents of teens…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                 </div>
-
-                    <!-- Hidden form fields for final submission -->
-                    <div id="hiddenFields" class="hidden">
-                        <input type="hidden" name="title" id="hiddenTitle">
-                        <input type="hidden" name="author" id="hiddenAuthor">
-                        <input type="hidden" name="primaryLanguage" id="hiddenLanguage">
-                        <input type="hidden" name="authorRegion" id="hiddenRegion">
-                        <input type="hidden" name="publicationYear" id="hiddenYear">
-                        <input type="hidden" name="reviewText" id="hiddenReview">
-                        <input type="hidden" name="motivation" id="hiddenMotivation">
-                        <input type="hidden" name="audience" id="hiddenAudience">
-                        <input type="hidden" name="contentWarnings" id="hiddenWarnings">
-                        <input type="hidden" name="amazonUrl" id="hiddenAmazonUrl">
+                            <div>
+                                <label for="warnings" class="block text-sm font-medium text-forest-text mb-2">Content warnings (if any)</label>
+                                <input id="warnings" name="warnings" type="text" placeholder="e.g., violence, difficult themes…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                 </div>
+                        </section>
 
-                    <!-- Submit button (appears at end) -->
-                    <button 
-                        id="finalSubmit" 
-                        type="submit" 
-                        class="hidden w-full mt-6 btn-primary">
-                        Publish Your Review
-                    </button>
-                    
-                    <div id="submissionStatus" class="mt-3 text-sm text-gray-200"></div>
+                        <div>
+                            <button id="submitReview" type="submit" class="w-full bg-forest-accent hover:bg-forest-accent-hover text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-300 text-lg">Publish Your Review</button>
+                            <p class="text-sm text-gray-600 mt-3 text-center">Your review will be published with an anonymized forest name to protect your privacy.</p>
+                        </div>
+                    </form>
                     </div>
                 </div>
             </div>
@@ -237,322 +230,116 @@
       import { app, db } from './firebase-config.js';
       import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
       
-      const auth = getAuth(app);
+      const pageAuth = getAuth(app);
       
       // Make auth and db available globally
-      window.auth = auth;
+      window.auth = pageAuth;
       window.db = db;
       
-      // Check authentication status - but don't force redirect, allow anonymous reviews
-      onAuthStateChanged(auth, (user) => {
+      onAuthStateChanged(pageAuth, (user) => {
         console.log('Auth state changed:', user ? 'signed in' : 'signed out');
-        // Allow both authenticated and anonymous users to write reviews
       });
     </script>
 
-    <!-- Conversational Review Interface -->
+    <!-- Review Form Logic -->
     <script type="module">
-      import { fetchBookMetadata, extractASIN } from './js/amazonService.js';
-      import { addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-      import { generateRandomForestName } from './js/randomForestNameService.js';
+      import { app, db } from './firebase-config.js';
       import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-      
-      class ConversationalReview {
-        constructor() {
-          this.currentStep = 0;
-          this.responses = {};
-          this.bookData = {};
-          this.isSubmitting = false;
-          
-          this.questions = [
-            {
-              id: 'book_input',
-              question: "Hi! What book would you like to share with The Forest?",
-              placeholder: "Book title or Amazon link...",
-              processor: this.processBookInput.bind(this),
-              required: true
-            },
-            {
-              id: 'motivation', 
-              question: (data) => `Great choice! What drew you to "${data.title}"?`,
-              placeholder: "e.g., friend recommended it, love the author, needed escapism...",
-              processor: this.processMotivation.bind(this),
-              required: true
-            },
-            {
-              id: 'review',
-              question: "How did it make you feel? What did you think?",
-              placeholder: "Share your honest thoughts...",
-              type: 'textarea',
-              processor: this.processReview.bind(this),
-              required: true
-            },
-            {
-              id: 'audience',
-              question: "Who else would connect with this book?",
-              placeholder: "e.g., anyone going through change, parents of teens, history lovers...",
-              processor: this.processAudience.bind(this),
-              required: false
-            },
-            {
-              id: 'warnings',
-              question: "Any content warnings others should know about?",
-              placeholder: "e.g., violence, difficult themes... or just say 'none'",
-              processor: this.processWarnings.bind(this),
-              required: false
-            }
-          ];
-          
-          this.init();
+      import { addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+      import { fetchBookMetadata, extractASIN } from './js/amazonService.js';
+      import { generateRandomForestName } from './js/randomForestNameService.js';
+
+      const formAuth = getAuth(app);
+
+      const form = document.getElementById('reviewForm');
+      const amazonUrlInput = document.getElementById('amazonUrl');
+
+      amazonUrlInput?.addEventListener('change', async (e) => {
+        const url = e.target.value.trim();
+        if (!url) return;
+        try {
+          const data = await fetchBookMetadata(url);
+          document.getElementById('title').value = data.title || '';
+          document.getElementById('author').value = data.author || '';
+          const blurb = document.getElementById('blurb');
+          if (blurb && !blurb.value) blurb.value = data.description || '';
+        } catch (err) {
+          console.warn('Amazon metadata fetch failed:', err);
         }
+      });
 
-        init() {
-          this.setupEventListeners();
-          this.showCurrentQuestion();
-        }
+      form?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const user = formAuth.currentUser;
+        if (!user) { alert('Please sign in to publish your review.'); return; }
 
-        setupEventListeners() {
-          const userInput = document.getElementById('userInput');
-          const sendButton = document.getElementById('sendButton');
-          const finalSubmit = document.getElementById('finalSubmit');
+        const title = document.getElementById('title').value.trim();
+        const author = document.getElementById('author').value.trim();
+        const blurb = document.getElementById('blurb').value.trim();
+        const motivation = document.getElementById('motivation').value.trim();
+        const review = document.getElementById('review').value.trim();
+        const audience = document.getElementById('audience').value.trim();
+        const warnings = document.getElementById('warnings').value.trim();
+        const amazonUrl = document.getElementById('amazonUrl').value.trim();
 
-          // Send button click
-          sendButton.addEventListener('click', () => this.handleUserInput());
-          
-          // Enter key in input
-          userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-              this.handleUserInput();
-            }
-          });
+        if (!title || !author || !review || !motivation) { alert('Please complete required fields.'); return; }
 
-          // Final submit
-          finalSubmit.addEventListener('click', () => this.submitReview());
-        }
-
-        async handleUserInput() {
-          const userInput = document.getElementById('userInput');
-          const input = userInput.value.trim();
-          
-          if (!input) return;
-
-          // Add user message to chat
-          this.addChatMessage('user', input);
-          userInput.value = '';
-
-          // Process the input
-          const currentQuestion = this.questions[this.currentStep];
-          const result = await currentQuestion.processor(input);
-          
-          if (result.success) {
-            this.responses[currentQuestion.id] = input;
-            this.currentStep++;
-            
-            if (this.currentStep < this.questions.length) {
-              this.showCurrentQuestion();
-            } else {
-              this.showFinalSubmit();
-            }
-          } else {
-            // Show error and ask again
-            this.addChatMessage('bot', result.message);
-          }
-        }
-
-        async processBookInput(input) {
-          // Try Amazon URL first
-          if (input.includes('amazon.com') || input.includes('amzn.to')) {
-            try {
-              const metadata = await fetchBookMetadata(input);
-              this.bookData = metadata;
-              
-              // Populate hidden fields
-              document.getElementById('hiddenTitle').value = metadata.title;
-              document.getElementById('hiddenAuthor').value = metadata.author;
-              document.getElementById('hiddenYear').value = this.extractYear(metadata.publicationDate);
-              document.getElementById('hiddenAmazonUrl').value = input;
-              
-              return {
-                message: `Found it! "${metadata.title}" by ${metadata.author} (${metadata.publicationDate})`,
-                success: true
-              };
-            } catch (error) {
-              return {
-                message: "Couldn't fetch from that link. What's the book title?",
-                success: false
-              };
-            }
-          } else {
-            // Manual title entry
-            this.bookData.title = input;
-            document.getElementById('hiddenTitle').value = input;
-            return {
-              message: `"${input}" - got it! Who's the author?`,
-              success: true,
-              followUp: 'author'
-            };
-          }
-        }
-        
-        processMotivation(input) {
-          this.responses.motivation = input;
-          document.getElementById('hiddenMotivation').value = input;
-          return { success: true };
-        }
-        
-        processReview(input) {
-          this.responses.review = input;
-          document.getElementById('hiddenReview').value = input;
-          return { success: true };
-        }
-        
-        processAudience(input) {
-          this.responses.audience = input;
-          document.getElementById('hiddenAudience').value = input;
-          return { success: true };
-        }
-        
-        processWarnings(input) {
-          this.responses.warnings = input;
-          document.getElementById('hiddenWarnings').value = input;
-          return { success: true };
-        }
-
-        showCurrentQuestion() {
-          const currentQuestion = this.questions[this.currentStep];
-          const questionText = typeof currentQuestion.question === 'function' 
-            ? currentQuestion.question(this.bookData) 
-            : currentQuestion.question;
-          
-          this.addChatMessage('bot', questionText);
-          
-          const userInput = document.getElementById('userInput');
-          userInput.placeholder = currentQuestion.placeholder;
-        }
-
-        showFinalSubmit() {
-          this.addChatMessage('bot', "Perfect! Ready to publish your review to The Forest?");
-          document.getElementById('finalSubmit').classList.remove('hidden');
-        }
-
-        addChatMessage(sender, message) {
-          const chatMessages = document.getElementById('chatMessages');
-          const messageDiv = document.createElement('div');
-          messageDiv.className = `chat-message ${sender}`;
-          
-          if (sender === 'bot') {
-            messageDiv.innerHTML = `
-              <div class="flex items-start space-x-3">
-                <div class="w-8 h-8 bg-gradient-to-br from-forest-accent to-orange-600 rounded-full flex items-center justify-center text-white text-xs font-bold">NF</div>
-                <div class="bg-[#5A6560] rounded-lg p-4 text-white max-w-md">
-                  ${message}
-                </div>
-              </div>
-            `;
-          } else {
-            messageDiv.innerHTML = `
-              <div class="flex items-start space-x-3 justify-end">
-                <div class="bg-forest-accent rounded-lg p-4 text-white max-w-md">
-                  ${message}
-                </div>
-                <div class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-800 rounded-full flex items-center justify-center text-white text-xs font-bold">U</div>
-              </div>
-            `;
-          }
-          
-          chatMessages.appendChild(messageDiv);
-          chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        extractYear(dateString) {
-          if (!dateString) return new Date().getFullYear();
-          const year = new Date(dateString).getFullYear();
-          return isNaN(year) ? new Date().getFullYear() : year;
-        }
-
-        async submitReview() {
-          if (this.isSubmitting) return;
-          this.isSubmitting = true;
-
-          const finalSubmit = document.getElementById('finalSubmit');
-          const originalText = finalSubmit.textContent;
-          finalSubmit.textContent = 'Publishing...';
-          finalSubmit.disabled = true;
-
-          try {
-            // Get current user
-            const auth = getAuth();
-            const user = auth.currentUser;
-            
-            if (!user) {
-              throw new Error('User not authenticated');
-            }
-
-            // Create book payload
             const bookPayload = {
-              title: this.bookData.title,
-              author: this.bookData.author || 'Unknown Author',
-              primaryLanguage: 'en', // Default for now
-              authorRegion: 'Unknown', // Default for now
-              publicationYear: this.extractYear(this.bookData.publicationDate),
+          title,
+          author,
+          primaryLanguage: 'en',
+          authorRegion: 'Unknown',
+          publicationYear: new Date().getFullYear(),
               publishedAt: new Date(),
               views: 0,
               popularity: 0,
-              userId: user.uid
+          userId: user.uid,
             };
 
-            // Create review payload
             const reviewPayload = {
-              bookId: '', // Will be set after book creation
-              text: this.responses.review,
-              authorId: user.uid,
-              authorAvatarUrl: user.photoURL || '',
-              motivation: this.responses.motivation,
-              audience: this.responses.audience,
-              contentWarnings: this.responses.warnings,
+          bookId: '',
+          text: review,
+          authorId: user.uid,
+          authorAvatarUrl: user.photoURL || '',
+          motivation,
+          audience,
+          contentWarnings: warnings,
               hasReadBook: true,
               authenticReview: true,
-              noAI: true
-            };
+          noAI: true,
+        };
 
-            // First, create the book
-            const bookRef = await addDoc(collection(db, 'books'), {
-              ...bookPayload,
-              coverUrl: this.bookData.coverUrl || '',
-              isbn: this.bookData.isbn || '',
-              asin: this.bookData.asin || '',
-              description: this.bookData.description || '',
-              reviewCount: 1,
-              createdAt: serverTimestamp()
-            });
+        const submitBtn = document.getElementById('submitReview');
+        const original = submitBtn.textContent;
+        submitBtn.textContent = 'Publishing…';
+        submitBtn.disabled = true;
 
-            // Then create the review with the book ID
-            const reviewRef = await addDoc(collection(db, 'reviews'), {
-              ...reviewPayload,
-              bookId: bookRef.id,
-              forestName: generateRandomForestName(),
-              createdAt: serverTimestamp(),
-              upvotes: 0,
-              downvotes: 0
-            });
-            
-            // Redirect to book page
-            window.location.href = `book.html?id=${bookRef.id}`;
+        try {
+          const bookRef = await addDoc(collection(db, 'books'), {
+            ...bookPayload,
+            description: blurb,
+            reviewCount: 1,
+            createdAt: serverTimestamp(),
+            asin: amazonUrl ? extractASIN(amazonUrl) : '',
+          });
 
-          } catch (error) {
-            console.error('Submission error:', error);
-            this.addChatMessage('bot', `Sorry, there was an error: ${error.message}. Please try again.`);
+          await addDoc(collection(db, 'reviews'), {
+            ...reviewPayload,
+            bookId: bookRef.id,
+            forestName: generateRandomForestName(),
+            createdAt: serverTimestamp(),
+            upvotes: 0,
+            downvotes: 0,
+          });
+
+          window.location.href = `book.html?id=${bookRef.id}`;
+        } catch (err) {
+          console.error('Review submit failed:', err);
+          alert('There was an error publishing your review. Please try again.');
           } finally {
-            this.isSubmitting = false;
-            finalSubmit.textContent = originalText;
-            finalSubmit.disabled = false;
-          }
+          submitBtn.textContent = original;
+          submitBtn.disabled = false;
         }
-      }
-
-      // Initialize when DOM is loaded
-      document.addEventListener('DOMContentLoaded', function() {
-        const conversationalReview = new ConversationalReview();
       });
     </script>
 
