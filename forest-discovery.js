@@ -467,8 +467,12 @@ class ForestDiscovery {
         booksQuery = query(booksQuery, startAfter(this.lastDoc));
       }
       
+      console.log('ForestDiscovery: Executing query with sort:', sortField, sortOrder);
       const booksSnap = await getDocs(booksQuery);
+      console.log('ForestDiscovery: Query returned', booksSnap.docs.length, 'books');
+      
       if (booksSnap.docs.length === 0 && page === 1) {
+        console.log('ForestDiscovery: No books found, showing empty state');
         this.showEmptyState();
         return [];
       }

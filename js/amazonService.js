@@ -2,17 +2,8 @@
 import { db } from '../firebase-config.js';
 import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
-// Cache book data to reduce API calls
 const bookCache = new Map();
 
-/**
- * Extract ASIN from Amazon URL
- * Supports various Amazon URL formats:
- * - https://www.amazon.com/dp/ASIN
- * - https://www.amazon.com/gp/product/ASIN
- * - https://www.amazon.com/*/dp/ASIN
- * - https://www.amazon.com/title/dp/ASIN
- */
 export function extractASIN(url) {
   try {
     const urlObj = new URL(url);
@@ -20,7 +11,6 @@ export function extractASIN(url) {
       throw new Error('Not an Amazon URL');
     }
 
-    // Try common ASIN patterns
     const patterns = [
       /\/dp\/([A-Z0-9]{10})/i,
       /\/gp\/product\/([A-Z0-9]{10})/i,
@@ -41,31 +31,23 @@ export function extractASIN(url) {
   }
 }
 
-/**
- * Fetch book metadata from Amazon API
- * First checks cache, then Firestore, then makes API call
- */
 export async function fetchBookMetadata(amazonUrl) {
   try {
     const asin = extractASIN(amazonUrl);
     
-    // Check in-memory cache
     if (bookCache.has(asin)) {
       return bookCache.get(asin);
     }
 
-    // Check Firestore cache
     const bookDoc = await getDoc(doc(db, 'book_metadata', asin));
     if (bookDoc.exists()) {
       const data = bookDoc.data();
-      // Only use cache if less than 30 days old
       if (data.cachedAt && (Date.now() - data.cachedAt.toMillis()) < 30 * 24 * 60 * 60 * 1000) {
         bookCache.set(asin, data);
         return data;
       }
     }
 
-    // Fetch from Amazon API
     const response = await fetch(`/api/pa/items?asin=${encodeURIComponent(asin)}`);
     if (!response.ok) {
       throw new Error('Failed to fetch book data');
@@ -76,9 +58,8 @@ export async function fetchBookMetadata(amazonUrl) {
       throw new Error('Invalid book data received');
     }
 
-    // Format the metadata
     const metadata = {
-      asin,
+      asin: asin,
       title: data.title,
       author: data.author || 'Unknown',
       coverUrl: data.imageUrl,
@@ -90,10 +71,7 @@ export async function fetchBookMetadata(amazonUrl) {
       cachedAt: new Date()
     };
 
-    // Cache in Firestore
     await setDoc(doc(db, 'book_metadata', asin), metadata);
-    
-    // Cache in memory
     bookCache.set(asin, metadata);
     
     return metadata;
@@ -103,9 +81,6 @@ export async function fetchBookMetadata(amazonUrl) {
   }
 }
 
-/**
- * Pre-fill form fields with book metadata
- */
 export function fillFormWithMetadata(metadata) {
   const fields = {
     title: metadata.title || '',
@@ -113,7 +88,6 @@ export function fillFormWithMetadata(metadata) {
     blurb: metadata.description || ''
   };
 
-  // Update form fields
   Object.entries(fields).forEach(([id, value]) => {
     const element = document.getElementById(id);
     if (element) {
