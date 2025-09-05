@@ -35,6 +35,7 @@
             </a>
             <nav class="flex items-center space-x-8">
                 <span id="adminEmail" class="text-forest-card"></span>
+                <a href="../dashboard.html" class="text-forest-card hover:text-forest-accent bg-forest-accent text-white px-3 py-1 rounded">User Dashboard</a>
                 <a href="../book-clubs.html" class="text-forest-card hover:text-forest-accent">Book Clubs</a>
                 <a href="./email-logs.html" class="text-forest-card hover:text-forest-accent">Email Logs</a>
                 <button id="signout" class="text-forest-card hover:text-forest-accent">Sign Out</button>
@@ -453,6 +454,22 @@
                 const email = user.email || 'Admin User';
                 adminEmailEl.textContent = email;
                 dropdownEmailEl.textContent = email;
+            }
+            
+            // Add dashboard switcher for admin users
+            if (user.email === 'tucker.apply@gmail.com') {
+                const dashboardSwitcher = document.createElement('div');
+                dashboardSwitcher.className = 'fixed top-4 right-4 z-50';
+                dashboardSwitcher.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-lg p-3 border-2 border-red-600">
+                        <div class="text-sm font-semibold text-forest-card mb-2">Dashboard Mode</div>
+                        <div class="flex gap-2">
+                            <button onclick="window.location.href='../dashboard.html'" class="px-3 py-1 bg-forest-accent text-white rounded text-xs">User View</button>
+                            <button onclick="window.location.href='dashboard.html'" class="px-3 py-1 bg-red-600 text-white rounded text-xs">Admin View</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(dashboardSwitcher);
             }
 
             // Set up real-time listeners

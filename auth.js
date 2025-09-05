@@ -291,6 +291,12 @@ async function loadReadingLists(userId) {
       return;
     }
     
+    // Skip if we're on account page (it has its own list management)
+    if (window.location.pathname.includes('account.html')) {
+      console.log('Skipping loadReadingLists on account page');
+      return;
+    }
+    
     const lists = await getUserLists(userId);
     if (lists.length === 0) {
       listsContainer.innerHTML = `
