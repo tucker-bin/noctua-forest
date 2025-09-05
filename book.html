@@ -632,21 +632,21 @@
 
     async function loadRecommendations(bookId, book) {
       try {
-        // More from Author
+        // More from Author (exclude current)
         if (book.author) {
           const authorBooks = await getMoreFromAuthor(book.author, bookId);
           if (authorBooks.length > 0) {
             const container = document.getElementById('moreFromAuthor');
             const grid = container.querySelector('.book-grid');
             grid.innerHTML = '';
-            authorBooks.forEach(book => {
-              grid.appendChild(renderBookCard(book));
-            });
+            authorBooks
+              .filter(b => String(b.id) !== String(bookId))
+              .forEach(b => grid.appendChild(renderBookCard(b)));
             container.classList.remove('hidden');
           }
         }
 
-        // Similar Books
+        // Similar Books (exclude current)
         const moods = book.moods || [];
         const genres = book.genres || [];
         const similarBooks = await getSimilarBooks(bookId, { moods, genres });
@@ -654,9 +654,9 @@
           const container = document.getElementById('similarBooks');
           const grid = container.querySelector('.book-grid');
           grid.innerHTML = '';
-          similarBooks.forEach(book => {
-            grid.appendChild(renderBookCard(book));
-          });
+          similarBooks
+            .filter(b => String(b.id) !== String(bookId))
+            .forEach(b => grid.appendChild(renderBookCard(b)));
           container.classList.remove('hidden');
         }
 
@@ -966,28 +966,31 @@
       const card = document.createElement('a');
       card.href = `book.html?id=${book.id}`;
       card.className = 'block bg-[#3A4440] rounded-lg overflow-hidden hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent';
-      
-      card.innerHTML = `
-        <div class="aspect-[2/3] bg-[#4A5450] relative">
-          ${book.coverUrl ? `
+
+      const cover = book.coverUrl || '';
+      const imgTag = cover ? `
             <img 
-              src="${book.coverUrl}" 
+              src="${cover}"
               alt="${book.title} cover"
               class="w-full h-full object-cover"
               loading="lazy"
               decoding="async"
+              onerror="this.style.display='none'"
             >
           ` : `
             <div class="absolute inset-0 flex items-center justify-center">
               <svg class="w-12 h-12 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
-            </div>
-          `}
+            </div>`;
+
+      card.innerHTML = `
+        <div class="aspect-[2/3] bg-[#4A5450] relative">
+          ${imgTag}
         </div>
         <div class="p-4">
-          <h3 class="font-medium text-white line-clamp-2">${book.title}</h3>
-          <p class="text-sm text-white/60 mt-1">${book.author}</p>
+          <h3 class="font-medium text-white line-clamp-2">${book.title || 'Untitled'}</h3>
+          <p class="text-sm text-white/60 mt-1">${book.author || ''}</p>
         </div>
       `;
 
@@ -1021,6 +1024,8 @@
       const btn = document.getElementById('toggleWarnings');
       const list = document.getElementById('warningsList');
       if (!btn || !list) return;
+
+      const MAX_WARNINGS_DISPLAY = 5;
       let open = false;
       function setClosed(){
         list.classList.add('hidden');
@@ -1037,9 +1042,32 @@
         setClosed();
         return;
       }
-      list.innerHTML = warningStats.warnings.map(({ warning, count }) => `
-        <div class="text-white/90 text-sm">${warning.replaceAll('_',' ')} (${count})</div>
-      `).join('');
+
+      const topWarnings = warningStats.warnings.slice(0, MAX_WARNINGS_DISPLAY);
+      list.innerHTML = topWarnings.map(({ warning, count }, idx) => {
+        const label = (warning || '').replaceAll('_',' ');
+        const id = `warn_${idx}`;
+        return `
+        <button id="${id}" type="button" class="mr-2 mb-2 inline-flex items-center px-2 py-1 rounded-full bg-red-500/20 text-red-300 text-xs hover:bg-red-500/30 transition"
+                aria-label="Reveal content warning" data-warning="${label}" data-count="${count}">
+          <span class="select-none" data-hidden>⚠︎ Spoiler</span>
+        </button>`;
+      }).join('');
+
+      // Wire per-warning reveal
+      topWarnings.forEach((w, idx) => {
+        const el = document.getElementById(`warn_${idx}`);
+        if (!el) return;
+        el.addEventListener('click', () => {
+          const label = (w.warning || '').replaceAll('_',' ');
+          const count = w.count || 0;
+          el.innerHTML = `<span>${label} (${count})</span>`;
+          el.classList.remove('bg-red-500/20','text-red-300');
+          el.classList.add('bg-red-500/25','text-red-200');
+          el.setAttribute('aria-label', `Content warning: ${label}`);
+        }, { once: true });
+      });
+
       setClosed();
     }
 
@@ -1246,23 +1274,12 @@
       function subscribe(){
         unsubscribe();
         
-        // Try indexed query first, fallback if index missing
-        let qy;
-        try {
-          qy = query(
-            collection(db, 'reviews'),
-            where('bookId', '==', bookId),
-            orderBy(orderField, orderDir),
-            limit(50)
-          );
-        } catch (indexError) {
-          console.warn('Using fallback query due to missing index:', indexError);
-          qy = query(
-            collection(db, 'reviews'),
-            where('bookId', '==', bookId),
-            limit(50)
-          );
-        }
+        // Always use non-ordered query to avoid composite index requirement; sort client-side
+        const qy = query(
+          collection(db, 'reviews'),
+          where('bookId', '==', bookId),
+          limit(50)
+        );
         
         unsubscribe = onSnapshot(qy, async (snapshot) => {
           reviewList.innerHTML = '';
@@ -1273,25 +1290,24 @@
             return;
           }
           
-          // If using fallback query (no orderBy), sort client-side
           let reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          if (!qy._query.orderBy?.length) {
-            reviews.sort((a, b) => {
-              const aTime = a[orderField]?.toDate?.() || new Date(a[orderField]) || new Date(0);
-              const bTime = b[orderField]?.toDate?.() || new Date(b[orderField]) || new Date(0);
-              return orderDir === 'desc' ? bTime - aTime : aTime - bTime;
-            });
-          }
+          // Sort client-side by selected field
+          reviews.sort((a, b) => {
+            if (orderField === 'helpfulCount') {
+              const av = Number(a.helpfulCount || 0);
+              const bv = Number(b.helpfulCount || 0);
+              return orderDir === 'desc' ? bv - av : av - bv;
+            }
+            const aTime = a.createdAt?.toDate?.() || new Date(a.createdAt) || new Date(0);
+            const bTime = b.createdAt?.toDate?.() || new Date(b.createdAt) || new Date(0);
+            return orderDir === 'desc' ? bTime - aTime : aTime - bTime;
+          });
+          
           reviewsEmpty.classList.add('hidden');
           const bottomCta = document.getElementById('bottomReviewCta');
           bottomCta?.classList.add('hidden');
           
-          // Use sorted reviews if fallback was applied, otherwise use snapshot docs
-          const reviewsToRender = qy._query.orderBy?.length ? 
-            snapshot.docs.map(d => ({ id: d.id, ...d.data() })) : 
-            reviews;
-          
-          for (const r of reviewsToRender){ reviewList.appendChild(await renderReview(r)); }
+          for (const r of reviews){ reviewList.appendChild(await renderReview(r)); }
         }, (error) => {
           console.error('Error loading reviews:', error);
           reviewList.innerHTML = '<p class="text-white/60 text-center py-4">Unable to load reviews. Please try again later.</p>';

@@ -65,22 +65,21 @@ export async function getSimilarBooks(bookId, { moods = [], genres = [], limit: 
         const books = [];
 
         booksSnap.forEach(doc => {
-            const book = doc.data();
+            const data = doc.data();
             const currentBookId = doc.id;
-            
+
             // Skip the source book
-            if (currentBookId === String(bookId)) {
-                return;
-            }
-            
+            if (String(currentBookId) === String(bookId)) return;
+
             // Calculate mood match score
             let moodScore = 0;
-            if (moods.length > 0 && book.moods) {
-                moodScore = moods.filter(mood => book.moods.includes(mood)).length;
+            if (moods.length > 0 && Array.isArray(data.moods)) {
+                moodScore = moods.filter(mood => data.moods.includes(mood)).length;
             }
 
             books.push({
-                ...book,
+                id: currentBookId,
+                ...data,
                 moodScore
             });
         });

@@ -384,12 +384,13 @@
             const items = [];
             snap.forEach(docSnap => {
               const d = docSnap.data();
+              const cover = d.coverUrl || '';
+              if (!cover) return; // skip items without covers
               const a = document.createElement('a');
               a.href = `book.html?id=${docSnap.id}`;
               a.className = 'nf-carousel-item text-center';
               a.setAttribute('aria-label', `Read our review: ${d.title || 'Untitled'} by ${d.author || ''}`);
               const img = document.createElement('img');
-              const cover = d.coverUrl || '';
               img.src = cover; img.alt = `${d.title || 'Untitled'} cover`; img.loading = 'lazy';
               img.className = 'w-full h-auto rounded-lg shadow-md mb-2 object-contain';
               img.width = 200; img.height = 300;
@@ -399,7 +400,8 @@
               a.appendChild(img); a.appendChild(cap);
               items.push(a);
             });
-            const duo = items.concat(items.map(n=>n.cloneNode(true)));
+            const filtered = items.filter(Boolean);
+            const duo = filtered.concat(filtered.map(n=>n.cloneNode(true)));
             duo.forEach(n => track.appendChild(n));
           }
         }catch(e){ /* fallback handled by non-module script */ }

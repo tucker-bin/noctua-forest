@@ -493,7 +493,7 @@ class ForestDiscovery {
           id: doc.id,
           title: data.title || 'Untitled',
           author: data.author || 'Unknown Author',
-          coverUrl: data.coverUrl || '/images/placeholder-book.jpg',
+          coverUrl: data.coverUrl || '',
           reviewCount: data.reviewCount || 0,
           primaryLanguage: data.primaryLanguage || 'en',
           authorRegion: data.authorRegion || 'unknown',
@@ -502,7 +502,9 @@ class ForestDiscovery {
           blurb: data.blurb || '',
           createdAt: data.publishedAt || data.createdAt || new Date()
         };
-      }).filter(book => book.id && book.title && book.author); // Filter out invalid books
+      })
+      // Filter out invalid books and those missing covers (until covers available)
+      .filter(book => book.id && book.title && book.author && book.coverUrl);
       
       if (filters.search && filters.search.trim()) {
         // If catalog is small (< 30) or model not yet loaded, use simple reranker
