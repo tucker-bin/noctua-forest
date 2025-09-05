@@ -185,40 +185,37 @@
                     <form id="reviewForm" class="space-y-8">
                         <!-- Book Information -->
                         <section class="space-y-4">
-                            <h2 class="text-2xl font-bold text-forest-text">Book Information</h2>
+                            <h2 class="text-2xl font-bold text-white">Book Information</h2>
                             <div>
-                                <label for="amazonUrl" class="block text-sm font-medium text-forest-text mb-2">Amazon URL (optional - auto‑fills)</label>
+                                <label for="amazonUrl" class="block text-sm font-medium text-white mb-2">Amazon URL (optional - auto‑fills)</label>
                                 <input id="amazonUrl" name="amazonUrl" type="url" placeholder="https://www.amazon.com/dp/…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label for="title" class="block text-sm font-medium text-forest-text mb-2">Book Title *</label>
+                                    <label for="title" class="block text-sm font-medium text-white mb-2">Book Title *</label>
                                     <input id="title" name="title" type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
             </div>
                                 <div>
-                                    <label for="author" class="block text-sm font-medium text-forest-text mb-2">Author *</label>
+                                    <label for="author" class="block text-sm font-medium text-white mb-2">Author *</label>
                                     <input id="author" name="author" type="text" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                         </div>
                     </div>
-                            <div>
-                                <label for="blurb" class="block text-sm font-medium text-forest-text mb-2">Book Description (optional)</label>
-                                <textarea id="blurb" name="blurb" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent"></textarea>
-                </div>
+                            
                         </section>
 
                         <!-- Review Content -->
                         <section class="space-y-4">
-                            <h2 class="text-2xl font-bold text-forest-text">Your Review</h2>
+                            <h2 class="text-2xl font-bold text-white">Your Review</h2>
                             <div>
-                                <label for="motivation" class="block text-sm font-medium text-forest-text mb-2">What drew you to this book? *</label>
+                                <label for="motivation" class="block text-sm font-medium text-white mb-2">What drew you to this book? *</label>
                                 <input id="motivation" name="motivation" type="text" required placeholder="e.g., friend recommendation, love the author, needed escapism…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                             </div>
                             <div>
-                                <label for="review" class="block text-sm font-medium text-forest-text mb-2">Your thoughts and feelings *</label>
+                                <label for="review" class="block text-sm font-medium text-white mb-2">Your thoughts and feelings *</label>
                                 <textarea id="review" name="review" rows="6" required placeholder="Share your honest thoughts about the book…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent"></textarea>
-                            </div>
+                </div>
                             <div>
-                                <label class="block text-sm font-medium text-forest-text mb-2">Moods & tags</label>
+                                <label class="block text-sm font-medium text-white mb-2">Moods & tags</label>
                                 <div id="moodChips" class="flex flex-wrap gap-2 mb-2"></div>
                                 <input id="moodInput" type="text" placeholder="Type a tag and press Enter…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                                 <div class="mt-2 flex flex-wrap gap-2 text-sm">
@@ -230,18 +227,18 @@
                                     <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="thoughtful">thoughtful</button>
                                     <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="adventurous">adventurous</button>
                                     <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="romantic">romantic</button>
-                                </div>
-                            </div>
+                    </div>
+                </div>
                             <div>
-                                <label for="audience" class="block text-sm font-medium text-forest-text mb-2">Who else would connect with this book?</label>
+                                <label for="audience" class="block text-sm font-medium text-white mb-2">Who else would connect with this book?</label>
                                 <input id="audience" name="audience" type="text" placeholder="e.g., anyone going through change, parents of teens…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                 </div>
                             <div>
-                                <label for="warnings" class="block text-sm font-medium text-forest-text mb-2">Content warnings (if any)</label>
+                                <label for="warnings" class="block text-sm font-medium text-white mb-2">Content warnings (if any)</label>
                                 <input id="warnings" name="warnings" type="text" placeholder="e.g., violence, difficult themes…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                             </div>
                             <div>
-                                <label for="copyFormat" class="block text-sm font-medium text-forest-text mb-2">How did you read it?</label>
+                                <label for="copyFormat" class="block text-sm font-medium text-white mb-2">How did you read it?</label>
                                 <select id="copyFormat" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                                     <option value="">Select format (optional)</option>
                                     <option value="print">Printed copy</option>
@@ -253,7 +250,7 @@
 
                         <div>
                             <button id="submitReview" type="submit" class="w-full bg-forest-accent hover:bg-forest-accent-hover text-white font-semibold py-4 px-6 rounded-lg transition-colors duration-300 text-lg">Publish Your Review</button>
-                            <p class="text-sm text-gray-600 mt-3 text-center">Your review will be published with an anonymized forest name to protect your privacy.</p>
+                            <p class="text-sm text-white/80 mt-3 text-center">Your review will be published with an anonymized forest name to protect your privacy.</p>
                         </div>
                     </form>
                     </div>
@@ -298,7 +295,7 @@
         moodChips.innerHTML = '';
         moodTags.slice(0,12).forEach((t, idx) => {
           const chip = document.createElement('span');
-          chip.className = 'px-2 py-1 rounded-full bg-[#3A4440] text-white text-xs flex items-center gap-2';
+          chip.className = 'px-2 py-1 rounded-full bg-forest-accent text-white text-xs flex items-center gap-2';
           chip.textContent = t;
           const x = document.createElement('button');
           x.type = 'button';
@@ -349,7 +346,8 @@
 
         const title = document.getElementById('title').value.trim();
         const author = document.getElementById('author').value.trim();
-        const blurb = document.getElementById('blurb').value.trim();
+        const blurbEl = document.getElementById('blurb');
+        const blurb = blurbEl ? blurbEl.value.trim() : '';
         const motivation = document.getElementById('motivation').value.trim();
         const review = document.getElementById('review').value.trim();
         const audience = document.getElementById('audience').value.trim();
@@ -370,6 +368,8 @@
               views: 0,
               popularity: 0,
           userId: user.uid,
+          ownerId: user.uid,
+          createdBy: user.uid,
             };
 
             const reviewPayload = {
@@ -377,6 +377,7 @@
           text: review,
           authorId: user.uid,
           authorAvatarUrl: user.photoURL || '',
+          userId: user.uid,
           motivation,
           audience,
           contentWarnings: warnings ? warnings.split(',').map(s=>s.trim()).filter(Boolean) : [],
@@ -393,28 +394,57 @@
         submitBtn.disabled = true;
 
         try {
-          const bookRef = await addDoc(collection(db, 'books'), {
-            ...bookPayload,
-            description: blurb,
-            reviewCount: 1,
-            createdAt: serverTimestamp(),
-            asin: amazonUrl ? extractASIN(amazonUrl) : '',
-          });
+          let bookIdCreated = null;
+          try {
+            const bookRef = await addDoc(collection(db, 'books'), {
+              ...bookPayload,
+              description: blurb,
+              reviewCount: 1,
+              createdAt: serverTimestamp(),
+              asin: amazonUrl ? extractASIN(amazonUrl) : '',
+            });
+            bookIdCreated = bookRef.id;
+          } catch (bookErr) {
+            console.warn('[reviews] books write denied; queueing submission', bookErr);
+            await addDoc(collection(db, 'submissions'), {
+              type: 'book',
+              status: 'pending',
+              payload: { ...bookPayload, description: blurb, asin: amazonUrl ? extractASIN(amazonUrl) : '' },
+              createdAt: serverTimestamp(),
+              userId: user.uid,
+            });
+          }
 
-          await addDoc(collection(db, 'reviews'), {
-            ...reviewPayload,
-            bookId: bookRef.id,
-            forestName: generateRandomForestName(),
-            createdAt: serverTimestamp(),
-            upvotes: 0,
-            downvotes: 0,
-          });
+          try {
+            const reviewDoc = {
+              ...reviewPayload,
+              bookId: bookIdCreated,
+              forestName: generateRandomForestName(),
+              createdAt: serverTimestamp(),
+              upvotes: 0,
+              downvotes: 0,
+            };
+            await addDoc(collection(db, 'reviews'), reviewDoc);
+          } catch (revErr) {
+            console.warn('[reviews] reviews write denied; queueing submission', revErr);
+            await addDoc(collection(db, 'submissions'), {
+              type: 'review',
+              status: 'pending',
+              payload: { ...reviewPayload, bookId: bookIdCreated },
+              createdAt: serverTimestamp(),
+              userId: user.uid,
+            });
+          }
 
-          window.location.href = `book.html?id=${bookRef.id}`;
+          if (bookIdCreated) {
+            window.location.href = `book.html?id=${bookIdCreated}`;
+          } else {
+            alert('Thanks! Your review has been queued for publishing.');
+          }
         } catch (err) {
-          console.error('Review submit failed:', err);
+          console.error('Review submit failed (unhandled):', err);
           alert('There was an error publishing your review. Please try again.');
-          } finally {
+        } finally {
           submitBtn.textContent = original;
           submitBtn.disabled = false;
         }

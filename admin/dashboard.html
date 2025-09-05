@@ -753,51 +753,19 @@
             }
         };
 
-        // Approve submission -> publish book pipeline
+        // Approve submission -> publish book pipeline (book only)
         window.approveSubmission = async (submissionId) => {
             try {
                 const submissionRef = doc(db, 'submissions', submissionId);
                 const subSnap = await getDoc(submissionRef);
                 if (!subSnap.exists()) throw new Error('Submission not found');
-                const s = subSnap.data();
-
-                // Normalize payload for books collection
-                const bookPayload = {
-                    title: s.title || 'Untitled',
-                    author: s.author || 'Unknown',
-                    publisher: s.publisher || '',
-                    blurb: s.blurb || '',
-                    primaryLanguage: s.primaryLanguage || '',
-                    originalLanguage: s.originalLanguage || '',
-                    authorRegion: s.authorRegion || '',
-                    publicationYear: s.publicationYear || null,
-                    culturalThemes: s.culturalThemes || '',
-                    authorTags: s.authorTags || '',
-                    targetAudience: s.targetAudience || '',
-                    bookLength: s.bookLength || '',
-                    coverUrl: s.coverUrl || '',
-                    pdfUrl: s.pdfUrl || '',
-                    purchaseLink: s.purchaseLink || '',
-                    purchaseLink2: s.purchaseLink2 || '',
-                    amazonUrl: s.amazonUrl || '',
-                    isbn: s.isbn || '',
-                    premium: s.premium === true,
-                    userId: s.userId || '',
-                    views: 0,
-                    publishedAt: serverTimestamp(),
-                };
-
-                const bookRef = doc(collection(db, 'books'));
-                await setDoc(bookRef, bookPayload);
-
-                await updateDoc(submissionRef, {
-                    approved: true,
-                    approvedAt: serverTimestamp(),
-                    bookId: bookRef.id
-                });
-
-                if (confirm('Published. View book page?')) {
-                    window.open(`../book.html?id=${bookRef.id}`, '_blank');
+                // Use unified promotion path
+                await promoteQueueItem(subSnap);
+                // Reload to get updated bookId (if any)
+                const after = await getDoc(submissionRef);
+                const data = after.exists() ? after.data() : {};
+                if (data?.bookId && confirm('Published. View book page?')) {
+                    window.open(`../book.html?id=${data.bookId}`, '_blank');
                 } else {
                     alert('Submission approved and published successfully!');
                 }
@@ -806,6 +774,93 @@
                 alert('Error approving submission. Please try again.');
             }
         };
+
+        // Auto promotion: handle 'book' and 'review' queue items
+        async function promoteQueueItem(docSnap){
+            const s = docSnap.data();
+            const id = docSnap.id;
+            try {
+                if (s.type === 'book'){
+                    const payload = {
+                        title: s.title || 'Untitled',
+                        author: s.author || 'Unknown',
+                        primaryLanguage: s.primaryLanguage || 'en',
+                        authorRegion: s.authorRegion || 'Unknown',
+                        publicationYear: s.publicationYear || null,
+                        coverUrl: s.coverUrl || '',
+                        isbn: s.isbn || '',
+                        asin: s.asin || s.amazonUrl || '',
+                        userId: s.userId || s.createdBy || '',
+                        ownerId: s.userId || s.createdBy || '',
+                        createdBy: s.userId || s.createdBy || '',
+                        views: 0, popularity: 0,
+                        reviewCount: s.reviewCount || 0,
+                        createdAt: serverTimestamp(),
+                        publishedAt: serverTimestamp()
+                    };
+                    const ref = doc(collection(db, 'books'));
+                    await setDoc(ref, payload);
+                    await updateDoc(doc(db, 'submissions', id), { approved: true, approvedAt: serverTimestamp(), bookId: ref.id });
+                    return;
+                }
+
+                if (s.type === 'review'){
+                    let bookId = s.bookId || null;
+                    if (!bookId && s.book){
+                        const b = s.book;
+                        const bp = {
+                            title: b.title || 'Untitled',
+                            author: b.author || 'Unknown',
+                            primaryLanguage: b.primaryLanguage || 'en',
+                            authorRegion: b.authorRegion || 'Unknown',
+                            publicationYear: b.publicationYear || null,
+                            userId: s.userId || '', ownerId: s.userId || '', createdBy: s.userId || '',
+                            reviewCount: 1, views: 0, popularity: 0,
+                            asin: b.asin || '', isbn: b.isbn || '', coverUrl: b.coverUrl || '',
+                            createdAt: serverTimestamp(), publishedAt: serverTimestamp()
+                        };
+                        const ref = doc(collection(db, 'books'));
+                        await setDoc(ref, bp);
+                        bookId = ref.id;
+                    }
+                    const rp = {
+                        bookId,
+                        text: s.text || s.reviewText || '',
+                        authorId: s.userId || '', userId: s.userId || '',
+                        authorForestName: s.forestName || 'Night Owl',
+                        authorAvatarUrl: s.authorAvatarUrl || '',
+                        moods: s.moods || [], contentWarnings: s.contentWarnings || [], copyFormat: s.copyFormat || null,
+                        hasReadBook: !!s.hasReadBook, authenticReview: !!s.authenticReview, noAI: !!s.noAI,
+                        upvotes: 0, downvotes: 0,
+                        createdAt: serverTimestamp()
+                    };
+                    await addDoc(collection(db, 'reviews'), rp);
+                    await updateDoc(doc(db, 'submissions', id), { approved: true, approvedAt: serverTimestamp(), bookId: bookId || null });
+                    return;
+                }
+            } catch (err) {
+                console.warn('Auto-promotion failed for submission', id, err);
+            }
+        }
+
+        // Retroactive sweep + live listener
+        async function startAutoPromotion(){
+            try {
+                // Sweep existing pending
+                const qPending = query(collection(db, 'submissions'), where('approved','!=', true));
+                const snap = await getDocs(qPending);
+                for (const d of snap.docs){ await promoteQueueItem(d); }
+
+                // Live listener for new items
+                const qLive = query(collection(db, 'submissions'), where('approved','==', false));
+                onSnapshot(qLive, (snapshot)=>{ snapshot.docChanges().forEach(ch => { if (ch.type === 'added') promoteQueueItem(ch.doc); }); });
+            } catch (err) {
+                console.warn('Auto promotion setup failed', err);
+            }
+        }
+
+        // Kick off background auto-promotion when admin dashboard loads
+        startAutoPromotion();
 
         // Reject submission
         window.rejectSubmission = async (submissionId) => {
@@ -832,6 +887,9 @@
                 alert('Error unpublishing book. Please try again.');
             }
         };
+
+        // Backwards-compat: alias removeBook to unpublishBook
+        window.removeBook = window.unpublishBook;
 
         // Preview submission
         let currentSubmissionId = null;

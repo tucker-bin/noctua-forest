@@ -6,8 +6,6 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [
     react(),
-    // PWA plugin temporarily disabled due to workbox-build dependency issue
-    // TODO: Re-enable VitePWA after fixing workbox compatibility
   ],
   
   // Simplified build configuration
