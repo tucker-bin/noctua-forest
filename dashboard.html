@@ -968,8 +968,9 @@
                 }
                 // Continue with regular user flow if admin check fails
             }
-                
-                // Check Curator Plus membership status
+            
+            // Check Curator Plus membership status
+            try {
                 const analyticsLocked = document.getElementById('analyticsLocked');
                 const curatorPlusLocked = document.getElementById('curatorPlusLocked');
                 const curatorPlusFeatures = document.getElementById('curatorPlusFeatures');
@@ -989,7 +990,7 @@
                     if (curatorPlusFeatures) curatorPlusFeatures.style.display = 'none';
                 }
             } catch (err) {
-                console.warn('User admin check failed (continuing as non-admin):', err);
+                console.warn('User membership check failed (continuing as non-Plus):', err);
                 // Show locked state as fallback
                 const analyticsLocked = document.getElementById('analyticsLocked');
                 if (analyticsLocked) {
