@@ -935,6 +935,13 @@
 
             // Check if admin (gracefully handle permission-denied)
             try {
+                // Hardcoded admin check for known admin users (fallback)
+                if (user.email === 'tucker.apply@gmail.com') {
+                    console.log('Hardcoded admin check: Admin user detected, redirecting to admin dashboard');
+                    window.location.href = 'admin/dashboard.html';
+                    return;
+                }
+                
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 const userData = userDoc.exists() ? userDoc.data() : {};
                 
@@ -953,6 +960,12 @@
                 }
             } catch (adminError) {
                 console.warn('Could not check admin status:', adminError);
+                // Fallback to hardcoded check on error
+                if (user.email === 'tucker.apply@gmail.com') {
+                    console.log('Fallback admin check: Admin user detected, redirecting to admin dashboard');
+                    window.location.href = 'admin/dashboard.html';
+                    return;
+                }
                 // Continue with regular user flow if admin check fails
             }
                 
