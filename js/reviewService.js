@@ -154,20 +154,6 @@ export async function getCopyFormatStats(bookId) {
   }
 }
 
-/**
- * Get helpful count for a review
- */
-export async function getHelpfulCount(reviewId) {
-  try {
-    const helpfulRef = collection(db, 'helpful_votes');
-    const q = query(helpfulRef, where('reviewId', '==', reviewId));
-    const snapshot = await getDocs(q);
-    return snapshot.size;
-  } catch (err) {
-    console.error('Error getting helpful count:', err);
-    return 0;
-  }
-}
 
 /**
  * Format mood name for display
@@ -263,8 +249,6 @@ export async function submitReview(reviewData) {
       contentWarnings: reviewData.contentWarnings || [],
       copyFormat: reviewData.copyFormat || null,
       status: reviewData.status || 'published',
-      helpfulCount: 0,
-      unhelpfulCount: 0,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
       // Verification flags (stored but not blocking)

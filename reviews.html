@@ -446,8 +446,6 @@
                 bookId: bookIdCreated,
                 authorForestName: generateRandomForestName(),
                 createdAt: serverTimestamp(),
-                helpfulCount: 0,
-                unhelpfulCount: 0,
               };
               await addDoc(collection(db, 'reviews'), reviewDoc);
             } catch (revErr) {

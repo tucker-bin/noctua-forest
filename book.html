@@ -117,8 +117,8 @@
       height: -webkit-fill-available;
     }
 
-    /* Vote button styles */
-    .vote-button {
+    /* Report button styles */
+    .report-button {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
@@ -129,22 +129,9 @@
       transition: all 0.2s;
     }
 
-    .vote-button:hover {
+    .report-button:hover {
       background-color: #4A5450;
       color: #E0E2DB;
-    }
-
-    .vote-button.active {
-      background-color: #F58220;
-      color: #E0E2DB;
-    }
-
-    .vote-button.helpful.active {
-      background-color: #22C55E;
-    }
-
-    .vote-button.unhelpful.active {
-      background-color: #EF4444;
     }
   </style>
 </head>
@@ -330,7 +317,6 @@
             <div class="text-white/80 text-sm">Sort by</div>
             <select id="reviewSort" class="bg-[#3A4440] text-white rounded-lg px-3 py-2 border border-white/10">
               <option value="newest">Newest</option>
-              <option value="helpful">Most Helpful</option>
             </select>
           </div>
           
@@ -459,8 +445,7 @@
     import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
     import { doc, getDoc, addDoc, collection, serverTimestamp, query, where, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
     import { createList, getUserLists, addBookToList, getList, getActiveListsCount } from './js/readingListService.js';
-    import { getUserVote, voteOnReview, formatVoteCount } from './js/reviewVotingService.js';
-    import { getBookMoods, getContentWarnings, getHelpfulCount, formatMoodName, formatWarningName, getMoodColor } from './js/reviewService.js';
+    import { getBookMoods, getContentWarnings, formatMoodName, formatWarningName, getMoodColor } from './js/reviewService.js';
     import { getCopyFormatStats } from './js/reviewService.js';
     import { validateReview, flagContent } from './js/moderationService.js';
     import { getSimilarBooks, getMoreFromAuthor, getFrequentlyListedTogether } from './js/recommendationService.js';
@@ -1112,12 +1097,6 @@
       const div = document.createElement('div');
       div.className = 'bg-[#3A4440] rounded-lg p-6';
 
-      // Get current user's vote
-      let userVote = null;
-      if (auth.currentUser) {
-        userVote = await getUserVote(review.id, auth.currentUser.uid);
-      }
-
       const { html, truncated } = createReadMore(review.text || '');
 
       div.innerHTML = `
@@ -1139,33 +1118,14 @@
             </div>
             <div class="flex items-center gap-2">
               <button 
-                class="vote-button helpful ${userVote === 'helpful' ? 'active' : ''}"
-                data-review-id="${review.id}"
-                data-vote="helpful"
-                title="Mark as helpful">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                </svg>
-                <span class="vote-count">${formatVoteCount(review.helpfulCount || 0)}</span>
-              </button>
-              <button 
-                class="vote-button unhelpful ${userVote === 'unhelpful' ? 'active' : ''}"
-                data-review-id="${review.id}"
-                data-vote="unhelpful"
-                title="Mark as unhelpful">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5 0v2a2 2 0 01-2 2h-2.5" />
-                </svg>
-                <span class="vote-count">${formatVoteCount(review.unhelpfulCount || 0)}</span>
-              </button>
-              <button 
-                class="vote-button report ml-2"
+                class="report-button"
                 data-review-id="${review.id}"
                 title="Report review"
                 onclick="reportReview('${review.id}')">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
+                <span>Report</span>
               </button>
             </div>
           </div>
@@ -1205,30 +1165,6 @@
           });
         }
       }
-
-      // Voting handlers
-      const voteButtons = div.querySelectorAll('.vote-button');
-      voteButtons.forEach(button => {
-        button.addEventListener('click', async () => {
-          if (!auth.currentUser) {
-            showSignInPrompt();
-            return;
-          }
-
-          const reviewId = button.dataset.reviewId;
-          const vote = button.dataset.vote;
-          const currentVote = button.classList.contains('active') ? null : vote;
-          try {
-            const counts = await voteOnReview(reviewId, auth.currentUser.uid, currentVote);
-            const helpfulButton = div.querySelector('.vote-button.helpful');
-            const unhelpfulButton = div.querySelector('.vote-button.unhelpful');
-            helpfulButton.querySelector('.vote-count').textContent = formatVoteCount(counts.helpful);
-            unhelpfulButton.querySelector('.vote-count').textContent = formatVoteCount(counts.unhelpful);
-            helpfulButton.classList.toggle('active', currentVote === 'helpful');
-            unhelpfulButton.classList.toggle('active', currentVote === 'unhelpful');
-          } catch (err) { console.error('Error voting:', err); }
-        });
-      });
 
       return div;
     }
@@ -1286,9 +1222,9 @@
       let orderField = 'createdAt';
       let orderDir = 'desc';
       function applySort(){
-        const val = reviewSort?.value || 'newest';
-        if (val === 'helpful'){ orderField = 'helpfulCount'; orderDir = 'desc'; }
-        else { orderField = 'createdAt'; orderDir = 'desc'; }
+        // Only newest sorting available
+        orderField = 'createdAt';
+        orderDir = 'desc';
         subscribe();
       }
       reviewSort?.addEventListener('change', applySort);
@@ -1314,16 +1250,11 @@
           }
           
           let reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-          // Sort client-side by selected field
+          // Sort client-side by creation date (newest first)
           reviews.sort((a, b) => {
-            if (orderField === 'helpfulCount') {
-              const av = Number(a.helpfulCount || 0);
-              const bv = Number(b.helpfulCount || 0);
-              return orderDir === 'desc' ? bv - av : av - bv;
-            }
             const aTime = a.createdAt?.toDate?.() || new Date(a.createdAt) || new Date(0);
             const bTime = b.createdAt?.toDate?.() || new Date(b.createdAt) || new Date(0);
-            return orderDir === 'desc' ? bTime - aTime : aTime - bTime;
+            return bTime - aTime;
           });
           
           reviewsEmpty.classList.add('hidden');
