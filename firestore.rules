@@ -45,7 +45,7 @@ service cloud.firestore {
 
     // Reviews
     match /reviews/{reviewId} {
-      allow read: if isAdmin() || isSignedIn();
+      allow read: if true; // Public read access for Forest display
       // Allow any signed-in user to create their review. Verify ownership on update/delete.
       allow create: if isSignedIn();
       allow update, delete: if isAdmin() || (isSignedIn() && (

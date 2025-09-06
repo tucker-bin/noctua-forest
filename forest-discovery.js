@@ -528,7 +528,6 @@ class ForestDiscovery {
           }
         } catch (_) {}
         const coverUrl = resolveCoverUrl(data);
-        console.log('DEBUG: Raw book data -', data.title, 'raw coverUrl:', data.coverUrl, 'resolved:', coverUrl);
         const book = {
           id: doc.id,
           title: data.title || 'Untitled',
@@ -715,7 +714,6 @@ class ForestDiscovery {
     
     const whyChips = this.buildWhyChips(book, this.lastSearchQuery);
     const hasCover = !!(book.coverUrl && String(book.coverUrl).trim());
-    console.log('DEBUG: Book cover check -', book.title, 'coverUrl:', book.coverUrl, 'hasCover:', hasCover);
     const coverSection = hasCover
       ? `
         <div class="relative bg-gray-200 overflow-hidden" data-cover style="aspect-ratio:3/4;">
