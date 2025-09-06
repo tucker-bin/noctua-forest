@@ -528,6 +528,7 @@ class ForestDiscovery {
           }
         } catch (_) {}
         const coverUrl = resolveCoverUrl(data);
+        console.log('DEBUG COVER:', data.title, 'raw coverUrl:', data.coverUrl, 'resolved:', coverUrl);
         const book = {
           id: doc.id,
           title: data.title || 'Untitled',
