@@ -189,6 +189,218 @@
         </div>
     </section>
 
+    <!-- Book Club Editor -->
+    <section id="book-club-editor" class="py-16 hidden">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                <!-- Editor Header -->
+                <div class="bg-forest-card p-6 text-white">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold" id="editor-club-name">Book Club Editor</h2>
+                        <button onclick="closeEditor()" class="bg-forest-secondary hover:bg-forest-primary text-white px-4 py-2 rounded-lg transition-colors">
+                            Back to Clubs
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tab Navigation -->
+                <div class="bg-gray-100 px-6 py-4 border-b">
+                    <div class="flex flex-wrap gap-2">
+                        <button class="editor-tab px-4 py-2 rounded-lg font-medium transition-colors active" data-tab="landing-page">
+                            Landing Page
+                        </button>
+                        <button class="editor-tab px-4 py-2 rounded-lg font-medium transition-colors" data-tab="reading-lists">
+                            Reading Lists
+                        </button>
+                        <button class="editor-tab px-4 py-2 rounded-lg font-medium transition-colors" data-tab="members">
+                            Members
+                        </button>
+                        <button class="editor-tab px-4 py-2 rounded-lg font-medium transition-colors" data-tab="discussions">
+                            Discussions
+                        </button>
+                        <button class="editor-tab px-4 py-2 rounded-lg font-medium transition-colors" data-tab="settings">
+                            Settings
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Tab Content -->
+                <div class="p-6">
+                    <!-- Landing Page Tab -->
+                    <div class="tab-content" id="landing-page-tab">
+                        <h3 class="text-xl font-semibold mb-4">Landing Page Customization</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Header Image</label>
+                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                        <div id="header-preview" class="h-32 bg-gray-200 mb-4 bg-center bg-cover rounded"></div>
+                                        <button class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:bg-forest-accent-hover">
+                                            Upload Image
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Primary Color</label>
+                                    <div class="flex items-center">
+                                        <input type="color" id="primary-color" value="#F58220" class="w-12 h-10 rounded border border-gray-300">
+                                        <span class="ml-2 text-sm text-gray-500">#F58220</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Secondary Color</label>
+                                    <div class="flex items-center">
+                                        <input type="color" id="secondary-color" value="#3A4440" class="w-12 h-10 rounded border border-gray-300">
+                                        <span class="ml-2 text-sm text-gray-500">#3A4440</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="mb-6">
+                                    <label for="welcome-message" class="block text-sm font-medium text-gray-700 mb-2">Welcome Message</label>
+                                    <textarea id="welcome-message" rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-forest-accent focus:border-transparent"
+                                        placeholder="Welcome to my book club! Here you'll find my favorite reading recommendations..."></textarea>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label for="layout-style" class="block text-sm font-medium text-gray-700 mb-2">Layout Style</label>
+                                    <select id="layout-style" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-forest-accent focus:border-transparent">
+                                        <option value="grid">Grid Layout</option>
+                                        <option value="list">List Layout</option>
+                                        <option value="carousel">Carousel Layout</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Preview</label>
+                                    <button class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:bg-forest-accent-hover">
+                                        Preview Landing Page
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Reading Lists Tab -->
+                    <div class="tab-content hidden" id="reading-lists-tab">
+                        <h3 class="text-xl font-semibold mb-4">Reading List Integration</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-lg font-medium mb-3">Your Reading Lists</h4>
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="bg-gray-100 px-4 py-2 border-b">
+                                        <div class="flex justify-between items-center">
+                                            <span class="font-medium">Available Lists</span>
+                                            <span class="text-sm text-gray-500">Select to add</span>
+                                        </div>
+                                    </div>
+                                    <div id="available-lists" class="p-4 max-h-96 overflow-y-auto">
+                                        <div class="text-center py-8 text-gray-500">Loading your reading lists...</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="text-lg font-medium mb-3">Lists in This Book Club</h4>
+                                <div class="border rounded-lg overflow-hidden">
+                                    <div class="bg-gray-100 px-4 py-2 border-b">
+                                        <div class="flex justify-between items-center">
+                                            <span class="font-medium">Selected Lists</span>
+                                            <span class="text-sm text-gray-500">Drag to reorder</span>
+                                        </div>
+                                    </div>
+                                    <div id="selected-lists" class="p-4 max-h-96 overflow-y-auto">
+                                        <div class="text-center py-8 text-gray-500">No lists added yet</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Members Tab -->
+                    <div class="tab-content hidden" id="members-tab">
+                        <h3 class="text-xl font-semibold mb-4">Member Management</h3>
+                        <p class="text-gray-500 mb-6">Coming soon in a future update.</p>
+                    </div>
+                    
+                    <!-- Discussions Tab -->
+                    <div class="tab-content hidden" id="discussions-tab">
+                        <h3 class="text-xl font-semibold mb-4">Discussion Forums</h3>
+                        <p class="text-gray-500 mb-6">Coming soon in a future update.</p>
+                    </div>
+                    
+                    <!-- Settings Tab -->
+                    <div class="tab-content hidden" id="settings-tab">
+                        <h3 class="text-xl font-semibold mb-4">Book Club Settings</h3>
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <div class="mb-6">
+                                    <label for="settings-club-name" class="block text-sm font-medium text-gray-700 mb-2">Book Club Name</label>
+                                    <input type="text" id="settings-club-name" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-forest-accent focus:border-transparent">
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label for="settings-club-description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                    <textarea id="settings-club-description" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-forest-accent focus:border-transparent"></textarea>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label for="settings-club-theme" class="block text-sm font-medium text-gray-700 mb-2">Theme/Genre</label>
+                                    <select id="settings-club-theme" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-forest-accent focus:border-transparent">
+                                        <option value="fantasy">Fantasy</option>
+                                        <option value="sci-fi">Science Fiction</option>
+                                        <option value="mystery">Mystery</option>
+                                        <option value="romance">Romance</option>
+                                        <option value="literary">Literary Fiction</option>
+                                        <option value="nonfiction">Non-Fiction</option>
+                                        <option value="mixed">Mixed Genre</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Sharing Tools</label>
+                                    <div class="space-y-4">
+                                        <button class="w-full px-4 py-3 bg-forest-card text-white rounded-lg hover:bg-forest-primary flex items-center justify-center gap-2">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                                            </svg>
+                                            Generate QR Code
+                                        </button>
+                                        <button class="w-full px-4 py-3 bg-forest-card text-white rounded-lg hover:bg-forest-primary flex items-center justify-center gap-2">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                                            </svg>
+                                            Get Embed Code
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Danger Zone</label>
+                                    <button class="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700">
+                                        Delete Book Club
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer Actions -->
+                <div class="bg-gray-100 px-6 py-4 border-t flex justify-end">
+                    <button id="save-club-changes" class="bg-forest-accent hover:bg-forest-accent-hover text-white px-6 py-2 rounded-lg transition-colors">
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Book Club Features -->
     <section class="py-16 bg-gradient-to-r from-[#3A4440] to-[#5A6560] text-white">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -378,7 +590,8 @@
     <script type="module">
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
         import { app, db } from './firebase-config.js';
-        import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { collection, addDoc, getDocs, query, where, serverTimestamp, doc, getDoc, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import * as bookClubService from './js/bookClubService.js';
         
         const auth = getAuth(app);
         let currentUser = null;
@@ -417,9 +630,13 @@
                     userMembership = null;
                 }
             } catch (error) {
+                // Silently handle permission errors - this is expected for regular users
+                if (error.code === 'permission-denied') {
+                    console.log('Membership check skipped - permission denied (normal for regular users)');
+                } else {
                 console.warn('Could not check membership status:', error);
+                }
                 userMembership = null;
-                // Don't show error to user for permission issues
             }
         }
 
@@ -461,12 +678,14 @@
         async function loadBookClubs() {
             if (!currentUser) return;
             
+            const bookClubsList = document.getElementById('book-clubs-list');
+            const noBookClubs = document.getElementById('no-book-clubs');
+            
+            if (!bookClubsList || !noBookClubs) return;
+            
             try {
                 const bookClubsQuery = query(collection(db, 'bookClubs'), where('ownerId', '==', currentUser.uid));
                 const bookClubsSnapshot = await getDocs(bookClubsQuery);
-                
-                const bookClubsList = document.getElementById('book-clubs-list');
-                const noBookClubs = document.getElementById('no-book-clubs');
                 
                 if (bookClubsSnapshot.empty) {
                     bookClubsList.innerHTML = '';
@@ -482,12 +701,28 @@
                     });
                 }
             } catch (error) {
+                // Handle different error types with appropriate messages
+                if (error.code === 'permission-denied') {
+                    console.log('Book clubs query skipped - permission denied');
+                    // Show a more helpful message for permission issues
+                    bookClubsList.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="bg-forest-secondary p-6 rounded-lg inline-block">
+                                <p class="text-white/80 mb-4">You need to be signed in with appropriate permissions to view book clubs.</p>
+                                <a href="account.html" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:bg-forest-accent-hover">Sign In</a>
+                            </div>
+                        </div>`;
+                } else {
                 console.warn('Error loading book clubs:', error);
-                // Show user-friendly message for permission issues
-                const bookClubsList = document.getElementById('book-clubs-list');
-                if (bookClubsList) {
-                    bookClubsList.innerHTML = '<div class="text-center py-8 text-white/80">Unable to load book clubs. Please check your permissions.</div>';
+                    bookClubsList.innerHTML = `
+                        <div class="text-center py-8">
+                            <div class="bg-forest-secondary p-6 rounded-lg inline-block">
+                                <p class="text-white/80">There was a problem loading your book clubs. Please try again later.</p>
+                            </div>
+                        </div>`;
                 }
+                // Always hide the "no book clubs" message when there's an error
+                noBookClubs.classList.add('hidden');
             }
         }
         
@@ -541,9 +776,274 @@
             });
         };
         
+        // Current book club being edited
+        let currentClubId = null;
+        
         window.manageBookClub = function(clubId) {
-            alert(`Managing book club ${clubId} - coming soon!`);
+            currentClubId = clubId;
+            
+            // Show the book club editor
+            document.getElementById('book-club-editor').classList.remove('hidden');
+            document.getElementById('book-club-management').classList.add('hidden');
+            document.getElementById('book-club-creation').classList.add('hidden');
+            
+            // Load book club data
+            loadBookClubData(clubId);
+            
+            // Set up tab navigation
+            setupTabNavigation();
         };
+        
+        window.closeEditor = function() {
+            document.getElementById('book-club-editor').classList.add('hidden');
+            document.getElementById('book-club-management').classList.remove('hidden');
+            currentClubId = null;
+        };
+        
+        function setupTabNavigation() {
+            const tabs = document.querySelectorAll('.editor-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active', 'bg-forest-accent', 'text-white'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active', 'bg-forest-accent', 'text-white');
+                    
+                    // Hide all tab content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // Show selected tab content
+                    const tabId = tab.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+                    
+                    // Load tab-specific data
+                    if (tabId === 'reading-lists' && currentClubId) {
+                        loadReadingLists(currentClubId);
+                    }
+                });
+            });
+        }
+        
+        async function loadBookClubData(clubId) {
+            try {
+                const club = await bookClubService.getCuratorPage(clubId);
+                if (!club) {
+                    console.error('Book club not found');
+                    return;
+                }
+                
+                // Update editor header
+                document.getElementById('editor-club-name').textContent = club.name;
+                
+                // Update settings form
+                document.getElementById('settings-club-name').value = club.name;
+                document.getElementById('settings-club-description').value = club.description || '';
+                document.getElementById('settings-club-theme').value = club.theme || 'mixed';
+                
+                // Update landing page form
+                document.getElementById('welcome-message').value = club.welcomeMessage || '';
+                document.getElementById('layout-style').value = club.layoutStyle || 'grid';
+                
+                if (club.primaryColor) {
+                    document.getElementById('primary-color').value = club.primaryColor;
+                }
+                
+                if (club.secondaryColor) {
+                    document.getElementById('secondary-color').value = club.secondaryColor;
+                }
+                
+                // Update header preview if available
+                if (club.headerImage) {
+                    document.getElementById('header-preview').style.backgroundImage = `url(${club.headerImage})`;
+                }
+                
+                // Load the reading lists for this club
+                loadReadingLists(clubId);
+            } catch (error) {
+                console.error('Error loading book club data:', error);
+            }
+        }
+        
+        async function loadReadingLists(clubId) {
+            try {
+                // Get all reading lists for the current user
+                const userListsQuery = query(collection(db, 'readingLists'), where('userId', '==', currentUser.uid));
+                const userListsSnapshot = await getDocs(userListsQuery);
+                
+                // Get lists already added to this club
+                const clubLists = await bookClubService.getCuratorPageLists(clubId);
+                const clubListIds = clubLists.map(list => list.listId);
+                
+                // Render available lists (not yet added to club)
+                const availableListsContainer = document.getElementById('available-lists');
+                availableListsContainer.innerHTML = '';
+                
+                if (userListsSnapshot.empty) {
+                    availableListsContainer.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <p>You haven't created any reading lists yet.</p>
+                            <a href="account.html" class="text-forest-accent hover:underline">Create a list</a>
+                        </div>
+                    `;
+                } else {
+                    userListsSnapshot.forEach(doc => {
+                        const list = { id: doc.id, ...doc.data() };
+                        
+                        // Skip lists already added to this club
+                        if (clubListIds.includes(list.id)) {
+                            return;
+                        }
+                        
+                        const listItem = document.createElement('div');
+                        listItem.className = 'border-b border-gray-200 last:border-0 py-3';
+                        listItem.innerHTML = `
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h5 class="font-medium">${list.title}</h5>
+                                    <p class="text-sm text-gray-500">${list.description || 'No description'}</p>
+                                    <div class="text-xs text-gray-400 mt-1">${list.bookCount || 0} books</div>
+                                </div>
+                                <button class="add-list-btn px-3 py-1 bg-forest-accent text-white rounded hover:bg-forest-accent-hover text-sm" 
+                                    data-list-id="${list.id}" data-list-title="${list.title}">
+                                    Add
+                                </button>
+                            </div>
+                        `;
+                        
+                        // Add event listener to add button
+                        const addButton = listItem.querySelector('.add-list-btn');
+                        addButton.addEventListener('click', () => {
+                            addListToClub(clubId, list.id, list.title, list.description || '');
+                        });
+                        
+                        availableListsContainer.appendChild(listItem);
+                    });
+                    
+                    if (availableListsContainer.children.length === 0) {
+                        availableListsContainer.innerHTML = `
+                            <div class="text-center py-8 text-gray-500">
+                                <p>All your lists have been added to this club.</p>
+                                <a href="account.html" class="text-forest-accent hover:underline">Create more lists</a>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // Render selected lists
+                renderSelectedLists(clubLists);
+                
+            } catch (error) {
+                console.error('Error loading reading lists:', error);
+                document.getElementById('available-lists').innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <p>Error loading lists. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function renderSelectedLists(clubLists) {
+            const selectedListsContainer = document.getElementById('selected-lists');
+            selectedListsContainer.innerHTML = '';
+            
+            if (clubLists.length === 0) {
+                selectedListsContainer.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">No lists added yet</div>
+                `;
+                return;
+            }
+            
+            // Sort lists by order
+            clubLists.sort((a, b) => a.order - b.order);
+            
+            clubLists.forEach((association, index) => {
+                const listItem = document.createElement('div');
+                listItem.className = 'border-b border-gray-200 last:border-0 py-3';
+                listItem.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1">
+                            <h5 class="font-medium">${association.title || 'Untitled List'}</h5>
+                            <p class="text-sm text-gray-500">${association.description || 'No description'}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button class="remove-list-btn p-1 text-red-600 hover:text-red-800" 
+                                data-association-id="${association.id}" title="Remove from club">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listener to remove button
+                const removeButton = listItem.querySelector('.remove-list-btn');
+                removeButton.addEventListener('click', () => {
+                    removeListFromClub(association.id);
+                });
+                
+                selectedListsContainer.appendChild(listItem);
+            });
+        }
+        
+        async function addListToClub(clubId, listId, title, description) {
+            try {
+                const associationId = await bookClubService.addListToCuratorPage(clubId, listId, title, description);
+                console.log('List added to club:', associationId);
+                
+                // Reload lists to update UI
+                loadReadingLists(clubId);
+            } catch (error) {
+                console.error('Error adding list to club:', error);
+                alert('Error adding list to club. Please try again.');
+            }
+        }
+        
+        async function removeListFromClub(associationId) {
+            try {
+                await bookClubService.removeListFromCuratorPage(associationId);
+                console.log('List removed from club:', associationId);
+                
+                // Reload lists to update UI
+                if (currentClubId) {
+                    loadReadingLists(currentClubId);
+                }
+            } catch (error) {
+                console.error('Error removing list from club:', error);
+                alert('Error removing list from club. Please try again.');
+            }
+        }
+        
+        // Save book club changes
+        document.getElementById('save-club-changes').addEventListener('click', async () => {
+            if (!currentClubId) return;
+            
+            try {
+                const updates = {
+                    name: document.getElementById('settings-club-name').value,
+                    description: document.getElementById('settings-club-description').value,
+                    theme: document.getElementById('settings-club-theme').value,
+                    welcomeMessage: document.getElementById('welcome-message').value,
+                    layoutStyle: document.getElementById('layout-style').value,
+                    primaryColor: document.getElementById('primary-color').value,
+                    secondaryColor: document.getElementById('secondary-color').value,
+                    updatedAt: serverTimestamp()
+                };
+                
+                await bookClubService.updateCuratorPage(currentClubId, updates);
+                alert('Book club updated successfully!');
+                
+                // Update editor header
+                document.getElementById('editor-club-name').textContent = updates.name;
+                
+            } catch (error) {
+                console.error('Error updating book club:', error);
+                alert('Error updating book club. Please try again.');
+            }
+        });
         
         // Handle book club form submission
         document.getElementById('book-club-form').addEventListener('submit', async (e) => {

@@ -955,14 +955,21 @@
                 return;
             }
 
+            // Fetch user data first - needed for both admin check and membership status
+            let userData = {};
+            try {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                userData = userDoc.exists() ? userDoc.data() : {};
+            } catch (err) {
+                console.warn('Could not fetch user data:', err);
+                // Continue with empty userData
+            }
+            
             // Check if admin (gracefully handle permission-denied)
             try {
                 // Check if admin wants to stay on user dashboard (manual override)
                 const urlParams = new URLSearchParams(window.location.search);
                 const stayOnUserDashboard = urlParams.get('stay') === 'user';
-                
-                // Hoist user data for use later (membership checks)
-                let userData = {};
                 
                 // Prevent redirect loop - don't redirect if we're already on admin dashboard
                 if (window.location.pathname.includes('admin/dashboard.html')) {
@@ -970,19 +977,19 @@
                     return;
                 }
                 
-                if (!stayOnUserDashboard) {
-                    // Hardcoded admin check for known admin users (fallback)
+                // If user explicitly wants to stay on user dashboard, honor that request
+                if (stayOnUserDashboard) {
+                    console.log('User requested to stay on user dashboard, honoring request');
+                    // Continue with user dashboard
+                } else {
+                    // Hardcoded admin check for known admin users
                     if (user.email === 'tucker.apply@gmail.com') {
                         console.log('Hardcoded admin check: Admin user detected, redirecting to admin dashboard');
                         window.location.href = 'admin/dashboard.html';
                         return;
                     }
-                }
-                
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                userData = userDoc.exists() ? userDoc.data() : {};
-                
-                if (!stayOnUserDashboard) {
+                    
+                    // Check Firestore admin flag
                     if (userData.isAdmin === true || userData.admin === true) {
                         console.log('Admin detected via Firestore, redirecting to admin dashboard');
                         window.location.href = 'admin/dashboard.html';
@@ -1000,7 +1007,7 @@
             } catch (adminError) {
                 console.warn('Could not check admin status:', adminError);
                 // Fallback to hardcoded check on error
-                if (user.email === 'tucker.apply@gmail.com') {
+                if (user.email === 'tucker.apply@gmail.com' && !stayOnUserDashboard) {
                     console.log('Fallback admin check: Admin user detected, redirecting to admin dashboard');
                     window.location.href = 'admin/dashboard.html';
                     return;

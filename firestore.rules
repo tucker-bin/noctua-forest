@@ -163,5 +163,23 @@ service cloud.firestore {
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update, delete: if isSignedIn() && (resource.data.ownerId == request.auth.uid || resource.data.userId == request.auth.uid || isAdmin());
     }
+    
+    // Book Club Lists (reading lists attached to clubs)
+    match /bookClubLists/{associationId} {
+      allow read: if true; // Public read access for club landing pages
+      allow create, update, delete: if isSignedIn() && (
+        get(/databases/$(database)/documents/bookClubs/$(request.resource.data.clubId)).data.ownerId == request.auth.uid || 
+        isAdmin()
+      );
+    }
+    
+    // List Click Tracking
+    match /listClicks/{clickId} {
+      allow create: if true; // Allow anonymous tracking
+      allow read, update, delete: if isSignedIn() && (
+        get(/databases/$(database)/documents/bookClubs/$(resource.data.pageId)).data.ownerId == request.auth.uid || 
+        isAdmin()
+      );
+    }
   }
 }

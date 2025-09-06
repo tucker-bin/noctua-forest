@@ -119,12 +119,41 @@ function buildSemanticText(book) {
   return normalize(parts.join(' '));
 }
 
-// Resolve a cover URL strictly from our stored value (Firestore/Storage)
+// Resolve a cover URL from multiple possible fields
 function resolveCoverUrl(data) {
-  const url = String(data.coverUrl || '').trim();
-  if (!url) return '';
-  // Normalize http->https for safety
-  return url.replace(/^http:\/\//, 'https://');
+  // Try direct cover URL fields first
+  const directUrl = String(
+    data.coverUrl || 
+    data.imageUrl || 
+    data.image || 
+    data.thumbnail || 
+    data.cover || 
+    ''
+  ).trim();
+  
+  if (directUrl) {
+    // Normalize http to https for security
+    return directUrl.replace(/^http:\/\//, 'https://');
+  }
+  
+  // Try to generate a cover URL from ISBN if available
+  if (data.isbn) {
+    const isbn = String(data.isbn).replace(/[^0-9X]/gi, '');
+    if (isbn.length >= 10) {
+      return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+    }
+  }
+  
+  // Try to generate a cover URL from Open Library ID if available
+  if (data.olid || data.openLibraryId) {
+    const olid = String(data.olid || data.openLibraryId).trim();
+    if (olid) {
+      return `https://covers.openlibrary.org/b/olid/${olid}-L.jpg`;
+    }
+  }
+  
+  // No cover URL found
+  return '';
 }
 
 // Simple client-side cache for covers
@@ -651,32 +680,52 @@ class ForestDiscovery {
     this.books.forEach(book => {
       const bookCard = this.createBookCard(book);
       booksGrid.appendChild(bookCard);
-      // Only attach runtime cover onerror fallback if the book actually has an image element
+      // Attach runtime cover onerror fallback with multiple fallback strategies
       try {
         const img = bookCard.querySelector('[data-cover-img]');
         if (img && book.coverUrl) {
           img.onerror = () => {
             try {
-              // If Open Library large image fails, try medium size
+              // First fallback: If Open Library large image fails, try medium size
               if (book.coverUrl.includes('covers.openlibrary.org') && book.coverUrl.endsWith('-L.jpg')) {
+                console.log('Trying medium size Open Library image for', book.title);
                 const altUrl = book.coverUrl.replace('-L.jpg', '-M.jpg');
                 img.src = altUrl;
+                
+                // Set a second onerror handler for the medium size fallback
+                img.onerror = () => {
+                  try {
+                    // Second fallback: If medium size fails, try small size
+                    if (img.src.endsWith('-M.jpg')) {
+                      console.log('Trying small size Open Library image for', book.title);
+                      img.src = img.src.replace('-M.jpg', '-S.jpg');
+                      
+                      // Set a third onerror handler for the small size fallback
+                      img.onerror = () => this.replaceWithTextCover(bookCard, book);
+                      return;
+                    }
+                  } catch (_) {}
+                  this.replaceWithTextCover(bookCard, book);
+                };
                 return;
               }
+              
+              // Try ISBN fallback if available
+              if (book.isbn && !book.coverUrl.includes('covers.openlibrary.org')) {
+                const isbn = String(book.isbn).replace(/[^0-9X]/gi, '');
+                if (isbn.length >= 10) {
+                  console.log('Trying ISBN fallback for', book.title);
+                  img.src = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+                  
+                  // Set a new onerror handler for the ISBN fallback
+                  img.onerror = () => this.replaceWithTextCover(bookCard, book);
+                  return;
+                }
+              }
             } catch (_) {}
-            const wrapper = bookCard.querySelector('[data-cover]');
-            if (!wrapper) return;
-            // Replace failed image with text-based cover
-            wrapper.innerHTML = `
-              <div class="relative bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center" style="aspect-ratio:3/4;">
-                <div class="text-center px-4">
-                  <div class="text-base font-semibold text-white line-clamp-3">${this.escapeHtml(book.title)}</div>
-                  <div class="mt-1 text-sm text-white/80 line-clamp-1">by ${this.escapeHtml(book.author)}</div>
-                </div>
-                <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
-                  <div class="flex flex-wrap" data-tags-overlay></div>
-                </div>
-              </div>`;
+            
+            // Final fallback: Replace with text-based cover
+            this.replaceWithTextCover(bookCard, book);
           };
         }
       } catch (_) {}
@@ -757,6 +806,24 @@ class ForestDiscovery {
     `;
     
     return card;
+  }
+
+  // Helper method to replace a failed image with a text-based cover
+  replaceWithTextCover(bookCard, book) {
+    const wrapper = bookCard.querySelector('[data-cover]');
+    if (!wrapper) return;
+    
+    // Replace failed image with text-based cover
+    wrapper.innerHTML = `
+      <div class="relative bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center" style="aspect-ratio:3/4;">
+        <div class="text-center px-4">
+          <div class="text-base font-semibold text-white line-clamp-3">${this.escapeHtml(book.title)}</div>
+          <div class="mt-1 text-sm text-white/80 line-clamp-1">by ${this.escapeHtml(book.author)}</div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+          <div class="flex flex-wrap" data-tags-overlay></div>
+        </div>
+      </div>`;
   }
 
   // Fetch and cache top tags (by frequency) from review moods
