@@ -124,12 +124,34 @@ function resolveCoverUrl(data) {
   const direct = String(
     data.coverUrl || data.imageUrl || data.image || data.thumbnail || data.cover || ''
   ).trim();
-  if (direct) return direct;
+  if (direct) {
+    // Normalize http to https for security
+    return direct.replace(/^http:\/\//, 'https://');
+  }
   const toStr = (v) => (Array.isArray(v) ? v[0] : v) || '';
   const olid = String(data.openLibraryId || data.olid || '').trim();
   if (olid) return `https://covers.openlibrary.org/b/olid/${encodeURIComponent(olid)}-L.jpg`;
   const isbn = String(toStr(data.isbn13) || toStr(data.isbn10) || data.isbn || '').replace(/[^0-9Xx]/g, '').trim();
   if (isbn) return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+  return '';
+}
+
+// Fetch cover from API as fallback
+async function fetchCoverFromAPI(book) {
+  try {
+    const params = new URLSearchParams();
+    if (book.isbn) params.append('isbn', book.isbn);
+    if (book.title) params.append('title', book.title);
+    if (book.author) params.append('author', book.author);
+    
+    const response = await fetch(`/api/covers?${params.toString()}`);
+    if (response.ok) {
+      const data = await response.json();
+      return data.coverUrl || '';
+    }
+  } catch (error) {
+    console.warn('Failed to fetch cover from API:', error);
+  }
   return '';
 }
 
@@ -533,7 +555,14 @@ class ForestDiscovery {
           authorTags: data.authorTags || [],
           topTags: Array.isArray(data.topTags) ? data.topTags : [],
           blurb: data.blurb || '',
-          createdAt
+          createdAt,
+          // Additional fields for cover resolution
+          isbn: data.isbn13 || data.isbn10 || data.isbn || '',
+          openLibraryId: data.openLibraryId || data.olid || '',
+          imageUrl: data.imageUrl || '',
+          image: data.image || '',
+          thumbnail: data.thumbnail || '',
+          cover: data.cover || ''
         };
       })
       // Filter out invalid books only; allow missing covers (grid renders text cover)
@@ -630,7 +659,15 @@ class ForestDiscovery {
       try {
         const img = bookCard.querySelector('[data-cover-img]');
         if (img && book.coverUrl) {
-          img.onerror = () => {
+          img.onerror = async () => {
+            // Try API fallback first
+            if (!book.coverUrl || book.coverUrl.startsWith('https://covers.openlibrary.org/')) {
+              const apiCover = await fetchCoverFromAPI(book);
+              if (apiCover) {
+                img.src = apiCover;
+                return;
+              }
+            }
             const wrapper = bookCard.querySelector('[data-cover]');
             if (!wrapper) return;
             // Replace failed image with text-based cover

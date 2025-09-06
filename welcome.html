@@ -373,10 +373,26 @@
 
 
 
+      // Resolve cover URL from various fields (same logic as Forest)
+      function resolveCoverUrl(data) {
+        const direct = String(
+          data.coverUrl || data.imageUrl || data.image || data.thumbnail || data.cover || ''
+        ).trim();
+        if (direct) {
+          return direct.replace(/^http:\/\//, 'https://');
+        }
+        const toStr = (v) => (Array.isArray(v) ? v[0] : v) || '';
+        const olid = String(data.openLibraryId || data.olid || '').trim();
+        if (olid) return `https://covers.openlibrary.org/b/olid/${encodeURIComponent(olid)}-L.jpg`;
+        const isbn = String(toStr(data.isbn13) || toStr(data.isbn10) || data.isbn || '').replace(/[^0-9Xx]/g, '').trim();
+        if (isbn) return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+        return '';
+      }
+
       // Try to load curated books from Firestore for the carousel
       (async function loadCuratedReviews(){
         try{
-          const q = query(collection(db, 'books'), orderBy('publishedAt','desc'), limit(12));
+          const q = query(collection(db, 'books'), orderBy('publishedAt','desc'), limit(20));
           const snap = await getDocs(q);
           const track = document.getElementById('reviewsCarousel');
           if (!track) return;
@@ -385,7 +401,7 @@
             const items = [];
             snap.forEach(docSnap => {
               const d = docSnap.data();
-              const cover = d.coverUrl || '';
+              const cover = resolveCoverUrl(d);
               if (!cover) return; // skip items without covers
               const a = document.createElement('a');
               a.href = `book.html?id=${docSnap.id}`;
@@ -473,24 +489,33 @@
           const track = document.getElementById('reviewsCarousel');
           if (!track || track.children.length) return;
           
-          // Load books with covers from Firebase
+          // Load recent books from Firebase (no coverUrl filter)
           const booksQuery = query(
             collection(db, 'books'),
-            where('coverUrl', '!=', ''),
-            orderBy('coverUrl'),
-            orderBy('createdAt', 'desc'),
-            limit(12)
+            orderBy('publishedAt', 'desc'),
+            limit(20)
           );
           const booksSnapshot = await getDocs(booksQuery);
           
           if (booksSnapshot.empty) {
+            console.warn('No books found for carousel');
+            const section = document.querySelector('.nf-carousel-section');
+            if (section) section.style.display = 'none';
+            return;
+          }
+          
+          // Filter books with resolved covers
+          const books = booksSnapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .filter(b => resolveCoverUrl(b)); // Only include books with covers
+          
+          if (books.length === 0) {
             console.warn('No books with covers found for carousel');
             const section = document.querySelector('.nf-carousel-section');
             if (section) section.style.display = 'none';
             return;
           }
           
-          const books = booksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           const duo = books.concat(books); // duplicate for seamless scroll
           
           const makeItem = (b) => {
@@ -499,7 +524,7 @@
             a.className = 'nf-carousel-item text-center';
             a.setAttribute('aria-label', `Read our review: ${b.title} by ${b.author}`);
             const img = document.createElement('img');
-            img.src = b.coverUrl || '';
+            img.src = resolveCoverUrl(b);
             img.alt = `${b.title} cover`;
             img.loading = 'lazy';
             img.className = 'w-full h-auto rounded-lg shadow-md mb-2 object-contain';
