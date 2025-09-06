@@ -788,12 +788,16 @@
               } catch (_) {}
             };
             img.onerror = () => {
-              cover.style.display = 'none';
+              const parent = cover.parentNode;
+              const fallback = createTextCoverEl(b.title || 'Untitled', b.author || '');
+              parent.replaceChild(fallback, cover);
               console.warn('Failed to load cover image:', coverUrl);
             };
             img.src = coverUrl;
           } else {
-            cover.style.display = 'none';
+            const parent = cover.parentNode;
+            const fallback = createTextCoverEl(b.title || 'Untitled', b.author || '');
+            parent.replaceChild(fallback, cover);
           }
         }
         
@@ -804,6 +808,24 @@
         function getRef(){ try{ return sessionStorage.getItem('nf_ref') || ''; }catch(_){ return ''; } }
         function withAmazonTag(url){ try{ const u=new URL(url); u.searchParams.set('tag','noctuaforest-20'); const r=getRef(); if(r) u.searchParams.set('ref', r); return u.toString(); }catch(_){ return url; } }
         function amazonSearch(){ const q=encodeURIComponent(`${b.title||''} ${b.author||''}`); const r=getRef(); return `https://amazon.com/s?k=${q}&tag=noctuaforest-20${r?`&ref=${encodeURIComponent(r)}`:''}`; }
+
+        // Create a text-based cover element when no image is available
+        function createTextCoverEl(title, author){
+          const el = document.createElement('div');
+          el.className = 'relative rounded-lg shadow bg-[#4A5450] aspect-[2/3] flex items-center justify-center p-4';
+          const inner = document.createElement('div');
+          inner.className = 'text-center px-2';
+          const t = document.createElement('div');
+          t.className = 'text-base font-semibold text-white line-clamp-3';
+          t.textContent = title || '';
+          const a = document.createElement('div');
+          a.className = 'mt-1 text-sm text-white/70 line-clamp-1';
+          a.textContent = author ? `by ${author}` : '';
+          inner.appendChild(t);
+          inner.appendChild(a);
+          el.appendChild(inner);
+          return el;
+        }
         // Bookshop links removed by product decision
 
         // Build purchase link candidates
@@ -967,20 +989,22 @@
       card.className = 'block bg-[#3A4440] rounded-lg overflow-hidden hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-forest-accent';
 
       const cover = book.coverUrl || '';
-      const imgTag = cover ? `
+      const hasCover = !!(cover && String(cover).trim());
+      const imgTag = hasCover ? `
             <img 
               src="${cover}"
               alt="${book.title} cover"
               class="w-full h-full object-cover"
               loading="lazy"
               decoding="async"
-              onerror="this.style.display='none'"
+              onerror="this.replaceWith((() => { const d=document.createElement('div'); d.className='absolute inset-0 flex items-center justify-center p-3'; d.innerHTML=\`<div class=\'text-center\'><div class=\'text-sm font-semibold text-white line-clamp-3\'>${book.title||'Untitled'}</div><div class=\'mt-1 text-xs text-white/70 line-clamp-1\'>${book.author||''}</div></div>\`; return d; })())"
             >
           ` : `
-            <div class="absolute inset-0 flex items-center justify-center">
-              <svg class="w-12 h-12 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
+            <div class="absolute inset-0 flex items-center justify-center p-3">
+              <div class="text-center">
+                <div class="text-sm font-semibold text-white line-clamp-3">${book.title || 'Untitled'}</div>
+                <div class="mt-1 text-xs text-white/70 line-clamp-1">${book.author || ''}</div>
+              </div>
             </div>`;
 
       card.innerHTML = `

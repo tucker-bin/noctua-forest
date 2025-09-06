@@ -425,8 +425,8 @@ class ForestDiscovery {
   }
 
   async fetchBooks(page, filters) {
-    if (this.isLoading) return [];
-    
+    // Allow fetchBooks to run even when outer loader is active. Concurrency is
+    // controlled by loadMoreBooks(); guarding here prevents any results.
     console.log('ForestDiscovery: Fetching books, page:', page, 'filters:', filters);
     this.lastSearchQuery = (filters && filters.search) ? String(filters.search) : '';
     
@@ -464,10 +464,13 @@ class ForestDiscovery {
         sortOrder = 'desc';
       }
       
-      booksQuery = query(booksQuery, orderBy(sortField, sortOrder), limit(pageSize));
+      // Build pagination constraints in a single query to preserve ordering/limit
+      const constraints = [orderBy(sortField, sortOrder)];
       if (this.lastDoc && page > 1) {
-        booksQuery = query(booksQuery, startAfter(this.lastDoc));
+        constraints.push(startAfter(this.lastDoc));
       }
+      constraints.push(limit(pageSize));
+      booksQuery = query(booksQuery, ...constraints);
       
       console.log('ForestDiscovery: Executing query with sort:', sortField, sortOrder);
       const booksSnap = await getDocs(booksQuery);
@@ -491,6 +494,18 @@ class ForestDiscovery {
         if (!doc.id || !data.title || !data.author) {
           console.warn('Book missing required fields:', { id: doc.id, title: data.title, author: data.author });
         }
+        // Normalize Firestore Timestamp/Date for createdAt
+        const createdAtRaw = data.publishedAt || data.createdAt;
+        let createdAt = new Date();
+        try {
+          if (createdAtRaw && typeof createdAtRaw.toDate === 'function') {
+            createdAt = createdAtRaw.toDate();
+          } else if (createdAtRaw instanceof Date) {
+            createdAt = createdAtRaw;
+          } else if (typeof createdAtRaw === 'number') {
+            createdAt = new Date(createdAtRaw);
+          }
+        } catch (_) {}
         return {
           id: doc.id,
           title: data.title || 'Untitled',
@@ -503,11 +518,11 @@ class ForestDiscovery {
           authorTags: data.authorTags || [],
           topTags: Array.isArray(data.topTags) ? data.topTags : [],
           blurb: data.blurb || '',
-          createdAt: data.publishedAt || data.createdAt || new Date()
+          createdAt
         };
       })
-      // Filter out invalid books and those missing covers (until covers available)
-      .filter(book => book.id && book.title && book.author && book.coverUrl);
+      // Filter out invalid books only; allow missing covers (grid renders text cover)
+      .filter(book => book.id && book.title && book.author);
       
       if (filters.search && filters.search.trim()) {
         // If catalog is small (< 30) or model not yet loaded, use simple reranker
@@ -630,13 +645,32 @@ class ForestDiscovery {
     }
     
     const whyChips = this.buildWhyChips(book, this.lastSearchQuery);
-    card.innerHTML = `
-      <div class="relative aspect-[3/4] bg-gray-200 overflow-hidden">
-        <img src="${book.coverUrl}" alt="${this.escapeHtml(book.title)}" class="w-full h-full object-cover">
-        <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/75 via-black/40 to-transparent">
-          <div class="flex flex-wrap" data-tags-overlay></div>
+    const hasCover = !!(book.coverUrl && String(book.coverUrl).trim());
+    const coverSection = hasCover
+      ? `
+        <div class="relative aspect-[3/4] bg-gray-200 overflow-hidden">
+          <img src="${book.coverUrl}" alt="${this.escapeHtml(book.title)}" class="w-full h-full object-cover">
+          <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/75 via-black/40 to-transparent">
+            <div class="flex flex-wrap" data-tags-overlay></div>
+          </div>
         </div>
-      </div>
+      `
+      : `
+        <div class="relative aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-end">
+          <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="text-center px-4">
+              <div class="text-base font-semibold text-forest-text line-clamp-3">${this.escapeHtml(book.title)}</div>
+              <div class="mt-1 text-sm text-forest-text-muted line-clamp-1">by ${this.escapeHtml(book.author)}</div>
+            </div>
+          </div>
+          <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+            <div class="flex flex-wrap" data-tags-overlay></div>
+          </div>
+        </div>
+      `;
+
+    card.innerHTML = `
+      ${coverSection}
       <div class="p-4">
         <h3 class="font-semibold text-lg text-forest-text mb-1 line-clamp-2">${this.escapeHtml(book.title)}</h3>
         <p class="text-forest-text-muted mb-2">by ${this.escapeHtml(book.author)}</p>
@@ -795,13 +829,12 @@ class ForestDiscovery {
 
   updateEmptyState() {
     const emptyState = document.getElementById('emptyState');
-    if (!emptyState) return;
-    
-    if (this.books.length === 0) {
-      emptyState.classList.remove('hidden');
-    } else {
-      emptyState.classList.add('hidden');
-    }
+    const booksGrid = document.getElementById('booksGrid');
+    if (!emptyState || !booksGrid) return;
+    const isEmpty = this.books.length === 0;
+    // Toggle via utility classes only; avoid inline display conflicts
+    emptyState.classList.toggle('hidden', !isEmpty);
+    booksGrid.classList.toggle('hidden', isEmpty);
   }
 
   showLoading(show) {
@@ -833,9 +866,9 @@ window.ForestDiscovery = ForestDiscovery;
 ForestDiscovery.prototype.showEmptyState = function() {
   const booksGrid = document.getElementById('booksGrid');
   const emptyState = document.getElementById('emptyState');
-  
-  if (booksGrid) booksGrid.style.display = 'none';
-  if (emptyState) emptyState.style.display = 'block';
+  if (!booksGrid || !emptyState) return;
+  emptyState.classList.remove('hidden');
+  booksGrid.classList.add('hidden');
 };
 
 // Initialize when DOM is loaded
