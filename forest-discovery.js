@@ -871,31 +871,35 @@ ForestDiscovery.prototype.showEmptyState = function() {
   booksGrid.classList.add('hidden');
 };
 
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('Forest Discovery: DOM loaded, initializing...');
-  console.log('Available Firebase functions:', {
-    app: !!window.app,
-    db: !!window.db,
-    collection: !!window.collection,
-    query: !!window.query,
-    getDocs: !!window.getDocs
-  });
-  
-  if (!window.db) {
-    console.error('Forest Discovery: Firebase db not available!');
-    return;
+// Initialize when DOM is ready (works whether imported before or after DOMContentLoaded)
+(function initForestDiscoveryImmediate() {
+  function start() {
+    console.log('Forest Discovery: Starting initialization...');
+    console.log('Available Firebase functions:', {
+      app: !!window.app,
+      db: !!window.db,
+      collection: !!window.collection,
+      query: !!window.query,
+      getDocs: !!window.getDocs
+    });
+    if (!window.db) {
+      console.error('Forest Discovery: Firebase db not available!');
+      return;
+    }
+    if (!window.app) {
+      console.error('Forest Discovery: Firebase app not available!');
+      return;
+    }
+    try {
+      window.forestDiscovery = new ForestDiscovery();
+      console.log('Forest Discovery: Initialized successfully');
+    } catch (error) {
+      console.error('Forest Discovery: Failed to initialize:', error);
+    }
   }
-  
-  if (!window.app) {
-    console.error('Forest Discovery: Firebase app not available!');
-    return;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start, { once: true });
+  } else {
+    start();
   }
-  
-  try {
-  window.forestDiscovery = new ForestDiscovery();
-    console.log('Forest Discovery: Initialized successfully');
-  } catch (error) {
-    console.error('Forest Discovery: Failed to initialize:', error);
-  }
-});
+})();
