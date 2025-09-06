@@ -205,7 +205,7 @@
         </section>
 
         <!-- Curated Reviews Carousel -->
-        <section class="py-14">
+        <section class="py-14 nf-carousel-section">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 class="text-2xl md:text-3xl font-bold mb-6" style="font-family: 'Poppins', sans-serif; color:#4A5450;">Read community favorites</h2>
                 <div class="relative overflow-hidden nf-carousel-mask rounded-xl bg-[#4A5450]/5 py-6">
@@ -329,7 +329,7 @@
     <!-- Firebase -->
     <script type="module">
       import { app, db } from './firebase-config.js';
-      import { collection, addDoc, serverTimestamp, query, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+      import { collection, addDoc, serverTimestamp, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
       // Minimal Alpha Popup (inline)
       (function showAlphaPopupInline(){
@@ -467,32 +467,69 @@
         });
       }
 
-      // Build moving carousel from sample books
-      (function(){
-        try{
+      // Build moving carousel from Firebase books with covers
+      async function loadCarousel() {
+        try {
           const track = document.getElementById('reviewsCarousel');
-          if(!track || track.children.length) return;
-          const books = (window.SAMPLE_BOOKS || []).slice(0, 8);
+          if (!track || track.children.length) return;
+          
+          // Load books with covers from Firebase
+          const booksQuery = query(
+            collection(db, 'books'),
+            where('coverUrl', '!=', ''),
+            orderBy('coverUrl'),
+            orderBy('createdAt', 'desc'),
+            limit(12)
+          );
+          const booksSnapshot = await getDocs(booksQuery);
+          
+          if (booksSnapshot.empty) {
+            console.warn('No books with covers found for carousel');
+            const section = document.querySelector('.nf-carousel-section');
+            if (section) section.style.display = 'none';
+            return;
+          }
+          
+          const books = booksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           const duo = books.concat(books); // duplicate for seamless scroll
+          
           const makeItem = (b) => {
             const a = document.createElement('a');
             a.href = `book.html?id=${b.id}`;
             a.className = 'nf-carousel-item text-center';
             a.setAttribute('aria-label', `Read our review: ${b.title} by ${b.author}`);
             const img = document.createElement('img');
-            const cover = (window.coverFor ? window.coverFor(b) : (b.coverUrl || ''));
-            img.src = cover; img.alt = `${b.title} cover`; img.loading = 'lazy';
+            img.src = b.coverUrl || '';
+            img.alt = `${b.title} cover`;
+            img.loading = 'lazy';
             img.className = 'w-full h-auto rounded-lg shadow-md mb-2 object-contain';
-            img.width = 200; img.height = 300;
+            img.width = 200;
+            img.height = 300;
+            // Add error handling for failed images
+            img.onerror = () => {
+              a.style.display = 'none'; // Hide items with failed images
+            };
             const cap = document.createElement('div');
             cap.className = 'text-sm text-[#4A5450]';
             cap.textContent = b.title;
-            a.appendChild(img); a.appendChild(cap);
+            a.appendChild(img);
+            a.appendChild(cap);
             return a;
           };
+          
           duo.forEach(b => track.appendChild(makeItem(b)));
-        }catch(e){ console.warn('carousel init failed', e); }
-      })();
+        } catch (e) {
+          console.warn('carousel init failed', e);
+          // Hide carousel section if it fails to load
+          const carouselSection = document.querySelector('.nf-carousel-section');
+          if (carouselSection) {
+            carouselSection.style.display = 'none';
+          }
+        }
+      }
+      
+      // Load carousel after Firebase is ready
+      loadCarousel();
 
 
 

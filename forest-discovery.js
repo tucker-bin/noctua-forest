@@ -626,22 +626,23 @@ class ForestDiscovery {
     this.books.forEach(book => {
       const bookCard = this.createBookCard(book);
       booksGrid.appendChild(bookCard);
-      // Attach runtime cover onerror fallback
+      // Only attach runtime cover onerror fallback if the book actually has an image element
       try {
         const img = bookCard.querySelector('[data-cover-img]');
-        if (img) {
+        if (img && book.coverUrl) {
           img.onerror = () => {
             const wrapper = bookCard.querySelector('[data-cover]');
             if (!wrapper) return;
+            // Replace failed image with text-based cover
             wrapper.innerHTML = `
-              <div class="absolute inset-0 flex items-center justify-center p-4">
+              <div class="relative bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center" style="aspect-ratio:3/4;">
                 <div class="text-center px-4">
                   <div class="text-base font-semibold text-white line-clamp-3">${this.escapeHtml(book.title)}</div>
                   <div class="mt-1 text-sm text-white/80 line-clamp-1">by ${this.escapeHtml(book.author)}</div>
                 </div>
-              </div>
-              <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
-                <div class="flex flex-wrap" data-tags-overlay></div>
+                <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+                  <div class="flex flex-wrap" data-tags-overlay></div>
+                </div>
               </div>`;
           };
         }
@@ -683,7 +684,7 @@ class ForestDiscovery {
     const hasCover = !!(book.coverUrl && String(book.coverUrl).trim());
     const coverSection = hasCover
       ? `
-        <div class="relative aspect-[3/4] bg-gray-200 overflow-hidden" data-cover>
+        <div class="relative bg-gray-200 overflow-hidden" data-cover style="aspect-ratio:3/4;">
           <img src="${book.coverUrl}"
                alt="${this.escapeHtml(book.title)}"
                class="w-full h-full object-cover"
@@ -697,12 +698,10 @@ class ForestDiscovery {
         </div>
       `
       : `
-        <div class="relative aspect-[3/4] bg-gradient-to-br from-gray-100 to-gray-200 flex items-end">
-          <div class="absolute inset-0 flex items-center justify-center p-4">
-            <div class="text-center px-4">
-              <div class="text-base font-semibold text-forest-text line-clamp-3">${this.escapeHtml(book.title)}</div>
-              <div class="mt-1 text-sm text-forest-text-muted line-clamp-1">by ${this.escapeHtml(book.author)}</div>
-            </div>
+        <div class="relative bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center" data-cover style="aspect-ratio:3/4;">
+          <div class="text-center px-4">
+            <div class="text-base font-semibold text-white line-clamp-3">${this.escapeHtml(book.title)}</div>
+            <div class="mt-1 text-sm text-white/80 line-clamp-1">by ${this.escapeHtml(book.author)}</div>
           </div>
           <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
             <div class="flex flex-wrap" data-tags-overlay></div>

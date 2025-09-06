@@ -143,5 +143,25 @@ service cloud.firestore {
       allow read, update, delete: if isSignedIn() && 
         (resource.data.userId == request.auth.uid || isAdmin());
     }
+
+    // Memberships
+    match /memberships/{membershipId} {
+      allow read: if isSignedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Book Clubs
+    match /bookClubs/{clubId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
+    }
+
+    // Book Club Members
+    match /bookClubMembers/{memberId} {
+      allow read: if isSignedIn() && (resource.data.ownerId == request.auth.uid || resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && (resource.data.ownerId == request.auth.uid || resource.data.userId == request.auth.uid || isAdmin());
+    }
   }
 }
