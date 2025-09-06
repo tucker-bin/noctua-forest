@@ -409,6 +409,7 @@
               a.setAttribute('aria-label', `Read our review: ${d.title || 'Untitled'} by ${d.author || ''}`);
               const img = document.createElement('img');
               img.src = cover; img.alt = `${d.title || 'Untitled'} cover`; img.loading = 'lazy';
+              img.setAttribute('crossorigin','anonymous');
               img.className = 'w-full h-auto rounded-lg shadow-md mb-2 object-contain';
               img.width = 200; img.height = 300;
               const cap = document.createElement('div');

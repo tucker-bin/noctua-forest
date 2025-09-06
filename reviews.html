@@ -292,7 +292,8 @@
     <script type="module">
       import { app, db } from './firebase-config.js';
       import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-      import { addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+      import { addDoc, collection, serverTimestamp, doc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+      import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js';
       import { fetchBookMetadata, extractASIN } from './js/amazonService.js';
       import { generateRandomForestName } from './js/randomForestNameService.js';
 
@@ -428,6 +429,34 @@
               asin: amazonUrl ? extractASIN(amazonUrl) : '',
             });
             bookIdCreated = bookRef.id;
+
+            // Attempt to resolve and persist a cover image into Firebase Storage
+            try {
+              // Fetch metadata (includes imageUrl if available)
+              let metadata = null;
+              if (amazonUrl) {
+                try { metadata = await fetchBookMetadata(amazonUrl); } catch (_) { metadata = null; }
+              }
+              const candidateUrl = (metadata && metadata.coverUrl) ? String(metadata.coverUrl).trim() : '';
+
+              if (candidateUrl) {
+                const storage = getStorage(app);
+                const imgRes = await fetch(candidateUrl, { mode: 'cors' });
+                if (imgRes.ok) {
+                  const blob = await imgRes.blob();
+                  const path = `covers/${bookRef.id}.jpg`;
+                  const ref = storageRef(storage, path);
+                  await uploadBytes(ref, blob, { contentType: blob.type || 'image/jpeg' });
+                  const downloadURL = await getDownloadURL(ref);
+                  await updateDoc(doc(db, 'books', bookRef.id), { coverUrl: downloadURL });
+                } else {
+                  // As a fallback, persist the candidate URL directly so Forest can render it
+                  await updateDoc(doc(db, 'books', bookRef.id), { coverUrl: candidateUrl.replace(/^http:\/\//, 'https://') });
+                }
+              }
+            } catch (coverErr) {
+              console.warn('[reviews] cover upload skipped:', coverErr);
+            }
           } catch (bookErr) {
             console.warn('[reviews] books write denied; queueing submission', bookErr);
             await addDoc(collection(db, 'submissions'), {
