@@ -126,28 +126,57 @@ function resolveCoverUrl(data) {
   ).trim();
   if (direct) {
     // Normalize http to https for security
-    return direct.replace(/^http:\/\//, 'https://');
+    const normalized = direct.replace(/^http:\/\//, 'https://');
+    console.log('Resolved direct cover for', data.title, ':', normalized);
+    return normalized;
   }
   const toStr = (v) => (Array.isArray(v) ? v[0] : v) || '';
   const olid = String(data.openLibraryId || data.olid || '').trim();
-  if (olid) return `https://covers.openlibrary.org/b/olid/${encodeURIComponent(olid)}-L.jpg`;
+  if (olid) {
+    const olUrl = `https://covers.openlibrary.org/b/olid/${encodeURIComponent(olid)}-L.jpg`;
+    console.log('Resolved Open Library cover for', data.title, ':', olUrl);
+    return olUrl;
+  }
   const isbn = String(toStr(data.isbn13) || toStr(data.isbn10) || data.isbn || '').replace(/[^0-9Xx]/g, '').trim();
-  if (isbn) return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+  if (isbn) {
+    const isbnUrl = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+    console.log('Resolved ISBN cover for', data.title, ':', isbnUrl);
+    return isbnUrl;
+  }
+  console.log('No cover found for', data.title, 'by', data.author);
   return '';
 }
 
+// Simple client-side cache for API covers
+const coverCache = new Map();
+
 // Fetch cover from API as fallback
 async function fetchCoverFromAPI(book) {
+  // Check cache first
+  const cacheKey = `${book.title}|${book.author}|${book.isbn}`;
+  if (coverCache.has(cacheKey)) {
+    console.log('Using cached cover for:', book.title);
+    return coverCache.get(cacheKey);
+  }
+  
   try {
     const params = new URLSearchParams();
     if (book.isbn) params.append('isbn', book.isbn);
     if (book.title) params.append('title', book.title);
     if (book.author) params.append('author', book.author);
     
+    console.log('Fetching cover from API for:', book.title, 'by', book.author);
     const response = await fetch(`/api/covers?${params.toString()}`);
     if (response.ok) {
       const data = await response.json();
-      return data.coverUrl || '';
+      const coverUrl = data.coverUrl || '';
+      if (coverUrl) {
+        coverCache.set(cacheKey, coverUrl);
+        console.log('API cover fetched and cached:', coverUrl);
+      }
+      return coverUrl;
+    } else {
+      console.warn('API returned non-OK status:', response.status);
     }
   } catch (error) {
     console.warn('Failed to fetch cover from API:', error);
@@ -543,7 +572,7 @@ class ForestDiscovery {
           }
         } catch (_) {}
         const coverUrl = resolveCoverUrl(data);
-        return {
+        const book = {
           id: doc.id,
           title: data.title || 'Untitled',
           author: data.author || 'Unknown Author',
@@ -564,6 +593,24 @@ class ForestDiscovery {
           thumbnail: data.thumbnail || '',
           cover: data.cover || ''
         };
+        
+        // If no cover found, try API pre-resolution (async, non-blocking)
+        if (!coverUrl && (book.title !== 'Untitled' && book.author !== 'Unknown Author')) {
+          (async () => {
+            try {
+              const apiCover = await fetchCoverFromAPI(book);
+              if (apiCover) {
+                // Update the book object for future renders
+                book.coverUrl = apiCover;
+                console.log('Pre-resolved cover for', book.title, ':', apiCover);
+              }
+            } catch (e) {
+              console.warn('Pre-resolution failed for', book.title, e);
+            }
+          })();
+        }
+        
+        return book;
       })
       // Filter out invalid books only; allow missing covers (grid renders text cover)
       .filter(book => book.id && book.title && book.author);
