@@ -61,8 +61,21 @@
   if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
     document.documentElement.classList.add('ios');
     
-    // Fix iOS scroll momentum
-    document.body.style.webkitOverflowScrolling = 'touch';
+    // Fix iOS scroll momentum - wait for body to be available
+    const fixScrollMomentum = () => {
+      if (document.body) {
+        document.body.style.webkitOverflowScrolling = 'touch';
+      } else {
+        // If body isn't ready, wait for DOMContentLoaded
+        document.addEventListener('DOMContentLoaded', () => {
+          if (document.body) {
+            document.body.style.webkitOverflowScrolling = 'touch';
+          }
+        });
+      }
+    };
+    
+    fixScrollMomentum();
     
     // Fix iOS 100vh issue
     const setVH = () => {

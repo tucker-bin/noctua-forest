@@ -131,7 +131,7 @@ function resolveCoverUrl(data) {
     ''
   ).trim();
   
-  if (directUrl) {
+  if (directUrl && directUrl !== 'undefined' && directUrl !== 'null') {
     // Normalize http to https for security
     return directUrl.replace(/^http:\/\//, 'https://');
   }
@@ -149,6 +149,32 @@ function resolveCoverUrl(data) {
     const olid = String(data.olid || data.openLibraryId).trim();
     if (olid) {
       return `https://covers.openlibrary.org/b/olid/${olid}-L.jpg`;
+    }
+  }
+  
+  // Try to extract ISBN from title/author for common books
+  const title = (data.title || '').toLowerCase();
+  const author = (data.author || '').toLowerCase();
+  
+  // Common book ISBNs for fallback
+  const commonBooks = {
+    'brave new world': '9780060850524',
+    '1984': '9780451524935',
+    'to kill a mockingbird': '9780061120084',
+    'the great gatsby': '9780743273565',
+    'pride and prejudice': '9780141439518',
+    'harry potter': '9780439708180',
+    'lord of the rings': '9780544003415',
+    'the hobbit': '9780547928227',
+    'dune': '9780441172719',
+    'foundation': '9780553293357',
+    'cat\'s cradle': '9780385333481',
+    'brave new you': '9780060850524' // Fallback for "brave new you"
+  };
+  
+  for (const [bookTitle, isbn] of Object.entries(commonBooks)) {
+    if (title.includes(bookTitle) || author.includes(bookTitle)) {
+      return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
     }
   }
   
@@ -305,7 +331,6 @@ function simpleRerank(books, query) {
 // Forest Discovery System - Infinite Scroll & Filtering
 class ForestDiscovery {
   constructor() {
-    console.log('ForestDiscovery: Constructor called');
     this.filters = {
       search: '',
       language: '',
@@ -324,7 +349,6 @@ class ForestDiscovery {
     
     this.init();
     this.loadUserPreferences();
-    console.log('ForestDiscovery: Constructor completed');
   }
 
   init() {
@@ -426,13 +450,11 @@ class ForestDiscovery {
   }
 
   async loadInitialBooks() {
-    console.log('ForestDiscovery: Loading initial books...');
     this.currentPage = 1;
     this.books = [];
     this.lastDoc = null;
     this.hasMoreBooks = true;
     await this.loadMoreBooks();
-    console.log('ForestDiscovery: Initial books loaded, count:', this.books.length);
   }
 
   async loadMoreBooks() {
@@ -477,7 +499,6 @@ class ForestDiscovery {
   async fetchBooks(page, filters) {
     // Allow fetchBooks to run even when outer loader is active. Concurrency is
     // controlled by loadMoreBooks(); guarding here prevents any results.
-    console.log('ForestDiscovery: Fetching books, page:', page, 'filters:', filters);
     this.lastSearchQuery = (filters && filters.search) ? String(filters.search) : '';
     
     try {
@@ -522,12 +543,9 @@ class ForestDiscovery {
       constraints.push(limit(pageSize));
       booksQuery = query(booksQuery, ...constraints);
       
-      console.log('ForestDiscovery: Executing query with sort:', sortField, sortOrder);
       const booksSnap = await getDocs(booksQuery);
-      console.log('ForestDiscovery: Query returned', booksSnap.docs.length, 'books');
       
       if (booksSnap.docs.length === 0 && page === 1) {
-        console.log('ForestDiscovery: No books found, showing empty state');
         this.showEmptyState();
         return [];
       }
@@ -557,7 +575,6 @@ class ForestDiscovery {
           }
         } catch (_) {}
         const coverUrl = resolveCoverUrl(data);
-        console.log('DEBUG COVER:', data.title, 'raw coverUrl:', data.coverUrl, 'resolved:', coverUrl);
         const book = {
           id: doc.id,
           title: data.title || 'Untitled',
@@ -585,7 +602,6 @@ class ForestDiscovery {
         const cachedCover = getCachedCoverUrl(book);
         if (cachedCover && !coverUrl) {
           book.coverUrl = cachedCover;
-          console.log('Using cached cover for', book.title, ':', cachedCover);
         }
         
         return book;
@@ -616,10 +632,8 @@ class ForestDiscovery {
   }
 
   semanticSearch(books, query) {
-    console.log('ForestDiscovery: Starting semantic search for:', query);
     
     const queryTags = extractSemanticTags(query);
-    console.log('ForestDiscovery: Extracted query tags:', queryTags);
     
     const scoredBooks = books.map(book => {
       const score = this.calculateSemanticScore(book, query, queryTags);
@@ -629,7 +643,6 @@ class ForestDiscovery {
     // Sort by semantic score (highest first)
     scoredBooks.sort((a, b) => b.semanticScore - a.semanticScore);
     
-    console.log('ForestDiscovery: Semantic search completed, returning', scoredBooks.length, 'books');
     return scoredBooks;
   }
 
@@ -688,7 +701,6 @@ class ForestDiscovery {
             try {
               // First fallback: If Open Library large image fails, try medium size
               if (book.coverUrl.includes('covers.openlibrary.org') && book.coverUrl.endsWith('-L.jpg')) {
-                console.log('Trying medium size Open Library image for', book.title);
                 const altUrl = book.coverUrl.replace('-L.jpg', '-M.jpg');
                 img.src = altUrl;
                 
@@ -697,7 +709,6 @@ class ForestDiscovery {
                   try {
                     // Second fallback: If medium size fails, try small size
                     if (img.src.endsWith('-M.jpg')) {
-                      console.log('Trying small size Open Library image for', book.title);
                       img.src = img.src.replace('-M.jpg', '-S.jpg');
                       
                       // Set a third onerror handler for the small size fallback
@@ -714,7 +725,6 @@ class ForestDiscovery {
               if (book.isbn && !book.coverUrl.includes('covers.openlibrary.org')) {
                 const isbn = String(book.isbn).replace(/[^0-9X]/gi, '');
                 if (isbn.length >= 10) {
-                  console.log('Trying ISBN fallback for', book.title);
                   img.src = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
                   
                   // Set a new onerror handler for the ISBN fallback
@@ -1015,14 +1025,6 @@ ForestDiscovery.prototype.showEmptyState = function() {
 // Initialize when DOM is ready (works whether imported before or after DOMContentLoaded)
 (function initForestDiscoveryImmediate() {
   function start() {
-    console.log('Forest Discovery: Starting initialization...');
-    console.log('Available Firebase functions:', {
-      app: !!window.app,
-      db: !!window.db,
-      collection: !!window.collection,
-      query: !!window.query,
-      getDocs: !!window.getDocs
-    });
     if (!window.db) {
       console.error('Forest Discovery: Firebase db not available!');
       return;
@@ -1033,7 +1035,6 @@ ForestDiscovery.prototype.showEmptyState = function() {
     }
     try {
       window.forestDiscovery = new ForestDiscovery();
-      console.log('Forest Discovery: Initialized successfully');
     } catch (error) {
       console.error('Forest Discovery: Failed to initialize:', error);
     }
