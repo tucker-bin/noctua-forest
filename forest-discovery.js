@@ -269,6 +269,8 @@ class ForestDiscovery {
     this.isLoading = false;
     this.lastDoc = null;
     this.lastSearchQuery = '';
+    // Cache for top tags per book to avoid repeated reads
+    this.topTagsCache = new Map();
     
     this.init();
     this.loadUserPreferences();
@@ -499,6 +501,7 @@ class ForestDiscovery {
           authorRegion: data.authorRegion || 'unknown',
           publicationYear: data.publicationYear || null,
           authorTags: data.authorTags || [],
+          topTags: Array.isArray(data.topTags) ? data.topTags : [],
           blurb: data.blurb || '',
           createdAt: data.publishedAt || data.createdAt || new Date()
         };
@@ -593,6 +596,24 @@ class ForestDiscovery {
     this.books.forEach(book => {
       const bookCard = this.createBookCard(book);
       booksGrid.appendChild(bookCard);
+      // After initial render, fetch top tags asynchronously and update overlay
+      // Use materialized topTags if present; otherwise fetch from reviews
+      const initial = Array.isArray(book.topTags) ? book.topTags.slice(0,5) : [];
+      if (initial.length) {
+        const overlay = bookCard.querySelector('[data-tags-overlay]');
+        if (overlay) {
+          overlay.innerHTML = initial.map(tag => (
+            `<span class=\"px-2 py-1 bg-white/90 text-gray-800 text-xs rounded-full font-medium mr-1 mb-1 inline-block\">${this.escapeHtml(tag)}</span>`
+          )).join('');
+        }
+      }
+      this.getTopTagsForBook(book.id).then(tags => {
+        const overlay = bookCard.querySelector('[data-tags-overlay]');
+        if (!overlay) return;
+        overlay.innerHTML = tags.map(tag => (
+          `<span class="px-2 py-1 bg-white/90 text-gray-800 text-xs rounded-full font-medium mr-1 mb-1 inline-block">${this.escapeHtml(tag)}</span>`
+        )).join('');
+      }).catch(err => console.warn('Top tags fetch failed for book', book.id, err));
     });
   }
 
@@ -608,34 +629,69 @@ class ForestDiscovery {
       console.warn('Book card missing ID:', book);
     }
     
-    const wordCloud = this.generateWordCloud(book);
     const whyChips = this.buildWhyChips(book, this.lastSearchQuery);
     card.innerHTML = `
-      <div class="aspect-[3/4] bg-gray-200 overflow-hidden">
-        <img src="${book.coverUrl}" alt="${book.title}" class="w-full h-full object-cover">
+      <div class="relative aspect-[3/4] bg-gray-200 overflow-hidden">
+        <img src="${book.coverUrl}" alt="${this.escapeHtml(book.title)}" class="w-full h-full object-cover">
+        <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/75 via-black/40 to-transparent">
+          <div class="flex flex-wrap" data-tags-overlay></div>
+        </div>
       </div>
       <div class="p-4">
-        <h3 class="font-semibold text-lg text-forest-text mb-2 line-clamp-2">${book.title}</h3>
-        <p class="text-forest-text-muted mb-3">by ${book.author}</p>
-        
-        <!-- Word Cloud instead of description -->
-        <div class="mb-3 text-sm">
-          ${wordCloud}
-        </div>
+        <h3 class="font-semibold text-lg text-forest-text mb-1 line-clamp-2">${this.escapeHtml(book.title)}</h3>
+        <p class="text-forest-text-muted mb-2">by ${this.escapeHtml(book.author)}</p>
         ${whyChips}
-        
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <span class="text-sm text-forest-text-muted">${book.reviewCount} reviews</span>
-            </div>
-          <div class="text-xs text-forest-text-muted">
-            ${this.formatRegion(book.authorRegion)}
-          </div>
-            </div>
+        <div class="flex items-center justify-between mt-1">
+          <span class="text-sm text-forest-text-muted">${Number(book.reviewCount || 0)} reviews</span>
+          <span class="text-xs text-forest-text-muted">${this.formatRegion(book.authorRegion)}</span>
         </div>
+      </div>
     `;
     
     return card;
+  }
+
+  // Fetch and cache top tags (by frequency) from review moods
+  async getTopTagsForBook(bookId) {
+    if (!bookId) return [];
+    if (this.topTagsCache.has(bookId)) return this.topTagsCache.get(bookId);
+    try {
+      const q = query(
+        collection(db, 'reviews'),
+        where('bookId', '==', bookId),
+        limit(50)
+      );
+      const snap = await getDocs(q);
+      const counts = Object.create(null);
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+        const moods = Array.isArray(d?.moods) ? d.moods : [];
+        moods.forEach(m => {
+          const key = String(m || '').toLowerCase().trim();
+          if (!key) return;
+          counts[key] = (counts[key] || 0) + 1;
+        });
+      });
+      const top = Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([t]) => t);
+      this.topTagsCache.set(bookId, top);
+      return top;
+    } catch (err) {
+      console.warn('getTopTagsForBook failed:', err);
+      this.topTagsCache.set(bookId, []);
+      return [];
+    }
+  }
+
+  escapeHtml(s) {
+    return String(s || '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
   }
 
   buildWhyChips(book, query) {

@@ -211,13 +211,14 @@
                                 <input id="motivation" name="motivation" type="text" required placeholder="e.g., friend recommendation, love the author, needed escapism…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                             </div>
                             <div>
-                                <label for="review" class="block text-sm font-medium text-white mb-2">What vibe did this give you? *</label>
-                                <textarea id="review" name="review" rows="6" required placeholder="Share the mood, feelings, and experience this book gave you…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent"></textarea>
+                                <label for="review" class="block text-sm font-medium text-white mb-2">Your thoughts and feelings *</label>
+                                <textarea id="review" name="review" rows="6" required placeholder="Share your honest thoughts about the book…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent"></textarea>
                 </div>
                             <div>
-                                <label class="block text-sm font-medium text-white mb-2">Moods & tags (aim for 3-5)</label>
+                                <label class="block text-sm font-medium text-white mb-2">Moods & tags</label>
                                 <div id="moodChips" class="flex flex-wrap gap-2 mb-2"></div>
-                                <input id="moodInput" type="text" placeholder="Type a mood and press Enter…" title="Popular: nostalgic, dreamy, intense, heartwarming, identity, family, friendship, romantic, mystery, adventure, emotional, inspiring, cozy" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
+                                <input id="moodInput" type="text" placeholder="Type a mood and press Enter…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
+                                <p class="text-xs text-white/60 mt-1">Popular tags:</p>
                                 <div id="suggestions" class="mt-2 flex flex-wrap gap-2 text-sm">
                                     <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="nostalgic">nostalgic</button>
                                     <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="dreamy">dreamy</button>
@@ -227,6 +228,18 @@
                                     <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="family">family</button>
                                     <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="friendship">friendship</button>
                                     <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="romantic">romantic</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="mystery">mystery</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="adventure">adventure</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="emotional">emotional</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="inspiring">inspiring</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="cozy">cozy</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="dark">dark</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="funny">funny</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="thoughtful">thoughtful</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="suspenseful">suspenseful</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="hopeful">hopeful</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="melancholy">melancholy</button>
+                                    <button type="button" class="px-2 py-1 rounded-full bg-forest-accent text-white" data-suggest="uplifting">uplifting</button>
                     </div>
                 </div>
                             <div>
@@ -234,7 +247,7 @@
                                 <input id="audience" name="audience" type="text" required placeholder="e.g., teens figuring things out, anyone missing home, people going through change…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                 </div>
                             <div>
-                                <label for="warnings" class="block text-sm font-medium text-white mb-2">Content warnings (if any)</label>
+                                <label for="warnings" class="block text-sm font-medium text-white mb-2">Content warnings (optional)</label>
                                 <input id="warnings" name="warnings" type="text" placeholder="e.g., violence, difficult themes…" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-forest-accent focus:border-forest-accent">
                             </div>
                             <div>
