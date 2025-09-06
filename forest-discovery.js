@@ -147,41 +147,17 @@ function resolveCoverUrl(data) {
   return '';
 }
 
-// Simple client-side cache for API covers
+// Simple client-side cache for covers
 const coverCache = new Map();
 
-// Fetch cover from API as fallback
-async function fetchCoverFromAPI(book) {
+// No API fetching - we use only what's in the book document
+function getCachedCoverUrl(book) {
   // Check cache first
   const cacheKey = `${book.title}|${book.author}|${book.isbn}`;
   if (coverCache.has(cacheKey)) {
-    console.log('Using cached cover for:', book.title);
     return coverCache.get(cacheKey);
   }
-  
-  try {
-    const params = new URLSearchParams();
-    if (book.isbn) params.append('isbn', book.isbn);
-    if (book.title) params.append('title', book.title);
-    if (book.author) params.append('author', book.author);
-    
-    console.log('Fetching cover from API for:', book.title, 'by', book.author);
-    const response = await fetch(`/api/covers?${params.toString()}`);
-    if (response.ok) {
-      const data = await response.json();
-      const coverUrl = data.coverUrl || '';
-      if (coverUrl) {
-        coverCache.set(cacheKey, coverUrl);
-        console.log('API cover fetched and cached:', coverUrl);
-      }
-      return coverUrl;
-    } else {
-      console.warn('API returned non-OK status:', response.status);
-    }
-  } catch (error) {
-    console.warn('Failed to fetch cover from API:', error);
-  }
-  return '';
+  return null;
 }
 
 // Lazy-load USE model; fallback gracefully
@@ -594,20 +570,12 @@ class ForestDiscovery {
           cover: data.cover || ''
         };
         
-        // If no cover found, try API pre-resolution (async, non-blocking)
-        if (!coverUrl && (book.title !== 'Untitled' && book.author !== 'Unknown Author')) {
-          (async () => {
-            try {
-              const apiCover = await fetchCoverFromAPI(book);
-              if (apiCover) {
-                // Update the book object for future renders
-                book.coverUrl = apiCover;
-                console.log('Pre-resolved cover for', book.title, ':', apiCover);
-              }
-            } catch (e) {
-              console.warn('Pre-resolution failed for', book.title, e);
-            }
-          })();
+        // No API pre-resolution - we use only what's in the document
+        // If there's a cached cover URL from a previous session, use it
+        const cachedCover = getCachedCoverUrl(book);
+        if (cachedCover && !coverUrl) {
+          book.coverUrl = cachedCover;
+          console.log('Using cached cover for', book.title, ':', cachedCover);
         }
         
         return book;
@@ -706,15 +674,7 @@ class ForestDiscovery {
       try {
         const img = bookCard.querySelector('[data-cover-img]');
         if (img && book.coverUrl) {
-          img.onerror = async () => {
-            // Try API fallback first
-            if (!book.coverUrl || book.coverUrl.startsWith('https://covers.openlibrary.org/')) {
-              const apiCover = await fetchCoverFromAPI(book);
-              if (apiCover) {
-                img.src = apiCover;
-                return;
-              }
-            }
+          img.onerror = () => {
             const wrapper = bookCard.querySelector('[data-cover]');
             if (!wrapper) return;
             // Replace failed image with text-based cover
