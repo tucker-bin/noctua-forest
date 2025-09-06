@@ -119,6 +119,20 @@ function buildSemanticText(book) {
   return normalize(parts.join(' '));
 }
 
+// Resolve a cover URL from various known fields; prefer Open Library when possible
+function resolveCoverUrl(data) {
+  const direct = String(
+    data.coverUrl || data.imageUrl || data.image || data.thumbnail || data.cover || ''
+  ).trim();
+  if (direct) return direct;
+  const toStr = (v) => (Array.isArray(v) ? v[0] : v) || '';
+  const olid = String(data.openLibraryId || data.olid || '').trim();
+  if (olid) return `https://covers.openlibrary.org/b/olid/${encodeURIComponent(olid)}-L.jpg`;
+  const isbn = String(toStr(data.isbn13) || toStr(data.isbn10) || data.isbn || '').replace(/[^0-9Xx]/g, '').trim();
+  if (isbn) return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+  return '';
+}
+
 // Lazy-load USE model; fallback gracefully
 let __useModel = null;
 async function ensureUSELoaded() {
@@ -506,11 +520,12 @@ class ForestDiscovery {
             createdAt = new Date(createdAtRaw);
           }
         } catch (_) {}
+        const coverUrl = resolveCoverUrl(data);
         return {
           id: doc.id,
           title: data.title || 'Untitled',
           author: data.author || 'Unknown Author',
-          coverUrl: data.coverUrl || '',
+          coverUrl,
           reviewCount: data.reviewCount || 0,
           primaryLanguage: data.primaryLanguage || 'en',
           authorRegion: data.authorRegion || 'unknown',
@@ -611,6 +626,26 @@ class ForestDiscovery {
     this.books.forEach(book => {
       const bookCard = this.createBookCard(book);
       booksGrid.appendChild(bookCard);
+      // Attach runtime cover onerror fallback
+      try {
+        const img = bookCard.querySelector('[data-cover-img]');
+        if (img) {
+          img.onerror = () => {
+            const wrapper = bookCard.querySelector('[data-cover]');
+            if (!wrapper) return;
+            wrapper.innerHTML = `
+              <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="text-center px-4">
+                  <div class="text-base font-semibold text-white line-clamp-3">${this.escapeHtml(book.title)}</div>
+                  <div class="mt-1 text-sm text-white/80 line-clamp-1">by ${this.escapeHtml(book.author)}</div>
+                </div>
+              </div>
+              <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+                <div class="flex flex-wrap" data-tags-overlay></div>
+              </div>`;
+          };
+        }
+      } catch (_) {}
       // After initial render, fetch top tags asynchronously and update overlay
       // Use materialized topTags if present; otherwise fetch from reviews
       const initial = Array.isArray(book.topTags) ? book.topTags.slice(0,5) : [];
@@ -648,8 +683,14 @@ class ForestDiscovery {
     const hasCover = !!(book.coverUrl && String(book.coverUrl).trim());
     const coverSection = hasCover
       ? `
-        <div class="relative aspect-[3/4] bg-gray-200 overflow-hidden">
-          <img src="${book.coverUrl}" alt="${this.escapeHtml(book.title)}" class="w-full h-full object-cover">
+        <div class="relative aspect-[3/4] bg-gray-200 overflow-hidden" data-cover>
+          <img src="${book.coverUrl}"
+               alt="${this.escapeHtml(book.title)}"
+               class="w-full h-full object-cover"
+               referrerpolicy="no-referrer"
+               loading="lazy"
+               decoding="async"
+               data-cover-img>
           <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/75 via-black/40 to-transparent">
             <div class="flex flex-wrap" data-tags-overlay></div>
           </div>
