@@ -864,8 +864,9 @@
         });
     </script>
     <script type="module">
-        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+        import { getAuth, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
         import { doc, getDoc, collection, query, where, getDocs, deleteDoc, orderBy, setDoc, updateDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { setupAuthStateListener } from './js/authUtils.js';
         import { ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js';
         import { 
             createList, getUserLists, updateList, deleteList, shareList, getList 

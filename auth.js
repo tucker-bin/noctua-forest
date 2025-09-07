@@ -2,6 +2,7 @@
 import { app, db } from './firebase-config.js';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+import { setupAuthStateListener } from './js/authUtils.js';
 import { getForestName, generateForestNameForUser } from './js/forestNameService.js';
 import { getUserLists, createList, shareList as createShare, deleteList } from './js/readingListService.js';
 import { getCommissionEarningsSummary } from './js/commissionService.js';
@@ -717,11 +718,9 @@ signoutBtn.addEventListener('click', handleSignOut);
 createListBtn?.addEventListener('click', createNewList);
 createListBtn2?.addEventListener('click', createNewList);
 
-// Auth state observer
-auth.onAuthStateChanged((user) => {
-  if (user) {
-    updateSignedInUI(user);
-  } else {
-    updateSignedOutUI();
-  }
+// Auth state observer using centralized utility
+setupAuthStateListener(db, (user) => {
+  updateSignedInUI(user);
+}, () => {
+  updateSignedOutUI();
 });
