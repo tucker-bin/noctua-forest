@@ -229,8 +229,35 @@
     <script type="module">
         // Wait for Firebase to be available, then load forest-discovery
         function initializeForestDiscovery() {
+            console.log('Initializing Forest Discovery...', {
+                db: !!window.db,
+                app: !!window.app,
+                collection: !!window.collection
+            });
+            
             if (window.db && window.app && window.collection) {
-                import('./forest-discovery.js').catch(err => {
+                console.log('Loading forest-discovery.js...');
+                
+                // Test Firestore connection first
+                getDocs(collection(db, 'books')).then(snapshot => {
+                    console.log('Firestore test successful, found', snapshot.size, 'books');
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        console.log('Book sample:', {
+                            id: doc.id,
+                            title: data.title,
+                            author: data.author,
+                            coverUrl: data.coverUrl,
+                            hasFirebaseStorageUrl: data.coverUrl?.includes('firebasestorage.googleapis.com')
+                        });
+                    });
+                }).catch(err => {
+                    console.error('Firestore connection test failed:', err);
+                });
+                
+                import('./forest-discovery.js').then(() => {
+                    console.log('forest-discovery.js loaded successfully');
+                }).catch(err => {
                     console.error('Failed to load forest-discovery.js:', err);
                     const grid = document.getElementById('booksGrid');
                     if (grid) {

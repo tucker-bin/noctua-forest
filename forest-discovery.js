@@ -669,7 +669,11 @@ class ForestDiscovery {
         overlay.innerHTML = tags.map(tag => (
           `<span class="px-2 py-1 bg-white/90 text-gray-800 text-xs rounded-full font-medium mr-1 mb-1 inline-block">${this.escapeHtml(tag)}</span>`
         )).join('');
-      }).catch(err => console.warn('Top tags fetch failed for book', book.id, err));
+      }).catch(err => {
+        // Tags failed to load - continue without them
+        const overlay = bookCard.querySelector('[data-tags-overlay]');
+        if (overlay) overlay.innerHTML = '';
+      });
     });
   }
 
@@ -744,9 +748,19 @@ class ForestDiscovery {
 
 
   // Fetch and cache top tags (by frequency) from review moods
+  // This is optional - Forest will display without tags if this fails
   async getTopTagsForBook(bookId) {
     if (!bookId) return [];
     if (this.topTagsCache.has(bookId)) return this.topTagsCache.get(bookId);
+    
+    // Return empty tags immediately if user is not authenticated
+    // This prevents permission errors from blocking Forest display
+    const auth = getAuth();
+    if (!auth.currentUser) {
+      this.topTagsCache.set(bookId, []);
+      return [];
+    }
+    
     try {
       const q = query(
         collection(db, 'reviews'),
@@ -771,7 +785,7 @@ class ForestDiscovery {
       this.topTagsCache.set(bookId, top);
       return top;
     } catch (err) {
-      console.warn('getTopTagsForBook failed:', err);
+      // Silently fail for permission errors - don't block Forest display
       this.topTagsCache.set(bookId, []);
       return [];
     }

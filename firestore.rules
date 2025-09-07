@@ -173,6 +173,13 @@ service cloud.firestore {
       );
     }
     
+    // Book metadata cache (for Amazon API results)
+    match /book_metadata/{metadataId} {
+      allow read: if true; // Public read for cached metadata
+      allow create, update: if isSignedIn(); // Allow caching during review submission
+      allow delete: if isAdmin();
+    }
+    
     // List Click Tracking
     match /listClicks/{clickId} {
       allow create: if true; // Allow anonymous tracking

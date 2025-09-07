@@ -1148,12 +1148,15 @@
 
             // Load user's book clubs
             async function loadUserBookClubs() {
+                console.log('Loading user book clubs...');
                 try {
                     userBookClubs = await getUserBookClubs(user.uid);
+                    console.log('Found book clubs:', userBookClubs.length);
                     
                     clubSelect.innerHTML = '';
                     if (userBookClubs.length === 0) {
                         clubSelect.innerHTML = '<option value="">No book clubs found</option>';
+                        console.log('No book clubs found for user');
                         return;
                     }
                     
@@ -1214,9 +1217,21 @@
             }
 
             // Event listeners for member management
-            document.getElementById('manageMembers').addEventListener('click', async () => {
-                await loadUserBookClubs();
-                membersModal.classList.remove('hidden');
+            document.getElementById('manageMembers').addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Manage Members button clicked');
+                try {
+                    await loadUserBookClubs();
+                    console.log('Book clubs loaded, opening modal');
+                    console.log('Modal element:', membersModal);
+                    console.log('Modal classes before:', membersModal.className);
+                    membersModal.classList.remove('hidden');
+                    console.log('Modal classes after:', membersModal.className);
+                } catch (error) {
+                    console.error('Error loading book clubs:', error);
+                    alert('Error loading book clubs. Please try again.');
+                }
             });
 
             document.getElementById('closeMembersModal').addEventListener('click', () => {
