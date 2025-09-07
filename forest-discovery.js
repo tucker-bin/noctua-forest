@@ -693,52 +693,7 @@ class ForestDiscovery {
     this.books.forEach(book => {
       const bookCard = this.createBookCard(book);
       booksGrid.appendChild(bookCard);
-      // Attach runtime cover onerror fallback with multiple fallback strategies
-      try {
-        const img = bookCard.querySelector('[data-cover-img]');
-        if (img && book.coverUrl) {
-          img.onerror = () => {
-            try {
-              // First fallback: If Open Library large image fails, try medium size
-              if (book.coverUrl.includes('covers.openlibrary.org') && book.coverUrl.endsWith('-L.jpg')) {
-                const altUrl = book.coverUrl.replace('-L.jpg', '-M.jpg');
-                img.src = altUrl;
-                
-                // Set a second onerror handler for the medium size fallback
-                img.onerror = () => {
-                  try {
-                    // Second fallback: If medium size fails, try small size
-                    if (img.src.endsWith('-M.jpg')) {
-                      img.src = img.src.replace('-M.jpg', '-S.jpg');
-                      
-                      // Set a third onerror handler for the small size fallback
-                      img.onerror = () => this.replaceWithTextCover(bookCard, book);
-                      return;
-                    }
-                  } catch (_) {}
-                  this.replaceWithTextCover(bookCard, book);
-                };
-                return;
-              }
-              
-              // Try ISBN fallback if available
-              if (book.isbn && !book.coverUrl.includes('covers.openlibrary.org')) {
-                const isbn = String(book.isbn).replace(/[^0-9X]/gi, '');
-                if (isbn.length >= 10) {
-                  img.src = `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
-                  
-                  // Set a new onerror handler for the ISBN fallback
-                  img.onerror = () => this.replaceWithTextCover(bookCard, book);
-                  return;
-                }
-              }
-            } catch (_) {}
-            
-            // Final fallback: Replace with text-based cover
-            this.replaceWithTextCover(bookCard, book);
-          };
-        }
-      } catch (_) {}
+      
       // After initial render, fetch top tags asynchronously and update overlay
       // Use materialized topTags if present; otherwise fetch from reviews
       const initial = Array.isArray(book.topTags) ? book.topTags.slice(0,5) : [];
@@ -773,18 +728,29 @@ class ForestDiscovery {
     }
     
     const whyChips = this.buildWhyChips(book, this.lastSearchQuery);
-    const hasCover = !!(book.coverUrl && String(book.coverUrl).trim());
+    
+    // Use same cover resolution logic as book pages - no backup images, only text fallback
+    const resolvedCoverUrl = resolveCoverUrl(book);
+    const hasCover = !!(resolvedCoverUrl && String(resolvedCoverUrl).trim());
+    
     const coverSection = hasCover
       ? `
         <div class="relative bg-gray-200 overflow-hidden" data-cover style="aspect-ratio:3/4;">
-          <img src="${book.coverUrl}"
+          <img src="${resolvedCoverUrl}"
                alt="${this.escapeHtml(book.title)}"
                class="w-full h-full object-cover"
                referrerpolicy="no-referrer"
                crossorigin="anonymous"
                loading="lazy"
                decoding="async"
-               data-cover-img>
+               onerror="this.parentElement.replaceWith((() => { 
+                 const div = document.createElement('div'); 
+                 div.className = 'relative bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center'; 
+                 div.setAttribute('data-cover', ''); 
+                 div.style.aspectRatio = '3/4'; 
+                 div.innerHTML = \`<div class='text-center px-4'><div class='text-base font-semibold text-white line-clamp-3'>${this.escapeHtml(book.title)}</div><div class='mt-1 text-sm text-white/80 line-clamp-1'>by ${this.escapeHtml(book.author)}</div></div><div class='absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 via-black/30 to-transparent'><div class='flex flex-wrap' data-tags-overlay></div></div>\`; 
+                 return div; 
+               })())">
           <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/75 via-black/40 to-transparent">
             <div class="flex flex-wrap" data-tags-overlay></div>
           </div>
@@ -818,23 +784,6 @@ class ForestDiscovery {
     return card;
   }
 
-  // Helper method to replace a failed image with a text-based cover
-  replaceWithTextCover(bookCard, book) {
-    const wrapper = bookCard.querySelector('[data-cover]');
-    if (!wrapper) return;
-    
-    // Replace failed image with text-based cover
-    wrapper.innerHTML = `
-      <div class="relative bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center" style="aspect-ratio:3/4;">
-        <div class="text-center px-4">
-          <div class="text-base font-semibold text-white line-clamp-3">${this.escapeHtml(book.title)}</div>
-          <div class="mt-1 text-sm text-white/80 line-clamp-1">by ${this.escapeHtml(book.author)}</div>
-        </div>
-        <div class="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
-          <div class="flex flex-wrap" data-tags-overlay></div>
-        </div>
-      </div>`;
-  }
 
   // Fetch and cache top tags (by frequency) from review moods
   async getTopTagsForBook(bookId) {
@@ -1045,3 +994,8 @@ ForestDiscovery.prototype.showEmptyState = function() {
     start();
   }
 })();
+
+// Global cover function for consistency with book pages
+window.coverFor = function(book) {
+  return resolveCoverUrl(book);
+};

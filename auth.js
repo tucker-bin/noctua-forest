@@ -718,9 +718,12 @@ signoutBtn.addEventListener('click', handleSignOut);
 createListBtn?.addEventListener('click', createNewList);
 createListBtn2?.addEventListener('click', createNewList);
 
-// Auth state observer using centralized utility
-setupAuthStateListener(db, (user) => {
-  updateSignedInUI(user);
-}, () => {
-  updateSignedOutUI();
-});
+// Auth state observer - only for pages that load auth.js (not account.html)
+// account.html uses its own centralized auth to avoid conflicts
+if (!window.location.pathname.includes('account.html')) {
+  setupAuthStateListener(db, (user) => {
+    updateSignedInUI(user);
+  }, () => {
+    updateSignedOutUI();
+  });
+}

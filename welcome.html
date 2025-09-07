@@ -374,19 +374,24 @@
 
 
 
-      // Resolve cover URL from various fields (same logic as Forest)
+      // Resolve cover URL from multiple possible fields (same logic as Forest and book pages)
       function resolveCoverUrl(data) {
-        const direct = String(
-          data.coverUrl || data.imageUrl || data.image || data.thumbnail || data.cover || ''
+        // Try direct cover URL fields first
+        const directUrl = String(
+          data.coverUrl || 
+          data.imageUrl || 
+          data.image || 
+          data.thumbnail || 
+          data.cover || 
+          ''
         ).trim();
-        if (direct) {
-          return direct.replace(/^http:\/\//, 'https://');
+        
+        if (directUrl && directUrl !== 'undefined' && directUrl !== 'null') {
+          // Normalize http to https for security
+          return directUrl.replace(/^http:\/\//, 'https://');
         }
-        const toStr = (v) => (Array.isArray(v) ? v[0] : v) || '';
-        const olid = String(data.openLibraryId || data.olid || '').trim();
-        if (olid) return `https://covers.openlibrary.org/b/olid/${encodeURIComponent(olid)}-L.jpg`;
-        const isbn = String(toStr(data.isbn13) || toStr(data.isbn10) || data.isbn || '').replace(/[^0-9Xx]/g, '').trim();
-        if (isbn) return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+        
+        // No backup images - return empty string for consistency with Forest/book pages
         return '';
       }
 

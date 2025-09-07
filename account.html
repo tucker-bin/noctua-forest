@@ -123,7 +123,7 @@
                     <a href="reviews.html" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
                         Write a Review
                     </a>
-                    <button id="create-list-btn" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">
+                    <button onclick="createNewList()" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">
                         Create List
                     </button>
                     <a href="book-clubs.html" id="book-clubs-link" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors hidden">
@@ -161,7 +161,7 @@
                         </svg>
                         <h2 class="text-2xl font-bold text-white">Reading Lists</h2>
                     </div>
-                    <button id="createList" class="px-4 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 transition-opacity flex items-center">
+                    <button onclick="createNewList()" class="px-4 py-2 bg-forest-accent text-white rounded-full hover:opacity-90 transition-opacity flex items-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -190,7 +190,7 @@
                 <!-- Empty State -->
                 <div id="emptyLists" class="hidden text-center py-8">
                     <p class="text-white/80 mb-4">You haven't created any reading lists yet.</p>
-                    <button class="create-list-btn px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90">
+                    <button onclick="createNewList()" class="px-5 py-2 bg-forest-accent text-white rounded-full hover:opacity-90">
                         Create Your First List
                     </button>
                 </div>
@@ -324,6 +324,317 @@
             // User not authenticated - handled by auth.js
         });
 
+        // Load and display user's reading lists
+        async function loadLists() {
+            const listsContainer = document.getElementById('readingLists');
+            const emptyState = document.getElementById('emptyLists');
+            
+            if (!listsContainer) {
+                console.warn('Lists container not found');
+                    return;
+                }
+            
+            try {
+                const lists = await getUserLists(auth.currentUser.uid);
+                
+                listsContainer.innerHTML = '';
+                
+                if (lists.length === 0) {
+                    if (emptyState) emptyState.classList.remove('hidden');
+                    return;
+                }
+                
+                if (emptyState) emptyState.classList.add('hidden');
+                
+                lists.forEach(list => {
+                    const listElement = document.createElement('div');
+                    listElement.className = 'bg-[#3A4440] rounded-lg p-4';
+                    listElement.innerHTML = `
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <h3 class="font-medium text-lg mb-1 text-white">${list.name}</h3>
+                                ${list.description ? `<p class="text-sm text-white/80 mb-2">${list.description}</p>` : ''}
+                                <div class="flex items-center gap-4 text-sm text-white/60">
+                                    <span>${list.books?.length || 0} books</span>
+                                    <span>Created ${new Date(list.createdAt?.toDate?.() || list.createdAt).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 ml-4">
+                                <button onclick="editList('${list.id}')" class="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded" title="Edit list">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <button onclick="deleteListHandler('${list.id}')" class="p-2 text-white/60 hover:text-red-400 hover:bg-red-500/10 rounded" title="Delete list">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <a href="list.html?id=${list.id}" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
+                                View List
+                            </a>
+                            <button onclick="shareList('${list.id}')" class="px-4 py-2 border border-white/20 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors">
+                                Share
+                            </button>
+                        </div>
+                    `;
+                    listsContainer.appendChild(listElement);
+                });
+            } catch (err) {
+                console.error('Error loading lists:', err);
+                listsContainer.innerHTML = '<p class="text-red-400 p-4">Error loading your lists. Please try again later.</p>';
+            }
+        }
+
+        // Set up list management functions
+        function setupListManagement() {
+            // Global functions for onclick handlers
+            window.createNewList = () => {
+                showCreateListModal();
+            };
+
+            window.editList = async (listId) => {
+                try {
+                    const list = await getList(listId);
+                    if (!list) throw new Error('List not found');
+                    
+                    currentListId = listId;
+                    showEditListModal(list);
+                } catch (err) {
+                    console.error('Failed to load list:', err);
+                    alert('Failed to load list details. Please try again.');
+                }
+            };
+
+            window.deleteListHandler = (listId) => {
+                showDeleteConfirmModal(listId);
+            };
+
+            window.shareList = async (listId) => {
+                try {
+                    const uid = auth.currentUser?.uid;
+                    if (!uid) {
+                        alert('Please sign in to share lists');
+                        return;
+                    }
+                    
+                    const shareId = await shareList(listId, uid);
+                    const link = `${window.location.origin}/list.html?${shareId ? `share=${shareId}` : `id=${listId}`}`;
+                    showShareModal(link);
+                } catch (err) {
+                    console.error('Error creating share link:', err);
+                    alert('Unable to create share link right now.');
+                }
+            };
+        }
+
+        // Modal functions for list management
+        function showCreateListModal() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+                    <h3 class="text-xl font-bold text-white mb-4">Create New List</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="list-name-input" class="block text-sm font-medium text-white/90 mb-1">List Name</label>
+                            <input type="text" id="list-name-input" placeholder="Enter list name" required
+                                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="list-description-input" class="block text-sm font-medium text-white/90 mb-1">Description (Optional)</label>
+                            <textarea id="list-description-input" placeholder="Describe your list..." rows="3"
+                                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent"></textarea>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 justify-end mt-6">
+                        <button onclick="closeModal()" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="confirmCreateList()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
+                            Create List
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('list-name-input').focus();
+        }
+
+        function showEditListModal(list) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+                    <h3 class="text-xl font-bold text-white mb-4">Edit List</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="edit-list-name-input" class="block text-sm font-medium text-white/90 mb-1">List Name</label>
+                            <input type="text" id="edit-list-name-input" value="${list.name || ''}" required
+                                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="edit-list-description-input" class="block text-sm font-medium text-white/90 mb-1">Description (Optional)</label>
+                            <textarea id="edit-list-description-input" rows="3"
+                                class="w-full px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F58220] focus:border-transparent">${list.description || ''}</textarea>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 justify-end mt-6">
+                        <button onclick="closeModal()" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="confirmEditList()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('edit-list-name-input').focus();
+        }
+
+        function showDeleteConfirmModal(listId) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+                    <h3 class="text-xl font-bold text-white mb-4">Delete List</h3>
+                    <p class="text-white/80 mb-4">Are you sure you want to delete this list? This action cannot be undone.</p>
+                    <div class="flex gap-3 justify-end">
+                        <button onclick="closeModal()" class="px-4 py-2 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-full text-sm font-medium transition-colors">
+                            Cancel
+                        </button>
+                        <button onclick="confirmDeleteList('${listId}')" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-full text-sm font-medium transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function showShareModal(link) {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-[#4A5450] rounded-xl p-6 w-full max-w-md mx-4">
+                    <h3 class="text-xl font-bold text-white mb-2">Share this list</h3>
+                    <p class="text-white/80 text-sm mb-4">Send the link or share via your apps.</p>
+                    <label for="share-link" class="block text-xs text-white/70 mb-2">Link to share</label>
+                    <div class="flex items-stretch gap-2 mb-4">
+                        <input id="share-link" type="text" readonly value="${link}"
+                            class="flex-1 px-4 py-3 rounded-lg bg-[#5A6560] border border-[#7A8580] text-white placeholder-gray-300 focus:outline-none">
+                        <button id="copy-btn" onclick="shareCopyLink('copy-btn')" class="px-4 py-3 bg-[#5A6560] hover:bg-[#6A7570] text-white rounded-lg text-sm font-medium transition-colors whitespace-nowrap">Copy</button>
+                    </div>
+                    <div class="space-y-2">
+                        <button onclick="shareNative()" class="w-full px-4 py-3 bg-forest-accent hover:bg-[#E0751C] text-white rounded-lg text-sm font-medium transition-colors">Share via apps</button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=${encodeURIComponent(link)}" class="w-full px-4 py-3 border border-white/20 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors text-center">Post on X</a>
+                            <a target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}" class="w-full px-4 py-3 border border-white/20 hover:bg-white/10 text-white rounded-lg text-sm font-medium transition-colors text-center">Facebook</a>
+                        </div>
+                    </div>
+                    <div class="flex justify-end mt-5">
+                        <button onclick="closeModal()" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">Done</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Modal utility functions
+        window.closeModal = function() {
+            const modal = document.querySelector('.fixed.inset-0.bg-black\\/50');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        window.confirmCreateList = async function() {
+            const nameInput = document.getElementById('list-name-input');
+            const descriptionInput = document.getElementById('list-description-input');
+            const name = nameInput.value.trim();
+            const description = descriptionInput.value.trim();
+            
+            if (!name) {
+                nameInput.focus();
+                return;
+            }
+
+            try {
+                await createList(auth.currentUser.uid, name, description);
+                await loadLists();
+                closeModal();
+            } catch (error) {
+                console.error('Error creating list:', error);
+                alert('Failed to create list. Please try again.');
+            }
+        }
+
+        window.confirmEditList = async function() {
+            const nameInput = document.getElementById('edit-list-name-input');
+            const descriptionInput = document.getElementById('edit-list-description-input');
+            const name = nameInput.value.trim();
+            const description = descriptionInput.value.trim();
+            
+            if (!name) {
+                nameInput.focus();
+                return;
+            }
+
+            try {
+                await updateList(currentListId, { name, description });
+                await loadLists();
+                closeModal();
+            } catch (error) {
+                console.error('Error updating list:', error);
+                alert('Failed to update list. Please try again.');
+            }
+        }
+
+        window.confirmDeleteList = async function(listId) {
+            try {
+                await deleteList(listId);
+                closeModal();
+                await loadLists();
+            } catch (error) {
+                console.error('Error deleting list:', error);
+                alert('Failed to delete list. Please try again.');
+            }
+        }
+
+        window.shareCopyLink = function(buttonId){
+            const input = document.getElementById('share-link');
+            if (!input) return;
+            try {
+                navigator.clipboard?.writeText(input.value) || document.execCommand('copy');
+            } catch (_) {
+                input.select();
+                document.execCommand('copy');
+            }
+            const btn = buttonId ? document.getElementById(buttonId) : null;
+            if (btn) {
+                const original = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.classList.add('bg-green-600');
+                setTimeout(() => {
+                    btn.textContent = original;
+                    btn.classList.remove('bg-green-600');
+                }, 1400);
+            }
+        }
+
+        window.shareNative = function(){
+            const input = document.getElementById('share-link');
+            const url = input ? input.value : window.location.href;
+            if (navigator.share) {
+                navigator.share({ title: 'Noctua Forest List', url }).catch(()=>{});
+            } else {
+                window.open(url, '_blank');
+            }
+        }
 
         async function checkMembershipAndUpdateUI(userId) {
             try {
@@ -428,52 +739,6 @@
             }
         }
 
-        function setupListManagement() {
-            const listModal = document.getElementById('listModal');
-            const listForm = document.getElementById('listForm');
-
-            // Create List
-            document.getElementById('createList').addEventListener('click', () => {
-                currentListId = null;
-                listForm.reset();
-                listModal.classList.remove('hidden');
-                listModal.classList.add('flex');
-            });
-
-            document.querySelectorAll('.create-list-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    currentListId = null;
-                    listForm.reset();
-                    listModal.classList.remove('hidden');
-                    listModal.classList.add('flex');
-                });
-            });
-
-            document.getElementById('cancelList').addEventListener('click', () => {
-                listModal.classList.add('hidden');
-                listModal.classList.remove('flex');
-            });
-
-            listForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('listName').value.trim();
-                const description = document.getElementById('listDescription').value.trim();
-
-                try {
-                    if (currentListId) {
-                        await updateList(currentListId, { name, description });
-                    } else {
-                        await createList(auth.currentUser.uid, name, description);
-                    }
-                    listModal.classList.add('hidden');
-                    listModal.classList.remove('flex');
-                    await loadLists();
-                } catch (err) {
-                    console.error('Failed to save list:', err);
-                    alert('Failed to save list. Please try again.');
-                }
-            });
-        }
 
         // Edit List
         window.editList = async (listId) => {
