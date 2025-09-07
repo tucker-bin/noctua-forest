@@ -970,6 +970,7 @@
                 // Check if admin wants to stay on user dashboard (manual override)
                 const urlParams = new URLSearchParams(window.location.search);
                 const stayOnUserDashboard = urlParams.get('stay') === 'user';
+                console.log('Dashboard check - stay parameter:', urlParams.get('stay'), 'stayOnUserDashboard:', stayOnUserDashboard);
                 
                 // Prevent redirect loop - don't redirect if we're already on admin dashboard
                 if (window.location.pathname.includes('admin/dashboard.html')) {
@@ -1057,8 +1058,10 @@
                 adminDashboardLink.classList.remove('hidden');
             }
             
-            // Add dashboard switcher for admin users
-            if (user.email === 'tucker.apply@gmail.com') {
+            // Add dashboard switcher for admin users (but respect stay=user parameter)
+            const stayOnUserDashboard = urlParams.get('stay') === 'user';
+            
+            if (user.email === 'tucker.apply@gmail.com' && !stayOnUserDashboard) {
                 const dashboardSwitcher = document.createElement('div');
                 dashboardSwitcher.className = 'fixed top-4 right-4 z-50';
                 dashboardSwitcher.innerHTML = `

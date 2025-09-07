@@ -307,81 +307,23 @@
             createList, getUserLists, updateList, deleteList, shareList, getList 
         } from './js/readingListService.js';
         import { app, db } from './firebase-config.js';
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
         import { doc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+        import { setupAuthStateListener, checkAdminStatus } from './js/authUtils.js';
 
         const auth = getAuth(app);
         let currentListId = null;
 
-        // Wait for auth state
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                console.log('User authenticated:', user.email);
-                
-                // Prevent redirect loop - don't redirect if we're already on admin dashboard
-                if (window.location.pathname.includes('admin/dashboard.html')) {
-                    console.log('Already on admin dashboard, skipping redirect');
-                    return;
-                }
-                
-                // Check if user is admin first
-                const isAdmin = await checkAdminStatus(user.uid);
-                console.log('Admin check result:', isAdmin);
-                
-                if (isAdmin) {
-                    console.log('Admin detected, redirecting to admin dashboard');
-                    // Redirect admin users to admin dashboard
-                    window.location.href = 'admin/dashboard.html';
-                    return;
-                }
-                
-                await loadLists();
-                setupListManagement();
-                await checkMembershipAndUpdateUI(user.uid);
-            }
+        // Wait for auth state using centralized auth utility
+        setupAuthStateListener(db, async (user) => {
+            // User is authenticated and admin redirect has been handled
+            await loadLists();
+            setupListManagement();
+            await checkMembershipAndUpdateUI(user.uid);
+        }, () => {
+            // User not authenticated - handled by auth.js
         });
 
-        async function checkAdminStatus(userId) {
-            try {
-                // Hardcoded admin check for known admin users (fallback)
-                const user = auth.currentUser;
-                if (user && user.email === 'tucker.apply@gmail.com') {
-                    console.log('Hardcoded admin check: Admin user detected');
-                    return true;
-                }
-                
-                // First try Firestore document
-                const userDoc = await getDoc(doc(db, 'users', userId));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    if (userData?.isAdmin === true || userData?.admin === true) {
-                        console.log('Firestore admin check: Admin detected');
-                        return true;
-                    }
-                }
-                
-                // Fallback: Check Firebase Auth custom claims
-                if (user) {
-                    const tokenResult = await user.getIdTokenResult();
-                    if (tokenResult.claims?.admin === true || tokenResult.claims?.isAdmin === true) {
-                        console.log('Custom claims admin check: Admin detected');
-                        return true;
-                    }
-                }
-                
-                console.log('No admin status detected');
-                return false;
-            } catch (error) {
-                console.warn('Could not check admin status:', error);
-                // Fallback to hardcoded check on error
-                const user = auth.currentUser;
-                if (user && user.email === 'tucker.apply@gmail.com') {
-                    console.log('Fallback admin check: Admin user detected');
-                    return true;
-                }
-                return false;
-            }
-        }
 
         async function checkMembershipAndUpdateUI(userId) {
             try {
@@ -392,29 +334,14 @@
                 
                 // Check admin status first (more reliable)
                 try {
-                    // Hardcoded admin check
-                    const user = auth.currentUser;
-                    if (user && user.email === 'tucker.apply@gmail.com') {
-                        isAdmin = true;
+                    isAdmin = await checkAdminStatus(userId, db);
+                    if (isAdmin) {
                         hasAccess = true;
                         adminDashboardLink.classList.remove('hidden');
-                    } else {
-                        const userDoc = await getDoc(doc(db, 'users', userId));
-                        isAdmin = userDoc.exists() && (userDoc.data()?.isAdmin === true || userDoc.data()?.admin === true);
-                        if (isAdmin) {
-                            hasAccess = true;
-                            adminDashboardLink.classList.remove('hidden');
-                        }
                     }
                 } catch (adminError) {
                     console.warn('Could not check admin status:', adminError);
-                    // Fallback to hardcoded check
-                    const user = auth.currentUser;
-                    if (user && user.email === 'tucker.apply@gmail.com') {
-                        isAdmin = true;
-                        hasAccess = true;
-                        adminDashboardLink.classList.remove('hidden');
-                    }
+                    // Admin check handled by centralized utility
                 }
                 
                 // Check membership status if not admin
