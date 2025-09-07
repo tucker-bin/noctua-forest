@@ -327,11 +327,9 @@
 
 
 
-    <!-- Firebase -->
+    <!-- Firebase and Welcome Page Scripts -->
+    <script type="module" src="js/welcome.js"></script>
     <script type="module">
-      import { app, db } from './firebase-config.js';
-      import { collection, addDoc, serverTimestamp, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-
       // Minimal Alpha Popup (inline)
       (function showAlphaPopupInline(){
         try{
@@ -371,68 +369,6 @@
           (document.body || document.documentElement).appendChild(bar);
         }catch(_){}
       })();
-
-
-
-      // Resolve cover URL from multiple possible fields (same logic as Forest and book pages)
-      function resolveCoverUrl(data) {
-        // Try direct cover URL fields first
-        const directUrl = String(
-          data.coverUrl || 
-          data.imageUrl || 
-          data.image || 
-          data.thumbnail || 
-          data.cover || 
-          ''
-        ).trim();
-        
-        if (directUrl && directUrl !== 'undefined' && directUrl !== 'null') {
-          // Normalize http to https for security
-          return directUrl.replace(/^http:\/\//, 'https://');
-        }
-        
-        // No backup images - return empty string for consistency with Forest/book pages
-        return '';
-      }
-
-      // Try to load curated books from Firestore for the carousel
-      (async function loadCuratedReviews(){
-        try{
-          const q = query(collection(db, 'books'), orderBy('publishedAt','desc'), limit(20));
-          const snap = await getDocs(q);
-          const track = document.getElementById('reviewsCarousel');
-          if (!track) return;
-          if (!snap.empty){
-            track.innerHTML = '';
-            const items = [];
-            snap.forEach(docSnap => {
-              const d = docSnap.data();
-              const cover = resolveCoverUrl(d);
-              if (!cover) return; // skip items without covers
-              const a = document.createElement('a');
-              a.href = `book.html?id=${docSnap.id}`;
-              a.className = 'nf-carousel-item text-center';
-              a.setAttribute('aria-label', `Read our review: ${d.title || 'Untitled'} by ${d.author || ''}`);
-              const img = document.createElement('img');
-              img.src = cover; img.alt = `${d.title || 'Untitled'} cover`; img.loading = 'lazy';
-              img.setAttribute('crossorigin','anonymous');
-              img.className = 'w-full h-auto rounded-lg shadow-md mb-2 object-contain';
-              img.width = 200; img.height = 300;
-              const cap = document.createElement('div');
-              cap.className = 'text-sm text-[#4A5450]';
-              cap.textContent = d.title || 'Untitled';
-              a.appendChild(img); a.appendChild(cap);
-              items.push(a);
-            });
-            const filtered = items.filter(Boolean);
-            const duo = filtered.concat(filtered.map(n=>n.cloneNode(true)));
-            duo.forEach(n => track.appendChild(n));
-          }
-        }catch(e){ /* fallback handled by non-module script */ }
-      })();
-
-      // We already have loadCuratedReviews function above, so we don't need a second carousel loader
-
 
       // Toggle new author promo via global flag (can be set server-side)
       try {

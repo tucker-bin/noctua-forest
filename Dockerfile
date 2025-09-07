@@ -1,18 +1,37 @@
-FROM node:20-alpine
+FROM node:20-alpine AS builder
 
-# Install build dependencies and runtime tools
-RUN apk add --no-cache python3 make g++ vips-dev wget
+# Install build dependencies
+RUN apk add --no-cache python3 make g++ vips-dev
 
 WORKDIR /app
 COPY package.json package-lock.json* ./
 
-# Install dependencies with Sharp support
-RUN npm ci --only=production || npm i --omit=dev
+# Install all dependencies for build
+RUN npm ci
 
+# Copy source files
 COPY . .
 
-# Generate images (with proper error handling)
-RUN node scripts/generate-images.mjs || echo "Image generation skipped"
+# Run full build process
+RUN npm run build:all
+
+# Production stage
+FROM node:20-alpine
+
+# Install runtime dependencies
+RUN apk add --no-cache vips-dev wget
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install production dependencies only
+RUN npm ci --only=production
+
+# Copy built files from builder stage
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server ./server
 
 ENV PORT=8080
 EXPOSE 8080

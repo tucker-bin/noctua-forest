@@ -1,17 +1,11 @@
 // Authentication and Account Management
-import { app, db } from './firebase-config.js';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
-import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-import { setupAuthStateListener } from './js/authUtils.js';
+import authService from './js/services/AuthService.js';
 import { getForestName, generateForestNameForUser } from './js/forestNameService.js';
 import { getUserLists, createList, shareList as createShare, deleteList } from './js/readingListService.js';
 import { getCommissionEarningsSummary } from './js/commissionService.js';
 import { getAnalyticsForUser } from './js/analyticsService.js';
 import { getRecentReviews } from './js/reviewService.js';
 import { getSimilarBooks } from './js/recommendationService.js';
-
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
 
 // UI Elements
 const signinForm = document.getElementById('signin-form');
@@ -709,10 +703,43 @@ window.shareNative = function(){
 }
 
 // Event listeners
-emailSigninBtn.addEventListener('click', handleEmailSignIn);
-emailSignupBtn.addEventListener('click', handleEmailSignUp);
-googleSigninBtn.addEventListener('click', handleGoogleSignIn);
-signoutBtn.addEventListener('click', handleSignOut);
+emailSigninBtn?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    try {
+        await authService.signInWithEmail(emailInput.value, passwordInput.value);
+        showSuccess('Signed in successfully!');
+    } catch (error) {
+        showError(error.message);
+    }
+});
+
+emailSignupBtn?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    try {
+        await authService.signUpWithEmail(emailInput.value, passwordInput.value);
+        showSuccess('Account created successfully!');
+    } catch (error) {
+        showError(error.message);
+    }
+});
+
+googleSigninBtn?.addEventListener('click', async () => {
+    try {
+        await authService.signInWithGoogle();
+        showSuccess('Signed in with Google successfully!');
+    } catch (error) {
+        showError(error.message);
+    }
+});
+
+signoutBtn?.addEventListener('click', async () => {
+    try {
+        await authService.signOut();
+        showSuccess('Signed out successfully!');
+    } catch (error) {
+        showError(error.message);
+    }
+});
 
 // Dashboard event listeners
 createListBtn?.addEventListener('click', createNewList);
@@ -721,9 +748,12 @@ createListBtn2?.addEventListener('click', createNewList);
 // Auth state observer - only for pages that load auth.js (not account.html)
 // account.html uses its own centralized auth to avoid conflicts
 if (!window.location.pathname.includes('account.html')) {
-  setupAuthStateListener(db, (user) => {
-    updateSignedInUI(user);
-  }, () => {
-    updateSignedOutUI();
+  window.addEventListener('authStateChanged', (event) => {
+    const { user } = event.detail;
+    if (user) {
+      updateSignedInUI(user);
+    } else {
+      updateSignedOutUI();
+    }
   });
 }

@@ -3,13 +3,19 @@
   "private": true,
   "version": "1.0.0",
   "description": "Noctua Forest — static site with minimal Node server",
+  "type": "module",
   "scripts": {
     "tailwind:build": "tailwindcss -c tailwind.config.js -i ./src/styles/input.css -o ./assets/tailwind.css --minify",
     "tailwind:watch": "tailwindcss -c tailwind.config.js -i ./src/styles/input.css -o ./assets/tailwind.css --watch",
     "start": "node server/server.js",
-    "images:thumbs": "node scripts/generate-images.mjs"
+    "images:thumbs": "node scripts/generate-images.mjs",
+    "build": "node scripts/build.js",
+    "build:all": "npm run tailwind:build && npm run images:thumbs && npm run build",
+    "clean": "rimraf dist",
+    "prebuild": "npm run clean"
   },
   "dependencies": {
+    "compression": "^1.7.4",
     "express": "^4.19.2",
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
@@ -22,6 +28,9 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.41"
+    "esbuild": "^0.20.2",
+    "fs-extra": "^11.2.0",
+    "postcss": "^8.4.41",
+    "rimraf": "^5.0.5"
   }
 }
