@@ -119,9 +119,9 @@ function buildSemanticText(book) {
   return normalize(parts.join(' '));
 }
 
-// Resolve a cover URL from multiple possible fields
+// Resolve a cover URL from multiple possible fields - Firebase Storage URLs only
 function resolveCoverUrl(data) {
-  // Try direct cover URL fields first
+  // Try direct cover URL fields first (should be Firebase Storage URLs from review submission)
   const directUrl = String(
     data.coverUrl || 
     data.imageUrl || 
@@ -136,49 +136,7 @@ function resolveCoverUrl(data) {
     return directUrl.replace(/^http:\/\//, 'https://');
   }
   
-  // Try to generate a cover URL from ISBN if available
-  if (data.isbn) {
-    const isbn = String(data.isbn).replace(/[^0-9X]/gi, '');
-    if (isbn.length >= 10) {
-      return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
-    }
-  }
-  
-  // Try to generate a cover URL from Open Library ID if available
-  if (data.olid || data.openLibraryId) {
-    const olid = String(data.olid || data.openLibraryId).trim();
-    if (olid) {
-      return `https://covers.openlibrary.org/b/olid/${olid}-L.jpg`;
-    }
-  }
-  
-  // Try to extract ISBN from title/author for common books
-  const title = (data.title || '').toLowerCase();
-  const author = (data.author || '').toLowerCase();
-  
-  // Common book ISBNs for fallback
-  const commonBooks = {
-    'brave new world': '9780060850524',
-    '1984': '9780451524935',
-    'to kill a mockingbird': '9780061120084',
-    'the great gatsby': '9780743273565',
-    'pride and prejudice': '9780141439518',
-    'harry potter': '9780439708180',
-    'lord of the rings': '9780544003415',
-    'the hobbit': '9780547928227',
-    'dune': '9780441172719',
-    'foundation': '9780553293357',
-    'cat\'s cradle': '9780385333481',
-    'brave new you': '9780060850524' // Fallback for "brave new you"
-  };
-  
-  for (const [bookTitle, isbn] of Object.entries(commonBooks)) {
-    if (title.includes(bookTitle) || author.includes(bookTitle)) {
-      return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
-    }
-  }
-  
-  // No cover URL found
+  // No external fallbacks - return empty string for text cover fallback
   return '';
 }
 

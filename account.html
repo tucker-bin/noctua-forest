@@ -324,70 +324,7 @@
             // User not authenticated - handled by auth.js
         });
 
-        // Load and display user's reading lists
-        async function loadLists() {
-            const listsContainer = document.getElementById('readingLists');
-            const emptyState = document.getElementById('emptyLists');
-            
-            if (!listsContainer) {
-                console.warn('Lists container not found');
-                    return;
-                }
-            
-            try {
-                const lists = await getUserLists(auth.currentUser.uid);
-                
-                listsContainer.innerHTML = '';
-                
-                if (lists.length === 0) {
-                    if (emptyState) emptyState.classList.remove('hidden');
-                    return;
-                }
-                
-                if (emptyState) emptyState.classList.add('hidden');
-                
-                lists.forEach(list => {
-                    const listElement = document.createElement('div');
-                    listElement.className = 'bg-[#3A4440] rounded-lg p-4';
-                    listElement.innerHTML = `
-                        <div class="flex items-start justify-between mb-3">
-                            <div class="flex-1">
-                                <h3 class="font-medium text-lg mb-1 text-white">${list.name}</h3>
-                                ${list.description ? `<p class="text-sm text-white/80 mb-2">${list.description}</p>` : ''}
-                                <div class="flex items-center gap-4 text-sm text-white/60">
-                                    <span>${list.books?.length || 0} books</span>
-                                    <span>Created ${new Date(list.createdAt?.toDate?.() || list.createdAt).toLocaleDateString()}</span>
-                                </div>
-                            </div>
-                            <div class="flex gap-2 ml-4">
-                                <button onclick="editList('${list.id}')" class="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded" title="Edit list">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                    </svg>
-                                </button>
-                                <button onclick="deleteListHandler('${list.id}')" class="p-2 text-white/60 hover:text-red-400 hover:bg-red-500/10 rounded" title="Delete list">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="flex gap-3">
-                            <a href="list.html?id=${list.id}" class="px-4 py-2 bg-forest-accent hover:bg-[#E0751C] text-white rounded-full text-sm font-medium transition-colors">
-                                View List
-                            </a>
-                            <button onclick="shareList('${list.id}')" class="px-4 py-2 border border-white/20 hover:bg-white/10 text-white rounded-full text-sm font-medium transition-colors">
-                                Share
-                            </button>
-                        </div>
-                    `;
-                    listsContainer.appendChild(listElement);
-                });
-            } catch (err) {
-                console.error('Error loading lists:', err);
-                listsContainer.innerHTML = '<p class="text-red-400 p-4">Error loading your lists. Please try again later.</p>';
-            }
-        }
+        // Load and display user's reading lists - using function defined later
 
         // Set up list management functions
         function setupListManagement() {
