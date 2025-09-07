@@ -53,4 +53,3 @@ echo Published to %CURR_BRANCH%. If Cloud Build trigger is configured, deploymen
 powershell -NoProfile -Command "Get-Content -Path '%LOG%' -Tail 20"
 pause
 endlocal
-
