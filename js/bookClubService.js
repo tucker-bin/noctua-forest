@@ -163,3 +163,108 @@ export function generateEmbedCode(pageId, pageName) {
     const pageUrl = `${window.location.origin}/club.html?id=${pageId}`;
     return `<iframe src="${pageUrl}" title="${pageName || 'Book Recommendations'}" width="100%" height="600" frameborder="0"></iframe>`;
 }
+
+// Book Club Members Management
+const BOOK_CLUB_MEMBERS_COLLECTION = 'bookClubMembers';
+
+/**
+ * Get all book clubs owned by a user
+ * @param {string} userId - Owner's user ID
+ * @returns {Promise<Array>} - Array of book clubs
+ */
+export async function getUserBookClubs(userId) {
+    const q = query(
+        collection(db, BOOK_CLUBS_COLLECTION),
+        where('ownerId', '==', userId),
+        orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+}
+
+/**
+ * Get members of a book club
+ * @param {string} clubId - Book club ID
+ * @returns {Promise<Array>} - Array of club members
+ */
+export async function getBookClubMembers(clubId) {
+    const q = query(
+        collection(db, BOOK_CLUB_MEMBERS_COLLECTION),
+        where('clubId', '==', clubId),
+        orderBy('joinedAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }));
+}
+
+/**
+ * Add a member to a book club
+ * @param {string} clubId - Book club ID
+ * @param {string} ownerId - Club owner's user ID
+ * @param {string} userEmail - New member's email
+ * @returns {Promise<string>} - ID of the membership record
+ */
+export async function addMemberToBookClub(clubId, ownerId, userEmail) {
+    // Check if user exists by email (this would need to be implemented with a cloud function in production)
+    // For now, we'll create a pending invitation
+    const membership = {
+        clubId,
+        ownerId,
+        userEmail: userEmail.toLowerCase(),
+        status: 'pending', // pending, active, declined
+        joinedAt: serverTimestamp(),
+        invitedAt: serverTimestamp()
+    };
+    
+    const docRef = await addDoc(collection(db, BOOK_CLUB_MEMBERS_COLLECTION), membership);
+    return docRef.id;
+}
+
+/**
+ * Remove a member from a book club
+ * @param {string} membershipId - Membership record ID
+ * @returns {Promise<void>}
+ */
+export async function removeMemberFromBookClub(membershipId) {
+    const docRef = doc(db, BOOK_CLUB_MEMBERS_COLLECTION, membershipId);
+    return deleteDoc(docRef);
+}
+
+/**
+ * Get total member count across all user's book clubs
+ * @param {string} userId - Owner's user ID
+ * @returns {Promise<number>} - Total member count
+ */
+export async function getTotalMemberCount(userId) {
+    const clubs = await getUserBookClubs(userId);
+    let totalMembers = 0;
+    
+    for (const club of clubs) {
+        const members = await getBookClubMembers(club.id);
+        totalMembers += members.filter(m => m.status === 'active').length;
+    }
+    
+    return totalMembers;
+}
+
+/**
+ * Update member status (accept/decline invitation)
+ * @param {string} membershipId - Membership record ID
+ * @param {string} status - New status (active, declined)
+ * @returns {Promise<void>}
+ */
+export async function updateMemberStatus(membershipId, status) {
+    const docRef = doc(db, BOOK_CLUB_MEMBERS_COLLECTION, membershipId);
+    return updateDoc(docRef, { 
+        status,
+        updatedAt: serverTimestamp()
+    });
+}

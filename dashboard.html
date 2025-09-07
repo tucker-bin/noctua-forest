@@ -101,16 +101,21 @@
                         </div>
                         <p id="reviewsCount" class="text-3xl font-bold text-white">0</p>
                     </div>
-                    <div id="membershipStatus" class="bg-forest-secondary rounded-lg p-6">
-                        <div class="flex items-center mb-2">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                            </svg>
-                            <h3 class="text-lg font-semibold text-white">Night Owl Status</h3>
+                    <div id="bookClubMembers" class="bg-forest-secondary rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <h3 class="text-lg font-semibold text-white">Book Club Members</h3>
+                            </div>
+                            <button id="manageMembers" class="text-sm text-forest-accent hover:text-white transition-colors">
+                                Manage
+                            </button>
                         </div>
                         <div class="space-y-2">
-                            <p id="membershipLevel" class="text-white/90">Active Night Owl</p>
-                            <p class="text-sm text-white/70">Earn commissions on book sales from your shared lists</p>
+                            <p id="memberCount" class="text-white/90">0 members</p>
+                            <p class="text-sm text-white/70">Members across all your book clubs</p>
                         </div>
                     </div>
                 </div>
@@ -205,9 +210,9 @@
             </div>
 
             <!-- List Edit Modal -->
-            <div id="listModal" class="hidden fixed inset-0 bg-black/60 items-center justify-center z-50">
+            <div id="listModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
                 <div class="bg-forest-card rounded-xl w-full max-w-lg mx-4 p-6">
-                    <h3 class="text-xl font-bold mb-4 text-white">Edit List</h3>
+                    <h3 id="listModalTitle" class="text-xl font-bold mb-4 text-white">Create List</h3>
                     <form id="listForm" class="space-y-4">
                         <div>
                             <label for="listName" class="block text-sm font-medium text-white/90 mb-1">List Name</label>
@@ -228,6 +233,47 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <!-- Book Club Members Management Modal -->
+            <div id="membersModal" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+                <div class="bg-forest-card rounded-xl w-full max-w-2xl mx-4 p-6 max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-white">Book Club Members</h3>
+                        <button id="closeMembersModal" class="text-white/60 hover:text-white">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Book Club Selection -->
+                    <div class="mb-6">
+                        <label for="clubSelect" class="block text-sm font-medium text-white/90 mb-2">Select Book Club</label>
+                        <select id="clubSelect" class="w-full px-4 py-2 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white">
+                            <option value="">Loading your book clubs...</option>
+                        </select>
+                    </div>
+
+                    <!-- Members List -->
+                    <div id="membersList" class="space-y-3">
+                        <div class="text-center py-8 text-white/60">
+                            Select a book club to view members
+                        </div>
+                    </div>
+
+                    <!-- Add Member Section -->
+                    <div id="addMemberSection" class="hidden mt-6 pt-6 border-t border-white/10">
+                        <h4 class="text-lg font-semibold text-white mb-4">Add New Member</h4>
+                        <div class="flex gap-3">
+                            <input type="email" id="memberEmail" placeholder="Enter member's email"
+                                class="flex-1 px-4 py-2 rounded-lg bg-[#3A4440] border border-[#7A8580] text-white placeholder-gray-400">
+                            <button id="addMemberBtn" class="px-4 py-2 bg-forest-accent text-white rounded-lg hover:opacity-90">
+                                Add Member
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -872,6 +918,10 @@
             createList, getUserLists, updateList, deleteList, shareList, getList 
         } from './js/readingListService.js';
         import { getCuratorAnalytics } from './js/analyticsService.js';
+        import { 
+            getUserBookClubs, getBookClubMembers, addMemberToBookClub, 
+            removeMemberFromBookClub, getTotalMemberCount 
+        } from './js/bookClubService.js';
         import { getNightOwlSalesStats } from './js/nightOwlService.js';
         import { app as firebaseApp, db as firebaseDb } from './firebase-config.js';
 
@@ -1077,6 +1127,152 @@
                 document.body.appendChild(dashboardSwitcher);
             }
 
+            // Book Club Members Management
+            const membersModal = document.getElementById('membersModal');
+            const clubSelect = document.getElementById('clubSelect');
+            const membersList = document.getElementById('membersList');
+            const addMemberSection = document.getElementById('addMemberSection');
+            let currentClubId = null;
+            let userBookClubs = [];
+
+            // Load book club member count
+            async function loadBookClubMemberCount() {
+                try {
+                    const totalMembers = await getTotalMemberCount(user.uid);
+                    document.getElementById('memberCount').textContent = `${totalMembers} member${totalMembers !== 1 ? 's' : ''}`;
+                } catch (err) {
+                    console.error('Failed to load member count:', err);
+                    document.getElementById('memberCount').textContent = '0 members';
+                }
+            }
+
+            // Load user's book clubs
+            async function loadUserBookClubs() {
+                try {
+                    userBookClubs = await getUserBookClubs(user.uid);
+                    
+                    clubSelect.innerHTML = '';
+                    if (userBookClubs.length === 0) {
+                        clubSelect.innerHTML = '<option value="">No book clubs found</option>';
+                        return;
+                    }
+                    
+                    clubSelect.innerHTML = '<option value="">Select a book club...</option>';
+                    userBookClubs.forEach(club => {
+                        const option = document.createElement('option');
+                        option.value = club.id;
+                        option.textContent = club.name || 'Unnamed Club';
+                        clubSelect.appendChild(option);
+                    });
+                } catch (err) {
+                    console.error('Failed to load book clubs:', err);
+                    clubSelect.innerHTML = '<option value="">Error loading book clubs</option>';
+                }
+            }
+
+            // Load members for selected club
+            async function loadClubMembers(clubId) {
+                if (!clubId) {
+                    membersList.innerHTML = '<div class="text-center py-8 text-white/60">Select a book club to view members</div>';
+                    addMemberSection.classList.add('hidden');
+                    return;
+                }
+
+                try {
+                    const members = await getBookClubMembers(clubId);
+                    
+                    if (members.length === 0) {
+                        membersList.innerHTML = '<div class="text-center py-8 text-white/60">No members yet. Add your first member below!</div>';
+                    } else {
+                        membersList.innerHTML = members.map(member => `
+                            <div class="flex items-center justify-between p-4 bg-[#3A4440] rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-forest-accent rounded-full flex items-center justify-center text-white font-semibold mr-3">
+                                        ${member.userEmail.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <div class="text-white font-medium">${member.userEmail}</div>
+                                        <div class="text-sm text-white/60">
+                                            ${member.status === 'pending' ? 'Invitation pending' : 'Active member'}
+                                            • Joined ${new Date(member.joinedAt?.toDate?.() || member.joinedAt).toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onclick="removeMember('${member.id}')" 
+                                    class="text-red-400 hover:text-red-300 text-sm px-3 py-1 rounded hover:bg-red-500/10 transition-colors">
+                                    Remove
+                                </button>
+                            </div>
+                        `).join('');
+                    }
+                    
+                    addMemberSection.classList.remove('hidden');
+                } catch (err) {
+                    console.error('Failed to load members:', err);
+                    membersList.innerHTML = '<div class="text-center py-8 text-red-400">Error loading members</div>';
+                }
+            }
+
+            // Event listeners for member management
+            document.getElementById('manageMembers').addEventListener('click', async () => {
+                await loadUserBookClubs();
+                membersModal.classList.remove('hidden');
+            });
+
+            document.getElementById('closeMembersModal').addEventListener('click', () => {
+                membersModal.classList.add('hidden');
+                currentClubId = null;
+            });
+
+            clubSelect.addEventListener('change', (e) => {
+                currentClubId = e.target.value;
+                loadClubMembers(currentClubId);
+            });
+
+            document.getElementById('addMemberBtn').addEventListener('click', async () => {
+                if (!currentClubId) {
+                    alert('Please select a book club first');
+                    return;
+                }
+
+                const email = document.getElementById('memberEmail').value.trim();
+                if (!email) {
+                    alert('Please enter an email address');
+                    return;
+                }
+
+                if (!email.includes('@')) {
+                    alert('Please enter a valid email address');
+                    return;
+                }
+
+                try {
+                    await addMemberToBookClub(currentClubId, user.uid, email);
+                    document.getElementById('memberEmail').value = '';
+                    await loadClubMembers(currentClubId);
+                    await loadBookClubMemberCount();
+                    alert('Member invitation sent successfully!');
+                } catch (err) {
+                    console.error('Failed to add member:', err);
+                    alert('Failed to add member. Please try again.');
+                }
+            });
+
+            // Global function for removing members
+            window.removeMember = async (membershipId) => {
+                if (!confirm('Are you sure you want to remove this member?')) return;
+
+                try {
+                    await removeMemberFromBookClub(membershipId);
+                    await loadClubMembers(currentClubId);
+                    await loadBookClubMemberCount();
+                    alert('Member removed successfully');
+                } catch (err) {
+                    console.error('Failed to remove member:', err);
+                    alert('Failed to remove member. Please try again.');
+                }
+            };
+
             // Load Night Owl stats
             try {
                 const nightOwlStats = await getNightOwlSalesStats(user.uid);
@@ -1230,6 +1426,7 @@
             document.getElementById('createList').addEventListener('click', () => {
                 currentListId = null;
                 listForm.reset();
+                document.getElementById('listModalTitle').textContent = 'Create List';
                 listModal.classList.remove('hidden');
                 listModal.classList.add('flex');
             });
@@ -1238,6 +1435,7 @@
                 btn.addEventListener('click', () => {
                     currentListId = null;
                     listForm.reset();
+                    document.getElementById('listModalTitle').textContent = 'Create List';
                     listModal.classList.remove('hidden');
                     listModal.classList.add('flex');
                 });
@@ -1333,6 +1531,7 @@
                     currentListId = listId;
                     document.getElementById('listName').value = list.name;
                     document.getElementById('listDescription').value = list.description || '';
+                    document.getElementById('listModalTitle').textContent = 'Edit List';
                     
                     listModal.classList.remove('hidden');
                     listModal.classList.add('flex');
@@ -1392,6 +1591,7 @@
 
             // Initial load
             loadLists();
+            loadBookClubMemberCount();
 
             // Load reviews
             const reviewsList = document.getElementById('reviewsList');
