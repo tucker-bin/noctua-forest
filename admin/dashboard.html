@@ -1059,7 +1059,7 @@
         };
         const n = (q||'').toLowerCase();
         const facets = { audience:[], tone:[], pace:[], domain:[], goal:[] };
-        Object.entries(dict).forEach(([k,list])=>{ list.forEach(w=>{ if(new RegExp(`(^|\\s)${w}(\\s|$)`).test(n)) facets[k].push(w); }); });
+        Object.entries(dict).forEach(([k,list])=>{ list.forEach(w=>{ const safe = String(w).replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'); if(new RegExp(`(^|\\s)${safe}(\\s|$)`).test(n)) facets[k].push(w); }); });
         const show=[]; if(facets.audience[0]) show.push(`for ${facets.audience[0]}`); if(facets.tone[0]) show.push(facets.tone[0]); if(facets.pace[0]) show.push(facets.pace[0]); if(facets.domain[0]) show.push(facets.domain[0]); if(facets.goal[0]) show.push(facets.goal[0]);
         if (!show.length) return '';
         return `<div>${show.slice(0,3).map(t=>`<span class=\"inline-block text-xs bg-gray-100 text-forest-text px-2 py-1 rounded mr-2 mb-2\">${t}</span>`).join('')}</div>`;
