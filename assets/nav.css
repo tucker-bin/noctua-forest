@@ -1,4 +1,4 @@
-/* Navigation supplemental styles */
+/* Navigation supplemental styles for Amazon PPC Agency */
 
 /* Desktop guard: ensure horizontal nav on md+ */
 @media (min-width: 768px) {
@@ -26,7 +26,6 @@
 .nav-overlay.active {
   display: block;
 }
-
 
 /* Basic nav layout to prevent oversized logo and broken alignment */
 .nav {
@@ -66,3 +65,29 @@
   }
 }
 
+/* Enhanced mobile menu animations */
+.nav-overlay {
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.nav-overlay.active {
+  opacity: 1;
+}
+
+#nav {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+#nav.mobile-nav-open {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Focus states for accessibility */
+.nav-link:focus,
+button:focus {
+  outline: 2px solid var(--color-forest-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

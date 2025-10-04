@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4A5450">
+    
+    <!-- SEO Meta Tags -->
+    <title>Educational Amazon PPC Services - Noctua Forest</title>
+    <meta name="description" content="Specialized Amazon PPC services for academic authors, educators, and children's educational toy sellers. Expert strategies for textbooks, STEM products, and educational materials.">
+    <meta name="keywords" content="Amazon PPC services, academic textbook marketing, educational toy advertising, STEM product promotion, university adoption campaigns">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Educational Amazon PPC Services - Noctua Forest">
+    <meta property="og:description" content="Specialized Amazon advertising services for educators and academic authors. Proven strategies for textbooks, educational toys, and STEM products.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://noctuaforest.com/services.html">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://noctuaforest.com/services.html">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="assets/tailwind.css" as="style">
+    <link rel="preload" href="assets/base-styles.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap" as="style">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/tailwind.css">
+    <link rel="stylesheet" href="assets/base-styles.css">
+    <link rel="stylesheet" href="assets/nav.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Poppins:wght@400;500;700&display=swap">
+    
+    <!-- Icons -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
+    <!-- Critical CSS -->
+    <style>
+        .service-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .price-highlight {
+            background: linear-gradient(135deg, #F58220 0%, #E0751C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .focus-visible:focus {
+            outline: 2px solid #F58220;
+            outline-offset: 2px;
+        }
+        
+        /* Loading states */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        /* Accessibility improvements */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+    
+    <!-- Schema Markup for Services -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Educational Amazon PPC Services",
+        "provider": {
+            "@type": "Organization",
+            "name": "Noctua Forest",
+            "url": "https://noctuaforest.com"
+        },
+        "description": "Specialized Amazon PPC management services for educators, academic authors, and educational product sellers",
+        "serviceType": "Digital Marketing",
+        "areaServed": "United States",
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Educational PPC Services",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Academic Author PPC Strategy",
+                        "description": "Specialized campaigns for textbooks and academic publications"
+                    },
+                    "price": "397",
+                    "priceCurrency": "USD"
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Educational Toy PPC Management",
+                        "description": "Compliance-focused campaigns for children's educational products"
+                    },
+                    "price": "597",
+                    "priceCurrency": "USD"
+                }
+            ]
+        }
+    }
+    </script>
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;">
+</head>
+<body class="text-gray-800 antialiased">
+    <!-- Skip to main content -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-accent text-white px-4 py-2 rounded-lg z-50">
+        Skip to main content
+    </a>
+
+    <!-- Navigation Overlay -->
+    <div id="navOverlay" class="nav-overlay" role="presentation" aria-hidden="true"></div>
+
+    <!-- Header -->
+    <header class="bg-[#fbebcc] sticky top-0 z-40 shadow-sm" role="banner">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <nav class="flex justify-between items-center" role="navigation" aria-label="Main navigation">
+                <a href="index.html" class="flex items-center space-x-3 focus-visible:focus" aria-label="Noctua Forest Home">
+                    <img src="images/logo.png" alt="Noctua Forest Logo" width="40" height="40" class="w-10 h-10" loading="eager">
+                    <span class="text-2xl font-bold text-forest-card" style="font-family: 'Poppins', sans-serif;">Noctua Forest</span>
+                </a>
+                
+                <div id="nav" class="hidden md:flex items-center space-x-8 text-lg" style="font-family: 'Noto Sans', sans-serif;">
+                    <a href="index.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium focus-visible:focus">Home</a>
+                    <a href="services.html" class="text-forest-accent font-medium" aria-current="page">Services</a>
+                    <a href="contact.html" class="nav-link hover:text-forest-accent transition-colors duration-300 font-medium focus-visible:focus">Contact</a>
+                </div>
+                
+                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 focus-visible:focus" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="nav">
+                    <svg class="w-6 h-6" fill="none" stroke="#4A5450" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main-content" role="main">
+        <!-- Page Header -->
+        <section class="py-16 bg-forest-card text-white" role="banner" aria-labelledby="page-title">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 id="page-title" class="text-4xl md:text-5xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">
+                    Educational Market PPC Services
+                </h1>
+                <p class="text-xl text-white/90 max-w-4xl mx-auto">
+                    Specialized Amazon advertising solutions for academic authors, educators, and children's educational product sellers.
+                </p>
+            </div>
+        </section>
+
+        <!-- Academic Authors Services -->
+        <section class="py-20 bg-white" role="region" aria-labelledby="academic-services-title">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <header class="text-center mb-16">
+                    <h2 id="academic-services-title" class="text-3xl md:text-4xl font-bold mb-6 text-forest-card" style="font-family: 'Poppins', sans-serif;">
+                        Academic Author Specialization
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        We understand the unique challenges of marketing academic content, from textbooks to scholarly publications.
+                    </p>
+                </header>
+
+                <div class="grid md:grid-cols-2 gap-12 mb-16" role="list">
+                    <article class="service-card bg-gray-50 rounded-xl p-8" role="listitem">
+                        <header class="mb-6">
+                            <h3 class="text-2xl font-bold mb-4 text-forest-card" style="font-family: 'Poppins', sans-serif;">
+                                Textbook Marketing Strategy
+                            </h3>
+                            <p class="text-gray-600">
+                                Comprehensive PPC strategy for academic textbooks targeting students, professors, and institutions.
+                            </p>
+                        </header>
+                        
+                        <ul class="space-y-3 text-gray-700 mb-8" role="list">
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Academic keyword research (course codes, subject terminology)</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>University adoption campaign strategies</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Semester-based timing optimization</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Professor vs. student targeting differentiation</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Academic conference season campaigns</span>
+                            </li>
+                        </ul>
+                        
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <div class="text-3xl font-bold price-highlight">$597</div>
+                                <p class="text-sm text-gray-500">Complete strategy + 3-month implementation</p>
+                            </div>
+                        </div>
+                        
+                        <a href="contact.html" 
+                           class="w-full bg-forest-accent hover:bg-[#E0751C] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 text-center block focus-visible:focus transform hover:-translate-y-1"
+                           aria-label="Get started with textbook marketing strategy">
+                            Get Started
+                        </a>
+                    </article>
+
+                    <article class="service-card bg-gray-50 rounded-xl p-8" role="listitem">
+                        <header class="mb-6">
+                            <h3 class="text-2xl font-bold mb-4 text-forest-card" style="font-family: 'Poppins', sans-serif;">
+                                Scholarly Publication Promotion
+                            </h3>
+                            <p class="text-gray-600">
+                                Specialized campaigns for research publications, academic monographs, and scholarly works.
+                            </p>
+                        </header>
+                        
+                        <ul class="space-y-3 text-gray-700 mb-8" role="list">
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Research community targeting</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Academic database keyword optimization</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Citation-driving campaign strategies</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Library acquisition targeting</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-forest-accent mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Academic reputation building</span>
+                            </li>
+                        </ul>
+                        
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <div class="text-3xl font-bold price-highlight">$397</div>
+                                <p class="text-sm text-gray-500">Strategy development + launch</p>
+                            </div>
+                        </div>
+                        
+                        <a href="contact.html" 
+                           class="w-full bg-forest-accent hover:bg-[#E0751C] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 text-center block focus-visible:focus transform hover:-translate-y-1"
+                           aria-label="Learn more about scholarly publication promotion">
+                            Learn More
+                        </a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- Educational Toys Services -->
+        <section class="py-20 bg-forest-card text-white" role="region" aria-labelledby="toys-services-title">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <header class="text-center mb-16">
+                    <h2 id="toys-services-title" class="text-3xl md:text-4xl font-bold mb-6" style="font-family: 'Poppins', sans-serif;">
+                        Children's Educational Product Expertise
+                    </h2>
+                    <p class="text-xl text-white/90 max-w-3xl mx-auto">
+                        Navigate complex compliance requirements while maximizing visibility for STEM toys, learning games, and educational materials.
+                    </p>
+                </header>
+
+                <div class="grid md:grid-cols-2 gap-12" role="list">
+                    <article class="service-card bg-forest-secondary rounded-xl p-8" role="listitem">
+                        <header class="mb-6">
+                            <h3 class="text-2xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">
+                                STEM Toy PPC Management
+                            </h3>
+                            <p class="text-white/90">
+                                Compliance-focused campaigns for science, technology, engineering, and math educational products.
+                            </p>
+                        </header>
+                        
+                        <ul class="space-y-3 text-white/90 mb-8" role="list">
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>COPPA-compliant advertising strategies</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Safety certification highlighting</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Parent vs. educator targeting</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Educational benefit messaging</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Age-appropriate keyword optimization</span>
+                            </li>
+                        </ul>
+                        
+                        <div class="mb-6">
+                            <div class="text-3xl font-bold text-[#F9A825] mb-2">$797</div>
+                            <p class="text-sm text-white/70">Monthly management + compliance monitoring</p>
+                        </div>
+                        
+                        <a href="contact.html" 
+                           class="w-full bg-forest-accent hover:bg-[#E0751C] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 text-center block focus-visible:focus transform hover:-translate-y-1"
+                           aria-label="Get started with STEM toy PPC management">
+                            Get Started
+                        </a>
+                    </article>
+
+                    <article class="service-card bg-forest-secondary rounded-xl p-8" role="listitem">
+                        <header class="mb-6">
+                            <h3 class="text-2xl font-bold mb-4" style="font-family: 'Poppins', sans-serif;">
+                                Learning Game Optimization
+                            </h3>
+                            <p class="text-white/90">
+                                Specialized strategies for educational games, puzzles, and interactive learning products.
+                            </p>
+                        </header>
+                        
+                        <ul class="space-y-3 text-white/90 mb-8" role="list">
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Developmental milestone targeting</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Educational outcome messaging</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Teacher recommendation campaigns</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Seasonal learning trend optimization</span>
+                            </li>
+                            <li class="flex items-start" role="listitem">
+                                <span class="text-[#F9A825] mr-2 font-bold" aria-hidden="true">✓</span>
+                                <span>Parent community targeting</span>
+                            </li>
+                        </ul>
+                        
+                        <div class="mb-6">
+                            <div class="text-3xl font-bold text-[#F9A825] mb-2">$597</div>
+                            <p class="text-sm text-white/70">Strategy + 6-month campaign management</p>
+                        </div>
+                        
+                        <a href="contact.html" 
+                           class="w-full bg-forest-accent hover:bg-[#E0751C] text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 text-center block focus-visible:focus transform hover:-translate-y-1"
+                           aria-label="Learn more about learning game optimization">
+                            Learn More
+                        </a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- K-12 Educator Services -->
+        <section class="py-20 bg-white" role="region" aria-labelledby="k12-services-title">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <header class="text-center mb-16">
+                    <h2 id="k12-services-title" class="text-3xl md:text-4xl font-bold mb-6 text-forest-card" style="font-family: 'Poppins', sans-serif;">
+                        K-12 Educator Resources
+                    </h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Specialized campaigns for classroom resources, teaching materials, and educational supplies.
+                    </p>
+                </header>
+
+                <div class="bg-gray-50 rounded-2xl p-8 md:p-12">
+                    <div class="grid md:grid-cols-3 gap-8 mb-12" role="list">
+                        <div class="text-center" role="listitem">
+                            <div class="w-16 h-16 bg-forest-accent rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold mb-2 text-forest-card">Classroom Resources</h3>
+                            <p class="text-gray-600 text-sm">Teaching aids, classroom decorations, and educational posters</p>
+                        </div>
+                        
+                        <div class="text-center" role="listitem">
+                            <div class="w-16 h-16 bg-forest-accent rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold mb-2 text-forest-card">STEM Supplies</h3>
+                            <p class="text-gray-600 text-sm">Science kits, math manipulatives, and engineering tools</p>
+                        </div>
+                        
+                        <div class="text-center" role="listitem">
+                            <div class="w-16 h-16 bg-forest-accent rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold mb-2 text-forest-card">Curriculum Materials</h3>
+                            <p class="text-gray-600 text-sm">Workbooks, activity guides, and supplemental learning materials</p>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <h4 class="text-xl font-bold mb-4 text-forest-card">K-12 Educator Package</h4>
+                        <p class="text-gray-600 mb-6">
+                            Comprehensive PPC strategy for classroom resources with teacher-focused targeting and bulk purchase optimization.
+                        </p>
+                        <div class="text-3xl font-bold price-highlight mb-2">$497</div>
+                        <p class="text-sm text-gray-500 mb-6">Strategy development + 4-month campaign management</p>
+                        <a href="contact.html" 
+                           class="bg-forest-accent hover:bg-[#E0751C] text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 focus-visible:focus transform hover:-translate-y-1"
+                           aria-label="Get started with K-12 educator package">
+                            Get Started
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Compliance & Expertise Section -->
+        <section class="py-20 bg-forest-card text-white" role="region" aria-labelledby="compliance-title">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <header class="text-center mb-16">
+                    <h2 id="compliance-title" class="text-3xl md:text-4xl font-bold mb-6" style="font-family: 'Poppins', sans-serif;">
+                        Educational Market Compliance Expertise
+                    </h2>
+                    <p class="text-xl text-white/90 max-w-3xl mx-auto">
+                        We navigate the complex regulatory landscape so you can focus on creating great educational content.
+                    </p>
+                </header>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8" role="list">
+                    <div class="text-center" role="listitem">
+                        <div class="w-16 h-16 bg-forest-accent rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">COPPA Compliance</h3>
+                        <p class="text-white/90 text-sm">Children's privacy protection in advertising campaigns</p>
+                    </div>
+                    
+                    <div class="text-center" role="listitem">
+                        <div class="w-16 h-16 bg-forest-accent rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Safety Standards</h3>
+                        <p class="text-white/90 text-sm">CPSC, ASTM, and international toy safety requirements</p>
+                    </div>
+                    
+                    <div class="text-center" role="listitem">
+                        <div class="w-16 h-16 bg-forest-accent rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Academic Standards</h3>
+                        <p class="text-white/90 text-sm">Common Core, NGSS, and state curriculum alignment</p>
+                    </div>
+                    
+                    <div class="text-center" role="listitem">
+                        <div class="w-16 h-16 bg-forest-accent rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2">Amazon Policies</h3>
+                        <p class="text-white/90 text-sm">Educational content and children's product policy expertise</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-16 bg-white" role="region" aria-labelledby="cta-title">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 id="cta-title" class="text-3xl font-bold mb-4 text-forest-card" style="font-family: 'Poppins', sans-serif;">
+                    Ready to Amplify Your Educational Impact?
+                </h2>
+                <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Choose the specialized service that fits your educational mission and start reaching more students, teachers, and parents.
+                </p>
+                <a href="contact.html" 
+                   class="bg-forest-accent hover:bg-[#E0751C] text-white font-bold py-4 px-8 rounded-full transition-all duration-300 text-lg focus-visible:focus transform hover:-translate-y-1 hover:shadow-xl"
+                   aria-label="Get your free educational market analysis">
+                    Get Your Free Educational Market Analysis
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="assets/nav.js" defer></script>
+    
+    <!-- Enhanced Services Page Functionality -->
+    <script>
+        class ServicesPageManager {
+            constructor() {
+                this.init();
+            }
+            
+            init() {
+                this.setupServiceCardInteractions();
+                this.setupPriceAnimations();
+                this.setupAccessibility();
+                this.setupAnalytics();
+            }
+            
+            setupServiceCardInteractions() {
+                const serviceCards = document.querySelectorAll('.service-card');
+                
+                serviceCards.forEach(card => {
+                    card.addEventListener('mouseenter', () => {
+                        card.style.transform = 'translateY(-8px)';
+                        card.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.25)';
+                    });
+                    
+                    card.addEventListener('mouseleave', () => {
+                        card.style.transform = 'translateY(0)';
+                        card.style.boxShadow = '';
+                    });
+                });
+            }
+            
+            setupPriceAnimations() {
+                // Animate price highlights on scroll
+                if ('IntersectionObserver' in window) {
+                    const priceObserver = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.style.animation = 'pulse 2s ease-in-out';
+                            }
+                        });
+                    }, { threshold: 0.5 });
+                    
+                    document.querySelectorAll('.price-highlight').forEach(price => {
+                        priceObserver.observe(price);
+                    });
+                }
+            }
+            
+            setupAccessibility() {
+                // Enhanced keyboard navigation for service cards
+                const serviceLinks = document.querySelectorAll('.service-card a');
+                
+                serviceLinks.forEach(link => {
+                    link.addEventListener('focus', () => {
+                        const card = link.closest('.service-card');
+                        if (card) {
+                            card.style.transform = 'translateY(-4px)';
+                            card.style.outline = '2px solid #F58220';
+                            card.style.outlineOffset = '4px';
+                        }
+                    });
+                    
+                    link.addEventListener('blur', () => {
+                        const card = link.closest('.service-card');
+                        if (card) {
+                            card.style.transform = '';
+                            card.style.outline = '';
+                            card.style.outlineOffset = '';
+                        }
+                    });
+                });
+            }
+            
+            setupAnalytics() {
+                // Track service interest
+                const serviceLinks = document.querySelectorAll('a[href="contact.html"]');
+                
+                serviceLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        const serviceName = link.closest('article')?.querySelector('h3')?.textContent || 'Unknown Service';
+                        
+                        // Analytics tracking (replace with your analytics service)
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'service_interest', {
+                                'service_name': serviceName,
+                                'event_category': 'engagement',
+                                'event_label': 'Services Page'
+                            });
+                        }
+                        
+                        console.log('Service interest tracked:', serviceName);
+                    });
+                });
+            }
+        }
+        
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => new ServicesPageManager());
+        } else {
+            new ServicesPageManager();
+        }
+        
+        // Add pulse animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

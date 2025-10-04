@@ -2,9 +2,8 @@
 module.exports = {
   content: [
     './*.html',
-    './components/**/*.js',
     './js/**/*.js',
-    './server/**/*.js'
+    './assets/**/*.js'
   ],
   theme: {
     extend: {
@@ -18,8 +17,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Noto Sans', 'sans-serif'],
         heading: ['Poppins', 'serif'],
+        display: ['Poppins', 'sans-serif'],
       },
     },
   },

@@ -24,19 +24,19 @@ if %errorlevel%==0 (
 REM Start local server
 if %PYTHON_FOUND%==0 (
     echo Starting local server on http://localhost:8080
+    echo Opening Amazon PPC Agency site...
     if defined CHROME_PATH (
-        start "" "%CHROME_PATH%" --incognito "http://localhost:8080/welcome.html"
+        start "" "%CHROME_PATH%" --incognito "http://localhost:8080/index.html"
     ) else (
-        start "" http://localhost:8080/welcome.html
+        start "" http://localhost:8080/index.html
     )
     python -m http.server 8080
 ) else (
-    echo Python not found. Opening welcome.html directly.
+    echo Python not found. Opening index.html directly.
     if defined CHROME_PATH (
-        start "" "%CHROME_PATH%" --incognito "welcome.html"
+        start "" "%CHROME_PATH%" --incognito "index.html"
     ) else (
-        start "" welcome.html
+        start "" index.html
     )
 )
 endlocal
-
