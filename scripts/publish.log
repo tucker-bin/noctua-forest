@@ -1,4 +1,4 @@
-==== NOCTUA FOREST PPC AGENCY PUBLISH Sun 10/05/2025 12:54:55.63 ==== 
+==== NOCTUA FOREST PPC AGENCY PUBLISH Sun 10/05/2025 13:02:37.38 ==== 
 Deploying Amazon PPC Agency transformation... 
 true
 https://github.com/tucker-bin/my-ryhme-app.git
@@ -9,20 +9,6 @@ Force mode: with FULL FORCE (overwrites remote)
 Message: Update site 
 ============================================ 
 Staging all changes for deployment... 
- M .firebaserc
- M .gitignore
- D FIREBASE_SETUP.md
- M firebase.json
- D js/config/AppConfig.js
- D js/utils/ErrorHandler.js
- D js/utils/PerformanceMonitor.js
- D package.json
- D postcss.config.cjs
- D scripts/README.md
- D scripts/cleanup-cloud-run.bat
- D scripts/deploy-firebase.bat
- D scripts/deploy.bat
  M scripts/publish.bat
  M scripts/publish.log
- D src/styles/input.css
- D tailwind.config.js
+?? .firebase/
