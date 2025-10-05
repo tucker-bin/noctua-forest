@@ -1,4 +1,4 @@
-==== NOCTUA FOREST PPC AGENCY PUBLISH Sun 10/05/2025 13:11:30.50 ==== 
+==== NOCTUA FOREST PPC AGENCY PUBLISH Sun 10/05/2025 13:12:29.26 ==== 
 Deploying Amazon PPC Agency transformation... 
 true
 https://github.com/tucker-bin/my-ryhme-app.git
@@ -9,6 +9,4 @@ Force mode: with FULL FORCE (overwrites remote)
 Message: Update site 
 ============================================ 
 Staging all changes for deployment... 
- D firebase.json
- M scripts/publish.bat
  M scripts/publish.log
