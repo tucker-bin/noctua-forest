@@ -1,22 +1,3 @@
-# Dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Build outputs
-dist/
-build/
-*.tgz
-*.tar.gz
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
 # IDE files
 .vscode/
 .idea/
@@ -54,7 +35,3 @@ temp/
 # Old website data (in case it gets recreated)
 old\ website\ data/
 old-website-data/
-
-# Build artifacts
-assets/tailwind.css.map
-src/styles/*.map

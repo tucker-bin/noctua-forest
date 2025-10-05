@@ -30,20 +30,13 @@ git remote get-url origin >> "%LOG%" 2>&1 || (
 )
 
 REM Check for force push options
-set FORCE=--force-with-lease
-set FORCE_MSG=with lease protection
-if /i "%1"=="--force" (
-  set FORCE=--force
-  set FORCE_MSG=with FULL FORCE ^(overwrites remote^)
-  shift
-) else if /i "%1"=="--no-force" (
-  set FORCE=
-  set FORCE_MSG=without force
-  shift
-)
+REM Always use force to ensure deployment overwrites old data
+set FORCE=--force
+set FORCE_MSG=with FULL FORCE ^(overwrites remote^)
 
+REM Allow custom message, but default to simple update
 set msg=%*
-if "%msg%"=="" set msg=🚀 MAJOR: Transform to Amazon PPC Agency for Educators - Complete platform migration
+if "%msg%"=="" set msg=Update site
 
 echo ============================================ >> "%LOG%"
 echo TRANSFORMATION DEPLOYMENT >> "%LOG%"
@@ -87,25 +80,55 @@ set PUSH_RESULT=%errorlevel%
 
 if %PUSH_RESULT%==0 (
   echo ============================================ >> "%LOG%"
-  echo ✅ DEPLOYMENT SUCCESSFUL >> "%LOG%"
-  echo Amazon PPC Agency site is now live! >> "%LOG%"
+  echo ✅ GITHUB PUSH SUCCESSFUL >> "%LOG%"
+  echo Now deploying to Firebase... >> "%LOG%"
   echo ============================================ >> "%LOG%"
   
   echo.
-echo ✅ SUCCESS: Amazon PPC Agency pushed to GitHub!
-echo.
-echo 🎯 Git Push Complete:
-echo    • Old book platform data overwritten
-echo    • New PPC agency code is in repository
-echo    • Educational market specialization active
-echo.
-echo 🚀 Next Steps:
-echo    • Deploy to Firebase: scripts\deploy-firebase.bat
-echo    • Or wait for CI/CD if configured
-echo.
+  echo ✅ SUCCESS: Pushed to GitHub!
+  echo.
+  echo 🚀 Now deploying to Firebase Hosting...
+  echo.
+  
+  REM Deploy to Firebase
+  firebase deploy --only hosting --non-interactive >> "%LOG%" 2>&1
+  set FIREBASE_RESULT=%errorlevel%
+  
+  if !FIREBASE_RESULT!==0 (
+    echo ============================================ >> "%LOG%"
+    echo ✅ FIREBASE DEPLOYMENT SUCCESSFUL >> "%LOG%"
+    echo Amazon PPC Agency is now LIVE! >> "%LOG%"
+    echo ============================================ >> "%LOG%"
+    
+    echo.
+    echo 🎉 COMPLETE SUCCESS!
+    echo.
+    echo ✅ GitHub: Updated
+    echo ✅ Firebase: Deployed
+    echo 🌐 Your Amazon PPC Agency is now live!
+    echo.
+    echo 🔗 Site URL: https://noctua-forest-ppc.web.app
+    echo 📊 Manage: https://console.firebase.google.com
+    echo.
+  ) else (
+    echo ============================================ >> "%LOG%"
+    echo ❌ FIREBASE DEPLOYMENT FAILED >> "%LOG%"
+    echo ============================================ >> "%LOG%"
+    
+    echo.
+    echo ⚠️ GitHub updated but Firebase deploy failed
+    echo.
+    echo Manual Firebase deploy:
+    echo   firebase deploy --only hosting
+    echo.
+    echo Or check if Firebase CLI is installed:
+    echo   npm install -g firebase-tools
+    echo   firebase login
+    echo.
+  )
 ) else (
   echo ============================================ >> "%LOG%"
-  echo ❌ DEPLOYMENT FAILED >> "%LOG%"
+  echo ❌ GITHUB PUSH FAILED >> "%LOG%"
   echo ============================================ >> "%LOG%"
   
   echo.
@@ -113,8 +136,8 @@ echo.
   echo.
   powershell -NoProfile -Command "Get-Content -Path '%LOG%' -Tail 30"
   echo.
-  echo 💡 If you need to force overwrite the remote:
-  echo    Run: scripts\publish.bat --force "Force deploy PPC agency"
+  echo The script uses --force to overwrite remote changes.
+  echo Check the log above for specific error details.
   echo.
   pause
   exit /b 1
