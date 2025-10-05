@@ -1,148 +1,120 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 cd /d "%~dp0.."
 
-set LOG=%CD%\scripts\publish.log
-echo ==== NOCTUA FOREST PPC AGENCY PUBLISH %DATE% %TIME% ==== > "%LOG%"
-echo Deploying Amazon PPC Agency transformation... >> "%LOG%"
+echo ============================================
+echo NOCTUA FOREST PPC AGENCY - DEPLOYMENT
+echo ============================================
+echo.
 
-REM Ensure this working directory is marked safe to avoid 'dubious ownership'
-git config --global --add safe.directory "%CD%" >> "%LOG%" 2>&1
-
-git rev-parse --is-inside-work-tree >> "%LOG%" 2>&1 || (
-  echo Not a git repository. Initialize and add a remote first. >> "%LOG%"
-  echo Example: git init ^&^& git remote add origin ^<your_repo_url^> >> "%LOG%"
-  echo ERROR: Not a git repository. See scripts\publish.log for details.
-  pause
-  exit /b 1
-)
-
-for /f %%b in ('git rev-parse --abbrev-ref HEAD 2^>nul') do set CURR_BRANCH=%%b
-if "%CURR_BRANCH%"=="" set CURR_BRANCH=main
-if /i "%CURR_BRANCH%"=="HEAD" set CURR_BRANCH=main
-
-git remote get-url origin >> "%LOG%" 2>&1 || (
-  echo No remote named "origin". Configure it with: >> "%LOG%"
-  echo   git remote add origin ^<your_repo_url^> >> "%LOG%"
-  echo ERROR: Missing origin remote. See scripts\publish.log for details.
-  pause
-  exit /b 1
-)
-
-REM Check for force push options
-REM Always use force to ensure deployment overwrites old data
-set FORCE=--force
-set FORCE_MSG=with FULL FORCE ^(overwrites remote^)
-
-REM Allow custom message, but default to simple update
+REM Simple message handling
 set msg=%*
-if "%msg%"=="" set msg=Update site
+if "%msg%"=="" set msg=Update Amazon PPC Agency site
 
-echo ============================================ >> "%LOG%"
-echo TRANSFORMATION DEPLOYMENT >> "%LOG%"
-echo Branch: %CURR_BRANCH% >> "%LOG%"
-echo Force mode: %FORCE_MSG% >> "%LOG%"
-echo Message: %msg% >> "%LOG%"
-echo ============================================ >> "%LOG%"
+echo Deploying: %msg%
+echo.
 
-REM Show what's being deployed
-echo Staging all changes for deployment... >> "%LOG%"
-git status --porcelain >> "%LOG%" 2>&1
-
-REM Add all changes including deletions
-git add -A >> "%LOG%" 2>&1
+REM Check if we're in a git repository
+git status >nul 2>&1
 if not %errorlevel%==0 (
-  echo ERROR: Failed to stage changes. >> "%LOG%"
-  echo Failed to stage changes. See scripts\publish.log for details.
-  pause
-  exit /b 1
+    echo ERROR: Not in a git repository
+    echo.
+    echo To fix:
+    echo   git init
+    echo   git remote add origin https://github.com/tucker-bin/my-rhyme-app.git
+    echo.
+    pause
+    exit /b 1
 )
 
-REM Create commit with transformation details
-git commit -m "%msg%" >> "%LOG%" 2>&1
+echo Git repository: OK
+echo.
+
+REM Check remote
+git remote get-url origin >nul 2>&1
+if not %errorlevel%==0 (
+    echo ERROR: No remote origin configured
+    echo.
+    echo To fix:
+    echo   git remote add origin https://github.com/tucker-bin/my-rhyme-app.git
+    echo.
+    pause
+    exit /b 1
+)
+
+echo Remote origin: OK
+echo.
+
+REM Stage all changes
+echo Staging changes...
+git add -A
+if not %errorlevel%==0 (
+    echo ERROR: Failed to stage changes
+    pause
+    exit /b 1
+)
+
+echo Staging: OK
+echo.
+
+REM Commit changes
+echo Creating commit...
+git commit -m "%msg%"
 set COMMIT_RESULT=%errorlevel%
 
 if %COMMIT_RESULT%==0 (
-  echo Commit created successfully. >> "%LOG%"
+    echo Commit: OK
 ) else (
-  echo No changes to commit or commit failed. >> "%LOG%"
-  git status >> "%LOG%" 2>&1
+    echo No changes to commit (this is fine)
 )
+echo.
 
-REM Push with appropriate force level
-echo ============================================ >> "%LOG%"
-echo PUSHING TO GITHUB %FORCE_MSG% >> "%LOG%"
-echo This will overwrite the old book platform data >> "%LOG%"
-echo ============================================ >> "%LOG%"
+REM Push with force
+echo Pushing to GitHub with force...
+echo This will overwrite any remote changes.
+echo.
 
-git push -u origin %CURR_BRANCH% %FORCE% >> "%LOG%" 2>&1
+git push -u origin main --force
 set PUSH_RESULT=%errorlevel%
 
+echo.
 if %PUSH_RESULT%==0 (
-  echo ============================================ >> "%LOG%"
-  echo ✅ GITHUB PUSH SUCCESSFUL >> "%LOG%"
-  echo Now deploying to Firebase... >> "%LOG%"
-  echo ============================================ >> "%LOG%"
-  
-  echo.
-  echo ✅ SUCCESS: Pushed to GitHub!
-  echo.
-  echo 🚀 Now deploying to Firebase Hosting...
-  echo.
-  
-  echo ============================================ >> "%LOG%"
-  echo ✅ DEPLOYMENT TO GITHUB PAGES SUCCESSFUL >> "%LOG%"
-  echo Amazon PPC Agency is now LIVE! >> "%LOG%"
-  echo ============================================ >> "%LOG%"
-  
-  echo.
-  echo 🎉 DEPLOYMENT SUCCESS!
-  echo.
-  echo ✅ GitHub: Updated and Live
-  echo 🌐 Your Amazon PPC Agency is now live!
-  echo.
-  echo 🔗 Site URL: https://tucker-bin.github.io/my-rhyme-app
-  echo 📊 Manage: https://github.com/tucker-bin/my-rhyme-app/settings/pages
-  echo.
-  echo 💡 To set up GitHub Pages (one-time):
-  echo    1. Go to your GitHub repository
-  echo    2. Settings → Pages
-  echo    3. Source: Deploy from branch
-  echo    4. Branch: main
-  echo    5. Folder: / (root)
-  echo.
-  echo Your site will be live in 2-3 minutes!
-  echo.
-  echo Press any key to close...
-  pause >nul
+    echo ============================================
+    echo SUCCESS: DEPLOYED TO GITHUB!
+    echo ============================================
+    echo.
+    echo Your Amazon PPC Agency has been deployed!
+    echo.
+    echo Live site: https://tucker-bin.github.io/my-rhyme-app
+    echo Repository: https://github.com/tucker-bin/my-rhyme-app
+    echo.
+    echo Set up GitHub Pages (one-time):
+    echo 1. Go to: https://github.com/tucker-bin/my-rhyme-app/settings/pages
+    echo 2. Source: Deploy from a branch
+    echo 3. Branch: main
+    echo 4. Folder: / (root)
+    echo 5. Save
+    echo.
+    echo Your site will be live in 2-3 minutes!
+    echo.
 ) else (
-  echo ============================================ >> "%LOG%"
-  echo ❌ GITHUB PUSH FAILED >> "%LOG%"
-  echo ============================================ >> "%LOG%"
-  
-  echo.
-  echo ❌ PUSH FAILED - See details below:
-  echo.
-  powershell -NoProfile -Command "Get-Content -Path '%LOG%' -Tail 30"
-  echo.
-  echo The script uses --force to overwrite remote changes.
-  echo Check the log above for specific error details.
-  echo.
-  echo Common GitHub issues:
-  echo 1. No remote origin configured
-  echo 2. Authentication problems
-  echo 3. Repository doesn't exist
-  echo.
-  echo Press any key to continue...
-  pause >nul
-  exit /b 1
+    echo ============================================
+    echo ERROR: DEPLOYMENT FAILED
+    echo ============================================
+    echo.
+    echo Push to GitHub failed.
+    echo.
+    echo Common fixes:
+    echo 1. Check internet connection
+    echo 2. Verify GitHub authentication: git config --list
+    echo 3. Check remote URL: git remote -v
+    echo.
+    echo Manual commands to try:
+    echo   git remote -v
+    echo   git push -u origin main --force
+    echo.
 )
 
-REM Show recent log entries
-echo.
-echo Recent deployment log:
-powershell -NoProfile -Command "Get-Content -Path '%LOG%' -Tail 15"
-echo.
 echo Press any key to close...
 pause >nul
 endlocal

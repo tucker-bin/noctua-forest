@@ -10,3 +10,14 @@ Message: Update site
 ============================================ 
 Staging all changes for deployment... 
  M scripts/publish.log
+warning: in the working copy of 'scripts/publish.log', LF will be replaced by CRLF the next time Git touches it
+[main a148347] Update site
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+Commit created successfully. 
+============================================ 
+PUSHING TO GITHUB with FULL FORCE (overwrites remote) 
+This will overwrite the old book platform data 
+============================================ 
+branch 'main' set up to track 'origin/main'.
+To https://github.com/tucker-bin/my-ryhme-app.git
+   bb6a10f..a148347  main -> main
