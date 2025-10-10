@@ -36,7 +36,7 @@ if not %errorlevel%==0 (
     echo ERROR: No remote origin configured
     echo.
     echo To fix:
-    echo   git remote add origin https://github.com/tucker-bin/my-rhyme-app.git
+    echo   git remote add origin https://github.com/tucker-bin/noctua-forest.git
     echo.
     pause
     exit /b 1
@@ -85,11 +85,11 @@ if %PUSH_RESULT%==0 (
     echo.
     echo Your Amazon PPC Agency has been deployed!
     echo.
-    echo Live site: https://tucker-bin.github.io/my-rhyme-app
-    echo Repository: https://github.com/tucker-bin/my-rhyme-app
+    echo Live site: https://tucker-bin.github.io/noctua-forest
+    echo Repository: https://github.com/tucker-bin/noctua-forest
     echo.
     echo Set up GitHub Pages (one-time):
-    echo 1. Go to: https://github.com/tucker-bin/my-rhyme-app/settings/pages
+    echo 1. Go to: https://github.com/tucker-bin/noctua-forest/settings/pages
     echo 2. Source: Deploy from a branch
     echo 3. Branch: main
     echo 4. Folder: / (root)
