@@ -21,7 +21,7 @@ if not %errorlevel%==0 (
     echo.
     echo To fix:
     echo   git init
-    echo   git remote add origin https://github.com/tucker-bin/my-rhyme-app.git
+    echo   git remote add origin https://github.com/tucker-bin/noctua-forest.git
     echo.
     pause
     exit /b 1
@@ -44,6 +44,9 @@ if not %errorlevel%==0 (
 
 echo Remote origin: OK
 echo.
+
+REM Create CNAME file to ensure custom domain setting is not erased
+echo www.noctuaforest.com > CNAME
 
 REM Stage all changes
 echo Staging changes...
@@ -85,15 +88,8 @@ if %PUSH_RESULT%==0 (
     echo.
     echo Your Amazon PPC Agency has been deployed!
     echo.
-    echo Live site: https://tucker-bin.github.io/noctua-forest
+    echo Live site: https://www.noctuaforest.com
     echo Repository: https://github.com/tucker-bin/noctua-forest
-    echo.
-    echo Set up GitHub Pages (one-time):
-    echo 1. Go to: https://github.com/tucker-bin/noctua-forest/settings/pages
-    echo 2. Source: Deploy from a branch
-    echo 3. Branch: main
-    echo 4. Folder: / (root)
-    echo 5. Save
     echo.
     echo Your site will be live in 2-3 minutes!
     echo.
